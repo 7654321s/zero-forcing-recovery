@@ -1,0 +1,4025 @@
+[
+  {
+    "theorem": "FaultObservationResearch.mem_synchronousStep",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.subset_synchronousStep",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.synchronousStep_mono",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.synchronousStep_full",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.colorAfter_zero",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.colorAfter_subset_succ",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.colorAfter_mono_time",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.colorAfter_mono_blue",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.colorAfter_full",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.FinishesBy_mono_time",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.FinishesBy_mono_blue",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.IsForcing_mono",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.colorAfter_add",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.colorAfter_of_fixed",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.FinishesBy_of_stable",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.card_colorAfter_strict_of_unfinished",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.IsForcing_finishes_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.IsForcing_iff_card_deadline",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.IsMinimumKilling_iff_card_minimum",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.completionTime_le_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.completionTime_eq_top_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.mem_allowedLosses",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.empty_mem_allowedLosses",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.worstTime_le_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.enat_eq_iff_finite_deadlines",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.everyMinimumSupport_iff_worstTime",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.coronaAdj_symmetric",
+    "axioms": []
+  },
+  {
+    "theorem": "FaultObservationResearch.coronaAdj_irreflexive",
+    "axioms": []
+  },
+  {
+    "theorem": "FaultObservationResearch.coronaLeaf_injective",
+    "axioms": [
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafSparse_mono",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leaf_not_step_of_two_white",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.two_white_leaves_stay_white",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_forcing_implies_sparse",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.sparse_exists_blue_leaf",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.core_mem_step_of_blue_leaf",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leaf_mem_step_of_cores_blue",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_finishes_two_of_sparse",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_forcing_iff_sparse",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_forcing_iff_two_rounds",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_single_loss_forcing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_pair_trace_kills",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_minimum_support_is_trace",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_minimum_support_card_le_two",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_minimum_two_all_leaves_blue",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.robustBy_zero_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_erased_leaf_not_one_complete",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_full_single_loss_finishes_one",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_complete_every_minimum_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_erased_leaf_not_one_white_center",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_nonadjacent_restricted_one_round",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_not_support_of_nonadjacent",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafy_every_minimum_support_iff_complete",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafyCoreTarget_proved",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.mem_relabelColors",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.relabelColors_card",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.relabelColors_symm",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.relabelColors_apply_symm",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.relabelColors_subset_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.relabelColors_sdiff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.relabelColors_univ",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.synchronousStep_relabel",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.colorAfter_relabel",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.FinishesBy_relabel_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.IsForcing_relabel_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.IsMinimumKilling_relabel_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.RobustBy_relabel_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.EveryMinimumSupport_transfer",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.EveryMinimumSupport_relabel_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.completionTime_relabel",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.worstTime_relabel",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.EveryMinimumSupport_iso_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.canonical_star_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.canonical_doubleStar_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.InTreeCandidateClass_iso_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.support_of_star_iso",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.support_of_doubleStar_iso",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.FullTreeClassificationTarget_iso_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_exists_leaf_ne",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.rootClosed_all_of_leaves",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.colorAfter_eq_from_plateau",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.colorAfter_stabilizes_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.rootClosed_of_stable",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.rooted_leaves_finish_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.rooted_leaves_forcing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.rooted_colorAfter_embeds",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.rooted_leaf_embedding_colors_image",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.rootInactive_colorAfter_subset",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.rooted_leaves_finish_card_ordinary",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.rooted_leaves_forcing_ordinary",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.allLeavesBlue_sdiff_sparse",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.sparse_exists_blue_leaf_local",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.corona_finishes_two_of_leaf_witnesses",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.corona_leaf_not_step_of_core_white",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.broom_all_leaves_blue",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.broom_short_ne_long",
+    "axioms": [
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.fin_two_vertex_cases",
+    "axioms": [
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.broom_loss_sparse",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.broom_loss_two_of_short_retained",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.broom_single_loss_three",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.broom_short_loss_not_two",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.broom_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.doubleStar_one_leaf_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.not_support_of_one_leaf_doubleStar_iso",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.computedSynchronousStep_eq",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.computedColorAfter_eq",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.computedFinishesBy_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.computedMinimumKilling_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.computedRobustBy_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.FinishesBy_min_card_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.RobustBy_min_card_deadline_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.computedEveryMinimumSupport_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.fourPath_computed_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.fourPath_every_minimum_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.coronaAdj_relabel_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.doubleStar_support_swap_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.doubleStar_other_one_leaf_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.fin_four_vertex_cases",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathGraph_four_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.doubleStar_one_one_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.doubleStarTarget_proved",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.doubleStar_support_iff_of_iso",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.force_target_mem_of_fixed",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathReverseEquiv_symm_zero",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_fixed_of_zero",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_fixed_of_last",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_fixed_of_pair",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.hasPathSeed_mono",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_forcing_of_seed",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_no_seed_step_eq",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_no_seed_not_forcing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_forcing_iff_seed",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_nonforcing_sdiff_iff_hits_seeds",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_minimum_killing_iff_minimum_seed_hit",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.robustBy_iff_of_minimum_card_le_one",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.everyMinimumSupport_of_card_le_two",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_small_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.IsForcing_finishes_unblue",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.full_blue_loss_finishes_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.full_blue_robust_by_budget",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathPrefix_self",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathPrefix_trans",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathPrefix_erase_max",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.exists_pathPrefix_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathPrefix_last_not_mem",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_max_loss_mem_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_prefix_step_subset",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_prefix_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_prefix_finishes_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_full_blue_restricted_robust_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_full_blue_robust_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_full_blue_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_min_white_mem_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_gap_blue_neighbor_white",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_gap_step_subset",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_gap_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.erasePathExtremes_subset",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathWhiteGap_erase_extremes",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.erasePathExtremes_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_gap_finishes_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_gap_deadline_lower_bound",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathWhiteGap_of_seed_hit_interval",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_interval_deadline_lower_bound",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_gap_zero_step_subset",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_gap_zero_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathWhiteGap_erase_max",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_gap_zero_persists_or_empty",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_gap_one_sided_finishes_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_gap_one_sided_deadline_lower_bound",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_interval_end_deadline_lower_bound",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathIntervalWhites_antitone",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathLeftReady_mono",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathRightReady_mono",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_interval_min_mem_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_interval_max_mem_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_interval_next_whites_subset_erase_max",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_interval_next_whites_subset_erase_extremes",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_interval_one_sided_upper",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_interval_two_sided_upper",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.minimumKilling_hits_forcing_subset",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.disjoint_cells_selection_injective",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.exists_injective_cell_pick",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.disjoint_cells_hitting_card_le",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.exists_exact_cell_selector",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.minimumKilling_card_eq_disjoint_forcing_cells",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.minimumKilling_exact_cell_selector",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.exact_cell_selection_subfamily_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.damaged_disjoint_cells_card_le_loss",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathCellBefore_disjoint",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathPairCoverPacking_cell_subset",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.exists_path_pair_cover_packing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathForcingUnit_forcing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.exists_path_seed_packing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathSeedPacking_disjoint",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathSeedPacking_every_minimum_selector",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_range_extend_to_budget",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_white_interval_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_loss_interval_card_le_support_window",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathWhiteGap_reverse",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_gap_right_deadline_lower_bound",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_interval_suffix_deadline_lower_bound",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathIntervalWhites_reverse",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathLeftReady_reverse",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_interval_left_sided_upper",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_zero_left_ready",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_last_right_ready",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_pair_ready",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathForcingUnit_ready_around_white",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.exists_path_left_guard",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.exists_path_right_guard",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_guard_interval_support_card_le_loss",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_guard_whites_inside",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_guards_have_ready_side",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_support_window_deadline_bounds",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_loss_white_inclusion_card_le",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_support_from_seed_packing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_every_minimum_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_every_minimum_support_time",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.canonical_path_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.support_of_path_iso",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.candidateClass_every_minimum_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.colorAfter_embeds_with_blue_exterior",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.forcing_embedding_with_blue_exterior_colors_image",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.forcing_of_embedding_and_blue_complement",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.IsForcing_of_forcing_colorAfter",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_armA_colors",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_armB_colors",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_core_colors_active",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_core_colors_inactive",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_heads_in_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_forcing_of_core_and_head",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_mem_initial_core",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_mem_initial_A",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_mem_initial_B",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_heads_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_heads_subset",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_singleton_loss_forcing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_initial_forcing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_only_core_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_heads_kill",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_heads_minimum_killing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_zero_finishes_n",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.path_last_finishes_n",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_armA_by_path_deadline",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_armB_by_path_deadline",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_delayed_arm_speed_limits",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_delayed_completion_lower",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_finish_of_core_and_B_last",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_delayed_completion_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_core_neighbors_from_core_blue",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_heads_step_of_blue_neighbors",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_leaf_A_is_last",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_leaf_B_is_last",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_leaves_in_core_and_ends",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_nested_heads_minimum",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_colorAfter_commute",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_finishesBy_commute",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoCenter_initial_eq_nested",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoCenter_inner_A_from_last",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoCenter_inner_B_from_last",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoCenter_head_support_minimum",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoCenter_restricted_head_deadline",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoCenter_remote_terminal_loss_lower",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoCenter_strict_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.bridgeJoin_isTree",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendantGraph_isTree",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoCenterGraph_isTree",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoCenter_strict_tree_witness",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_empty_A_white_root_speed",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPendant_empty_A_white_root_completion_lower",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_initial_eq_nested",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_short_u_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_short_v_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_core_off_center_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_core_with_heads_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_u_blue_one",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_core_blue_two",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_u_heads_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_long_u_from_first",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_finish_of_core_heads",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_all_single_loss_deadline",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_restricted_head_deadline",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_head_support_minimum",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_remote_head_loss_lower",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_nonadjacent_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.equal_nonadjacent_tree_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_arm_second_le_sum",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_arm_sum_eq_second_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_arm_strict_or_matching",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_arm_sum_eq_one_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_arm_all_positive_cases",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_core_split",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_graph_isTree",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_v_to_u_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_u_tail_from_last",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_u_head_to_root_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_leaves_subset",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_leaves_mem",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_keep_nonleaf_seeds",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_finish_of_components",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_leaf_loss_deadline",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_obstruction_fixed",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_support_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_support_subset_leaves",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_support_kills",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_support_minimum",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_restricted_deadline",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_remote_loss_subset",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_remote_loss_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_remote_loss_lower",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.adjacentEqual_tree_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.one_white_finishes_one",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.two_white_finishes_two_of_first_recovery",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leaf_no_mate_has_other_neighbor",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.single_white_leaf_one_loss_finishes_two",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.connected_neighbor_closed_eq_univ",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.uniqueLeafPair_geometry",
+    "axioms": []
+  },
+  {
+    "theorem": "FaultObservationResearch.uniqueLeafPair_recovery_data",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.same_center_leaf_pair_stalled",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.same_center_leaf_pair_nonforcing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.uniqueLeafPair_global_deadline",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.uniqueLeafPair_support_minimum",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.uniqueLeafPair_restricted_deadline",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.white_leaf_white_neighbor_completion_lower",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.uniqueLeafPair_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.connected_leaf_pair_single_leaf_center_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.white_center_leaf_guard_one_loss_finishes_two",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.nonadjacentLeafCenters_geometry",
+    "axioms": []
+  },
+  {
+    "theorem": "FaultObservationResearch.nonadjacentLeafCenters_global_deadline",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.nonadjacentLeafCenters_support_minimum",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.nonadjacentLeafCenters_restricted_deadline",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.nonadjacentLeafCenters_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leaf_center_other_neighbor_of_connected",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.connected_nonadjacent_leaf_centers_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_maximal_path_through_vertex",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_tree_vertex_on_leaf_path",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.support_cherry_leaf_parent_second_leaf",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.support_cherry_leaf_parent_has_pair",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.support_cherry_leaf_parents_clique",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leaf_pair_center_not_leaf",
+    "axioms": []
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_tree_leaf_parent_clique_cover",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.support_cherry_leaf_parent_cover",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.support_cherry_nonleaf_has_pair",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.support_cherry_nonleaf_clique",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_leaf_neighbor_unique",
+    "axioms": []
+  },
+  {
+    "theorem": "FaultObservationResearch.leafParentAmount_at_least_two",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafParentRealizationMap_injective",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafParentRealizationMap_surjective",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leafParentRealizationMap_adj_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.support_of_leaf_parent_complete_cover",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_cherry_support_iff_leaf_parent_structure",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.leaf_parent_clique_tree_card_le_two",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.original_graph_star_of_one_leaf_parent",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.original_graph_double_star_of_two_leaf_parents",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_cherry_support_iff_star_or_double_star",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.nonbranch_maximal_path_neighbor_closed",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_spanning_path_iso",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_nonbranch_tree_path",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_nonbranch_tree_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_maximal_path_from_vertex",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.rooted_nonbranch_maximal_path_neighbor_closed",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_spanning_path_iso_start",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_rooted_nonbranch_tree_path",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.branch_vertex_of_embedding",
+    "axioms": []
+  },
+  {
+    "theorem": "FaultObservationResearch.acyclic_cut_neighbors_unique",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.connected_cut_component_has_neighbor",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_cut_component_unique_neighbor",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_cut_component_isTree",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.single_branch_cut_component_nonbranch",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.single_branch_cut_attachment_at_most_one_neighbor",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_single_branch_cut_components_paths",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.cut_component_edge_same",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_cut_root_adj_iff_index_zero",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStarRealizationEquiv_adj_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_single_branch_path_star_iso",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_empty_arm_white_center_speed",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_empty_arm_white_center_completion_lower",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_heads_fixed",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_heads_not_forcing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_arm_prefix_blue",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_arm_after_center_head",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_finishes_after_center_heads",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_center_from_intact_pair",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_missing_head_recovers",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_arm_index_ne",
+    "axioms": []
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_head_ne_second",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_pair_support_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_head_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_initial_sdiff_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_support_subset_initial",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_center_not_initial",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_initial_head",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_initial_selected_second",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_single_loss_center_one",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_single_loss_heads_two",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_single_loss_finishes",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_support_loss_finishes",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_pair_minimum_killing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_unselected_head_loss_not_finishes",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_all_long_designated_obstruction",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_two_distinct_away_from",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_all_long_not_everyMinimumSupport",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.graph_iso_all_long_pathStar_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.treeLeaf_of_graph_iso",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_length_one_is_leaf",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_branch_center_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_single_branch_no_leaf_neighbors_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_nodes_eq_arm",
+    "axioms": []
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_empty_arm_step",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_two_empty_arms_white",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_two_empty_arms_not_forcing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_coupled_arm_speed",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_empty_completion_lower",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_empty_not_finishes_at_arm_length",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_arm_suffix_blue",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_arm_endpoint_finishes",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_eq_first",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_eq_last",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_center_mem",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_head_mem",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_end_mem",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_arm_mem_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_other_mem_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_short_support_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_short_support_subset",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_short_support_kills",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_center_from_short_leaf",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_single_loss_center_one",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_lost_end_finishes",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_kept_end_colors",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_single_loss_finishes",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_support_loss_finishes",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_short_support_minimum_killing",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_other_head_loss_completion_lower",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_terminal_other_head_loss_not_finishes",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_one_short_deadline_gap",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_one_short_designated_obstruction",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_one_short_not_everyMinimumSupport",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.graph_iso_one_short_pathStar_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.pathStar_head_leaf_length_one",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_single_branch_unique_leaf_neighbor_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_single_branch_at_most_one_leaf_neighbor_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_at_most_one_branch_tree_classification",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_component_remainder_root_mem",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_component_remainder_of_component",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_cut_component_adj_mem",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_component_remainder_connected",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_component_remainder_isTree",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.removed_component_core_adj_root",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_off_components_keep_other_vertex",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.off_cut_component_point_ne",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.off_cut_component_root_reachable",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.opposite_off_components_disjoint",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.opposite_off_component_kept",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.retained_component_point_mem",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.componentToRetained_bijective",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.retained_component_realization",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.retained_cut_component_realization",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.retainedCutComponentIso_apply_val",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.retainedCutComponent_map",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.retained_cut_components_distinct",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.retained_cut_component_avoids",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.retained_cut_component_mem_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.removed_component_not_in_core",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.cut_component_point_eq_component",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_component_remainder_or_removed",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoComponentPartitionMap_bijective",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.removed_path_core_adj_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoCutPathsRealizationEquiv_adj_iff",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_two_cut_paths_realization",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_maximal_branch_path",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.branch_path_start_off_neighbor_nonbranch",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.branch_path_end_off_neighbor_nonbranch",
+    "axioms": [
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.acyclic_paths_same_snd_of_common_vertex",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.tree_off_component_attachment_not_on_path",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.branch_path_off_component_nonbranch",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.branch_path_end_off_component_nonbranch",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_rooted_nonbranch_cut_component_path",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_terminal_branch_path_components",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.branch_vertex_cut_components_card",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.branch_vertex_two_off_components",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.rooted_cut_path_of_positive_length",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_two_terminal_path_pairs",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_pair_opposite_first_kept",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_pair_opposite_second_kept",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_pair_two_pendant_realization",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.rooted_cut_path_retained",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_pair_opposite_path_components",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_pairs_two_center_realization",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_pairs_prescribed_two_center_realization",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_multi_branch_two_center_realization",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_pairs_strict_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_pairs_equal_nonadjacent_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_sorted_terminal_arms",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.sorted_shortest_pair_max",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.singleton_cut_component_leaf",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.terminal_pair_unit_lengths_cherry",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.sorted_terminal_strict_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.sorted_terminal_cherry_free_shape",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.sorted_longest_two_lengths",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.sorted_cherry_free_support_centers_adjacent",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.sorted_terminal_off_components_exhausted",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.sorted_terminal_adjacent_core_root_neighbor",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_cherry_free_support_terminal_reduction",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.connected_two_neighbor_core_cover",
+    "axioms": [
+      "Classical.choice"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.twoPointCoreMap_bijective",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.sorted_adjacent_canonical_realization",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.sorted_cherry_free_support_impossible",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_cherry_free_multi_branch_not_support",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.finite_tree_everyMinimumSupport_classification",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "theorem": "FaultObservationResearch.full_tree_classification_statement",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  }
+]

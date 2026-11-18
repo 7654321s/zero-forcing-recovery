@@ -1,0 +1,2137 @@
+{
+  "status": "finite_classification_checks_passed",
+  "max_vertices": 9,
+  "trees": 95,
+  "positive": 21,
+  "forcing_colourings_checked": 4277,
+  "minimum_killing_sets_checked": 11338,
+  "script_sha256": "c5939b16bf482bb7550e586da9c32ef530cb6867368d8eb940394ae0b3b1164b",
+  "infinity_encoding": "n+1; every finite successful propagation uses at most n rounds",
+  "budget_reduction": "For k at least the minimum killing size, both worst times are infinite.",
+  "enumeration": "Extend every preceding tree by one leaf; deduplicate by minimum rooted parenthesis code.",
+  "full_arbitrary_tree_proof": false,
+  "results": [
+    {
+      "vertices": 1,
+      "adjacency_bitmasks": [
+        0
+      ],
+      "property": true,
+      "forcing_colourings_checked": 1,
+      "minimum_killing_sets_checked": 1,
+      "counterexample": null
+    },
+    {
+      "vertices": 2,
+      "adjacency_bitmasks": [
+        2,
+        1
+      ],
+      "property": true,
+      "forcing_colourings_checked": 3,
+      "minimum_killing_sets_checked": 3,
+      "counterexample": null
+    },
+    {
+      "vertices": 3,
+      "adjacency_bitmasks": [
+        2,
+        5,
+        2
+      ],
+      "property": true,
+      "forcing_colourings_checked": 6,
+      "minimum_killing_sets_checked": 6,
+      "counterexample": null
+    },
+    {
+      "vertices": 4,
+      "adjacency_bitmasks": [
+        2,
+        5,
+        10,
+        4
+      ],
+      "property": true,
+      "forcing_colourings_checked": 13,
+      "minimum_killing_sets_checked": 17,
+      "counterexample": null
+    },
+    {
+      "vertices": 4,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        2
+      ],
+      "property": true,
+      "forcing_colourings_checked": 8,
+      "minimum_killing_sets_checked": 18,
+      "counterexample": null
+    },
+    {
+      "vertices": 5,
+      "adjacency_bitmasks": [
+        2,
+        5,
+        10,
+        20,
+        8
+      ],
+      "property": true,
+      "forcing_colourings_checked": 27,
+      "minimum_killing_sets_checked": 35,
+      "counterexample": null
+    },
+    {
+      "vertices": 5,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        8
+      ],
+      "property": false,
+      "forcing_colourings_checked": 6,
+      "minimum_killing_sets_checked": 13,
+      "counterexample": {
+        "blue": 13,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 5,
+      "adjacency_bitmasks": [
+        2,
+        29,
+        2,
+        2,
+        2
+      ],
+      "property": true,
+      "forcing_colourings_checked": 10,
+      "minimum_killing_sets_checked": 36,
+      "counterexample": null
+    },
+    {
+      "vertices": 6,
+      "adjacency_bitmasks": [
+        2,
+        5,
+        10,
+        20,
+        40,
+        16
+      ],
+      "property": true,
+      "forcing_colourings_checked": 56,
+      "minimum_killing_sets_checked": 84,
+      "counterexample": null
+    },
+    {
+      "vertices": 6,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        40,
+        16
+      ],
+      "property": false,
+      "forcing_colourings_checked": 6,
+      "minimum_killing_sets_checked": 13,
+      "counterexample": {
+        "blue": 13,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 6,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        34,
+        18,
+        8,
+        4
+      ],
+      "property": false,
+      "forcing_colourings_checked": 13,
+      "minimum_killing_sets_checked": 29,
+      "counterexample": {
+        "blue": 23,
+        "minimum_killing": 17,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 6,
+      "adjacency_bitmasks": [
+        2,
+        29,
+        2,
+        2,
+        34,
+        16
+      ],
+      "property": false,
+      "forcing_colourings_checked": 8,
+      "minimum_killing_sets_checked": 25,
+      "counterexample": {
+        "blue": 29,
+        "minimum_killing": 12,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 6,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        50,
+        8,
+        8
+      ],
+      "property": true,
+      "forcing_colourings_checked": 36,
+      "minimum_killing_sets_checked": 56,
+      "counterexample": null
+    },
+    {
+      "vertices": 6,
+      "adjacency_bitmasks": [
+        2,
+        61,
+        2,
+        2,
+        2,
+        2
+      ],
+      "property": true,
+      "forcing_colourings_checked": 12,
+      "minimum_killing_sets_checked": 60,
+      "counterexample": null
+    },
+    {
+      "vertices": 7,
+      "adjacency_bitmasks": [
+        2,
+        5,
+        10,
+        20,
+        40,
+        80,
+        32
+      ],
+      "property": true,
+      "forcing_colourings_checked": 115,
+      "minimum_killing_sets_checked": 183,
+      "counterexample": null
+    },
+    {
+      "vertices": 7,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        40,
+        80,
+        32
+      ],
+      "property": false,
+      "forcing_colourings_checked": 6,
+      "minimum_killing_sets_checked": 13,
+      "counterexample": {
+        "blue": 13,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 4,
+        "global_time": 5
+      }
+    },
+    {
+      "vertices": 7,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        34,
+        18,
+        8,
+        68,
+        32
+      ],
+      "property": false,
+      "forcing_colourings_checked": 7,
+      "minimum_killing_sets_checked": 14,
+      "counterexample": {
+        "blue": 15,
+        "minimum_killing": 9,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 7,
+      "adjacency_bitmasks": [
+        2,
+        29,
+        2,
+        2,
+        34,
+        80,
+        32
+      ],
+      "property": false,
+      "forcing_colourings_checked": 8,
+      "minimum_killing_sets_checked": 25,
+      "counterexample": {
+        "blue": 29,
+        "minimum_killing": 12,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 7,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        50,
+        8,
+        72,
+        32
+      ],
+      "property": false,
+      "forcing_colourings_checked": 24,
+      "minimum_killing_sets_checked": 50,
+      "counterexample": {
+        "blue": 53,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 7,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        104,
+        16,
+        16
+      ],
+      "property": false,
+      "forcing_colourings_checked": 38,
+      "minimum_killing_sets_checked": 99,
+      "counterexample": {
+        "blue": 103,
+        "minimum_killing": 96,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 7,
+      "adjacency_bitmasks": [
+        66,
+        13,
+        34,
+        18,
+        8,
+        4,
+        1
+      ],
+      "property": false,
+      "forcing_colourings_checked": 42,
+      "minimum_killing_sets_checked": 78,
+      "counterexample": {
+        "blue": 61,
+        "minimum_killing": 48,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 7,
+      "adjacency_bitmasks": [
+        2,
+        29,
+        2,
+        66,
+        34,
+        16,
+        8
+      ],
+      "property": false,
+      "forcing_colourings_checked": 8,
+      "minimum_killing_sets_checked": 27,
+      "counterexample": {
+        "blue": 29,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 7,
+      "adjacency_bitmasks": [
+        2,
+        61,
+        2,
+        2,
+        2,
+        66,
+        32
+      ],
+      "property": false,
+      "forcing_colourings_checked": 10,
+      "minimum_killing_sets_checked": 41,
+      "counterexample": {
+        "blue": 61,
+        "minimum_killing": 24,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 7,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        114,
+        8,
+        8,
+        8
+      ],
+      "property": true,
+      "forcing_colourings_checked": 48,
+      "minimum_killing_sets_checked": 120,
+      "counterexample": null
+    },
+    {
+      "vertices": 7,
+      "adjacency_bitmasks": [
+        2,
+        125,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "property": true,
+      "forcing_colourings_checked": 14,
+      "minimum_killing_sets_checked": 90,
+      "counterexample": null
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        5,
+        10,
+        20,
+        40,
+        80,
+        160,
+        64
+      ],
+      "property": true,
+      "forcing_colourings_checked": 235,
+      "minimum_killing_sets_checked": 411,
+      "counterexample": null
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        40,
+        80,
+        160,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 6,
+      "minimum_killing_sets_checked": 13,
+      "counterexample": {
+        "blue": 13,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 5,
+        "global_time": 6
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        34,
+        18,
+        8,
+        68,
+        160,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 7,
+      "minimum_killing_sets_checked": 14,
+      "counterexample": {
+        "blue": 15,
+        "minimum_killing": 9,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        34,
+        18,
+        136,
+        68,
+        32,
+        16
+      ],
+      "property": false,
+      "forcing_colourings_checked": 13,
+      "minimum_killing_sets_checked": 28,
+      "counterexample": {
+        "blue": 29,
+        "minimum_killing": 17,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        29,
+        2,
+        2,
+        34,
+        80,
+        160,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 8,
+      "minimum_killing_sets_checked": 25,
+      "counterexample": {
+        "blue": 29,
+        "minimum_killing": 12,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 4,
+        "global_time": 5
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        50,
+        8,
+        72,
+        160,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 24,
+      "minimum_killing_sets_checked": 50,
+      "counterexample": {
+        "blue": 53,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        104,
+        16,
+        144,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 36,
+      "minimum_killing_sets_checked": 95,
+      "counterexample": {
+        "blue": 101,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        40,
+        208,
+        32,
+        32
+      ],
+      "property": false,
+      "forcing_colourings_checked": 86,
+      "minimum_killing_sets_checked": 195,
+      "counterexample": {
+        "blue": 199,
+        "minimum_killing": 192,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        66,
+        13,
+        34,
+        18,
+        8,
+        4,
+        129,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 10,
+      "minimum_killing_sets_checked": 20,
+      "counterexample": {
+        "blue": 23,
+        "minimum_killing": 20,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        29,
+        2,
+        66,
+        34,
+        16,
+        136,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 8,
+      "minimum_killing_sets_checked": 23,
+      "counterexample": {
+        "blue": 29,
+        "minimum_killing": 20,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        130,
+        50,
+        8,
+        72,
+        32,
+        4
+      ],
+      "property": false,
+      "forcing_colourings_checked": 23,
+      "minimum_killing_sets_checked": 56,
+      "counterexample": {
+        "blue": 55,
+        "minimum_killing": 17,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        61,
+        2,
+        2,
+        2,
+        66,
+        160,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 10,
+      "minimum_killing_sets_checked": 41,
+      "counterexample": {
+        "blue": 61,
+        "minimum_killing": 24,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        130,
+        114,
+        8,
+        8,
+        8,
+        4
+      ],
+      "property": false,
+      "forcing_colourings_checked": 34,
+      "minimum_killing_sets_checked": 97,
+      "counterexample": {
+        "blue": 117,
+        "minimum_killing": 96,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        232,
+        16,
+        16,
+        16
+      ],
+      "property": false,
+      "forcing_colourings_checked": 54,
+      "minimum_killing_sets_checked": 195,
+      "counterexample": {
+        "blue": 231,
+        "minimum_killing": 192,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        114,
+        8,
+        8,
+        136,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 40,
+      "minimum_killing_sets_checked": 102,
+      "counterexample": {
+        "blue": 117,
+        "minimum_killing": 48,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        66,
+        13,
+        34,
+        146,
+        8,
+        4,
+        1,
+        8
+      ],
+      "property": false,
+      "forcing_colourings_checked": 66,
+      "minimum_killing_sets_checked": 111,
+      "counterexample": {
+        "blue": 151,
+        "minimum_killing": 144,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        146,
+        104,
+        16,
+        16,
+        8
+      ],
+      "property": false,
+      "forcing_colourings_checked": 38,
+      "minimum_killing_sets_checked": 99,
+      "counterexample": {
+        "blue": 103,
+        "minimum_killing": 96,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        29,
+        130,
+        66,
+        34,
+        16,
+        8,
+        4
+      ],
+      "property": false,
+      "forcing_colourings_checked": 17,
+      "minimum_killing_sets_checked": 57,
+      "counterexample": {
+        "blue": 47,
+        "minimum_killing": 33,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        61,
+        2,
+        2,
+        130,
+        66,
+        32,
+        16
+      ],
+      "property": false,
+      "forcing_colourings_checked": 10,
+      "minimum_killing_sets_checked": 44,
+      "counterexample": {
+        "blue": 61,
+        "minimum_killing": 12,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        125,
+        2,
+        2,
+        2,
+        2,
+        130,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 12,
+      "minimum_killing_sets_checked": 61,
+      "counterexample": {
+        "blue": 125,
+        "minimum_killing": 48,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        242,
+        8,
+        8,
+        8,
+        8
+      ],
+      "property": true,
+      "forcing_colourings_checked": 60,
+      "minimum_killing_sets_checked": 212,
+      "counterexample": null
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        141,
+        2,
+        114,
+        8,
+        8,
+        8,
+        2
+      ],
+      "property": true,
+      "forcing_colourings_checked": 64,
+      "minimum_killing_sets_checked": 216,
+      "counterexample": null
+    },
+    {
+      "vertices": 8,
+      "adjacency_bitmasks": [
+        2,
+        253,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "property": true,
+      "forcing_colourings_checked": 16,
+      "minimum_killing_sets_checked": 126,
+      "counterexample": null
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        5,
+        10,
+        20,
+        40,
+        80,
+        160,
+        320,
+        128
+      ],
+      "property": true,
+      "forcing_colourings_checked": 478,
+      "minimum_killing_sets_checked": 906,
+      "counterexample": null
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        40,
+        80,
+        160,
+        320,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 6,
+      "minimum_killing_sets_checked": 13,
+      "counterexample": {
+        "blue": 13,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 6,
+        "global_time": 7
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        34,
+        18,
+        8,
+        68,
+        160,
+        320,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 7,
+      "minimum_killing_sets_checked": 14,
+      "counterexample": {
+        "blue": 15,
+        "minimum_killing": 9,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 4,
+        "global_time": 5
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        34,
+        18,
+        136,
+        68,
+        32,
+        272,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 7,
+      "minimum_killing_sets_checked": 15,
+      "counterexample": {
+        "blue": 15,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        29,
+        2,
+        2,
+        34,
+        80,
+        160,
+        320,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 8,
+      "minimum_killing_sets_checked": 25,
+      "counterexample": {
+        "blue": 29,
+        "minimum_killing": 12,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 5,
+        "global_time": 6
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        50,
+        8,
+        72,
+        160,
+        320,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 24,
+      "minimum_killing_sets_checked": 50,
+      "counterexample": {
+        "blue": 53,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 4,
+        "global_time": 5
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        104,
+        16,
+        144,
+        320,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 36,
+      "minimum_killing_sets_checked": 95,
+      "counterexample": {
+        "blue": 101,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 5
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        40,
+        208,
+        32,
+        288,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 80,
+      "minimum_killing_sets_checked": 191,
+      "counterexample": {
+        "blue": 197,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 4,
+        "global_time": 5
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        40,
+        80,
+        416,
+        64,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 166,
+      "minimum_killing_sets_checked": 371,
+      "counterexample": {
+        "blue": 391,
+        "minimum_killing": 384,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 4,
+        "global_time": 5
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        66,
+        13,
+        34,
+        18,
+        8,
+        4,
+        129,
+        320,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 10,
+      "minimum_killing_sets_checked": 20,
+      "counterexample": {
+        "blue": 23,
+        "minimum_killing": 20,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 5
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        29,
+        2,
+        66,
+        34,
+        16,
+        136,
+        320,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 8,
+      "minimum_killing_sets_checked": 23,
+      "counterexample": {
+        "blue": 29,
+        "minimum_killing": 20,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 4,
+        "global_time": 5
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        130,
+        50,
+        8,
+        72,
+        32,
+        260,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 21,
+      "minimum_killing_sets_checked": 47,
+      "counterexample": {
+        "blue": 53,
+        "minimum_killing": 48,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        258,
+        18,
+        104,
+        16,
+        144,
+        64,
+        4
+      ],
+      "property": false,
+      "forcing_colourings_checked": 37,
+      "minimum_killing_sets_checked": 99,
+      "counterexample": {
+        "blue": 103,
+        "minimum_killing": 96,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        66,
+        13,
+        34,
+        18,
+        8,
+        260,
+        129,
+        64,
+        32
+      ],
+      "property": false,
+      "forcing_colourings_checked": 23,
+      "minimum_killing_sets_checked": 49,
+      "counterexample": {
+        "blue": 47,
+        "minimum_killing": 12,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        29,
+        2,
+        66,
+        34,
+        272,
+        136,
+        64,
+        32
+      ],
+      "property": false,
+      "forcing_colourings_checked": 8,
+      "minimum_killing_sets_checked": 27,
+      "counterexample": {
+        "blue": 29,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        61,
+        2,
+        2,
+        2,
+        66,
+        160,
+        320,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 10,
+      "minimum_killing_sets_checked": 41,
+      "counterexample": {
+        "blue": 61,
+        "minimum_killing": 24,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 4,
+        "global_time": 5
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        130,
+        114,
+        8,
+        8,
+        8,
+        260,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 34,
+      "minimum_killing_sets_checked": 97,
+      "counterexample": {
+        "blue": 117,
+        "minimum_killing": 96,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        258,
+        18,
+        232,
+        16,
+        16,
+        16,
+        4
+      ],
+      "property": false,
+      "forcing_colourings_checked": 52,
+      "minimum_killing_sets_checked": 181,
+      "counterexample": {
+        "blue": 229,
+        "minimum_killing": 192,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        40,
+        464,
+        32,
+        32,
+        32
+      ],
+      "property": false,
+      "forcing_colourings_checked": 126,
+      "minimum_killing_sets_checked": 411,
+      "counterexample": {
+        "blue": 455,
+        "minimum_killing": 384,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        114,
+        8,
+        8,
+        136,
+        320,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 40,
+      "minimum_killing_sets_checked": 102,
+      "counterexample": {
+        "blue": 117,
+        "minimum_killing": 48,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        66,
+        13,
+        34,
+        146,
+        8,
+        4,
+        257,
+        8,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 60,
+      "minimum_killing_sets_checked": 115,
+      "counterexample": {
+        "blue": 151,
+        "minimum_killing": 144,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        146,
+        104,
+        16,
+        272,
+        8,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 40,
+      "minimum_killing_sets_checked": 105,
+      "counterexample": {
+        "blue": 117,
+        "minimum_killing": 48,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        296,
+        208,
+        32,
+        32,
+        16
+      ],
+      "property": false,
+      "forcing_colourings_checked": 72,
+      "minimum_killing_sets_checked": 177,
+      "counterexample": {
+        "blue": 207,
+        "minimum_killing": 192,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        232,
+        16,
+        16,
+        272,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 52,
+      "minimum_killing_sets_checked": 185,
+      "counterexample": {
+        "blue": 229,
+        "minimum_killing": 96,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        66,
+        13,
+        34,
+        18,
+        8,
+        4,
+        385,
+        64,
+        64
+      ],
+      "property": false,
+      "forcing_colourings_checked": 198,
+      "minimum_killing_sets_checked": 391,
+      "counterexample": {
+        "blue": 397,
+        "minimum_killing": 384,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        66,
+        13,
+        34,
+        146,
+        8,
+        4,
+        1,
+        264,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 92,
+      "minimum_killing_sets_checked": 183,
+      "counterexample": {
+        "blue": 185,
+        "minimum_killing": 48,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        29,
+        130,
+        66,
+        34,
+        16,
+        8,
+        260,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 9,
+      "minimum_killing_sets_checked": 24,
+      "counterexample": {
+        "blue": 31,
+        "minimum_killing": 24,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        61,
+        2,
+        2,
+        130,
+        66,
+        32,
+        272,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 10,
+      "minimum_killing_sets_checked": 38,
+      "counterexample": {
+        "blue": 61,
+        "minimum_killing": 40,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        258,
+        114,
+        8,
+        8,
+        136,
+        64,
+        4
+      ],
+      "property": false,
+      "forcing_colourings_checked": 34,
+      "minimum_killing_sets_checked": 100,
+      "counterexample": {
+        "blue": 117,
+        "minimum_killing": 48,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        125,
+        2,
+        2,
+        2,
+        2,
+        130,
+        320,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 12,
+      "minimum_killing_sets_checked": 61,
+      "counterexample": {
+        "blue": 125,
+        "minimum_killing": 48,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        258,
+        242,
+        8,
+        8,
+        8,
+        8,
+        4
+      ],
+      "property": false,
+      "forcing_colourings_checked": 44,
+      "minimum_killing_sets_checked": 168,
+      "counterexample": {
+        "blue": 245,
+        "minimum_killing": 192,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        18,
+        488,
+        16,
+        16,
+        16,
+        16
+      ],
+      "property": false,
+      "forcing_colourings_checked": 70,
+      "minimum_killing_sets_checked": 324,
+      "counterexample": {
+        "blue": 487,
+        "minimum_killing": 384,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        66,
+        13,
+        34,
+        402,
+        8,
+        4,
+        1,
+        8,
+        8
+      ],
+      "property": false,
+      "forcing_colourings_checked": 120,
+      "minimum_killing_sets_checked": 312,
+      "counterexample": {
+        "blue": 407,
+        "minimum_killing": 384,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        141,
+        2,
+        114,
+        8,
+        8,
+        8,
+        258,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 56,
+      "minimum_killing_sets_checked": 185,
+      "counterexample": {
+        "blue": 245,
+        "minimum_killing": 96,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        146,
+        360,
+        16,
+        16,
+        8,
+        16
+      ],
+      "property": false,
+      "forcing_colourings_checked": 78,
+      "minimum_killing_sets_checked": 267,
+      "counterexample": {
+        "blue": 359,
+        "minimum_killing": 320,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        269,
+        2,
+        18,
+        232,
+        16,
+        16,
+        16,
+        2
+      ],
+      "property": false,
+      "forcing_colourings_checked": 74,
+      "minimum_killing_sets_checked": 333,
+      "counterexample": {
+        "blue": 487,
+        "minimum_killing": 192,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        242,
+        8,
+        8,
+        8,
+        264,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 52,
+      "minimum_killing_sets_checked": 183,
+      "counterexample": {
+        "blue": 245,
+        "minimum_killing": 96,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        29,
+        130,
+        66,
+        290,
+        16,
+        8,
+        4,
+        16
+      ],
+      "property": false,
+      "forcing_colourings_checked": 114,
+      "minimum_killing_sets_checked": 237,
+      "counterexample": {
+        "blue": 301,
+        "minimum_killing": 288,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        402,
+        104,
+        16,
+        16,
+        8,
+        8
+      ],
+      "property": false,
+      "forcing_colourings_checked": 204,
+      "minimum_killing_sets_checked": 436,
+      "counterexample": {
+        "blue": 495,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 1,
+        "global_time": 2
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        146,
+        104,
+        16,
+        16,
+        264,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 38,
+      "minimum_killing_sets_checked": 99,
+      "counterexample": {
+        "blue": 103,
+        "minimum_killing": 96,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 3,
+        "global_time": 4
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        258,
+        29,
+        130,
+        66,
+        34,
+        16,
+        8,
+        4,
+        1
+      ],
+      "property": false,
+      "forcing_colourings_checked": 59,
+      "minimum_killing_sets_checked": 167,
+      "counterexample": {
+        "blue": 125,
+        "minimum_killing": 96,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        61,
+        2,
+        258,
+        130,
+        66,
+        32,
+        16,
+        8
+      ],
+      "property": false,
+      "forcing_colourings_checked": 10,
+      "minimum_killing_sets_checked": 46,
+      "counterexample": {
+        "blue": 61,
+        "minimum_killing": 5,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        125,
+        2,
+        2,
+        2,
+        258,
+        130,
+        64,
+        32
+      ],
+      "property": false,
+      "forcing_colourings_checked": 12,
+      "minimum_killing_sets_checked": 65,
+      "counterexample": {
+        "blue": 125,
+        "minimum_killing": 24,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        253,
+        2,
+        2,
+        2,
+        2,
+        2,
+        258,
+        128
+      ],
+      "property": false,
+      "forcing_colourings_checked": 14,
+      "minimum_killing_sets_checked": 85,
+      "counterexample": {
+        "blue": 253,
+        "minimum_killing": 96,
+        "minimum_killing_size": 2,
+        "budget": 1,
+        "restricted_time": 2,
+        "global_time": 3
+      }
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        13,
+        2,
+        498,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "property": true,
+      "forcing_colourings_checked": 72,
+      "minimum_killing_sets_checked": 332,
+      "counterexample": null
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        141,
+        2,
+        370,
+        8,
+        8,
+        8,
+        2,
+        8
+      ],
+      "property": true,
+      "forcing_colourings_checked": 80,
+      "minimum_killing_sets_checked": 348,
+      "counterexample": null
+    },
+    {
+      "vertices": 9,
+      "adjacency_bitmasks": [
+        2,
+        509,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "property": true,
+      "forcing_colourings_checked": 18,
+      "minimum_killing_sets_checked": 168,
+      "counterexample": null
+    }
+  ]
+}

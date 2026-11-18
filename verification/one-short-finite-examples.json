@@ -1,0 +1,355 @@
+{
+  "status": "finite_one_short_deadline_witnesses_passed",
+  "cases": 124,
+  "scope": "All sorted vectors with 3..6 arms, exactly one length1 arm, others2..5; additional (1,m,m), m=8,30,80. Chosen longest terminal-seeded arm; all initial losses of size at most one.",
+  "null_means": "infinite propagation time",
+  "general_classification_proved": false,
+  "inputs": [
+    {
+      "file": "scripts/one_short_experiment.py",
+      "sha256": "bb2cf70062c2576e91db130a68ec57fefaa3ffbf27472d4317c38d8cb6bfa16e"
+    },
+    {
+      "file": "scripts/experiment.py",
+      "sha256": "a8bb00065e148727bfb712a1d197ad735bbd26c054f3b0d883415c8a9ae4fc51"
+    }
+  ],
+  "examples": [
+    {
+      "arm_lengths": [
+        1,
+        2,
+        2
+      ],
+      "vertices": 6,
+      "initial_blue": [
+        0,
+        1,
+        3,
+        4
+      ],
+      "minimum_killing_support": [
+        1,
+        3
+      ],
+      "minimum_killing_cardinality": 2,
+      "deadline": 2,
+      "budget": 1,
+      "restricted_worst_time": 2,
+      "global_worst_time": 3,
+      "attaining_loss": [
+        4
+      ],
+      "single_loss_times": [
+        {
+          "loss": [],
+          "time": 1
+        },
+        {
+          "loss": [
+            0
+          ],
+          "time": 2
+        },
+        {
+          "loss": [
+            1
+          ],
+          "time": 2
+        },
+        {
+          "loss": [
+            3
+          ],
+          "time": 2
+        },
+        {
+          "loss": [
+            4
+          ],
+          "time": 3
+        }
+      ]
+    },
+    {
+      "arm_lengths": [
+        1,
+        2,
+        5
+      ],
+      "vertices": 9,
+      "initial_blue": [
+        0,
+        1,
+        2,
+        8
+      ],
+      "minimum_killing_support": [
+        1,
+        8
+      ],
+      "minimum_killing_cardinality": 2,
+      "deadline": 5,
+      "budget": 1,
+      "restricted_worst_time": 5,
+      "global_worst_time": 6,
+      "attaining_loss": [
+        2
+      ],
+      "single_loss_times": [
+        {
+          "loss": [],
+          "time": 2
+        },
+        {
+          "loss": [
+            0
+          ],
+          "time": 3
+        },
+        {
+          "loss": [
+            1
+          ],
+          "time": 5
+        },
+        {
+          "loss": [
+            2
+          ],
+          "time": 6
+        },
+        {
+          "loss": [
+            8
+          ],
+          "time": 5
+        }
+      ]
+    },
+    {
+      "arm_lengths": [
+        1,
+        5,
+        5
+      ],
+      "vertices": 12,
+      "initial_blue": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "minimum_killing_support": [
+        1,
+        6
+      ],
+      "minimum_killing_cardinality": 2,
+      "deadline": 5,
+      "budget": 1,
+      "restricted_worst_time": 5,
+      "global_worst_time": 9,
+      "attaining_loss": [
+        7
+      ],
+      "single_loss_times": [
+        {
+          "loss": [],
+          "time": 4
+        },
+        {
+          "loss": [
+            0
+          ],
+          "time": 5
+        },
+        {
+          "loss": [
+            1
+          ],
+          "time": 5
+        },
+        {
+          "loss": [
+            6
+          ],
+          "time": 5
+        },
+        {
+          "loss": [
+            7
+          ],
+          "time": 9
+        }
+      ]
+    },
+    {
+      "arm_lengths": [
+        1,
+        8,
+        8
+      ],
+      "vertices": 18,
+      "initial_blue": [
+        0,
+        1,
+        9,
+        10
+      ],
+      "minimum_killing_support": [
+        1,
+        9
+      ],
+      "minimum_killing_cardinality": 2,
+      "deadline": 8,
+      "budget": 1,
+      "restricted_worst_time": 8,
+      "global_worst_time": 15,
+      "attaining_loss": [
+        10
+      ],
+      "single_loss_times": [
+        {
+          "loss": [],
+          "time": 7
+        },
+        {
+          "loss": [
+            0
+          ],
+          "time": 8
+        },
+        {
+          "loss": [
+            1
+          ],
+          "time": 8
+        },
+        {
+          "loss": [
+            9
+          ],
+          "time": 8
+        },
+        {
+          "loss": [
+            10
+          ],
+          "time": 15
+        }
+      ]
+    },
+    {
+      "arm_lengths": [
+        1,
+        30,
+        30
+      ],
+      "vertices": 62,
+      "initial_blue": [
+        0,
+        1,
+        31,
+        32
+      ],
+      "minimum_killing_support": [
+        1,
+        31
+      ],
+      "minimum_killing_cardinality": 2,
+      "deadline": 30,
+      "budget": 1,
+      "restricted_worst_time": 30,
+      "global_worst_time": 59,
+      "attaining_loss": [
+        32
+      ],
+      "single_loss_times": [
+        {
+          "loss": [],
+          "time": 29
+        },
+        {
+          "loss": [
+            0
+          ],
+          "time": 30
+        },
+        {
+          "loss": [
+            1
+          ],
+          "time": 30
+        },
+        {
+          "loss": [
+            31
+          ],
+          "time": 30
+        },
+        {
+          "loss": [
+            32
+          ],
+          "time": 59
+        }
+      ]
+    },
+    {
+      "arm_lengths": [
+        1,
+        80,
+        80
+      ],
+      "vertices": 162,
+      "initial_blue": [
+        0,
+        1,
+        81,
+        82
+      ],
+      "minimum_killing_support": [
+        1,
+        81
+      ],
+      "minimum_killing_cardinality": 2,
+      "deadline": 80,
+      "budget": 1,
+      "restricted_worst_time": 80,
+      "global_worst_time": 159,
+      "attaining_loss": [
+        82
+      ],
+      "single_loss_times": [
+        {
+          "loss": [],
+          "time": 79
+        },
+        {
+          "loss": [
+            0
+          ],
+          "time": 80
+        },
+        {
+          "loss": [
+            1
+          ],
+          "time": 80
+        },
+        {
+          "loss": [
+            81
+          ],
+          "time": 80
+        },
+        {
+          "loss": [
+            82
+          ],
+          "time": 159
+        }
+      ]
+    }
+  ]
+}

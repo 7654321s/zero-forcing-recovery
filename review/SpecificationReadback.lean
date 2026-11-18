@@ -1,0 +1,25 @@
+import ZeroForcingRecovery
+
+set_option pp.universes true
+
+#print FaultObservationResearch.synchronousStep
+#print FaultObservationResearch.colorAfter
+#print FaultObservationResearch.FinishesBy
+#print FaultObservationResearch.IsForcing
+#print FaultObservationResearch.IsMinimumKilling
+#print FaultObservationResearch.RobustBy
+#print FaultObservationResearch.EveryMinimumSupport
+#print FaultObservationResearch.completionTime
+#print FaultObservationResearch.allowedLosses
+#print FaultObservationResearch.worstTime
+#print FaultObservationResearch.EveryMinimumSupportTime
+#print FaultObservationResearch.InTreeCandidateClass
+#print FaultObservationResearch.FullTreeClassificationTarget
+#print FaultObservationResearch.FullTreeClassificationStatement
+#check @FaultObservationResearch.IsMinimumKilling_iff_card_minimum
+#check @FaultObservationResearch.completionTime_le_iff
+#check @FaultObservationResearch.everyMinimumSupport_iff_worstTime
+#check @FaultObservationResearch.finite_tree_everyMinimumSupport_classification
+#check @FaultObservationResearch.full_tree_classification_statement
+#print axioms FaultObservationResearch.finite_tree_everyMinimumSupport_classification
+#print axioms FaultObservationResearch.full_tree_classification_statement

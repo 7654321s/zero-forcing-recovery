@@ -1,0 +1,9 @@
+{
+  "project_version": "1.0.1",
+  "proof_snapshot_version": "1.0.0",
+  "proof_modules_unchanged": 71,
+  "named_declarations": 511,
+  "base_source_archive_sha256": "693251ef23142e02e778706852d4647ea4ba2970235b322f1fb714636375e1e3",
+  "proof_snapshot_sha256": "9f7fcdf015242b371a69fa87c30887cd75af9724b104c602d48722e2be86ec6a",
+  "novelty_confirmed": false
+}

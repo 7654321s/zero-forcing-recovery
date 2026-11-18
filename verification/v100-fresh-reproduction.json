@@ -1,0 +1,18 @@
+{
+  "status": "fresh_toolchain_and_dependencies_source_reproduction_passed",
+  "source_archive_sha256": "693251ef23142e02e778706852d4647ea4ba2970235b322f1fb714636375e1e3",
+  "host_os": "Windows",
+  "separate_machine": false,
+  "separate_os_or_vm": false,
+  "existing_toolchain_reused": false,
+  "existing_dependency_cache_reused": false,
+  "existing_project_olean_inputs_reused": false,
+  "official_compiler_archive_sha256": "893fde3f52b48c647e3edcf33844cbb61f8ef70fcd88e0536bfc83f29844081e",
+  "compiler_sha256": "ec7a472d1c12a09b0c0c718f7427c2be527b3f5f07810fdbe076c2507c7a91ea",
+  "lake_sha256": "023feb24d3e7244fe671dba79f1cd1affc6c7a7cacfe497bf3675febb506578c",
+  "source_modules": 71,
+  "named_declarations": 511,
+  "small_trees": 95,
+  "full_run_summary_sha256": "778b8a7f616fdbb5ab6f93eecd1e146d6266b0db3862a1f8a111b4822695bb3f",
+  "note": "The full local run and logs are preserved. This receipt concerns the unchanged v1.0.0 proof sources."
+}

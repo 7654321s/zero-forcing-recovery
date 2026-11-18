@@ -1,0 +1,735 @@
+'FaultObservationResearch.mem_synchronousStep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.subset_synchronousStep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.synchronousStep_mono' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.synchronousStep_full' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.colorAfter_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.colorAfter_subset_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.colorAfter_mono_time' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.colorAfter_mono_blue' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.colorAfter_full' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.FinishesBy_mono_time' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.FinishesBy_mono_blue' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.IsForcing_mono' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.colorAfter_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.colorAfter_of_fixed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.FinishesBy_of_stable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.card_colorAfter_strict_of_unfinished' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.IsForcing_finishes_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.IsForcing_iff_card_deadline' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.IsMinimumKilling_iff_card_minimum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.completionTime_le_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.completionTime_eq_top_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.mem_allowedLosses' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.empty_mem_allowedLosses' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.worstTime_le_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.enat_eq_iff_finite_deadlines' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.everyMinimumSupport_iff_worstTime' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.coronaAdj_symmetric' does not depend on any axioms
+'FaultObservationResearch.coronaAdj_irreflexive' does not depend on any axioms
+'FaultObservationResearch.coronaLeaf_injective' depends on axioms: [propext]
+'FaultObservationResearch.leafSparse_mono' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leaf_not_step_of_two_white' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.two_white_leaves_stay_white' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafy_forcing_implies_sparse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.sparse_exists_blue_leaf' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.core_mem_step_of_blue_leaf' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leaf_mem_step_of_cores_blue' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafy_finishes_two_of_sparse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafy_forcing_iff_sparse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafy_forcing_iff_two_rounds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafy_single_loss_forcing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafy_pair_trace_kills' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafy_minimum_support_is_trace' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafy_minimum_support_card_le_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafy_minimum_two_all_leaves_blue' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.robustBy_zero_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafy_erased_leaf_not_one_complete' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafy_full_single_loss_finishes_one' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.leafy_complete_every_minimum_support' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.leafy_erased_leaf_not_one_white_center' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.leafy_nonadjacent_restricted_one_round' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.leafy_not_support_of_nonadjacent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafy_every_minimum_support_iff_complete' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.leafyCoreTarget_proved' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.mem_relabelColors' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.relabelColors_card' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.relabelColors_symm' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.relabelColors_apply_symm' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.relabelColors_subset_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.relabelColors_sdiff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.relabelColors_univ' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.synchronousStep_relabel' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.colorAfter_relabel' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.FinishesBy_relabel_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.IsForcing_relabel_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.IsMinimumKilling_relabel_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.RobustBy_relabel_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.EveryMinimumSupport_transfer' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.EveryMinimumSupport_relabel_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.completionTime_relabel' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.worstTime_relabel' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.EveryMinimumSupport_iso_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.canonical_star_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.canonical_doubleStar_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.InTreeCandidateClass_iso_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.support_of_star_iso' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.support_of_doubleStar_iso' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.FullTreeClassificationTarget_iso_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.tree_exists_leaf_ne' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.rootClosed_all_of_leaves' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.colorAfter_eq_from_plateau' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.colorAfter_stabilizes_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.rootClosed_of_stable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.rooted_leaves_finish_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.rooted_leaves_forcing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.rooted_colorAfter_embeds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.rooted_leaf_embedding_colors_image' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.rootInactive_colorAfter_subset' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.rooted_leaves_finish_card_ordinary' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.rooted_leaves_forcing_ordinary' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.allLeavesBlue_sdiff_sparse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.sparse_exists_blue_leaf_local' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.corona_finishes_two_of_leaf_witnesses' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.corona_leaf_not_step_of_core_white' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.broom_all_leaves_blue' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.broom_short_ne_long' depends on axioms: [propext]
+'FaultObservationResearch.fin_two_vertex_cases' depends on axioms: [propext]
+'FaultObservationResearch.broom_loss_sparse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.broom_loss_two_of_short_retained' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.broom_single_loss_three' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.broom_short_loss_not_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.broom_not_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.doubleStar_one_leaf_not_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.not_support_of_one_leaf_doubleStar_iso' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.computedSynchronousStep_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.computedColorAfter_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.computedFinishesBy_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.computedMinimumKilling_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.computedRobustBy_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.FinishesBy_min_card_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.RobustBy_min_card_deadline_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.computedEveryMinimumSupport_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.fourPath_computed_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.fourPath_every_minimum_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.coronaAdj_relabel_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.doubleStar_support_swap_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.doubleStar_other_one_leaf_not_support' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.fin_four_vertex_cases' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.pathGraph_four_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.doubleStar_one_one_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.doubleStarTarget_proved' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.doubleStar_support_iff_of_iso' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.force_target_mem_of_fixed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathReverseEquiv_symm_zero' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.path_fixed_of_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_fixed_of_last' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_fixed_of_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.hasPathSeed_mono' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_forcing_of_seed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_no_seed_step_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_no_seed_not_forcing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_forcing_iff_seed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_nonforcing_sdiff_iff_hits_seeds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.path_minimum_killing_iff_minimum_seed_hit' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.robustBy_iff_of_minimum_card_le_one' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.everyMinimumSupport_of_card_le_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_small_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.IsForcing_finishes_unblue' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.full_blue_loss_finishes_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.full_blue_robust_by_budget' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathPrefix_self' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathPrefix_trans' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathPrefix_erase_max' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.exists_pathPrefix_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathPrefix_last_not_mem' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_max_loss_mem_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_prefix_step_subset' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_prefix_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_prefix_finishes_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_full_blue_restricted_robust_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.path_full_blue_robust_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_full_blue_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_min_white_mem_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_gap_blue_neighbor_white' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_gap_step_subset' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_gap_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.erasePathExtremes_subset' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathWhiteGap_erase_extremes' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.erasePathExtremes_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_gap_finishes_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_gap_deadline_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathWhiteGap_of_seed_hit_interval' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_interval_deadline_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_gap_zero_step_subset' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_gap_zero_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathWhiteGap_erase_max' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_gap_zero_persists_or_empty' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_gap_one_sided_finishes_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_gap_one_sided_deadline_lower_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.path_interval_end_deadline_lower_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathIntervalWhites_antitone' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathLeftReady_mono' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathRightReady_mono' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_interval_min_mem_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_interval_max_mem_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_interval_next_whites_subset_erase_max' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.path_interval_next_whites_subset_erase_extremes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.path_interval_one_sided_upper' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_interval_two_sided_upper' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.minimumKilling_hits_forcing_subset' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.disjoint_cells_selection_injective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.exists_injective_cell_pick' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.disjoint_cells_hitting_card_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.exists_exact_cell_selector' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.minimumKilling_card_eq_disjoint_forcing_cells' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.minimumKilling_exact_cell_selector' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.exact_cell_selection_subfamily_card' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.damaged_disjoint_cells_card_le_loss' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathCellBefore_disjoint' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathPairCoverPacking_cell_subset' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.exists_path_pair_cover_packing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathForcingUnit_forcing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.exists_path_seed_packing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathSeedPacking_disjoint' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathSeedPacking_every_minimum_selector' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.path_range_extend_to_budget' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_white_interval_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_loss_interval_card_le_support_window' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathWhiteGap_reverse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_gap_right_deadline_lower_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.path_interval_suffix_deadline_lower_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathIntervalWhites_reverse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathLeftReady_reverse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_interval_left_sided_upper' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_zero_left_ready' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_last_right_ready' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_pair_ready' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathForcingUnit_ready_around_white' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.exists_path_left_guard' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.exists_path_right_guard' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_guard_interval_support_card_le_loss' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.path_guard_whites_inside' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_guards_have_ready_side' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_support_window_deadline_bounds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.path_loss_white_inclusion_card_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_support_from_seed_packing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_every_minimum_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_every_minimum_support_time' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.canonical_path_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.support_of_path_iso' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.candidateClass_every_minimum_support' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.colorAfter_embeds_with_blue_exterior' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.forcing_embedding_with_blue_exterior_colors_image' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.forcing_of_embedding_and_blue_complement' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.IsForcing_of_forcing_colorAfter' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_armA_colors' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_armB_colors' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_core_colors_active' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_core_colors_inactive' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_heads_in_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_forcing_of_core_and_head' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.twoPendant_mem_initial_core' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_mem_initial_A' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_mem_initial_B' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_heads_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_heads_subset' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_singleton_loss_forcing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_initial_forcing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_only_core_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_heads_kill' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_heads_minimum_killing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_zero_finishes_n' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.path_last_finishes_n' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_armA_by_path_deadline' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_armB_by_path_deadline' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_delayed_arm_speed_limits' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.twoPendant_delayed_completion_lower' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.twoPendant_finish_of_core_and_B_last' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.twoPendant_delayed_completion_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_core_neighbors_from_core_blue' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.twoPendant_heads_step_of_blue_neighbors' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.twoPendant_leaf_A_is_last' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_leaf_B_is_last' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_leaves_in_core_and_ends' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_nested_heads_minimum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_colorAfter_commute' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_finishesBy_commute' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoCenter_initial_eq_nested' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoCenter_inner_A_from_last' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoCenter_inner_B_from_last' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoCenter_head_support_minimum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoCenter_restricted_head_deadline' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoCenter_remote_terminal_loss_lower' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.twoCenter_strict_not_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.bridgeJoin_isTree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendantGraph_isTree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoCenterGraph_isTree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoCenter_strict_tree_witness' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoPendant_empty_A_white_root_speed' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.twoPendant_empty_A_white_root_completion_lower' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.equal_initial_eq_nested' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_short_u_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_short_v_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_core_off_center_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_core_with_heads_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_u_blue_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_core_blue_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_u_heads_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_long_u_from_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_finish_of_core_heads' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_all_single_loss_deadline' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_restricted_head_deadline' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_head_support_minimum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_remote_head_loss_lower' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_nonadjacent_not_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.equal_nonadjacent_tree_not_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.terminal_arm_second_le_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.terminal_arm_sum_eq_second_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.terminal_arm_strict_or_matching' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.terminal_arm_sum_eq_one_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.terminal_arm_all_positive_cases' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_core_split' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.adjacentEqual_graph_isTree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_v_to_u_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_u_tail_from_last' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_u_head_to_root_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_leaves_subset' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_leaves_mem' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_keep_nonleaf_seeds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_finish_of_components' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_leaf_loss_deadline' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_obstruction_fixed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_support_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_support_subset_leaves' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.adjacentEqual_support_kills' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_support_minimum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_restricted_deadline' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_remote_loss_subset' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_remote_loss_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_remote_loss_lower' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_not_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.adjacentEqual_tree_not_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.one_white_finishes_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.two_white_finishes_two_of_first_recovery' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.leaf_no_mate_has_other_neighbor' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.single_white_leaf_one_loss_finishes_two' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.connected_neighbor_closed_eq_univ' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.uniqueLeafPair_geometry' does not depend on any axioms
+'FaultObservationResearch.uniqueLeafPair_recovery_data' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.same_center_leaf_pair_stalled' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.same_center_leaf_pair_nonforcing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.uniqueLeafPair_global_deadline' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.uniqueLeafPair_support_minimum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.uniqueLeafPair_restricted_deadline' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.white_leaf_white_neighbor_completion_lower' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.uniqueLeafPair_not_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.connected_leaf_pair_single_leaf_center_not_support' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.white_center_leaf_guard_one_loss_finishes_two' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.nonadjacentLeafCenters_geometry' does not depend on any axioms
+'FaultObservationResearch.nonadjacentLeafCenters_global_deadline' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.nonadjacentLeafCenters_support_minimum' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.nonadjacentLeafCenters_restricted_deadline' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.nonadjacentLeafCenters_not_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leaf_center_other_neighbor_of_connected' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.connected_nonadjacent_leaf_centers_not_support' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.finite_maximal_path_through_vertex' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.finite_tree_vertex_on_leaf_path' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.support_cherry_leaf_parent_second_leaf' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.support_cherry_leaf_parent_has_pair' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.support_cherry_leaf_parents_clique' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leaf_pair_center_not_leaf' does not depend on any axioms
+'FaultObservationResearch.finite_tree_leaf_parent_clique_cover' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.support_cherry_leaf_parent_cover' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.support_cherry_nonleaf_has_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.support_cherry_nonleaf_clique' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.tree_leaf_neighbor_unique' does not depend on any axioms
+'FaultObservationResearch.leafParentAmount_at_least_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafParentRealizationMap_injective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.leafParentRealizationMap_surjective' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.leafParentRealizationMap_adj_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.support_of_leaf_parent_complete_cover' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.tree_cherry_support_iff_leaf_parent_structure' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.leaf_parent_clique_tree_card_le_two' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.original_graph_star_of_one_leaf_parent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.original_graph_double_star_of_two_leaf_parents' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.tree_cherry_support_iff_star_or_double_star' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.nonbranch_maximal_path_neighbor_closed' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.tree_spanning_path_iso' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.finite_nonbranch_tree_path' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.finite_nonbranch_tree_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.finite_maximal_path_from_vertex' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.rooted_nonbranch_maximal_path_neighbor_closed' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.tree_spanning_path_iso_start' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.finite_rooted_nonbranch_tree_path' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.branch_vertex_of_embedding' does not depend on any axioms
+'FaultObservationResearch.acyclic_cut_neighbors_unique' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.connected_cut_component_has_neighbor' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.tree_cut_component_unique_neighbor' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.tree_cut_component_isTree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.single_branch_cut_component_nonbranch' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.single_branch_cut_attachment_at_most_one_neighbor' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.finite_single_branch_cut_components_paths' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.cut_component_edge_same' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.tree_cut_root_adj_iff_index_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStarRealizationEquiv_adj_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.finite_single_branch_path_star_iso' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_empty_arm_white_center_speed' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_empty_arm_white_center_completion_lower' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_heads_fixed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_heads_not_forcing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_arm_prefix_blue' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_arm_after_center_head' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_finishes_after_center_heads' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_center_from_intact_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_missing_head_recovers' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_arm_index_ne' does not depend on any axioms
+'FaultObservationResearch.pathStar_head_ne_second' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.pathStar_pair_support_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_head_not_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_initial_sdiff_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_support_subset_initial' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_center_not_initial' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_initial_head' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_initial_selected_second' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_single_loss_center_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_single_loss_heads_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_single_loss_finishes' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_support_loss_finishes' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_pair_minimum_killing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_unselected_head_loss_not_finishes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_all_long_designated_obstruction' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.finite_two_distinct_away_from' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_all_long_not_everyMinimumSupport' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.graph_iso_all_long_pathStar_not_support' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.treeLeaf_of_graph_iso' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.pathStar_length_one_is_leaf' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_branch_center_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.finite_single_branch_no_leaf_neighbors_not_support' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_nodes_eq_arm' does not depend on any axioms
+'FaultObservationResearch.pathStar_empty_arm_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_two_empty_arms_white' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_two_empty_arms_not_forcing' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_coupled_arm_speed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_terminal_empty_completion_lower' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_terminal_empty_not_finishes_at_arm_length' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_arm_suffix_blue' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_arm_endpoint_finishes' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_eq_first' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.pathStar_eq_last' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.pathStar_terminal_center_mem' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_terminal_head_mem' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_terminal_end_mem' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_terminal_arm_mem_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_terminal_other_mem_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_short_support_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_short_support_subset' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_short_support_kills' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_center_from_short_leaf' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_terminal_single_loss_center_one' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_terminal_lost_end_finishes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_terminal_kept_end_colors' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_terminal_single_loss_finishes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_terminal_support_loss_finishes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_short_support_minimum_killing' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_terminal_other_head_loss_completion_lower' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_terminal_other_head_loss_not_finishes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_one_short_deadline_gap' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.pathStar_one_short_designated_obstruction' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_one_short_not_everyMinimumSupport' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.graph_iso_one_short_pathStar_not_support' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.pathStar_head_leaf_length_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.finite_single_branch_unique_leaf_neighbor_not_support' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.finite_single_branch_at_most_one_leaf_neighbor_not_support' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.finite_at_most_one_branch_tree_classification' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.tree_component_remainder_root_mem' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.tree_component_remainder_of_component' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.tree_cut_component_adj_mem' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.tree_component_remainder_connected' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.tree_component_remainder_isTree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.removed_component_core_adj_root' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.tree_off_components_keep_other_vertex' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.off_cut_component_point_ne' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.off_cut_component_root_reachable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.opposite_off_components_disjoint' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.opposite_off_component_kept' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.retained_component_point_mem' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.componentToRetained_bijective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.retained_component_realization' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.retained_cut_component_realization' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.retainedCutComponentIso_apply_val' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.retainedCutComponent_map' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.retained_cut_components_distinct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.retained_cut_component_avoids' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.retained_cut_component_mem_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.removed_component_not_in_core' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.cut_component_point_eq_component' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.tree_component_remainder_or_removed' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.twoComponentPartitionMap_bijective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.removed_path_core_adj_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.twoCutPathsRealizationEquiv_adj_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.tree_two_cut_paths_realization' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.finite_maximal_branch_path' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.branch_path_start_off_neighbor_nonbranch' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.branch_path_end_off_neighbor_nonbranch' depends on axioms: [propext, Quot.sound]
+'FaultObservationResearch.acyclic_paths_same_snd_of_common_vertex' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.tree_off_component_attachment_not_on_path' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.branch_path_off_component_nonbranch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.branch_path_end_off_component_nonbranch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.finite_rooted_nonbranch_cut_component_path' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.finite_terminal_branch_path_components' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.branch_vertex_cut_components_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.branch_vertex_two_off_components' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.rooted_cut_path_of_positive_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.finite_two_terminal_path_pairs' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.terminal_pair_opposite_first_kept' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.terminal_pair_opposite_second_kept' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.terminal_pair_two_pendant_realization' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.rooted_cut_path_retained' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.terminal_pair_opposite_path_components' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.terminal_pairs_two_center_realization' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.terminal_pairs_prescribed_two_center_realization' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.finite_multi_branch_two_center_realization' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.terminal_pairs_strict_not_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.terminal_pairs_equal_nonadjacent_not_support' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.finite_sorted_terminal_arms' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.sorted_shortest_pair_max' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.singleton_cut_component_leaf' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.terminal_pair_unit_lengths_cherry' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.sorted_terminal_strict_not_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.sorted_terminal_cherry_free_shape' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.sorted_longest_two_lengths' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.sorted_cherry_free_support_centers_adjacent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.sorted_terminal_off_components_exhausted' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.sorted_terminal_adjacent_core_root_neighbor' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.finite_cherry_free_support_terminal_reduction' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.connected_two_neighbor_core_cover' depends on axioms: [Classical.choice]
+'FaultObservationResearch.twoPointCoreMap_bijective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.sorted_adjacent_canonical_realization' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.sorted_cherry_free_support_impossible' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.finite_cherry_free_multi_branch_not_support' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.finite_tree_everyMinimumSupport_classification' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.full_tree_classification_statement' depends on axioms: [propext, Classical.choice, Quot.sound]

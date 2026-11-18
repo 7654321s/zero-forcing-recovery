@@ -1,0 +1,16 @@
+{
+  "project_version": "1.0.1",
+  "status": "verified_local_snapshot_before_github_publication",
+  "proof_sources_unchanged": true,
+  "local_unified_checks_passed": true,
+  "source_modules": 71,
+  "named_declarations": 511,
+  "github_published": false,
+  "github_workflow_executed": false,
+  "linux_build_verified": false,
+  "independent_human_review": false,
+  "novelty_confirmed": false,
+  "snapshot_scope": "Captured before public GitHub publication; use the Actions URL for per-commit remote status.",
+  "repository": "https://github.com/7654321s/zero-forcing-recovery",
+  "actions_url": "https://github.com/7654321s/zero-forcing-recovery/actions"
+}

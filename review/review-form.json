@@ -1,0 +1,15 @@
+{
+  "status": "not_reviewed",
+  "project_version": "1.0.1",
+  "reviewed_manifest_sha256": null,
+  "reviewer": null,
+  "review_date": null,
+  "independence_and_conflicts": null,
+  "reviewed_files_and_claims": [],
+  "environment": null,
+  "commands_and_logs": [],
+  "findings": [],
+  "prior_art_references": [],
+  "novelty_assessed": false,
+  "conclusion": null
+}

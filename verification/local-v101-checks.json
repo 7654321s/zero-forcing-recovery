@@ -1,0 +1,83 @@
+{
+  "project_version": "1.0.1",
+  "status": "local_windows_unified_checks_passed",
+  "operating_system": "Windows",
+  "separate_machine": false,
+  "separate_os_or_vm": false,
+  "source_modules": 71,
+  "named_declarations": 511,
+  "precompiled_project_proofs_reused": false,
+  "dependencies_and_compiler_reused_from_prior_verified_run": true,
+  "tested_input_release_manifest_sha256": "2b576e2c0af6dce0b546b8ef0c28b518e5077501b7d8d3acd5c2e154ac66bf6a",
+  "controller_run_sha256": "9141a6e10ffacfa937d632ca34b1a7e4ceeda810ed66bdd0dba2a6667b5f772a",
+  "unified_checks_summary_sha256": "d9cd9200346ec37fe268d416b7bb198715ece5735cbf8ce7b6d76864763a23bf",
+  "steps": [
+    {
+      "name": "lake-version",
+      "exit_code": 0,
+      "log_sha256": "165f92ed239a8c7db772bf5ee9d58c59357b489951582a12c86dc9d8e06b23a2"
+    },
+    {
+      "name": "build",
+      "exit_code": 0,
+      "log_sha256": "8264e5ec4333921b42fc6afee02e73cf854c649f142006794f09be6da37739da"
+    },
+    {
+      "name": "axiom-audit",
+      "exit_code": 0,
+      "log_sha256": "47b2eabf7c8eafcaec1d584abc95897b78c8107ac56f7f8775fa754f6ceedd9b"
+    },
+    {
+      "name": "long-arm",
+      "exit_code": 0,
+      "log_sha256": "ec857ba2b938520b72e861f7de0d409f025bd2110aea739499c2748e1a172828"
+    },
+    {
+      "name": "one-short",
+      "exit_code": 0,
+      "log_sha256": "b89d16b3274ab297eb05781eed08258bfd0bc9f2f9a46ffa7e41202cbe7c1f80"
+    },
+    {
+      "name": "small-trees",
+      "exit_code": 0,
+      "log_sha256": "5486a3af10c9af4ea71a9eb7a4233f5e2df051ddf338d12d0363c54bad05d2ba"
+    },
+    {
+      "name": "paper-comparison",
+      "exit_code": 0,
+      "log_sha256": "a19efdda07e1af54e4492c82686238cb9716e56764694aab4928c9c159f7234a"
+    },
+    {
+      "name": "specification",
+      "exit_code": 0,
+      "log_sha256": "61908e175b2b246ed932ee46894276a07f893cbe689112d30f870217555f7063"
+    }
+  ],
+  "actionlint_version": "1.7.12",
+  "actionlint_exit_code": 0,
+  "git_autocrlf_byte_roundtrip_verified": true,
+  "negative_failure_propagation_checks": [
+    {
+      "case": "changed-release-file",
+      "expected_failure_observed": true,
+      "wrapper_exit_code": 1,
+      "executed_steps": [],
+      "later_checks_not_run": true
+    },
+    {
+      "case": "failing-build-command",
+      "expected_failure_observed": true,
+      "wrapper_exit_code": 1,
+      "executed_steps": [
+        "lake-version",
+        "build"
+      ],
+      "later_checks_not_run": true
+    }
+  ],
+  "note": "After the successful command run, this receipt and current-release metadata were added and the release inventory resealed. Proof and command source bytes are unchanged.",
+  "github_workflow_executed": false,
+  "linux_build_verified": false,
+  "independent_human_review": false,
+  "novelty_confirmed": false
+}
