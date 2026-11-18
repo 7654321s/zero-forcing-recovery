@@ -195,6 +195,7 @@ theorem certified_padding_gaps : certifiedPaddingGroups.map PaddingGroup.gaps = 
 theorem original_padding_layout_count : shortPathLayouts.length = 4050 := by
   unfold shortPathLayouts
   rw [List.length_flatMap, ← certified_padding_gaps, List.map_map]
+  change (certifiedPaddingGroups.map (fun g => (palettesAt g.gaps).length)).sum = _
   have h : certifiedPaddingGroups.map (fun g => (palettesAt g.gaps).length) =
       certifiedPaddingGroups.map PaddingGroup.layoutCount :=
     List.map_congr_left (fun g _ => g.layoutCount_ok)
@@ -204,6 +205,7 @@ theorem original_padding_layout_count : shortPathLayouts.length = 4050 := by
 theorem original_padding_mark_count : requiredPaddingMarks.length = 10229 := by
   unfold requiredPaddingMarks
   rw [List.length_flatMap, ← certified_padding_gaps, List.map_map]
+  change (certifiedPaddingGroups.map (fun g => (requiredAt g.gaps).length)).sum = _
   have h : certifiedPaddingGroups.map (fun g => (requiredAt g.gaps).length) =
       certifiedPaddingGroups.map PaddingGroup.markCount :=
     List.map_congr_left (fun g _ => g.markCount_ok)
