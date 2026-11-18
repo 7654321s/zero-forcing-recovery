@@ -708,7 +708,18 @@ The Lean proofs use the same synchronous step and deadline semantics as the tree
 | [SubdivisionProjection.lean](SubdivisionProjection.lean) | Subdivision of a blue edge preserves each compared deadline while both original endpoints and the new vertices are blue. The recovery lemmas give the round-one repairs for a lost original endpoint or a lost inserted vertex. |
 | [SubdivisionCertificate.lean](SubdivisionCertificate.lean) | An all-blue subdivision transports a budget-one witness with the same deadline if the old endpoints are disjoint from the compared losses and each inserted vertex survives a singleton loss by round-one restoration. |
 
-The classification theorem combines the general mathematical case analysis with the finite coverage checks. The Lean modules prove the pure-cycle result and the extension and certificate statements listed here. The Python scripts continue to check the finite coverage tables.
+The classification theorem combines the general mathematical case analysis with the finite coverage checks. The Lean modules prove the pure-cycle result and the extension and certificate statements listed here.
+
+### Kernel checks for the finite tables
+
+[MaskForcing.lean](MaskForcing.lean) proves that the mask representation gives the original synchronous step. [FastMaskStep.lean](FastMaskStep.lean) shows that a faster integer implementation computes the same step. [ReplayForcing.lean](ReplayForcing.lean) checks each proposed color transition and its final fixed point. The resulting theorem identifies the recorded coloring in every round with the mathematical process.
+
+[FiniteWitness.lean](FiniteWitness.lean) uses that equality to check the intact coloring, every singleton loss, failure after both support vertices are lost, and the exact restricted and delayed times. [NumberedGraph.lean](NumberedGraph.lean) verifies the correspondence between each input adjacency table and the graph constructed from its parameters. [FiniteExtensions.lean](FiniteExtensions.lean) checks the terminal arrival and suppression conditions used in the path extensions.
+
+- The fork checker validates 670 cases and compares their parameters with the entire list generated from the gap, depth and length bounds. Terminal modes, waiting ancestors and the allowed stem subdivision edge are checked for each case. [ForkCertificates.lean](ForkCertificates.lean)
+- The padding checker validates 5,087 certificates grouped by 208 gap words. Lean enumerates 4,050 initial layouts and checks coverage of every one of the 10,229 pairs of an initial layout and a marked longest path. The exceptional mark uses a length-three extension base and an independent certificate for the exact length-two graph. [PathPaddingCertificates.lean](PathPaddingCertificates.lean)
+
+The generated proofs use kernel reduction with `decide +kernel`, and the checker audits their axiom dependencies. The Python generators supply the tables and candidate trajectories. Their source data are pinned by SHA-256. The graph reductions that lead to these finite families remain part of the general mathematical proof.
 
 ## Reproduction
 
@@ -717,9 +728,12 @@ From a checkout with the pinned Lean dependencies installed, build the core modu
 ```sh
 lake build
 python -B research-unicyclic/run_checks.py
+python -B research-unicyclic/check_kernel_certificates.py
 ```
 
 The checker compiles the listed Lean modules, checks the reported axioms, and reproduces the path-padding, adjacent-fork and size-two witness reports and the order-eleven census. Its output is under `build/unicyclic-checks`. GitHub Actions uses the same entry point on Linux and Windows.
+
+The kernel checker regenerates the Lean inputs, compiles the two finite families and audits every generated module. Its sources, logs and summary are under `build/kernel-checks`. Use `--family fork` or `--family padding` to run one family and `--jobs` to control parallel compilations.
 
 The enumeration and replay scripts use the v1.0.1 simulator from commit 48ab3a42aece2e56df4c7db4ef3b68d61ea485c1. The input data and stored replays are in [evidence.zip](evidence.zip). To run a single check, prepare a working copy from the repository root.
 

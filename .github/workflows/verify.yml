@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    timeout-minutes: 120
     env:
       LEAN_NUM_THREADS: "2"
       PYTHONUTF8: "1"
@@ -48,6 +48,8 @@ jobs:
         run: python scripts/run_checks.py
       - name: Compile and reproduce unicyclic results
         run: python -B research-unicyclic/run_checks.py
+      - name: Check finite unicyclic certificates in Lean
+        run: python -B research-unicyclic/check_kernel_certificates.py --jobs 3
       - name: Preserve check logs and experiment results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
