@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "base_certificates": 670,
+  "extended_replays": 2010,
+  "bases_sha256": "952e60f8a0c3007e78719731c08dfa568bdd06910b5b04e5f13ccdabb53fe4f2",
+  "verifier_sha256": "9178ae6acfa12d5070ba0d4d6fd430a68222285c033de05865760c5b5694c0a1",
+  "simulator_sha256": "c5939b16bf482bb7550e586da9c32ef530cb6867368d8eb940394ae0b3b1164b"
+}

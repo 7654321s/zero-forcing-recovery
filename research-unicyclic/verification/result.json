@@ -1,0 +1,22 @@
+[
+  {
+    "module": "CycleSeeds",
+    "exit_code": 0,
+    "source_sha256": "5fabe8cfaf56ae9fc422903d6d43608de9106e2cf616abdd005440ba15a061e2"
+  },
+  {
+    "module": "CycleArcs",
+    "exit_code": 0,
+    "source_sha256": "321add542fb884f2b2a5ea0503c5f521e31136cd57dbebde202e555829e8cf4c"
+  },
+  {
+    "module": "CyclePacking",
+    "exit_code": 0,
+    "source_sha256": "54808cf88da8ceec0c68e8be88c0ab9805c4116edc36d78feed42b73dd47f9c9"
+  },
+  {
+    "module": "CycleSupport",
+    "exit_code": 0,
+    "source_sha256": "d37cc1f8ce79099d8a0f8010c3df5e00e5a1145f2136f8050cb1a62ebea90e00"
+  }
+]

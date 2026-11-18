@@ -1,0 +1,7 @@
+'FaultObservationResearch.cycle_exists_start_packing_at_white_zero' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.cycle_pair_packing_rotate' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.cycle_damaged_card_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.cycle_prefix_exists_of_card_ge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.cycle_pair_subset_arc_of_prefix' depends on axioms: [propext, Classical.choice, Quot.sound]

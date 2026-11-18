@@ -1,0 +1,21 @@
+'FaultObservationResearch.cycle_forcing_iff_adjacent_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.cycle_nonforcing_sdiff_iff_hits_edges' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.cycle_minimum_killing_iff_minimum_vertex_cover' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.cycle_step_white_card_le_of_zero_one' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.cycle_finishesBy_of_white_card_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.cycle_full_blue_robust_upper' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.cycle_guarded_region_finishesBy' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.cycle_not_finishesBy_white_chain' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.cycle_full_blue_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.cycle_exists_pair_packing_selector_at_white_zero' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.cycle_everyMinimumSupport_iff_white_zero' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

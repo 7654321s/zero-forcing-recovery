@@ -1,0 +1,8 @@
+'FaultObservationResearch.cycle_target_finishes_from_anchored_window' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'FaultObservationResearch.cycle_everyMinimumSupport' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.cycle_everyMinimumSupportTime' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FaultObservationResearch.everyMinimumSupport_of_cycleGraph_iso' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
