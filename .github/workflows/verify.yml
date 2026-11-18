@@ -46,6 +46,8 @@ jobs:
           $elanBin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Build, audit and reproduce examples
         run: python scripts/run_checks.py
+      - name: Compile and reproduce unicyclic results
+        run: python -B research-unicyclic/run_checks.py
       - name: Preserve check logs and experiment results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

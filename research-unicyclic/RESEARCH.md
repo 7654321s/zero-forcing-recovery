@@ -656,7 +656,32 @@ The remaining runs each consist of exactly two sites. Choose two consecutive run
 
 ## Coverage of the classification
 
-The pure-cycle and positive triangle arguments prove membership for all listed graphs. For exclusion, the twin theorem handles graphs with twins. The sole-site and two-site results handle those attachment counts. The triangle and four-cycle sections handle every placement on those cycle lengths. For longer cycles, graphs with at least two nonpath attachments admit the two-center obstruction. Graphs in which every site has a single path are covered by the path-interval arguments and the terminal extension criterion. Four or more sites with one nonpath attachment are handled by the exterior constructions and the short-fork verification. The final three-site case is covered by the bare-arc and adjacent-site reductions and the 670 fork bases. The exclusions give a minimum killing pair whose restricted worst time at budget one is strictly smaller than the unrestricted worst time.
+The pure-cycle and positive triangle arguments prove membership for all listed graphs. The following theorem records the strength of the exclusion direction.
+
+### Two-vertex certificates at budget one
+
+**Theorem.** In every finite connected simple unicyclic graph that fails EveryMinimumSupport, there are an initial blue set $B$, a two-element support $H\subseteq B$, a vertex $z\in B\setminus H$, and an integer deadline $R\ge0$ with the following properties.
+
+1. The coloring $B\setminus H$ never completes. Every coloring $B\setminus\{x\}$ for $x\in B$ completes.
+2. The intact coloring and both singleton losses from $H$ complete by round $R$.
+3. The coloring $B\setminus\{z\}$ completes strictly after round $R$.
+
+Conditions 1 and 2 make $H$ a minimum killing support because every loss set smaller than $H$ is empty or a singleton. Condition 2 bounds the restricted worst time at budget one by $R$. Condition 3 makes the unrestricted worst time strictly larger, and Condition 1 guarantees it is finite. These implications hold for any finite graph. In particular, testing only budget one and two-element minimum killing supports suffices to determine EveryMinimumSupport within the unicyclic class.
+
+**Proof of existence.** Apply the first applicable row. Each row points to the killing pair, the recovery argument for all singleton losses, and the finite strict time comparison.
+
+| Negative graph family | Certificate construction and exhaustion |
+| --- | --- |
+| A graph with twins | [Twin classification](#complete-classification-when-the-unicyclic-graph-has-twins), including the [shallow cases](#exclusion-of-shallow-attachments-with-a-pair-of-sibling-leaves) and the [two-white-vertex construction](#a-two-white-vertex-obstruction-for-deeper-attachments). |
+| A twin-free graph with a triangular core | [Triangle classification](#complete-classification-on-a-triangular-core), including [one path per site](#triangles-with-one-path-per-site) and the [two-site cases](#completion-of-the-two-site-triangle-classification). |
+| A twin-free graph with a four-cycle core | [Four-cycle classification](#complete-classification-on-a-four-cycle), with its [three-site and branching constructions](#four-cycle-configurations-and-a-stronger-fork-comparison). |
+| A longer cycle with at most two attachment sites | [One site](#one-attachment-site-and-some-separated-sites) and [two sites](#adjacent-short-pairs-and-exhaustion-of-two-sites-on-longer-cycles). |
+| A longer cycle with at least three sites and at least two nonpath attachments | [Distinct pendant centers](#time-comparisons-across-distinct-pendant-centers) and the [adjacent short pair](#adjacent-short-pairs-and-exhaustion-of-two-sites-on-longer-cycles). |
+| A longer cycle with at least three sites and only single-path attachments | [Short paths](#complete-classification-for-paths-of-length-at-most-two), [many single-path sites](#six-or-more-single-path-sites-with-arbitrary-lengths), and [terminal extensions](#completing-the-single-path-classification-by-extending-terminal-segments). |
+| A longer cycle with four or more sites and exactly one nonpath attachment | [Exterior interval and short-fork constructions](#four-or-more-sites-with-a-branching-attachment). |
+| A longer cycle with three sites and exactly one nonpath attachment | [Three-site reductions](#reductions-for-the-last-three-site-case), including [the 670 remaining bases and their extensions](#finite-certificates-for-the-remaining-fork-and-adjacent-sites). |
+
+A cycle of length at least five with no attachments belongs to the positive family, so the longer-cycle rows exhaust the negative cases. For a finite data check, the size-two witness replay verifies Conditions 1 through 3 for all 2,815 negative graphs in the census. This census check covers orders through eleven. The constructions and extension arguments in the table establish the theorem at arbitrary order.
 
 ## Relation to prior work
 
@@ -670,9 +695,33 @@ The literature check found related methods and parameters. Mathematical priority
 
 The sole-site, separated-sites, and two-site path proofs cover 192 of the 600 previously uncovered negative census members through order eleven. The common-center path arguments cover a further 55 after deduplicating overlaps. The all-blue tree and single-leaf extensions cover a further 209 and 114 respectively. Each of the last 30 is a triangle with at most one path per site and a path of length at least two, so the triangle-path theorem excludes them. Thus all 2,815 negative census members belong to the established families or are obtained by a certified extension from a smaller excluded graph. The paired-center, remote-path and successive-interval constructions directly cover 72 instances previously handled by the extension replays, and the direct-leaf theorem settles all shallow shapes at arbitrary order.
 
+## Lean verification of certificate extensions
+
+The Lean proofs use the same synchronous step and deadline semantics as the tree and pure-cycle modules.
+
+| Module | Proved statement |
+| --- | --- |
+| [CertificateDeadline.lean](CertificateDeadline.lean) | A budget-one witness with the three stated conditions gives a minimum killing pair and a counterexample to EveryMinimumSupport. If every extended restricted term is below a common slow bound, so is their maximum with the original restricted deadline. |
+| [AttachmentProjection.lean](AttachmentProjection.lean) | An all-blue attachment preserves the deadline when the old root is blue by round one. A dormant attachment preserves every old color and retains its seeds until the bridge can activate. |
+| [AttachmentTiming.lean](AttachmentTiming.lean) | A wholly white path of length $d$ attached to an initially white leaf that first appears in round $r$ finishes in round $r+d$. An alternating side path of length $J\ge2$ completes in round $r+\lceil J/2\rceil$ from its anchor's first blue round. Both results give exact completion conditions for the extended graph. |
+| [AttachmentRecovery.lean](AttachmentRecovery.lean) | Recovery on the core suffices to finish a pendant path. A blue head or successful core recovery with the root suppressed provides that recovery. On an all-blue path of length at least two the second vertex repairs a lost head in round one. |
+| [SubdivisionProjection.lean](SubdivisionProjection.lean) | Subdivision of a blue edge preserves each compared deadline while both original endpoints and the new vertices are blue. The recovery lemmas give the round-one repairs for a lost original endpoint or a lost inserted vertex. |
+| [SubdivisionCertificate.lean](SubdivisionCertificate.lean) | An all-blue subdivision transports a budget-one witness with the same deadline if the old endpoints are disjoint from the compared losses and each inserted vertex survives a singleton loss by round-one restoration. |
+
+The classification theorem combines the general mathematical case analysis with the finite coverage checks. The Lean modules prove the pure-cycle result and the extension and certificate statements listed here. The Python scripts continue to check the finite coverage tables.
+
 ## Reproduction
 
-The enumeration and replay scripts use the v1.0.1 simulator from commit 48ab3a42aece2e56df4c7db4ef3b68d61ea485c1. The input data and stored replays are in [evidence.zip](evidence.zip). Prepare a working copy from the repository root using Python 3.10 or later.
+From a checkout with the pinned Lean dependencies installed, build the core modules and run the unicyclic checks from the repository root with Python 3.10 or later.
+
+```sh
+lake build
+python -B research-unicyclic/run_checks.py
+```
+
+The checker compiles the listed Lean modules, checks the reported axioms, and reproduces the path-padding, adjacent-fork and size-two witness reports and the order-eleven census. Its output is under `build/unicyclic-checks`. GitHub Actions uses the same entry point on Linux and Windows.
+
+The enumeration and replay scripts use the v1.0.1 simulator from commit 48ab3a42aece2e56df4c7db4ef3b68d61ea485c1. The input data and stored replays are in [evidence.zip](evidence.zip). To run a single check, prepare a working copy from the repository root.
 
 ```sh
 python research-unicyclic/prepare_reproduction.py
@@ -727,4 +776,4 @@ A positive census result checks all forcing sets, all minimum killing sets, and 
 - three-site-adjacent-replay.json records 17,982 parameter replays of the two long-gap regimes for adjacent single-path sites. Regenerate it with verify_three_site_adjacent.py and a new --output path.
 - three-site-side-paths-replay.json records 720 parameter replays and 120 census certificates for the side-leaf and long-side-path comparisons. Regenerate it with verify_three_site_side_paths.py and a new --output path.
 - adjacent-fork-coverage-replay.json records the independent check of all 670 base certificates and 2,010 extensions. Run py -3 -B verify_adjacent_fork_bases.py --output adjacent-fork-coverage-rerun.json from this directory. To regenerate the base search, run py -3 -B explore_adjacent_fork_bases.py --output adjacent-fork-bases-rerun.json and pass that file to the verifier with --bases.
-- [verification/result.json](verification/result.json) and the accompanying logs record the successful Lean compilation and the transitive axioms of both pure-cycle theorem statements and the isomorphism transfer. Run check_cycle_modules.py from the prepared directory with the absolute path to a built repository checkout as --base, the absolute Lean 4.35.0 executable directory as --bin, and CycleSeeds CycleArcs CyclePacking CycleSupport as the ordered module arguments.
+- [verification/result.json](verification/result.json) and the accompanying logs preserve the original successful pure-cycle Lean compilation and its transitive axioms. The [extension audit](verification/extension-result.json) records the source hashes and accepted axioms of all ten cycle and certificate modules.

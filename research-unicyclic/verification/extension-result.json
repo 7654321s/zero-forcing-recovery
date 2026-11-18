@@ -1,0 +1,102 @@
+[
+  {
+    "module": "CycleSeeds",
+    "exit_code": 0,
+    "source_sha256": "5fabe8cfaf56ae9fc422903d6d43608de9106e2cf616abdd005440ba15a061e2",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "module": "CycleArcs",
+    "exit_code": 0,
+    "source_sha256": "321add542fb884f2b2a5ea0503c5f521e31136cd57dbebde202e555829e8cf4c",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "module": "CyclePacking",
+    "exit_code": 0,
+    "source_sha256": "54808cf88da8ceec0c68e8be88c0ab9805c4116edc36d78feed42b73dd47f9c9",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "module": "CycleSupport",
+    "exit_code": 0,
+    "source_sha256": "d37cc1f8ce79099d8a0f8010c3df5e00e5a1145f2136f8050cb1a62ebea90e00",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "module": "CertificateDeadline",
+    "exit_code": 0,
+    "source_sha256": "627ac750fa8e7fc1106369bd49abfae9abbcb1b13ddf8bb22d292e34f51f4f96",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "module": "AttachmentProjection",
+    "exit_code": 0,
+    "source_sha256": "bbfb52c3cf14404958e6a7b591b4470119e2725af2abf056c1b458a810ca1a3e",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "module": "AttachmentTiming",
+    "exit_code": 0,
+    "source_sha256": "63da4fb01ced284046b0ac5db371fef055d440c995588ba2bf325c87f1f8286d",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "module": "AttachmentRecovery",
+    "exit_code": 0,
+    "source_sha256": "ced26dee4131819b64141e23294d667b92f517826f267b9c1c5cda4794235332",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "module": "SubdivisionProjection",
+    "exit_code": 0,
+    "source_sha256": "fb544a0645112f27f2e17c15cb6b013812d7347263f5b378ca4b6f24f1e10921",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  {
+    "module": "SubdivisionCertificate",
+    "exit_code": 0,
+    "source_sha256": "9c5941ca9d98a7b5bf2c40b981ba20690637b5d855e41f05475a47827e7f65b2",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  }
+]
