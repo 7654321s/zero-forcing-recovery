@@ -85,17 +85,41 @@ files = [str(p.relative_to(ROOT)) for p in sorted((ROOT/'assets').iterdir()) if 
 notes = (ROOT/'release-notes.md').read_text(encoding='utf-8')
 notes += '\nSource commit: `'+TARGET+'`.\n\nCloud verification: '+run['html_url']+'\n'
 (ROOT/'release-notes-final.md').write_text(notes, encoding='utf-8')
-existing = subprocess.run(['gh', 'release', 'view', TAG, '--repo', REPO, '--json', 'isDraft,targetCommitish'], capture_output=True, text=True)
-assert existing.returncode != 0, 'Release already exists; preserve it and inspect before retrying publication.'
-gh('release', 'create', TAG, *files, '--repo', REPO, '--target', TARGET, '--draft', '--title', 'v1.0.1: finite-tree classification and reproducible Lean proofs', '--notes-file', 'release-notes-final.md')
-draft = api(f'repos/{REPO}/releases/tags/{TAG}')
+existing = [x for x in api(f'repos/{REPO}/releases?per_page=100') if x['tag_name'] == TAG]
+assert len(existing) <= 1
+if existing:
+    draft = existing[0]
+else:
+    gh('release', 'create', TAG, *files, '--repo', REPO, '--target', TARGET, '--draft', '--title', 'v1.0.1: finite-tree classification and reproducible Lean proofs', '--notes-file', 'release-notes-final.md')
+    matches = [x for x in api(f'repos/{REPO}/releases?per_page=100') if x['tag_name'] == TAG]
+    assert len(matches) == 1
+    draft = matches[0]
 assert draft['draft'] is True and draft['target_commitish'] == TARGET
 assets = {x['name']: x for x in draft['assets']}
 assert set(assets) == {Path(x).name for x in files}
+downloaded = ROOT/'.uploaded-assets'
+downloaded.mkdir()
 for name, asset in assets.items():
-    assert asset['size'] == (ROOT/'assets'/name).stat().st_size
-    assert asset.get('digest') == 'sha256:'+sha(ROOT/'assets'/name), name
-gh('release', 'edit', TAG, '--repo', REPO, '--draft=false', '--latest')
+    assert Path(name).name == name
+    destination = downloaded/name
+    with destination.open('wb') as output:
+        subprocess.run(['gh', 'api', f"repos/{REPO}/releases/assets/{asset['id']}", '-H', 'Accept: application/octet-stream'], stdout=output, stderr=subprocess.PIPE, check=True)
+    assert asset['size'] == destination.stat().st_size
+    assert asset.get('digest') == 'sha256:'+sha(destination), name
+    if name in inventory['assets']:
+        assert sha(destination) == inventory['assets'][name]
+uploaded_receipt = json.loads((downloaded/'ci-verification.json').read_text(encoding='utf-8'))
+assert uploaded_receipt['source_commit'] == TARGET and uploaded_receipt['status'] == 'passed_both_platforms'
+assert uploaded_receipt['workflow_run_id'] == run['id']
+assert {x['operating_system']:x for x in uploaded_receipt['summaries']} == {x['operating_system']:x for x in summaries}
+assert uploaded_receipt['log_archive_sha256'] == sha(downloaded/'ci-verification-v1.0.1.zip')
+with zipfile.ZipFile(downloaded/'ci-verification-v1.0.1.zip') as uploaded_zip, zipfile.ZipFile(archive) as current_zip:
+    assert set(uploaded_zip.namelist()) == set(current_zip.namelist())
+    assert all(uploaded_zip.read(name) == current_zip.read(name) for name in uploaded_zip.namelist())
+for line in (downloaded/'SHA256SUMS').read_text(encoding='utf-8').splitlines():
+    digest, name = line.split('  ', 1)
+    assert name in assets and sha(downloaded/name) == digest
+gh('api', '--method', 'PATCH', f"repos/{REPO}/releases/{draft['id']}", '-F', 'draft=false', '-f', 'make_latest=true')
 published = api(f'repos/{REPO}/releases/tags/{TAG}')
 tag = api(f'repos/{REPO}/git/ref/tags/{TAG}')
 assert published['draft'] is False and tag['object']['type'] == 'commit' and tag['object']['sha'] == TARGET
