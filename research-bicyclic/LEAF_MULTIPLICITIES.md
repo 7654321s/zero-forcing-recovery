@@ -33,10 +33,24 @@ The positive cases follow from [the previous direct-leaf proofs](ATTACHMENTS.md#
 | $\Theta(2,2,2)$ | 1 | 59 |
 | $\Theta(2,2,3)$ | 1 | 269 |
 
+## Negative bicyclic cores through order eight
+
+Let $G$ be a finite connected simple bicyclic graph of minimum degree at least two with at most eight vertices, and suppose $G$ is outside the four positive classes. Attaching any number of direct leaves at any vertices of $G$ still gives a negative graph. In fact every such attachment has a budget-one certificate with a two-element minimum killing support and finite recovery under every singleton loss.
+
+The [bicyclic decomposition](NEARBY_FAMILIES.md#bicyclic-graphs-of-minimum-degree-two) lists the possible cores by sorted lengths. For each negative core through order eight, enumerate leaf counts in $\{0,1,2\}$ up to its automorphisms. The following counts give the verified scope. The checker constructs and replays a certificate for every row of the enumeration. Truncation then gives the result for unbounded leaf counts. Consequently the previous classification on the four positive cores also classifies all bicyclic graphs whose core has at most eight vertices and whose off-core vertices are direct leaves.
+
+| Order of the core | Negative cores | Compressed configurations with certificates |
+| ---: | ---: | ---: |
+| 5 | 1 | 135 |
+| 6 | 4 | 1,116 |
+| 7 | 8 | 6,534 |
+| 8 | 12 | 28,122 |
+| **Total** | **25** | **35,907** |
+
 ## Reproduction
 
 ```sh
 python -B research-bicyclic/check_leaf_multiplicities.py
 ```
 
-The checker generates the 429 compressed configurations, checks the nine positives exhaustively, and searches for then verifies every negative certificate. It uses the mandatory blue leaves of any repeated group to restrict that search. It also increases the multiplicities in each applicable negative configuration and replays 363 enlarged certificates. The proof of the reduction applies to any finite base graph.
+On the four positive cores, the checker generates 429 compressed configurations, checks the nine positive configurations exhaustively, and searches for then verifies every negative certificate. It also increases the multiplicities in each applicable negative configuration on these cores and replays 363 enlarged certificates. On the negative cores through order eight, it generates and checks the further 35,907 certificates. The option `--max-negative-core-order` changes that finite search bound. In both parts the search uses the mandatory blue leaves of any repeated group. The reduction itself applies to any finite base graph.

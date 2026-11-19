@@ -1,7 +1,8 @@
-"""Check the compressed direct-leaf attachments on the four positive bicyclic cores."""
+"""Check compressed direct-leaf attachments on positive and bounded bicyclic cores."""
 
+import argparse
 from functools import lru_cache
-from itertools import combinations, permutations, product
+from itertools import combinations, combinations_with_replacement, permutations, product
 from pathlib import Path
 import runpy
 
@@ -25,7 +26,7 @@ def expected_positive(name, counts):
         return not any(counts[1:])
     if name == 'theta122':
         return not any(counts[2:]) and (min(counts[:2]) == 0 or min(counts[:2]) == 2)
-    return not any(counts)
+    return name in ('theta222', 'theta223') and not any(counts)
 
 
 def find_pair(adj, mandatory):
@@ -61,7 +62,7 @@ def replay(adj, row, blue_extra=0):
                     row['restricted_deadline'], row['slow_completion_time'])
 
 
-def check_core(name, core):
+def check_core(name, core, expand=True):
     perms = list(automorphisms(core))
     positive = negative = expanded = 0
     for counts in product(range(3), repeat=len(core)):
@@ -88,6 +89,8 @@ def check_core(name, core):
         replay(adj, row)
         negative += 1
 
+        if not expand:
+            continue
         blue_extra = 0
         for v, amount in enumerate(counts):
             if amount == 2:
@@ -98,7 +101,25 @@ def check_core(name, core):
     return positive, negative, expanded
 
 
+def negative_bicyclic_cores(max_order):
+    for lengths in combinations_with_replacement(range(1, max_order), 3):
+        if lengths[1] >= 2 and sum(lengths) <= max_order + 1 and lengths not in THETA['POSITIVE_CORES']:
+            yield f'theta{lengths}', THETA['theta'](lengths)[0]
+
+    two_cycles = SINGLE_SITE['TWO_CYCLES']
+    for p, q in combinations_with_replacement(range(3, max_order), 2):
+        if p + q - 1 <= max_order and (p, q) != (3, 3):
+            yield f'shared{p, q}', two_cycles['graph'](p, q, True)[0]
+        for length in range(1, max_order + 2 - p - q):
+            yield f'path{p, q, length}', two_cycles['graph'](p, q, False, length)[0]
+
+
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--max-negative-core-order', type=int, default=8)
+    args = parser.parse_args()
+    if args.max_negative_core_order < 4:
+        parser.error('--max-negative-core-order must be at least 4')
     all_positive = all_negative = all_expanded = 0
     for name, core in SINGLE_SITE['cores']().items():
         positive, negative, expanded = check_core(name, core)
@@ -106,8 +127,16 @@ def main():
         all_positive += positive
         all_negative += negative
         all_expanded += expanded
-    print('Total compressed configurations:', all_positive + all_negative)
-    print('Larger certificate replays:', all_expanded)
+    print('Total compressed configurations on positive cores:', all_positive + all_negative, flush=True)
+    print('Larger certificate replays:', all_expanded, flush=True)
+
+    core_count = cert_count = 0
+    for name, core in negative_bicyclic_cores(args.max_negative_core_order):
+        _, negative, _ = check_core(name, core, expand=False)
+        core_count += 1
+        cert_count += negative
+    print(f'Negative cores through order {args.max_negative_core_order}: {core_count}', flush=True)
+    print('Compressed negative-core certificates:', cert_count, flush=True)
 
 
 if __name__ == '__main__':
