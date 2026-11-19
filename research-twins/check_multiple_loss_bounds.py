@@ -76,11 +76,12 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
     if [late[v] for v in distinguished] != list(range(delayed, intact, -1)):
         raise AssertionError(('incorrect sequence of arrival rounds', distinguished))
 
-    visits, edges, nonroots = [], set(), 0
+    visits, visit_sizes, root_visits, edges = [], [], set(), set()
     previous = None
     for vertex, selected in trail:
         if previous is None:
             visits.append(representative[vertex])
+            visit_sizes.append(0)
         else:
             edge = frozenset((previous, vertex))
             if edge in edges:
@@ -88,17 +89,25 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
             edges.add(edge)
             if edge not in forest_edges:
                 visits.append(representative.get(vertex, vertex))
-                nonroots = 0
+                visit_sizes.append(0)
         if selected:
             if vertex not in representative:
                 raise AssertionError(('uncovered discrepancy', vertex))
-            nonroots += vertex not in roots
-            if nonroots > 2 * intact:
-                raise AssertionError(('too many nonroots in one visit', vertex, nonroots))
+            visit_sizes[-1] += 1
+            if vertex in roots:
+                root_visits.add(len(visits) - 1)
         previous = vertex
 
+    surcharge = max(0, 2 * intact - 1)
+    for index, size in enumerate(visit_sizes):
+        limit = 2 * intact + 1 if index in root_visits else surcharge
+        if size > limit:
+            raise AssertionError(('too many arrivals in one visit', index, size, limit))
     revisits = len(visits) - len(set(visits))
-    if revisits > cycle_rank or delayed > intact + (2 * intact + 1) * len(roots) + 2 * intact * revisits:
+    upper = intact + (2 * intact + 1) * len(roots) + surcharge * revisits
+    if intact == 1 and cycle_rank > 0:
+        upper = min(upper, 3 * len(roots) + cycle_rank)
+    if revisits > cycle_rank or delayed > upper:
         raise AssertionError(('cycle rank bound', intact, delayed, cycle_rank, revisits))
     return intact, delayed, revisits
 
@@ -161,12 +170,13 @@ def check_small_subcubic_one_round():
     return checked
 
 
-def protect_seeds(degree, edges, blue, order, deliberately_lost, seed):
+def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique_support=True):
     """Add private blue paths and a connected minimum killing support."""
     losses = len(deliberately_lost)
     support = range(order, order + losses + 1)
     order = support.stop
-    support_pairs = combinations(support, 2) if losses <= degree else pairwise(support)
+    support_pairs = (combinations(support, 2) if clique_support and losses <= degree
+                     else pairwise(support))
     attachment = order
     for left, right in support_pairs:
         edges.extend(((order, left), (order, right)))
@@ -185,6 +195,36 @@ def protect_seeds(degree, edges, blue, order, deliberately_lost, seed):
             paths.append(tuple(path))
             order = path.stop
     return adjacency(order, edges), mask([*blue, *support]), mask(support), paths
+
+
+def sparse_one_round_certificate(losses, cyclic_blocks, extra_cycle):
+    seed, endpoint = 0, 1
+    edges, blue, deliberately_lost = [(seed, endpoint)], [seed], []
+    order = 2
+    for index in range(losses):
+        if index < cyclic_blocks:
+            a, b, c, z, p, q, u = range(order, order + 7)
+            edges.extend(((endpoint, a), (a, z), (a, b), (a, u), (b, u),
+                          (z, p), (b, p), (z, q), (c, q)))
+            blue.extend((z, p, q, u))
+            endpoint = c
+            order += 7
+        else:
+            a, b, z, p = range(order, order + 4)
+            edges.extend(pairwise((endpoint, a, z, p, b)))
+            blue.extend((z, p))
+            endpoint = b
+            order += 4
+        deliberately_lost.append(z)
+    if extra_cycle:
+        x, y, z = range(order, order + 3)
+        edges.extend(((seed, x), (x, y), (y, z), (z, x)))
+        blue.extend((x, y, z))
+        order += 3
+    graph, initial, support, paths = protect_seeds(
+        4, edges, blue, order, deliberately_lost, seed, clique_support=False
+    )
+    return graph, initial, mask(deliberately_lost), support, paths
 
 
 def one_round_certificate(degree, losses):
@@ -360,13 +400,14 @@ def check_all_losses(graph, blue, limit):
     return checked
 
 
-def check_robust_samples(graph, blue, slow, support, paths, degree, rounds, losses):
+def check_robust_samples(graph, blue, slow, support, paths, degree, rounds, losses, *,
+                         clique_support=True):
     check_connected(graph, degree)
     if completion_time(graph, blue) != rounds or completion_time(graph, blue ^ support) <= len(graph):
         raise AssertionError(('intact or killing time', degree, rounds, losses))
     support_time = max(completion_time(graph, blue ^ support ^ (1 << retained))
                        for retained in members(support))
-    expected = rounds if losses <= degree else max(rounds, losses)
+    expected = rounds if clique_support and losses <= degree else max(rounds, losses)
     if support_time != expected:
         raise AssertionError(('restricted deadline', support_time, expected))
     if any(completion_time(graph, blue ^ (1 << lost)) != rounds for lost in members(support)):
@@ -413,6 +454,20 @@ def main():
         if completion_time(graph, blue ^ support) <= len(graph):
             raise AssertionError(('cycle support survives', t, k))
         exhaustive += check_all_losses(graph, blue, k)
+
+    for k, blocks, extra in ((1, 0, True), (2, 0, True), (8, 0, True),
+                              (1, 1, False), (2, 1, False), (8, 1, False), (5, 4, True)):
+        graph, blue, slow, support, paths = sparse_one_round_certificate(k, blocks, extra)
+        sampled += check_robust_samples(graph, blue, slow, support, paths, 4, 1, k,
+                                        clique_support=False)
+        actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
+        rank = 2 * blocks + extra
+        intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
+        if (intact, delayed, actual_rank) != (1, 1 + 3 * k + blocks, rank):
+            raise AssertionError(('sparse one-round delay', k, blocks, extra, delayed, actual_rank))
+        if k <= 2:
+            exhaustive += check_all_losses(graph, blue, k)
+        print('Sparse one-round family:', rank, k, len(graph), delayed)
 
     for d, k in ((4, 2), (5, 3), (7, 4), (4, 6)):
         graph, blue, slow, support, paths, n = one_round_certificate(d, k)
@@ -475,7 +530,7 @@ def main():
             raise AssertionError(('concatenated two-round delay', d, k, expected, upper))
         print('Concatenated two-round family:', d, k, len(graph), expected, upper)
 
-    print('Exhaustive losses on the degree-two and small one-round examples:', exhaustive)
+    print('Exhaustive losses on degree-two, sparse-cycle and small one-round examples:', exhaustive)
     print('Recoverable losses checked against the cycle upper bound:', check_small_cycles())
     print('Recoverable losses checked against the subcubic one-round bound:',
           check_small_subcubic_one_round())
