@@ -1563,6 +1563,52 @@ def cubic_fourteen_round_certificate(cycle_rank=16):
     return adjacency(order, edges), blue, mask((0, 16))
 
 
+def cubic_two_round_chain_certificate(losses, cycle_rank=None):
+    """Use one designated loss per block in a three-connected cubic chain."""
+    if losses < 1:
+        raise ValueError('The chain requires at least one designated loss')
+    minimum_rank = 9 if losses == 1 else 8 * losses + 2
+    rank = minimum_rank if cycle_rank is None else cycle_rank
+    if rank < minimum_rank:
+        raise ValueError('The requested rank is below the rank of this construction')
+
+    graph, blue, _ = SINGLE['cubic_eight_round_certificate']()
+    edges = [(v, w) for v, row in enumerate(graph) for w in members(row) if v < w]
+    lost = 1
+    waves = [(13,), (12,), (4,), (7,), (3,), (0,), (2,), (5, 6)]
+    padding = ((8, 14), (9, 15))
+    if losses > 1:
+        block_edges = [(v, w) for v, w in edges if w < 12]
+        block_blue = blue & ((1 << 12) - 1)
+        SINGLE['expand_cubic_edge_pair'](edges, 16, *padding, 1)
+        graph = adjacency(18, edges)
+        blue |= mask((16, 17))
+        hub, tail = 16, (5, 6)
+        prism = SINGLE['cubic_padding_graph'](6)
+        for _ in range(losses - 1):
+            graph, labels = SINGLE['replace_cubic_vertex'](graph, hub, prism)
+            blue |= mask(labels[1:])
+            # Port 1 stays in the blue set. Vertex 4 becomes the relay.
+            hub, relay = labels[1], labels[4]
+            start = len(graph)
+            edges = [(v, w) for v, row in enumerate(graph) for w in members(row)
+                     if v < w and relay not in (v, w) and (v, w) != tail]
+            edges.extend(((tail[0], relay), (tail[1], relay), (relay, start + 4)))
+            edges.extend(zip(members(graph[relay]), (start + 8, start + 9, start + 10)))
+            edges.extend((start + v, start + w) for v, w in block_edges)
+            graph = adjacency(start + 12, edges)
+            blue |= block_blue << start
+            lost |= 1 << start
+            tail = (start + 5, start + 6)
+            waves.extend(tuple(start + v for v in wave) for wave in ((4,), (7,), (3,), (0,), (2,), (5, 6)))
+        contact = next(w for w in members(graph[8]) if w >= 16)
+        padding = ((8, contact), (10, 15))
+    order = 2 * (rank - 1)
+    SINGLE['expand_cubic_edge_pair'](edges, len(graph), *padding, rank - minimum_rank)
+    blue |= mask(range(len(graph), order))
+    return adjacency(order, edges), blue, lost, waves
+
+
 def cubic_two_fault_gap_certificate(cycle_rank=10):
     """Give a two-fault-tolerant cubic witness with unrestricted time nine."""
     if cycle_rank < 10 or cycle_rank == 11:
@@ -2106,6 +2152,26 @@ def main():
         ])
         exhaustive += check_all_losses(graph, blue, 1)
         print('Cubic fourteen-round two-loss chain:', rank, len(graph))
+
+    block, original_blue, _ = SINGLE['cubic_eight_round_certificate']()
+    block_edges = [(v, w) for v, row in enumerate(block) for w in members(row) if v < w]
+    for order, losses in ((16, (1, 10, 11)), (12, (1, 11))):
+        for keep_tail_edge in (False, True):
+            local = adjacency(order, [(v, w) for v, w in block_edges
+                                      if w < order and (keep_tail_edge or (v, w) != (5, 6))])
+            for seed in losses:
+                if completion_time(local, (original_blue & ((1 << order) - 1)) ^ (1 << seed)) > order:
+                    raise AssertionError(('local cubic chain recovery', order, seed))
+    for losses, rank in ((1, 9), (1, 12), (2, 18), (3, 27), (5, 42), (12, 103)):
+        graph, blue, lost, waves = cubic_two_round_chain_certificate(losses, rank)
+        if (any(row.bit_count() != 3 for row in graph) or len(graph) // 2 + 1 != rank
+                or completion_time(graph, blue) != 2 or lost.bit_count() != losses
+                or len(waves) != 2 + 6 * losses):
+            raise AssertionError(('cubic chain metadata', losses, rank))
+        check_no_two_edge_cut(graph)
+        check_arrival_waves(graph, blue ^ lost, waves)
+        exhaustive += check_all_losses(graph, blue, 1)
+        print('Cubic two-round chain:', losses, rank, len(waves))
 
     for rank in (10, 12, 13, 22):
         graph, blue, lost, support = cubic_two_fault_gap_certificate(rank)
