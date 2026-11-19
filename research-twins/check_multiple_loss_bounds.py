@@ -131,6 +131,8 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
             upper = min(upper, (cycle_rank + 19) // 2)
         elif len(roots) >= 2:
             upper = min(upper, 2 + (3 * cycle_rank + 13 * len(roots)) // 2)
+        if cycle_rank == 1 and all(row.bit_count() <= 3 for row in graph):
+            upper = min(upper, 3 + 5 * len(roots))
     if intact >= 3:
         upper = min(upper, intact + (2 * intact + 3) * len(roots) + (2 * intact - 3) * cycle_rank)
     if revisits > cycle_rank or delayed > upper:
@@ -214,7 +216,8 @@ def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique
         edges.extend(((order, left), (order, right)))
         blue.append(order)
         order += 1
-    edges.append((seed, attachment))
+    if degree != 3:
+        edges.append((seed, attachment))
 
     paths = []
     unprotected = set(deliberately_lost)
@@ -223,6 +226,8 @@ def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique
             path = range(order, order + 2 * losses + 2)
             edges.append((vertex, path[0]))
             edges.extend(pairwise(path))
+            if degree == 3 and vertex == attachment:
+                edges.append((seed, path[-1]))
             blue.extend(path)
             paths.append(tuple(path))
             order = path.stop
@@ -637,6 +642,38 @@ def layered_certificate(degree, rounds, losses):
     return graph, initial, mask(deliberately_lost), support, paths, early
 
 
+def subcubic_low_rank_certificate(losses, cycle_rank):
+    seed, endpoint = 0, 2
+    edges, blue, lost = [(0, 1), (1, 2)], [seed], []
+    additions = [(1,), (2,)]
+    order = 3
+    for block in range(losses):
+        root = order
+        order += 1
+        blue.append(root)
+        lost.append(root)
+        order, left = relay_arm(edges, blue, root, order, 2)
+        order, right = relay_arm(edges, blue, root, order, 2)
+        waves = [(left[1],), (left[0],), (root,), (right[0],), (right[1],)]
+        if block < cycle_rank:
+            center, guard, relay, target = range(order, order + 4)
+            order += 4
+            blue.append(relay)
+            edges.extend(((root, center), (center, guard), (center, relay),
+                          (relay, target), (endpoint, target), (target, left[1])))
+            additions.append((target,))
+            waves[0] += (center,)
+            waves[3] += (guard,)
+        else:
+            edges.append((endpoint, left[1]))
+        additions.extend(waves)
+        endpoint = right[1]
+    graph, initial, support, paths = protect_seeds(
+        3, edges, blue, order, lost, seed, clique_support=False
+    )
+    return graph, initial, mask(lost), support, paths, additions
+
+
 def subcubic_two_round_certificate(losses):
     block, block_blue, size, entry, tail = SINGLE['subcubic_two_round_block']()
     seed, first, prefix = range(losses * size, losses * size + 3)
@@ -841,6 +878,19 @@ def main():
 
     if observed_extremizers != rank_extremizers:
         raise AssertionError(('two-round rank extrema', observed_extremizers, rank_extremizers))
+
+    for k, rank in ((1, 1), (2, 1), (2, 2), (3, 1), (5, 1), (5, 3), (7, 7)):
+        graph, blue, slow, support, paths, waves = subcubic_low_rank_certificate(k, rank)
+        sampled += check_robust_samples(graph, blue, slow, support, paths, 3, 2, k,
+                                        clique_support=False)
+        intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
+        actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
+        if (intact, delayed, actual_rank) != (2, 2 + 5 * k + rank, rank):
+            raise AssertionError(('subcubic low-rank recovery', k, rank, intact, delayed, actual_rank))
+        check_arrival_waves(graph, blue ^ slow, waves)
+        if k <= 2:
+            exhaustive += check_all_losses(graph, blue, k)
+        print('Subcubic low-rank recovery:', k, rank, len(graph), delayed)
 
     for t in (1, 2, 4, 7):
         for k in (1, 2, 3, 4, 6):
