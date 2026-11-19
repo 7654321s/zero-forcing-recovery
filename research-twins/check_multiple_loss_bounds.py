@@ -2,8 +2,9 @@
 
 from collections import Counter, defaultdict, namedtuple
 from fractions import Fraction
+from functools import lru_cache
 from heapq import heappop, heappush
-from itertools import combinations, groupby, pairwise
+from itertools import chain, combinations, groupby, pairwise
 from pathlib import Path
 from random import Random
 import runpy
@@ -1785,6 +1786,100 @@ def check_compact_cubic_chain_killing_pairs():
     return tested
 
 
+def bipartite_cubic_chain_certificate(blocks, cycle_rank=None):
+    """Lift the compact chain and its intact and delayed waves to two sheets."""
+    if cycle_rank is not None and cycle_rank % 2 == 0:
+        raise ValueError('The bipartite double cover has odd cycle rank')
+    base_rank = None if cycle_rank is None else (cycle_rank + 1) // 2
+    if blocks == 1:
+        base_rank = 10 if base_rank is None else base_rank
+        if base_rank < 10:
+            raise ValueError('The one-block cover needs at least one padding column')
+    graph, blue, lost, waves = compact_cubic_two_round_chain_certificate(blocks, base_rank)
+    lifted = adjacency(2 * len(graph), ((2 * v + sheet, 2 * w + 1 - sheet)
+                                       for v, row in enumerate(graph) for w in members(row) if v < w
+                                       for sheet in (0, 1)))
+    seeds = mask(2 * v + sheet for v in members(blue) for sheet in (0, 1))
+    deleted = mask(2 * v + sheet for v in members(lost) for sheet in (0, 1))
+    lifted_waves = [tuple(2 * v + sheet for v in wave for sheet in (0, 1)) for wave in waves]
+    return lifted, seeds, deleted, lifted_waves
+
+
+def cubic_loss_deadlines(graph, blue, budget):
+    """Compute maximum parallel times for each loss budget, with None for a stall."""
+    def minimal(terms):
+        if 0 in terms:
+            return (0,)
+        result = []
+        for term in terms:
+            submask = (term - 1) & term
+            while submask and submask not in terms:
+                submask = (submask - 1) & term
+            if not submask:
+                result.append(term)
+        return tuple(sorted(result))
+
+    @lru_cache(maxsize=32768)
+    def conjoin(left, right):
+        if left == (0,):
+            return right
+        if right == (0,):
+            return left
+        return minimal({a | b for a in left for b in right if (a | b).bit_count() <= budget})
+
+    @lru_cache(maxsize=32768)
+    def disjoin(left, middle, right):
+        return minimal(set(chain(left, middle, right)))
+
+    neighbors = [tuple(members(row)) for row in graph]
+    sources = [[(u, *(w for w in neighbors[u] if w != v)) for u in row]
+               for v, row in enumerate(neighbors)]
+    state = [((1 << v,) if budget else ()) if blue & (1 << v) else (0,) for v in range(len(graph))]
+    deadlines = [None] * (budget + 1)
+    for round_number in range(len(graph) + 1):
+        first_white = min((term.bit_count() for term in chain.from_iterable(state)), default=budget + 1)
+        for size in range(first_white):
+            if deadlines[size] is None:
+                deadlines[size] = round_number
+        if first_white > budget:
+            break
+        after = []
+        for still_white, candidates in zip(state, sources):
+            for u, a, b in candidates:
+                if not still_white:
+                    break
+                # A force from u is blocked if any of u, a or b is white.
+                still_white = conjoin(still_white, disjoin(state[u], state[a], state[b]))
+            after.append(still_white)
+        if after == state:
+            break
+        state = after
+    return tuple(deadlines)
+
+
+def check_bipartite_cubic_chain_deadlines():
+    cases = 0
+    for blocks in range(1, 28):
+        minimum_base_rank = (13 * blocks + 4) // 2 + 1
+        for padding in range(int(blocks == 1), 6):
+            rank = 2 * (minimum_base_rank + padding) - 1
+            graph, blue, lost, waves = bipartite_cubic_chain_certificate(blocks, rank)
+            deadlines = cubic_loss_deadlines(graph, blue, 3)
+            if any(actual is None or actual > bound for actual, bound in zip(deadlines, (2, 5, 8, 11))):
+                raise AssertionError(('bipartite chain loss deadlines', blocks, padding, deadlines))
+            if len(waves) != 6 * blocks + 2 or completion_time(graph, blue) != 2 or lost.bit_count() != 2 * blocks:
+                raise AssertionError(('bipartite chain metadata', blocks, padding))
+            check_arrival_waves(graph, blue ^ lost, waves)
+            if blocks >= 4:
+                first_spare = 17 + 13 * (1 + blocks % 2)
+                next_start = first_spare + 13
+                triple = mask((2 * (first_spare + 8), 2 * next_start + 1, 2 * (next_start + 1) + 1))
+                if completion_time(graph, blue ^ triple) != 11:
+                    raise AssertionError(('bipartite chain eleven-round witness', blocks, padding))
+            cases += 1
+    return cases
+
+
 def cubic_two_fault_gap_certificate(cycle_rank=10):
     """Give a two-fault-tolerant cubic witness with unrestricted time nine."""
     if cycle_rank < 10 or cycle_rank == 11:
@@ -2369,6 +2464,7 @@ def main():
         check_cubic_chain_loss_patterns(certificate, 9, padded_rank)
     print('Cubic chain designated loss patterns: 3068 subsets')
     print('Compact cubic chain killing pairs:', check_compact_cubic_chain_killing_pairs(), 'two-seed cases')
+    print('Bipartite cubic chain loss deadlines:', check_bipartite_cubic_chain_deadlines(), 'finite cases')
 
     for rank in (10, 12, 13, 22):
         graph, blue, lost, support = cubic_two_fault_gap_certificate(rank)
