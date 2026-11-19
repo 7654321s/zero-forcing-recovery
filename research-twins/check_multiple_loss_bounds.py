@@ -131,6 +131,8 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
             upper = min(upper, (cycle_rank + 19) // 2)
         elif len(roots) >= 2:
             upper = min(upper, 2 + (3 * cycle_rank + 13 * len(roots)) // 2)
+    if intact >= 3:
+        upper = min(upper, intact + (2 * intact + 3) * len(roots) + (2 * intact - 3) * cycle_rank)
     if revisits > cycle_rank or delayed > upper:
         raise AssertionError(('cycle rank bound', intact, delayed, cycle_rank, revisits))
     return intact, delayed, revisits
@@ -296,6 +298,64 @@ def low_rank_recovery_certificate(rounds, losses, cycle_rank, *, degree=4):
         endpoint = right[-1]
     unused_rank = cycle_rank - cyclic_blocks - 2 * extra
     order = append_blue_triangles(edges, blue, seed, order, unused_rank)
+    graph, initial, support, paths = protect_seeds(
+        degree, edges, blue, order, deliberately_lost, seed, clique_support=False
+    )
+    return graph, initial, mask(deliberately_lost), support, paths, additions
+
+
+def recovery_detour(edges, blue, parent, order, length):
+    center, guard = order, order + 1
+    edges.extend(((parent, center), (center, guard)))
+    order, left = relay_arm(edges, blue, center, order + 2, length)
+    order, right = relay_arm(edges, blue, center, order, length)
+    return order, left[-1], right[-1], guard, [*reversed(left), center, *right]
+
+
+def deep_detour_recovery_certificate(rounds, losses, cycle_rank, degree):
+    seed, endpoint = 0, rounds
+    edges, blue, deliberately_lost = list(pairwise(range(rounds + 1))), [seed], []
+    additions = [(v,) for v in range(1, rounds + 1)]
+    shallow = min(losses, cycle_rank)
+    deep = min(cycle_rank - shallow, shallow * (degree - 3))
+    remaining = deep
+    order = rounds + 1
+    for index in range(losses):
+        root = order
+        order += 1
+        deliberately_lost.append(root)
+        blue.append(root)
+        order, left = relay_arm(edges, blue, root, order, rounds)
+        order, right = relay_arm(edges, blue, root, order, rounds)
+        main = [(v,) for v in [*reversed(left), root, *right]]
+        if index < shallow:
+            first_releases, second_releases = [], []
+            count = min(degree - 3, remaining)
+            remaining -= count
+            for _ in range(count):
+                relay, parent = order, order + 1
+                blue.append(relay)
+                edges.extend(((root, relay), (relay, parent)))
+                order, entry, exit_vertex, guard, sequence = recovery_detour(
+                    edges, blue, parent, order + 2, rounds - 2
+                )
+                edges.append((endpoint, entry))
+                additions.extend((v,) for v in sequence)
+                first_releases.append(parent)
+                second_releases.append(guard)
+                endpoint = exit_vertex
+            order, entry, exit_vertex, guard, sequence = recovery_detour(
+                edges, blue, root, order, rounds - 1
+            )
+            edges.append((endpoint, entry))
+            additions.extend((v,) for v in sequence)
+            main[rounds + 1] = (right[0], guard, *first_releases)
+            main[rounds + 2] = (right[1], *second_releases)
+            endpoint = exit_vertex
+        edges.append((endpoint, left[-1]))
+        additions.extend(main)
+        endpoint = right[-1]
+    order = append_blue_triangles(edges, blue, seed, order, cycle_rank - shallow - deep)
     graph, initial, support, paths = protect_seeds(
         degree, edges, blue, order, deliberately_lost, seed, clique_support=False
     )
@@ -663,6 +723,16 @@ def check_ranked_one_round_example(graph, blue, slow, rank, expected):
                               delayed, expected, actual_rank))
 
 
+def check_arrival_waves(graph, remaining_blue, additions):
+    _, arrivals = trace(graph, remaining_blue)
+    waves = [set() for _ in additions]
+    for vertex, arrival in enumerate(arrivals):
+        if arrival > 0:
+            waves[arrival - 1].add(vertex)
+    if waves != [set(vertices) for vertices in additions]:
+        raise AssertionError('Arrival sequence differs from the certificate')
+
+
 def main():
     exhaustive = sampled = 0
     check_branched_forest_extremizers()
@@ -688,16 +758,32 @@ def main():
         intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
         if (intact, delayed, actual_rank) != (t, expected, rank):
             raise AssertionError(('low-rank recovery', t, k, rank, delayed, actual_rank))
-        _, arrivals = trace(graph, blue ^ slow)
-        waves = [set() for _ in additions]
-        for vertex, arrival in enumerate(arrivals):
-            if arrival > 0:
-                waves[arrival - 1].add(vertex)
-        if waves != [set(vertices) for vertices in additions]:
-            raise AssertionError(('low-rank arrival order', t, k, rank))
+        check_arrival_waves(graph, blue ^ slow, additions)
         if (t, k, rank) in ((2, 1, 2), (2, 2, 1)):
             exhaustive += check_all_losses(graph, blue, k)
         print('Low-rank recovery:', t, k, rank, len(graph), delayed)
+
+    deep_cases = ((3, 1, 0, 4), (3, 1, 1, 4), (3, 1, 2, 4), (3, 1, 4, 5),
+                  (3, 2, 1, 4), (3, 2, 6, 6), (4, 2, 7, 6), (6, 1, 9, 12),
+                  (5, 3, 15, 7), (4, 3, 17, 5))
+    for t, k, rank, cap in deep_cases:
+        graph, blue, slow, support, paths, additions = deep_detour_recovery_certificate(t, k, rank, cap)
+        degree = max(row.bit_count() for row in graph)
+        if degree > cap:
+            raise AssertionError(('deep-detour degree cap', t, k, rank, cap, degree))
+        sampled += check_robust_samples(graph, blue, slow, support, paths, degree, t, k,
+                                        clique_support=False)
+        actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
+        shallow = min(k, rank)
+        deep = min(rank - shallow, shallow * (cap - 3))
+        expected = t + k * (2 * t + 1) + shallow * (2 * t - 1) + deep * (2 * t - 3)
+        intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
+        if (intact, delayed, actual_rank) != (t, expected, rank):
+            raise AssertionError(('deep-detour recovery', t, k, rank, delayed, actual_rank))
+        check_arrival_waves(graph, blue ^ slow, additions)
+        if (t, k, rank) == (3, 1, 2):
+            exhaustive += check_all_losses(graph, blue, k)
+        print('Deep-detour recovery:', t, k, rank, cap, len(graph), delayed)
 
     shared_cases = ((2, 2, 1), (2, 2, 9), (2, 2, 10), (2, 2, 100),
                     (2, 5, 35), (3, 3, 23), (7, 4, 46))
