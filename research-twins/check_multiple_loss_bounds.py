@@ -1429,18 +1429,48 @@ def cap_subcubic_leaves(graph, blue, padding):
     return adjacency(order, edges), blue, white_caps
 
 
-def cubic_single_loss_lift_rank(rounds):
+def cubic_leaf_cycle_lift(base, blue, padding):
+    """Join the blue leaves and the white-leaf caps of both copies in one cycle."""
+    edges = [(v, w) for v, row in enumerate(base) for w in members(row) if v < w]
+    ring = list(range(len(base), len(base) + padding))
+    blue |= mask(ring)
+    matched = [*ring, *(v for v, row in enumerate(base) if row.bit_count() == 2)]
+    order = len(base) + padding
+    white_caps = {}
+    for vertex, row in enumerate(base):
+        if row.bit_count() != 1:
+            continue
+        if blue & (1 << vertex):
+            ring.append(vertex)
+            continue
+        first, target, second = range(order, order + 3)
+        order += 3
+        edges.extend(((vertex, first), (vertex, second)))
+        ring.extend((first, target, second))
+        blue |= mask((first, second))
+        matched.append(target)
+        white_caps[vertex] = target
+    edges.extend((v + order, w + order) for v, w in edges[:])
+    edges.extend((v, v + order) for v in matched)
+    ring.extend(v + order for v in ring[:])
+    edges.extend(pairwise([*ring, ring[0]]))
+    return adjacency(2 * order, edges), blue, white_caps
+
+
+def cubic_single_loss_lift_rank(rounds, *, three_connected=False):
     """The smallest rank in this construction, indexed by the base intact time."""
     if rounds < 3:
         raise ValueError('The base needs at least three intact rounds')
+    if three_connected:
+        return 106 if rounds == 3 else 50 * 2 ** (rounds - 2) - 13 * rounds + 52
     if rounds == 3:
         return 142
     return 68 * 2 ** (rounds - 2) - 19 * rounds + 73
 
 
-def cubic_single_loss_lift_certificate(rounds, *, cycle_rank=None):
+def cubic_single_loss_lift_certificate(rounds, *, cycle_rank=None, three_connected=False):
     """Keep only one copy of the degree-two root in a bridgeless cubic double."""
-    minimum = cubic_single_loss_lift_rank(rounds)
+    minimum = cubic_single_loss_lift_rank(rounds, three_connected=three_connected)
     surplus = 0 if cycle_rank is None else cycle_rank - minimum
     if surplus < 0:
         raise ValueError('The requested rank is below the rank of the unpadded lift')
@@ -1451,15 +1481,18 @@ def cubic_single_loss_lift_certificate(rounds, *, cycle_rank=None):
         rounds, 1, 2 * sum(grafts.values()) + 2, layered_detours=grafts,
         ordinary_detours=ordinary, fault_budget=2
     )
-    capped, blue, white_caps = cap_subcubic_leaves(base, blue, surplus)
-    graph, copies, _ = subcubic_synchronous_lift(capped, cubic=True)
-    order = len(capped)
+    if three_connected:
+        graph, blue, white_caps = cubic_leaf_cycle_lift(base, blue, surplus)
+    else:
+        capped, blue, white_caps = cap_subcubic_leaves(base, blue, surplus)
+        graph, _, _ = subcubic_synchronous_lift(capped, cubic=True)
+    order = len(graph) // 2
     capped_waves = [list(wave) for wave in waves] + [[]]
     for index, wave in enumerate(waves, 1):
         capped_waves[index].extend(white_caps[v] for v in wave if v in white_caps)
-    lifted_waves = [tuple(copy * order + v for copy in range(copies) for v in wave)
+    lifted_waves = [tuple(copy * order + v for copy in range(2) for v in wave)
                     for wave in capped_waves]
-    return graph, copy_mask(blue, order, copies) ^ (root << order), root, lifted_waves
+    return graph, copy_mask(blue, order, 2) ^ (root << order), root, lifted_waves
 
 
 def subcubic_nine_round_chain(losses):
@@ -1966,18 +1999,35 @@ def main():
                 raise AssertionError(('arbitrary lift fault', t, h, cubic, deletion))
         print('Subcubic bridgeless lift:', t, losses, rank, expected, 'cubic:', cubic)
 
-    for t, padding in ((3, 0), (4, 0), (4, 1), (5, 0), (8, 0)):
-        rank = cubic_single_loss_lift_rank(t) + padding
-        graph, blue, slow, waves = cubic_single_loss_lift_certificate(t, cycle_rank=rank)
-        expected = 3 * t + 2 ** (t - 1)
-        if (graph_bridges(graph) or any(row.bit_count() != 3 for row in graph)
-                or len(graph) // 2 + 1 != rank or slow.bit_count() != 1 or not blue & slow
-                or completion_time(graph, blue) != t + 2 or len(waves) != expected):
-            raise AssertionError(('cubic single-loss lift', t, rank))
-        check_arrival_waves(graph, blue ^ slow, waves)
-        if t <= 5:
-            exhaustive += check_all_losses(graph, blue, 1)
-        print('Cubic single-loss lift:', t + 2, rank, expected)
+    for three_connected, cases in (
+        (False, ((3, 0), (4, 0), (4, 1), (5, 0), (8, 0))),
+        (True, ((3, 0), (3, 1), (4, 8), (5, 0), (8, 3))),
+    ):
+        for t, padding in cases:
+            rank = cubic_single_loss_lift_rank(t, three_connected=three_connected) + padding
+            graph, blue, slow, waves = cubic_single_loss_lift_certificate(
+                t, cycle_rank=rank, three_connected=three_connected
+            )
+            expected = 3 * t + 2 ** (t - 1)
+            if (graph_bridges(graph) or any(row.bit_count() != 3 for row in graph)
+                    or len(graph) // 2 + 1 != rank or slow.bit_count() != 1 or not blue & slow
+                    or completion_time(graph, blue) != t + 2 or len(waves) != expected):
+                raise AssertionError(('cubic single-loss lift', t, rank, three_connected))
+            check_arrival_waves(graph, blue ^ slow, waves)
+            if t <= 5:
+                exhaustive += check_all_losses(graph, blue, 1)
+            if three_connected and t <= 5:
+                without_edge = list(graph)
+                for u, row in enumerate(graph):
+                    for offset in members(row >> (u + 1)):
+                        v = u + 1 + offset
+                        without_edge[u] ^= 1 << v
+                        without_edge[v] ^= 1 << u
+                        if graph_bridges(without_edge):
+                            raise AssertionError(('two-edge cut in cubic lift', t, rank, u, v))
+                        without_edge[u] = graph[u]
+                        without_edge[v] = graph[v]
+            print('Cubic single-loss lift:', t + 2, rank, expected, '3-connected:', three_connected)
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()
