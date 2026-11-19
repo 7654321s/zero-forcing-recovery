@@ -1,4 +1,4 @@
-"""Certify the wrapped-fort bounds at 27 through 32 sheets."""
+"""Certify the wrapped-fort bounds at 26 through 32 sheets."""
 
 import argparse
 from itertools import product
@@ -16,6 +16,7 @@ SHEETS = 32
 BUDGET = 23
 SHEET_CAP = 4
 CASES = {
+    26: ((22, 5),),
     27: ((21, 3), (22, 4), (23, 5)),
     28: ((20, 2), (21, 3), (22, 4), (23, 5)),
     29: ((21, 3), (22, 4), (23, 5)),
@@ -65,7 +66,8 @@ def check_thresholds(cap=SHEET_CAP):
                         raise AssertionError(('threshold semantics', values, j))
 
 
-def wrapped_formula(graph, blue, sheets=SHEETS, budget=BUDGET, cap=SHEET_CAP, *, band_through=13):
+def wrapped_formula(graph, blue, sheets=SHEETS, budget=BUDGET, cap=SHEET_CAP, *,
+                    band_through=13, maximum_at_zero=False):
     order = len(graph)
     adjacent = [tuple(members(row)) for row in graph]
     clauses = list(BLOCK['fort_clauses'](graph, range(order)))
@@ -84,6 +86,9 @@ def wrapped_formula(graph, blue, sheets=SHEETS, budget=BUDGET, cap=SHEET_CAP, *,
         clauses.append([v + 1 for s in (sheet, (sheet + 1) % sheets)
                         for v in range(s, order, sheets)])
     clauses.append([counters[0][0]])
+    if maximum_at_zero:
+        for row in counters[1:]:
+            clauses.extend([-flag, maximum] for flag, maximum in zip(row, counters[0]))
     selected = [flag for row in counters for flag in row]
     total = CardEnc.equals(lits=selected, bound=budget, top_id=top, encoding=EncType.seqcounter)
     top = total.nv
@@ -122,10 +127,11 @@ def main():
     upper = mask(v * args.sheets + sheet for v, sheet in CHECKS['FOUR_BLOCK_FORT'])
     if CHECKS['fort_cost'](graph, blue, upper) != 24:
         raise AssertionError('Missing the 24-seed upper witness')
-    band_through = 16 if args.sheets == 27 else 13
+    band_through = {26: 17, 27: 16}.get(args.sheets, 13)
     for budget, cap in CASES[args.sheets]:
         check_thresholds(cap)
-        clauses = wrapped_formula(graph, blue, args.sheets, budget, cap, band_through=band_through)
+        clauses = wrapped_formula(graph, blue, args.sheets, budget, cap,
+                                  band_through=band_through, maximum_at_zero=args.sheets == 26)
         with Solver(name='cadical195', bootstrap_with=clauses) as solver:
             if args.conflicts is None:
                 result = solver.solve()

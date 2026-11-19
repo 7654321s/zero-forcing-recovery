@@ -114,6 +114,10 @@ For costs at most 19, $9\cdot28=252>13\cdot19$ excludes a wrapped fort and the f
 
 For costs at most 20, the sixteen-sheet bound rules out wrapping, since $12\cdot27=324>16\cdot20$. An empty pair then reduces to the finite exclusion. For a wrapped fort of cost 21, 22 or 23, the other 26 sheets around any given sheet form two thirteen-sheet bands and contain at least 18 seeds. The verifier imposes the resulting caps of three, four and five and the band bounds of widths ten through sixteen. The three formulas are unsatisfiable and the inherited cost-24 fort verifies the upper bound. Block stabilization and opening insertion give the full range of at least 24 blocks and 27 sheets.
 
+## Bounds at 26 sheets
+
+The width-21 inequality excludes wrapped forts of cost at most 21, and a fort with a pair of empty sheets unrolls to the already excluded finite cost range. At budget 22, the 25 sheets other than a given sheet split into twelve- and thirteen-sheet bands. They require at least $8+9=17$ lost seeds, so the given sheet contains at most five. Rotate a sheet of maximum seed count to zero. In the threshold encoding, every true threshold on another sheet must then be true on sheet zero. With band bounds through width seventeen the cost-22 instance is unsatisfiable. Together with the inherited witness, block stabilization and opening insertion give $23\leq\kappa_{k,26}\leq24$ for every $k\geq24$.
+
 ## Reproduction
 
 ```sh
@@ -129,6 +133,7 @@ python -B research-twins/check_32_sheet_cover.py --sheets 30
 python -B research-twins/check_32_sheet_cover.py --sheets 29
 python -B research-twins/check_32_sheet_cover.py --sheets 28
 python -B research-twins/check_32_sheet_cover.py --sheets 27
+python -B research-twins/check_32_sheet_cover.py --sheets 26
 python -B research-twins/check_prism_opening_insertion.py
 ```
 
