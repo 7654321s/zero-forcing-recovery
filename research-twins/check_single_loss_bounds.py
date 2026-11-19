@@ -300,28 +300,55 @@ def cubic_eight_round_certificate(cycle_rank=9, *, twin_support=False):
     return graph, blue, support
 
 
+def cubic_six_round_gap_certificate(cycle_rank=10):
+    """Return an eighteen-vertex gap witness or its expansion by blue edge pairs."""
+    if cycle_rank < 10:
+        raise ValueError('The six-round gap requires cycle rank at least ten')
+    edges = [(0, 2), (0, 3), (0, 13), (1, 2), (1, 3), (1, 17), (2, 4), (3, 4), (4, 5),
+             (5, 6), (5, 7), (6, 7), (6, 8), (7, 9), (8, 10), (8, 11), (9, 10),
+             (9, 12), (10, 13), (11, 13), (11, 14), (12, 15), (12, 16), (14, 15),
+             (14, 17), (15, 16), (16, 17)]
+    order = 2 * (cycle_rank - 1)
+    left, right = 13, 17
+    for a in range(18, order, 2):
+        b = a + 1
+        edges.remove((0, left))
+        edges.remove((1, right))
+        edges.extend(((0, a), (a, left), (1, b), (b, right), (a, b)))
+        left, right = a, b
+    blue = mask((0, 1, 2, 3, 7, 8, 11, 12, 13, 17, *range(18, order)))
+    return adjacency(order, edges), blue, mask((2, 3)), 1 << 11
+
+
+def check_cubic_single_loss_certificate(graph, blue, support, slow, rank, restricted):
+    order = len(graph)
+    if (any(row.bit_count() != 3 for row in graph) or order // 2 + 1 != rank
+            or completion_time(graph, blue) != 2):
+        raise AssertionError(('incorrect cubic graph, rank or intact time', rank))
+    MODEL['certify'](graph, blue, support, slow, restricted, 8)
+    for a, b in combinations(range(order), 2):
+        remaining = ((1 << order) - 1) ^ (1 << a) ^ (1 << b)
+        reached = pending = remaining & -remaining
+        while pending:
+            vertex = pending & -pending
+            pending ^= vertex
+            fresh = graph[vertex.bit_length() - 1] & remaining & ~reached
+            reached |= fresh
+            pending |= fresh
+        if reached != remaining:
+            raise AssertionError(('cubic vertex cut', rank, a, b))
+
+
 def check_cubic_eight_round_examples():
     for rank, twin_support in ((9, False), (10, False), (11, False), (16, False),
                                (12, True), (13, True), (17, True)):
         graph, blue, support = cubic_eight_round_certificate(rank, twin_support=twin_support)
-        if (any(row.bit_count() != 3 for row in graph) or len(graph) // 2 + 1 != rank
-                or completion_time(graph, blue) != 2):
-            raise AssertionError(('incorrect cubic graph, rank or intact time', rank))
-        MODEL['certify'](graph, blue, support, 1, 2 if twin_support else 5, 8)
-
-        order = len(graph)
-        for a, b in combinations(range(order), 2):
-            remaining = ((1 << order) - 1) ^ (1 << a) ^ (1 << b)
-            reached = pending = remaining & -remaining
-            while pending:
-                vertex = pending & -pending
-                pending ^= vertex
-                fresh = graph[vertex.bit_length() - 1] & remaining & ~reached
-                reached |= fresh
-                pending |= fresh
-            if reached != remaining:
-                raise AssertionError(('cubic vertex cut', rank, a, b))
-        print('Cubic eight-round witness:', rank, order, 'twin support:', twin_support)
+        check_cubic_single_loss_certificate(graph, blue, support, 1, rank, 2 if twin_support else 5)
+        print('Cubic eight-round witness:', rank, len(graph), 'twin support:', twin_support)
+    for rank in (10, 11, 15, 20):
+        graph, blue, support, slow = cubic_six_round_gap_certificate(rank)
+        check_cubic_single_loss_certificate(graph, blue, support, slow, rank, 2)
+        print('Cubic six-round gap witness:', rank, len(graph))
 
 
 def check_low_degree_examples():

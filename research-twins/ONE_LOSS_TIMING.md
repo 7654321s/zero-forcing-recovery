@@ -178,6 +178,33 @@ All inserted vertices are blue. In the intact and designated runs, the only init
 
 The gap of six is sharp among cubic graphs with intact time at most two and recovery from every singleton loss. Monotonicity gives restricted time at least the intact time. The new upper bound gives a gap of at most six at intact time two, the one-round upper bound gives at most four at intact time one, and at intact time zero every singleton loss takes one round. In particular the witnesses disprove EveryMinimumSupport in the 3-vertex-connected cubic class.
 
+### Exact cubic values at every cycle rank
+
+The smallest cubic graph attaining eight recovery rounds has 16 vertices. The smallest attaining the six-round minimum-support gap has 18 vertices. Both orders suffice with 3-vertex-connectivity and recovery from every singleton loss.
+
+The following values hold separately for connected cubic graphs and for their 3-vertex-connected subclass. The intact propagation time is at most two throughout. The first maximum counts single losses that recover. The second requires the whole seed set to tolerate every singleton loss. The gap is the maximum, among those tolerant sets and their minimum killing supports, of the unrestricted singleton time minus the restricted singleton time.
+
+| Order | Cycle rank | Maximum finite recovery | Maximum with singleton tolerance | Maximum gap |
+| ---: | ---: | ---: | ---: | ---: |
+| 4 | 3 | 1 | 1 | 0 |
+| 6 | 4 | 2 | 2 | 0 |
+| 8 | 5 | 3 | 3 | 1 |
+| 10 | 6 | 5 | 4 | 2 |
+| 12 | 7 | 6 | 6 | 3 |
+| 14 | 8 | 7 | 7 | 4 |
+| 16 | 9 | 8 | 8 | 5 |
+| Every even order from 18 | At least 10 | 8 | 8 | 6 |
+
+**Small-order census.** The [census replay](check_cubic_small_orders.py) checks the complete lists from the [House of Graphs cubic catalog](https://houseofgraphs.org/meta-directory/cubic) through order 16. It pins the bytes of each graph6 file and checks each graph's degree and connectivity. The 4,681 graphs include 3,247 that are 3-vertex-connected. Vertex labels in a catalog representative are sufficient because the replay covers every initial coloring and the quantities are invariant under relabeling.
+
+The replay holds one bit column per vertex. Bit $B$ of that column tells whether the vertex is blue in the run from the initial mask $B$. Each force into a vertex requires the three columns for its source and the source's other neighbors. A bitwise intersection selects precisely the runs allowing the force. This computes the set of colorings that finish by each round, together with those that stall. For losses at vertex $v$, the result for a mask omitting $v$ is lifted to the mask with $v$ added. Finally, the minimum killing size is zero at a stalled mask $A$, and otherwise is one plus the minimum killing size among masks $A\setminus\{v\}$ for $v\in A$. The replay checks supports of that cardinality against the singleton deadlines. Run `python -B research-twins/check_cubic_small_orders.py` to use the catalog directly, or pass `--data DIR` to reuse local copies.
+
+**Eighteen vertices and every larger even order.** The 18-vertex certificate in the [single-loss replay](check_single_loss_bounds.py) starts with $\{0,1,2,3,7,8,11,12,13,17\}$ blue. Its intact waves are $\{4,10,14\}$ and $\{5,6,9,15,16\}$. Losing $11$ gives the sequence $\{4\},\{5\},\{6\},\{9\},\{10\},\{11\},\{14\},\{15,16\}$. Every singleton loss recovers. The twins $\{2,3\}$ form a minimum killing support, and the two losses restricted to this pair take two rounds apiece.
+
+Subdivide the disjoint blue edges $0$–$13$ and $1$–$17$, then join the two inserted vertices by an edge. Iterate on the two blue edges incident to $0$ and $1$ just created. The graph stays cubic. Removing two old vertices leaves the old connected graph with the surviving edges subdivided. If both endpoints of one subdivided edge are removed, its inserted vertex still attaches through the other inserted vertex. Removing one old and one inserted vertex deletes at most one edge from the old graph with one old vertex removed, which is 2-vertex-connected and has no bridge. Removing both inserted vertices deletes two edges from the old graph, whose edge connectivity is at least three. Thus the operation preserves 3-vertex-connectivity.
+
+The inserted vertices are blue. Neither subdivided edge touches $11$ or a member of the support, so the intact and three distinguished singleton runs have the same old waves. The two twins retain their identical neighborhoods. An old singleton loss outside the four edge ends follows the old process. A loss at an edge end is restored in round one by its inserted neighbor. If an inserted vertex is lost, its paired inserted vertex restores it in round one. This supplies the maximum gap at all larger ranks, and the preceding eight-round bound supplies the matching global upper bounds.
+
 ## Quadratic growth with the maximum degree
 
 Let $M_d$ be the largest finite recovery time after one initial blue vertex is lost, over graphs of maximum degree at most $d$ whose intact coloring takes at most two rounds. Put $F=\lfloor d^2/2\rfloor$. Then
