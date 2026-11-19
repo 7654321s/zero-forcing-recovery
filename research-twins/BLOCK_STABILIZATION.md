@@ -52,9 +52,9 @@ The twelve-sheet band also shortens the search for a finite integer-sheet fort o
 
 More generally, at a budget $b\in\{20,21,22,23\}$ choose three band widths from ten through thirteen that sum to $b+13$. Their seed requirements sum to $b+1$, since a width-$w$ band needs $w-4$ seeds to avoid an empty pair. A piece with no such pair therefore spans at most $b+12$ sheets. The verifier uses the same 37-sheet domain at all four budgets.
 
-The extended verifier gives the same loss bound $w-5$ at widths fourteen, fifteen and sixteen. For a wrapped fort and $m\geq16$, counting the sixteen-sheet bands gives $12m\leq16b$. In particular, a cost-at-most-23 fort must unroll when $m\geq31$, so the finite exclusion alone now settles every $m\geq31$. The smaller thirteen-sheet counts still suffice for the explicit wrapped cases below.
+The extended verifier gives the same loss bound $w-5$ at widths fourteen through eighteen. For a wrapped fort and $m\geq16$, counting the sixteen-sheet bands gives $12m\leq16b$. In particular, a cost-at-most-23 fort must unroll when $m\geq31$, so the finite exclusion alone now settles every $m\geq31$. At widths seventeen and eighteen the inequalities are $13m\leq17b$ and $14m\leq18b$. The latter rules out wrapping at budget 23 for $m\geq30$. The explicit wrapped cases below use the smaller bands in their formulas.
 
-Two disjoint sixteen-sheet bands would cost at least 24, so an inclusion-minimal finite fort of cost at most 23 occupies at most 31 consecutive sheets. At a budget $b\in\{20,21,22,23\}$, choose two widths between thirteen and sixteen summing to $b+9$. These need $b+1$ seeds in total, so a piece without an internal empty pair spans at most $b+8$ sheets. It is enough to certify a 33-sheet domain with two guard sheets for all four budgets.
+Two disjoint sixteen-sheet bands would cost at least 24, so an inclusion-minimal finite fort of cost at most 23 occupies at most 31 consecutive sheets. At a budget $b\in\{20,21,22,23\}$, choose two widths between thirteen and sixteen summing to $b+9$. These need $b+1$ seeds in total, so a piece without an internal empty pair spans at most $b+8$ sheets. The resulting 33-sheet domain with two guard sheets is sufficient for all four budgets. The verifier also excludes the budget-23 formula on this smaller domain and checks the same 24-seed witness there.
 
 ## The seven- through ten-sheet cases
 
@@ -110,9 +110,10 @@ For costs at most 19, $9\cdot28=252>13\cdot19$ excludes a wrapped fort and the f
 
 ```sh
 python -B research-twins/check_block_stabilization.py
-python -B research-twins/check_block_stabilization.py --band-through 16
+python -B research-twins/check_block_stabilization.py --band-through 18
 python -B research-twins/check_block_stabilization.py --certify-sheets 7 8 9 10
 python -B research-twins/check_finite_fort_strip.py
+python -B research-twins/check_finite_fort_strip.py --sheets 33
 python -B research-twins/check_33_sheet_profiles.py
 python -B research-twins/check_32_sheet_cover.py
 python -B research-twins/check_32_sheet_cover.py --sheets 31

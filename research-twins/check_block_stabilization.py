@@ -137,7 +137,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--certify-sheets', type=int, nargs='+', choices=(7, 8, 9, 10), default=(),
                         help='replay the selected small-sheet thresholds at 26 blocks')
-    parser.add_argument('--band-through', type=int, choices=range(13, 17), default=13,
+    parser.add_argument('--band-through', type=int, choices=range(13, 19), default=13,
                         help='replay the sheet-band bounds through this width')
     parser.add_argument('--band-blocks', type=int, nargs='+', default=[26], metavar='BLOCKS',
                         help='check the sheet-band bounds on these base chain lengths')
