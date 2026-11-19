@@ -158,9 +158,9 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
             linear_bound = intact + (2 * intact + 1) * len(roots) + coefficient * cycle_rank
             excess_rank = max(0, cycle_rank - len(roots))
             penalty = min(2 if intact == 3 else intact, 2 * excess_rank)
-            if intact >= 7 and cycle_rank >= 3 * len(roots):
+            if intact >= 4 and cycle_rank > 3 * len(roots):
                 depth_two_penalty = 2 * excess_rank + 2 * (cycle_rank - 3 * len(roots))
-                penalty = max(penalty, min(intact - 4, depth_two_penalty))
+                penalty = min(intact, depth_two_penalty)
             upper = min(upper, linear_bound - penalty)
             if delayed == linear_bound:
                 root_size = 2 * intact + 1
@@ -1060,7 +1060,9 @@ def main():
                                  (9, 3, 7, 163), (10, 3, 8, 199), (11, 3, 8, 222),
                                  (12, 3, 9, 264), (13, 3, 9, 289),
                                  (12, 1, 4, 113), (16, 1, 5, 182), (20, 1, 6, 267),
-                                 (16, 2, 7, 273), (20, 2, 8, 382)):
+                                 (16, 2, 7, 273), (20, 2, 8, 382),
+                                 (8, 1, 4, 69), (12, 1, 5, 130), (16, 1, 6, 207),
+                                 (12, 2, 7, 197), (16, 2, 8, 298)):
         graph, blue, slow, support, paths, waves = subcubic_recursive_rank_certificate(t, k, rank)
         sampled += check_robust_samples(graph, blue, slow, support, paths, 3, t, k,
                                         clique_support=False)

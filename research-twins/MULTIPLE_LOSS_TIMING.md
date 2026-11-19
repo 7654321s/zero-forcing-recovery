@@ -320,7 +320,7 @@ This is the exact maximum for $0\leq\beta\leq k$. For $\beta=k+j$ with $j>0$, th
 $$
 t+k(2t+1)+(2t-3)k+(2t-5)j.
 $$
-For $3k<\beta\leq6k$ and $t\geq4(\beta-2k)+4$, the [next exact range](#counting-visits-down-to-the-third-round) has maximum
+For $3k<\beta\leq6k$ and $t\geq4(\beta-2k)$, the [next exact range](#counting-visits-down-to-the-third-round) has maximum
 $$
 t+k(2t+1)+(2t-3)k+2k(2t-5)+(\beta-3k)(2t-7).
 $$
@@ -409,13 +409,19 @@ The only possible free old side belongs to the nonfull root visit's short-end ma
 
 #### Counting visits down to the third round
 
-For $t\geq7$ and $\beta\geq3k$, every finite recovery under the degree cap three satisfies
+For $t\geq4$ and $\beta\geq3k$, every finite recovery under the degree cap three satisfies
 $$
-D\geq\min\{t-4,\ 2(\beta-k)+2(\beta-3k)\}.
+D\geq\min\{t,\ 2(\beta-k)+2(\beta-3k)\}.
 $$
-The two terms in the sum come from counting rootless visits at two sizes. Write $a=2t-3$. Assume $D\leq t-5$, since otherwise the first term of the minimum already gives the claim. The preceding proof gives $V=k+\beta$, and the union of the trail and $F$ is connected of rank $\beta$. It also gives at most $k+u$ rootless visits of size at least $a-1$, where $u$ is the number of undistinguished roots. We show that at most $3k+u$ rootless visits have size at least $a-3$.
+For $t\leq6$, the preceding bound already implies this. If $\beta=3k$ the second term is unchanged, and if $\beta>3k$ then $2(\beta-k)\geq6$. Assume $t\geq7$ and $D\leq t-1$. The preceding proof gives $V=k+\beta$, and the union of the trail and $F$ is connected of rank $\beta$. It eliminates the case of a distinguished root with only one mark on either side, since $\beta\geq k+2$. Write $a=2t-3$ and let $u$ be the number of undistinguished roots. At most $k+u$ of the $\beta+u$ rootless visits have size at least $a-1$, so at least $\beta-k$ visits contribute shortfalls of two or more. We show that at most $3k+u$ rootless visits have size at least $a-3$.
 
-**Distinguished vertices born by round two have no free side.** Each distinguished root uses both branches and has no charged units. Its visit has at least $2t+1-D$ marks, with at least $t-D\geq5$ on either side. The birth round strictly increases along either branch away from the root, so a distinguished vertex born by round two cannot be an end mark there. A rootless visit has at least $a-D\geq t+2$ marks, since any shortfall from $a$ is part of the nonnegative deficit count. The marks of such a visit stay in one branch of its root. If a distinguished vertex born by round two were an end mark, there could be at most one earlier-born mark in that branch, born in round one, and at most $t-1$ further marks in the downward direction. Including the end mark would give at most $t+1$ marks. Thus every distinguished vertex born by round two has both sides inside its visit. An edge outside $F$ between two vertices born by round two, or from one such vertex to a relay of $F$, is therefore impossible. Within the connected rank-saturated union it would have to be a trail edge. Its distinguished endpoint would need a free side, and relays are never distinguished.
+**Distinguished vertices born by round two have no free side.** Each distinguished root uses both branches and has no charged units. If one side had at most two marks, its visit would have at most $t+3$ marks and contribute at least $t-2$ deficit. The shortfalls in rootless visits would then give $D\geq t-2+2(\beta-k)>t-1$. Hence there are at least three marks on either side of every distinguished root. Birth rounds strictly increase away from a root along either of its branches, so no mark born by round two is an end mark of its root visit.
+
+A rootless visit stays in one branch of its root. Suppose it has an end mark born by round two. If there is no distinguished first-round vertex, the end mark must be born in round two. The path cannot pass through an undistinguished first-round vertex to reach a different descendant branch, since that would require two direct downward edges in one trail step. All other marks are therefore descendants of the end mark, giving at most $t-1$ marks in the visit. Its shortfall is at least $t-2$. At least $\beta-k-1$ other visits each contribute at least two, yielding $D\geq t-2+2(\beta-k-1)>t-1$ because $\beta-k\geq2$.
+
+If the visit distinguishes a first-round vertex, that vertex lies within one round of its own lost root. The entire visit lies in the root's window. The root is undistinguished, since otherwise the first-round mark's time would already be occupied. With an end mark born by round two, the visit has at most $t+1$ marks: the end mark, at most one earlier-born mark, and at most $t-1$ marks on a downward branch. The visit is too short to charge an excess to the root's allowance of four. Any long visit charging that root would also fit in its window by the preceding proof. It would have at least $a+1=2t-2$ marks and leave at most three times for the visit under consideration, which has at least $a-D\geq t-2>3$ marks. The root therefore loses its full allowance of four. Together with the shortfall of at least $a-(t+1)=t-4$, this gives $D\geq t$.
+
+Consequently every distinguished vertex born by round two has both sides inside its visit. An edge outside $F$ between two vertices born by round two, or from one such vertex to a relay of $F$, is impossible. Within the connected rank-saturated union it would have to be a trail edge. Its distinguished endpoint would need a free side, and relays are never distinguished.
 
 **Arrival gaps for births in rounds two and three.** Let $y$ be born in round $s\in\{2,3\}$ and have forest parent $w$. Write $r_x$ for the delayed arrival of $x$.
 
@@ -425,7 +431,7 @@ The two terms in the sum come from counting rootless visits at two sizes. Write 
 
 **Locate the larger visits.** A rootless visit with at least $a-3=2t-6$ marks distinguishes a center born at some round $s\leq3$. To see this, follow its branch down until the earliest distinguished vertex. An undistinguished branch point cannot connect two marked descendant branches: it would have to be an intermediate source on a trail step using two downward direct intact edges. The path therefore stays in a single descendant branch until it reaches a distinguished vertex. If the earliest distinguished birth were at least four, each side of that vertex would have at most $t-4$ marks. For a center born in round $s$, the visit uses times within $t-s$ rounds of the center.
 
-If the center is within $s$ rounds of any lost seed, the whole visit lies in that seed's window. Its center's time is already occupied whenever that seed is distinguished, since its visit uses at least five marks on each side of the seed. We can therefore count these visits in the $u$ undistinguished windows. Each window accommodates at most one, since $2(2t-6)>2t+1$. A first-round center is always within one round of its seed by the preceding proof.
+If the center is within $s$ rounds of any lost seed, the whole visit lies in that seed's window. Its center's time is already occupied whenever that seed is distinguished, since its visit uses at least three marks on each side of the seed. We can therefore count these visits in the $u$ undistinguished windows. Each window accommodates at most one, since $2(2t-6)>2t+1$. A first-round center is always within one round of its seed by the preceding proof.
 
 Each remaining visit can be assigned to the branch of its center's root $z$ in $F$. We show that, within each particular branch, all such visits fit in a single interval of at most $2t-1$ times. A center born in round two or three is within one round of its parent or of its parent's direct predecessor, by the arrival rules. Call that older vertex its anchor.
 
@@ -441,7 +447,7 @@ There is room for at most one of these remaining visits per branch, since $2(2t-
 
 There are $V-(k-u)=\beta+u$ rootless visits. At least $\beta-k$ of them fall short of $a$ by at least two marks, and at least $\beta-3k$ fall short by at least four. These shortfalls contribute to $D$ even when a long visit charges excess marks to a root allowance. This yields $D\geq2(\beta-k)+2(\beta-3k)$ under the assumed small deficit, proving the bound.
 
-For $3k<\beta\leq6k$, the recursive construction uses $k$, $2k$ and $\beta-3k$ attachments at depths zero, one and two, respectively. It loses exactly $2(\beta-k)+2(\beta-3k)$ rounds from the linear bound. Hence its time is maximal whenever $t\geq4(\beta-2k)+4$, including in the class that tolerates every loss of at most $k$ seeds.
+For $3k<\beta\leq6k$, the recursive construction uses $k$, $2k$ and $\beta-3k$ attachments at depths zero, one and two, respectively. It loses exactly $2(\beta-k)+2(\beta-3k)$ rounds from the linear bound. Hence its time is maximal whenever $t\geq4(\beta-2k)$, including in the class that tolerates every loss of at most $k$ seeds.
 
 #### Construction through a second-round center
 
@@ -466,7 +472,7 @@ t+k(2t+1)+\sum_{i=0}^{t-2}(2t-2i-3)b_i.
 $$
 Any unused rank is supplied by all-blue cycles. At $\beta=k+j$ with $1\leq j\leq2k$, each of the $j$ detours beyond rank $k$ attaches at depth one and contributes $2t-5$ rounds. This attains the upper bound whenever $2j\leq t$.
 
-For $3k<\beta\leq6k$, each of the $\beta-3k$ further detours attaches at depth two, contributing $2t-7$ rounds apiece. This attains the [third-round visit bound](#counting-visits-down-to-the-third-round) for $t\geq4(\beta-2k)+4$.
+For $3k<\beta\leq6k$, each of the $\beta-3k$ further detours attaches at depth two, contributing $2t-7$ rounds apiece. This attains the [third-round visit bound](#counting-visits-down-to-the-third-round) for $t\geq4(\beta-2k)$.
 
 <a id="one-intact-round-at-small-cycle-rank"></a>
 
