@@ -16,11 +16,13 @@ completion_time = MODEL['completion_time']
 MAX_LOSSES = 7
 
 
-def find_stalled_set(graph, seeds, required, active_order):
+def find_stalled_set(graph, seeds, required, active_order, *, also_required=None):
     """Leave vertices outside the active range fixed and allow no forces there."""
     limit = CardEnc.atmost(lits=[v + 1 for v in seeds], bound=MAX_LOSSES,
                          top_id=len(graph), encoding=EncType.totalizer)
     clauses = limit.clauses + [[v + 1 for v in required]]
+    if also_required is not None:
+        clauses.append([v + 1 for v in also_required])
     for v in range(active_order):
         neighbors = tuple(members(graph[v]))
         for u in neighbors:
@@ -35,7 +37,13 @@ def find_stalled_set(graph, seeds, required, active_order):
 
 def verify_case(case):
     blocks, columns = case
-    rank = 32 * blocks + 5 + 4 * columns
+    verify_rank_case((blocks, columns, 0))
+    return case
+
+
+def verify_rank_case(case):
+    blocks, columns, extra = case
+    rank = 32 * blocks + 5 + 4 * columns + extra
     graph, blue, lost, waves = MODEL['four_sheet_cubic_chain_certificate'](blocks, rank)
     if (len(graph) // 2 + 1 != rank or completion_time(graph, blue) != 2
             or lost.bit_count() != 4 * blocks or len(waves) != 6 * blocks + 2
@@ -47,9 +55,17 @@ def verify_case(case):
 
     seeds = tuple(members(blue))
     first_padding = 4 * (16 * blocks + 2)
-    # Rotate a required deleted seed to sheet zero.
-    required = [v for v in seeds if v % 4 == 0 and (columns == 1 or v >= first_padding)]
-    witness = find_stalled_set(graph, seeds, required, len(graph))
+    also_required = None
+    if extra:
+        a, b = MODEL['FOUR_SHEET_RANK_EDGE']
+        start = len(graph) - 2 * extra
+        required = [4 * a, 4 * a + 2, 4 * b + 1, 4 * b + 3, *range(start, len(graph))]
+        if columns > 1:
+            also_required = range(first_padding, start)
+    else:
+        # Rotate a required deleted seed to sheet zero in the symmetric cover.
+        required = [v for v in seeds if v % 4 == 0 and (columns <= 1 or v >= first_padding)]
+    witness = find_stalled_set(graph, seeds, required, len(graph), also_required=also_required)
     if witness is not None:
         raise AssertionError(('small fort', case, witness))
     return case
@@ -76,11 +92,16 @@ def main():
     verify_long_ladders()
     print('Ladder widths 10 through 13 verified', flush=True)
     with ProcessPoolExecutor(max_workers=args.jobs) as pool:
-        for columns in range(1, 10):
+        for columns in range(10):
             cases = [(blocks, columns) for blocks in range(2, 35)]
             for count, _ in enumerate(pool.map(verify_case, cases), 1):
                 if count % 10 == 0 or count == len(cases):
                     print(f'Padding columns {columns}: {count}/{len(cases)} graphs', flush=True)
+        for columns in range(10):
+            cases = [(blocks, columns, extra) for blocks in range(2, 35) for extra in range(1, 4)]
+            for count, _ in enumerate(pool.map(verify_rank_case, cases), 1):
+                if count == len(cases):
+                    print(f'Augmentations at padding width {columns}: {count}/{len(cases)} graphs', flush=True)
 
 
 if __name__ == '__main__':

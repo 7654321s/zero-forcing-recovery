@@ -34,7 +34,7 @@ The [3-vertex-connected bipartite chains](MULTIPLE_LOSS_TIMING.md#bipartite-chai
 
 The [three-sheet cubic chains](MULTIPLE_LOSS_TIMING.md#three-sheet-chains-tolerating-any-five-seed-losses) tolerate any five seed losses and have a six-seed obstruction at every available rank. Their intact time is two, and the loss of all three copies of each of the $k$ designated seeds gives exactly $6k+2$ rounds. They retain 3-vertex-connectivity and admit arbitrarily many padding columns.
 
-The [four-sheet bipartite prism chains](MULTIPLE_LOSS_TIMING.md#four-sheet-bipartite-chains-tolerating-any-seven-seed-losses) tolerate any seven seed losses and have an eight-seed obstruction. They are 3-vertex-connected, finish in two intact rounds, and take $6k+2$ rounds after losing the $4k$ designated copies. For $k\geq2$ they work at ranks $32k+5+4p$ for every $p\geq1$.
+The [four-sheet bipartite prism chains](MULTIPLE_LOSS_TIMING.md#four-sheet-bipartite-chains-tolerating-any-seven-seed-losses) tolerate any seven seed losses and have an eight-seed obstruction. They are 3-vertex-connected, finish in two intact rounds, and take $6k+2$ rounds after losing the $4k$ designated copies. For $k\geq2$ they work at every integer cycle rank from $32k+5$.
 
 [Longer intact runs](ONE_LOSS_TIMING.md#more-than-two-intact-rounds) have sharp exponential base $d-1$ for fixed maximum degree $d\geq3$. Their worst finite recovery time divided by $d(d-1)^{t-1}$ approaches $1/2$ as $d$ grows, uniformly over intact deadlines $t\geq3$. At maximum degree two the exact time is $3t+1$. [The two-term expansion](ONE_LOSS_TIMING.md#the-first-two-asymptotic-terms) gives $d^t/2-(t-2)d^{t-1}/2+O_t(d^{t-2})$ for each fixed $t\geq3$.
 
