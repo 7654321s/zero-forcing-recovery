@@ -1,4 +1,4 @@
-"""Certify the wrapped-fort bounds at 30 through 32 sheets."""
+"""Certify the wrapped-fort bounds at 29 through 32 sheets."""
 
 import argparse
 from itertools import product
@@ -15,7 +15,12 @@ members, mask = STRIP['members'], STRIP['mask']
 SHEETS = 32
 BUDGET = 23
 SHEET_CAP = 4
-CASES = {30: ((21, 3), (22, 4), (23, 5)), 31: ((22, 4), (23, 5)), 32: ((23, 4),)}
+CASES = {
+    29: ((21, 3), (22, 4), (23, 5)),
+    30: ((21, 3), (22, 4), (23, 5)),
+    31: ((22, 4), (23, 5)),
+    32: ((23, 4),),
+}
 
 
 def thresholds(seed_vars, top, clauses, cap):

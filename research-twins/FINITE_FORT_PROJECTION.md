@@ -48,7 +48,7 @@ For the four-cycle example above, the integer lift has no finite fort. In the cy
 
 ## Application to shorter prism chains
 
-In the [signed unpadded prism chain](BLOCK_STABILIZATION.md), the finite blocking number is 24 for every fixed chain with at least 11 blocks. Its cyclic blocking number is therefore 24 at every sheet count of at least 162 by the [seven-sheet gap bound](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers). The sharper guarantee of 30 sheets applies when the chain has at least 24 blocks.
+In the [signed unpadded prism chain](BLOCK_STABILIZATION.md), the finite blocking number is 24 for every fixed chain with at least 11 blocks. Its cyclic blocking number is therefore 24 at every sheet count of at least 162 by the [seven-sheet gap bound](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers). The sharper guarantee of 29 sheets applies when the chain has at least 24 blocks.
 
 The finite result for at least 24 blocks follows from [block and sheet stabilization](BLOCK_STABILIZATION.md). To descend from $k+1$ blocks to $k$, consider a hypothetical finite fort of cost at most 23. If the fort has two successive empty appended stages, insert a new empty stage between them to preserve the cost. If the fort avoids all opening seeds, the opening fills from its own seeds in two rounds. The fort then avoids the opening and the old stage ports adjacent to it, so the opening insertion preserves its cost. Each insertion would produce a finite fort at the excluded budget on $k+1$ blocks.
 

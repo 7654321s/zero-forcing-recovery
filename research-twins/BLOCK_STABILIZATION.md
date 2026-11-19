@@ -4,7 +4,7 @@ Let $\kappa_{k,m}$ be the minimum number of seeds whose loss blocks recovery in 
 $$
 \kappa_{k,m}=\kappa_{26,m} \qquad (k\geq26).
 $$
-The common value is exactly 24 when $k\geq24$ and $m\geq30$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 30 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
+The common value is exactly 24 when $k\geq24$ and $m\geq29$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 29 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
 
 ## The prism stage labels
 
@@ -92,7 +92,11 @@ At 31 sheets a fort of cost at most 21 would contain two consecutive empty sheet
 
 ## The 30-sheet case
 
-At 30 sheets a fort of cost at most 20 would unroll by the sheet-band inequality. In a wrapped fort of cost 21, 22 or 23, two disjoint thirteen-sheet bands avoiding a given sheet require at least 18 seeds. This caps the given sheet at three, four or five seeds, respectively. The count-flag verifier excludes all three formulas and checks the cost-24 witness. Block stabilization and opening insertion give the full range of at least 24 blocks and 30 sheets.
+At 30 sheets a fort of cost at most 20 would unroll by the sheet-band inequality. In a wrapped fort of cost 21, 22 or 23, two disjoint thirteen-sheet bands avoiding a given sheet require at least 18 seeds. This caps the given sheet at three, four or five seeds, respectively. The count-flag verifier excludes all three formulas and checks the cost-24 witness. Thus $\kappa_{26,30}=24$.
+
+## The 29-sheet case
+
+The same division as at 30 sheets holds at 29 sheets. For costs at most 20, $9\cdot29=261>13\cdot20$ gives consecutive empty sheets and the finite exclusion applies. For wrapped forts of cost 21, 22 or 23, the other 28 sheets around a given sheet still contain two disjoint thirteen-sheet bands. At least 18 seeds lie in those bands, so the same caps of three, four and five apply. All three formulas are unsatisfiable, and the inherited fort verifies the upper bound of 24 at 29 sheets. Block stabilization and opening insertion give the full range of at least 24 blocks and 29 sheets.
 
 ## Reproduction
 
@@ -104,6 +108,7 @@ python -B research-twins/check_33_sheet_profiles.py
 python -B research-twins/check_32_sheet_cover.py
 python -B research-twins/check_32_sheet_cover.py --sheets 31
 python -B research-twins/check_32_sheet_cover.py --sheets 30
+python -B research-twins/check_32_sheet_cover.py --sheets 29
 python -B research-twins/check_prism_opening_insertion.py
 ```
 
