@@ -1719,6 +1719,72 @@ def check_cubic_chain_loss_patterns(certificate, losses, rank=None):
             raise AssertionError(('cubic chain pattern extremes', losses, count))
 
 
+def cubic_killing_pairs(graph, blue):
+    """Replay all two-seed deletions, with one bit per deletion in each vertex state."""
+    seeds = tuple(members(blue))
+    pairs = list(combinations(seeds, 2))
+    all_cases = (1 << len(pairs)) - 1
+    omitted = [0] * len(graph)
+    for i, (a, b) in enumerate(pairs):
+        case = 1 << i
+        omitted[a] |= case
+        omitted[b] |= case
+    state = [0] * len(graph)
+    for v in seeds:
+        state[v] = all_cases ^ omitted[v]
+    neighbors = [tuple(members(row)) for row in graph]
+    while True:
+        after = state.copy()
+        for v, (a, b, c) in enumerate(neighbors):
+            after[a] |= state[v] & state[b] & state[c]
+            after[b] |= state[v] & state[a] & state[c]
+            after[c] |= state[v] & state[a] & state[b]
+        if after == state:
+            break
+        state = after
+    successful = all_cases
+    for cases in state:
+        successful &= cases
+    return {pairs[i] for i in members(all_cases ^ successful)}
+
+
+def compact_cubic_chain_killing_pair_formula(losses, padded):
+    """List the predicted labelled pairs for a compact chain with at least two blocks."""
+    starts = range(17, 17 + 13 * (losses - 1), 13)
+    pairs = {(0, 1), (0, 9)}
+    pairs.update((start, start + 1) for start in starts)
+    pairs.update((left, right + 9) for left, right in pairwise(starts))
+    spare_pairs = starts[2 if losses % 2 else 1:]
+    pairs.update((left + 1, right + 8) for left, right in zip(spare_pairs[::2], spare_pairs[1::2]))
+    if not padded:
+        pairs.update(((1, 25), (9, 25)) if losses % 2 else ((8, 15),))
+    return pairs
+
+
+def check_cubic_chain_root_forts(graph, blue, designated):
+    for root in members(designated):
+        fort = mask(root + offset for offset in (0, 1, 2, 3, 5, 6, 7))
+        if (blue & fort != mask((root, root + 1))
+                or any((row & fort).bit_count() == 1 for v, row in enumerate(graph) if not fort & (1 << v))):
+            raise AssertionError(('cubic chain root fort', root))
+
+
+def check_compact_cubic_chain_killing_pairs():
+    tested = 0
+    for losses in range(2, 32):
+        minimum_rank = (13 * losses + 4) // 2 + 1
+        for extra in range(3):
+            graph, blue, lost, _ = compact_cubic_two_round_chain_certificate(losses, minimum_rank + extra)
+            check_cubic_chain_root_forts(graph, blue, lost)
+            actual = cubic_killing_pairs(graph, blue)
+            expected = compact_cubic_chain_killing_pair_formula(losses, extra > 0)
+            if actual != expected:
+                raise AssertionError(('compact cubic chain killing pairs', losses, extra,
+                                      sorted(actual - expected), sorted(expected - actual)))
+            tested += blue.bit_count() * (blue.bit_count() - 1) // 2
+    return tested
+
+
 def cubic_two_fault_gap_certificate(cycle_rank=10):
     """Give a two-fault-tolerant cubic witness with unrestricted time nine."""
     if cycle_rank < 10 or cycle_rank == 11:
@@ -2280,6 +2346,7 @@ def main():
             raise AssertionError(('cubic chain metadata', losses, rank))
         check_no_two_edge_cut(graph)
         check_arrival_waves(graph, blue ^ lost, waves)
+        check_cubic_chain_root_forts(graph, blue, lost)
         exhaustive += check_all_losses(graph, blue, 1)
         print('Cubic two-round chain:', losses, rank, len(waves))
 
@@ -2301,6 +2368,7 @@ def main():
             check_cubic_chain_loss_patterns(certificate, losses)
         check_cubic_chain_loss_patterns(certificate, 9, padded_rank)
     print('Cubic chain designated loss patterns: 3068 subsets')
+    print('Compact cubic chain killing pairs:', check_compact_cubic_chain_killing_pairs(), 'two-seed cases')
 
     for rank in (10, 12, 13, 22):
         graph, blue, lost, support = cubic_two_fault_gap_certificate(rank)
