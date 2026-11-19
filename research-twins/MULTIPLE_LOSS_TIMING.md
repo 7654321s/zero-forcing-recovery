@@ -324,6 +324,7 @@ For $3k<\beta\leq6k$ and $t\geq4(\beta-2k)$, the [next exact range](#counting-vi
 $$
 t+k(2t+1)+(2t-3)k+2k(2t-5)+(\beta-3k)(2t-7).
 $$
+At $\beta=6k+1$ and $t\geq16k+5$, the [exact deficit](#the-first-rank-above-six-per-lost-seed) from the linear bound is $16k+5$.
 The sharp examples recover from every loss of at most $k$ seeds and have a minimum killing support of size $k+1$.
 
 #### Counting long visits at degree three
@@ -473,6 +474,51 @@ $$
 Any unused rank is supplied by all-blue cycles. At $\beta=k+j$ with $1\leq j\leq2k$, each of the $j$ detours beyond rank $k$ attaches at depth one and contributes $2t-5$ rounds. This attains the upper bound whenever $2j\leq t$.
 
 For $3k<\beta\leq6k$, each of the $\beta-3k$ further detours attaches at depth two, contributing $2t-7$ rounds apiece. This attains the [third-round visit bound](#counting-visits-down-to-the-third-round) for $t\geq4(\beta-2k)$.
+
+#### Joining a detour to an existing center
+
+For $t\geq5$ and $\beta>6k$, a modification of the recursive construction gives a larger lower bound at the same cycle rank. Put $q=\min\{k,\beta-6k\}$. Choose $q$ of the detours attached to lost roots. At the center $x$ of each chosen detour, replace its outgoing arm by a new detour attached at $x$, together with a shorter outgoing arm at the new detour's guard. More precisely, remove the old outgoing arm, attach a standard detour to $x$ with parent $p$, guard $g$, and center $y$, and give $g$ an outgoing relay arm of length $t-4$. The old detour's new serial path follows its incoming arm to $x$, then goes through $g$ and along that outgoing relay arm. The new detour's serial path has center $y$ and two arms of length $t-4$. In the graph, $x$ and $g$ are joined through $p$.
+
+The intact run colors $x$ in round two, $p$ in round three, and $g,y$ in round four. At $x$, the incoming arm and the source linking it to its own parent use two blue relays. The new parent $p$ is its sole intact white neighbor. The new outgoing arm still ends in round $t$. Order all serial paths by decreasing attachment depth within each block, as before, so the path through $y$ precedes the one through $x$. In the delayed run, the relay at $y$ restores $p$ one round after $y$ arrives. The blue $p$ then waits with both $x$ and $g$ white. When the original incoming arm restores $x$, $p$ forces $g$ the next round and the serial run continues on $g$'s arm. Thus the other detour's guard release becomes a step on the shortened serial path. Further detours at $g$ use the same delayed schedule: their parents see both $g$ and their own guards white until the serial path reaches $g$. The usual induction for the recursive construction gives one serial arrival per round, with all other guard releases in parallel. The original path loses its outgoing mark at depth three, and the path attached at depth two contributes $2t-7$ marks. The new serial path gives one additional unit of cycle rank. Its parent and both centers have degree at most three, and every retained blue relay still has degree two before protection. Consequently the same private paths give tolerance of every loss of at most $k$ seeds and a minimum killing support of size $k+1$.
+
+To count the sites, choose the $q$ center attachments first and then use the lowest available depths for the rest. Write $H_i^{(q)}$ for the number of sites at depth $i$ when all shallower sites have been used, including the selected center sites at depth two. Set $H_i^{(q)}=0$ at negative indices, $c_0=k$ and $c_i=2k$ for $i>0$. For $0\leq i\leq t-2$ the counts satisfy
+$$
+H_i^{(q)}=c_i+H_{i-2}^{(q)}+2\sum_{j=0}^{i-3}H_j^{(q)}
++q\,\mathbf{1}_{i=2}-q\,\mathbf{1}_{i=3}-q\,\mathbf{1}_{i=4}.
+$$
+As in the unmodified construction, each detour supplies one guard site two depths later and two arm sites at each eligible depth from three depths later. Each chosen splice adds its center site at depth two and removes the old outgoing depth-three site. At depth four its new guard and the replacement outgoing arm start at the same vertex, so these count as just one site. The later arm sites keep their original depths. Take
+$$
+b_i^{(q)}=\min\{H_i^{(q)},\max(0,\beta-\sum_{j<i}H_j^{(q)})\}.
+$$
+The choice of $q$ ensures that rank $\beta$ reaches all selected center sites. The resulting recovery time is
+$$
+t+k(2t+1)+\sum_{i=0}^{t-2}(2t-2i-3)b_i^{(q)}-q.
+$$
+As before, all-blue cycles supply any unused rank.
+
+For $6k<\beta\leq12k$, this is exactly $q$ rounds longer than the unmodified recursive construction. The site counts through depth three change from $(k,2k,3k,6k)$ to $(k,2k,3k+q,6k-q)$. Moving $q$ detours from depth three to depth two gains $2q$ rounds, and the $q$ shortened paths cost $q$ rounds. At larger ranks the improvement is at least $q$. In fact, if $\Delta_i=H_i^{(q)}-H_i^{(0)}$, then $\Delta_2=q,\Delta_3=-q,\Delta_4=0,\Delta_5=q$ whenever those depths are eligible. For $i\geq6$, the contributions of $\Delta_2,\Delta_3$ to the sum cancel, leaving $\Delta_i=\Delta_{i-2}+2\sum_{j=4}^{i-3}\Delta_j\geq0$. For example, at $t=8$, $k=1$ and $\beta=44$, the construction gives 248 rounds, compared with 245 for unmodified detours at the same parameters. These are constructive lower bounds for the worst-case time.
+
+#### The first rank above six per lost seed
+
+For $\beta>6k$ and $t\geq4$, the degree-three deficit satisfies
+$$
+D\geq\min\{t,\ 4(\beta-2k)+1\}.
+$$
+At $\beta=6k+1$, the center attachment loses $16k+5$ rounds from the linear bound. It therefore attains this upper bound whenever $t\geq16k+5$.
+
+To prove the bound, put $a=2t-3$ and $D_0=4(\beta-2k)$. The [third-round count](#counting-visits-down-to-the-third-round) suffices for $t\leq D_0$. For $t>D_0$, suppose $D=D_0$. We have $t\geq21$, and the rank count is tight. The third-round count spends all of the deficit on the two classes of rootless shortfalls. In particular there can be no undistinguished root, which would lose at least two from its own allowance. Every root's visit is full, and the $\beta$ rootless visits consist of $k$ of size $a$, $2k$ of size $a-2$, and $\beta-3k$ of size $a-4$. Indeed the two counts require at least $\beta-k$ shortfalls of two and $\beta-3k$ shortfalls of four. Attaining their sum requires each count to be tight, with no other deficit.
+
+**The centers of the three classes.** The $k$ visits of size $a$ use distinguished second-round centers, one for each root. Each is relayed from an undistinguished early direct first-round child of that root, by the [count at size $a-1$](#several-excess-units-of-cycle-rank). Here an early direct child means one that arrives two or more rounds before its forest parent. Each such visit lies within $t-1$ rounds of the early child, with two full branches at its second-round center. In the other two branches of every root, the full root visit has successive marks born in rounds one and two. Denote them by $w_1,w_2$ in each of these branches. Since the root's only direct child is already assigned to the size-$a$ visit, the marked $w_1$ is relayed and near the root.
+
+Every root branch contains one of the $3k$ visits of size at least $a-3$, by the third-round count. In the two branches that contain $w_1,w_2$, the rootless visit has size $a-2$. Its center must be born in round three. A first-round center fits in a full root window and a second-round center outside those windows requires an early direct first-round parent. By the branch argument for third-round centers, the center is within one round of an early direct second-round child $e$ of $w_1$. This child differs from $w_2$, since a distinguished vertex cannot arrive two rounds before its direct parent. The visit lies within $t-2$ rounds of $e$ and has two full branches at its third-round center.
+
+A size-$(a-4)$ visit cannot have a center born by round three. Such a center would fit in a full root window or in the interval already assigned to a rootless visit in that branch. The interval bound in the third-round count applies to any center born by round three, and no interval of length at most $2t-1$ fits both a size-$(a-4)$ visit and one of the occupied sizes $a,a-2$. A later center than round four cannot supply $a-4$ marks. Thus all remaining visits have a fourth-round center and two full branches. It follows that every distinguished vertex born by round three is internal to its visit, including those in the full root visits. Rank saturation now excludes any edge outside $F$ between such early vertices of $F$ (whether distinguished or undistinguished), and any edge outside $F$ joining a vertex born by round three to a forest relay. Any such trail edge would need a free side of an early distinguished endpoint.
+
+**Locate fourth-round centers.** The [arrival gap rules](#counting-visits-down-to-the-third-round) extend to round four because the extra edges to vertices born by round three have just been excluded. For a nonroot born by round four, its time is within one round of its parent or of its parent's direct predecessor, unless it is an early direct child. For round one the same statement follows from the absence of adjacent lost seeds and shared first-round sources. Starting at a fourth-round center, follow these parent or predecessor steps until reaching a root or an early direct child. The center itself cannot be early and direct, since it is distinguished. Each step decreases the birth round by at least one and changes delayed time by at most one. If the procedure ends at a vertex born in round $i$, the entire size-$(a-4)$ visit fits within $t-i$ rounds of its arrival. The root windows are full. The intervals of early direct first-round children and of early direct second-round children already contain the larger visits located above. They cannot also fit an additional visit of size $a-4$.
+
+For the last assertion and to count the remaining intervals, consider the early direct children through round three. Two successive direct edges cannot both lead to early children. If $v,w,y$ followed such edges and $y$ arrived at least two rounds before $w$, then $w$ returns after the intact birth round of $y$. Its only possible white neighbor at its delayed return other than $y$ is its direct predecessor $v$. Indeed every other neighbor was intact blue by the round before $y$ was born, and a still-white neighbor then would need an excluded edge from $w$ to an early vertex. With $y$ already blue, $w$ would restore $v$ too early. Thus an early direct first-round child has no early direct second-round child. The other first-round children $w_1$ each have their one direct child $e$. These are all possible early direct children born by round two.
+
+An early direct third-round child cannot come directly from a root or a first-round vertex. The root and each $w_1$ already have their unique direct child, and the early first-round child cannot have an early direct child by the preceding argument. In each of the two branches with $w_1,w_2$, the second-round vertex $e$ cannot have an early direct child either. This leaves at most one early direct third-round child from $w_2$ in each of those branches. In the remaining branch the second-round center has two marked children born in round three, neither of which can be early and direct. Its parent, the early first-round child, has at most one other child. That other child can contribute at most one early direct third-round child. This gives at most $3k$ early direct third-round children in total, with room for just one visit of size $a-4$ in each corresponding interval. The required $\beta-3k>3k$ visits contradict this count. Therefore $D=D_0$ is impossible when $t>D_0$.
 
 <a id="one-intact-round-at-small-cycle-rank"></a>
 
