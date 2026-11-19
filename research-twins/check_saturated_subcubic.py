@@ -1,30 +1,77 @@
-"""Enumerate all subcubic round-two residual rules when ten vertices are white."""
+"""Exhaust the subcubic round-two residuals with eight to ten whites."""
 
-from itertools import combinations
-
-
-# For each round-one branch, the second child is either forced directly
-# by its parent or via a permanently blue source, like the first child.
-def templates():
-    for lost_is_source in (False, True):
-        for self_count in range(4 if not lost_is_source else 3):
-            for lost_target_self in ((False, True) if lost_is_source else (False,)):
-                self_targets = [False] * (3 - self_count) + [True] * self_count
-                if lost_is_source:
-                    self_targets[0] = lost_target_self
-                yield lost_is_source, self_targets
+from itertools import combinations, combinations_with_replacement
 
 
-def completion_time(neighbors, blue_rules):
-    white = (1 << len(neighbors)) - 1
+def toggle_edge(neighbors, left, right):
+    neighbors[left] ^= 1 << right
+    neighbors[right] ^= 1 << left
+
+
+def templates(white_count):
+    for missed in (2, 3):
+        for own_first_target in (False, True):
+            # A branch is specified by its new targets and whether one is
+            # forced directly. A branch with two targets has an outside source.
+            branch_types = ((0, False), (1, False), (1, True), (2, False), (2, True))
+            ordinary = combinations_with_replacement(branch_types, missed - own_first_target)
+            for ordinary_branches in ordinary:
+                first_branches = ((branch,) for branch in branch_types) if own_first_target else ((),)
+                for first_branch in first_branches:
+                    for lost_count in range(4 - missed):
+                        assignments = ((lost_count, False), *first_branch, *ordinary_branches)
+                        yield from residual_templates(
+                            white_count, missed, own_first_target, assignments
+                        )
+
+
+def residual_templates(white_count, missed, own_first_target, assignments):
+    old = missed + 1
+    new = sum(count for count, _ in assignments)
+    restored_count = old + new - white_count
+    if restored_count < 0:
+        return
+
+    remaining = [3 - missed] + [2] * missed + [2] * new
+    neighbors = [0] * (old + new)
+    rules = []
+    for parent in range(1, old):
+        if own_first_target and parent == 1:
+            toggle_edge(neighbors, 0, parent)
+        else:
+            rules.append(1 | (1 << parent))
+
+    next_child = old
+    outside_sources = []
+    for parent, (count, direct) in enumerate(assignments):
+        remaining[parent] -= count
+        for index in range(count):
+            if direct and index == 0:
+                toggle_edge(neighbors, parent, next_child)
+            else:
+                outside_sources.append((len(rules), parent))
+                rules.append((1 << parent) | (1 << next_child))
+            next_child += 1
+
+    eligible = [parent for parent in range(old) if remaining[parent]]
+    for restored in combinations(eligible, restored_count):
+        capacity = remaining[:]
+        for parent in restored:
+            capacity[parent] -= 1
+        white = ((1 << len(neighbors)) - 1) ^ sum(1 << parent for parent in restored)
+        yield neighbors, rules, outside_sources, capacity, white, old
+
+
+def completion_time(neighbors, rules, white, minimum):
+    full = (1 << len(neighbors)) - 1
     elapsed = 0
     while white:
         added = 0
-        for rule in blue_rules:
+        for rule in rules:
             available = rule & white
             if available and not available & (available - 1):
                 added |= available
-        blue = ((1 << len(neighbors)) - 1) ^ white
+        blue = full ^ white
         while blue:
             vertex = blue & -blue
             blue ^= vertex
@@ -35,92 +82,103 @@ def completion_time(neighbors, blue_rules):
             return 0
         white ^= added
         elapsed += 1
+        if elapsed + white.bit_count() < minimum:
+            return 0
     return elapsed
 
 
-def enumerate_residuals():
-    # 0 is the lost vertex. 1..3 are its three missed round-one targets,
-    # with 1 its own target if it acted. Each parent has two labeled children.
-    children = range(4, 10)
-    features_by_first = [[] for _ in range(10)]
-    for size in range(1, 4):
-        for ends in combinations(children, size):
-            mask = sum(1 << end for end in ends)
-            features_by_first[ends[0]].append((False, ends, mask))
-            if size == 2:
-                features_by_first[ends[0]].append((True, ends, mask))
-    counts = []
-    max_time = 0
-    for lost_is_source, self_targets in templates():
-        neighbors = [0] * 10
-        blue_rules = []
-        for parent, self_target in enumerate(self_targets, 1):
-            first, second = 2 * parent + 2, 2 * parent + 3
-            if lost_is_source and parent == 1:
-                neighbors[0] |= 1 << parent
-                neighbors[parent] |= 1
-            else:
-                blue_rules.append(1 | (1 << parent))
-            blue_rules.append((1 << parent) | (1 << first))
-            if self_target:
-                neighbors[parent] |= 1 << second
-                neighbors[second] |= 1 << parent
-            else:
-                blue_rules.append((1 << parent) | (1 << second))
-        counts.append(enumerate_template(neighbors, blue_rules, features_by_first))
-        max_time = max(max_time, counts[-1][2])
-        print(lost_is_source, self_targets, counts[-1], flush=True)
-    return sum(count for count, _, _ in counts), sum(success for _, success, _ in counts), max_time
+def enumerate_features(neighbors, rules, remaining, white, minimum):
+    free = [v for v, capacity in enumerate(remaining) if capacity]
+    free_white = [v for v in free if white & (1 << v)]
+    features = {v: [] for v in free}
+    for size in (1, 2, 3):
+        for ends in combinations(free_white, size):
+            features[ends[0]].append((False, ends, sum(1 << v for v in ends)))
+    for left, right in combinations(free, 2):
+        incident = (1 << left) | (1 << right)
+        if white & incident and not neighbors[left] & (1 << right):
+            features[left].append((True, (left, right), incident))
 
+    fixed_start = any((rule & white).bit_count() == 1 for rule in rules)
+    fixed_start |= any(not white & (1 << v) and (row & white).bit_count() == 1
+                       for v, row in enumerate(neighbors))
+    configurations = finishing = longest = 0
 
-def enumerate_template(neighbors, blue_rules, features_by_first):
-    remaining = [0] * 4 + [2] * 6
-    count = success = max_time = 0
-
-    def visit(first, start, has_singleton):
-        nonlocal count, success, max_time
-        if first == 10:
-            if has_singleton:
-                count += 1
-                elapsed = completion_time(neighbors, blue_rules)
+    def visit(index, first, possible_start):
+        nonlocal configurations, finishing, longest
+        if index == len(free):
+            if possible_start:
+                configurations += 1
+                elapsed = completion_time(neighbors, rules, white, minimum)
                 if elapsed:
-                    success += 1
-                    max_time = max(max_time, elapsed)
+                    finishing += 1
+                    longest = max(longest, elapsed)
             return
-        # Finish this vertex, or add another feature whose least end is here.
-        # Increasing the choice index avoids enumerating repeated rules.
-        visit(first + 1, 0, has_singleton)
-        if remaining[first] == 0:
+
+        # Every feature is picked at its least end with a growing index.
+        # This also avoids repeated blue rules with the same neighbor set.
+        visit(index + 1, 0, possible_start)
+        vertex = free[index]
+        if not remaining[vertex]:
             return
-        choices = features_by_first[first]
-        for i in range(start, len(choices)):
-            direct, ends, mask = choices[i]
-            if any(remaining[end] == 0 for end in ends):
+        for choice, (direct, ends, mask) in enumerate(features[vertex][first:], first):
+            if any(remaining[v] == 0 for v in ends):
                 continue
             for end in ends:
                 remaining[end] -= 1
             if direct:
-                left, right = ends
-                neighbors[left] ^= 1 << right
-                neighbors[right] ^= 1 << left
+                toggle_edge(neighbors, *ends)
             else:
-                blue_rules.append(mask)
-            visit(first, i + 1, has_singleton or len(ends) == 1)
+                rules.append(mask)
+            visit(index, choice + 1, possible_start or (mask & white).bit_count() == 1)
             if direct:
-                neighbors[left] ^= 1 << right
-                neighbors[right] ^= 1 << left
+                toggle_edge(neighbors, *ends)
             else:
-                blue_rules.pop()
+                rules.pop()
             for end in ends:
                 remaining[end] += 1
 
-    visit(4, 0, False)
-    return count, success, max_time
+    visit(0, 0, fixed_start)
+    return configurations, finishing, longest
+
+
+def enumerate_residuals(white_count, minimum):
+    skeletons = configurations = finishing = longest = 0
+    for neighbors, rules, outside_sources, remaining, white, old in templates(white_count):
+        skeletons += 1
+
+        def extend_sources(index):
+            nonlocal configurations, finishing, longest
+            if index == len(outside_sources):
+                count, success, elapsed = enumerate_features(
+                    neighbors, rules, remaining, white, minimum
+                )
+                configurations += count
+                finishing += success
+                longest = max(longest, elapsed)
+                return
+            extend_sources(index + 1)
+            rule_index, parent = outside_sources[index]
+            for other in range(old):
+                bit = 1 << other
+                if other != parent and white & bit and remaining[other]:
+                    remaining[other] -= 1
+                    rules[rule_index] ^= bit
+                    extend_sources(index + 1)
+                    rules[rule_index] ^= bit
+                    remaining[other] += 1
+
+        extend_sources(0)
+    return skeletons, configurations, finishing, longest
 
 
 if __name__ == '__main__':
-    observed = enumerate_residuals()
-    expected = (6176870, 5921708, 6)
-    if observed != expected:
-        raise AssertionError((observed, expected))
-    print('Configurations, finishing runs, maximum additional rounds:', observed)
+    for whites, minimum, expected in (
+        (10, 1, (10, 6176870, 5921708, 6)),
+        (9, 7, (20, 5390980, 0, 0)),
+        (8, 7, (57, 3470951, 1168, 7)),
+    ):
+        observed = enumerate_residuals(whites, minimum)
+        if observed != expected:
+            raise AssertionError((whites, minimum, observed, expected))
+        print(f'{whites} whites, at least {minimum} additional rounds: {observed}', flush=True)

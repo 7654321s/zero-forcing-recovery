@@ -102,8 +102,8 @@ def check_two_round_bound(degree, lost, full_arrivals, delayed_arrivals):
     if len(missed_second) > bound:
         raise AssertionError((degree, lost, missed_first, missed_second, bound))
     if None not in delayed_arrivals:
-        cap = 10 if degree == 3 else degree**2 + 3
-        if degree == 3 and len(missed_second) == 10:
+        cap = 9 if degree == 3 else degree**2 + 3
+        if degree == 3 and len(missed_second) in (9, 10):
             cap = 8
         if max(delayed_arrivals) > cap:
             raise AssertionError((degree, lost, delayed_arrivals, cap))
@@ -194,6 +194,28 @@ def check_eight_round_example():
     MODEL['certify'](adj, blue, mask([22, 23]), 1, 2, 8)
 
 
+def check_nine_round_example():
+    edges = [(0, 1), (0, 8), (0, 9), (1, 4), (1, 10), (2, 8), (2, 10),
+             (2, 11), (3, 6), (3, 9), (3, 11), (4, 7), (5, 7), (5, 10),
+             (5, 12), (7, 11), (12, 13), (13, 14), (14, 15), (15, 16),
+             (16, 17), (16, 18)]
+    adj = adjacency(19, edges)
+    blue = mask([0, 8, 9, 10, 11, 13, 15, 16, 17, 18])
+    intact, full_arrivals = trace(adj, blue)
+    delayed, delayed_arrivals = trace(adj, blue ^ 1)
+    degree = max(row.bit_count() for row in adj)
+    if (degree, intact, delayed) != (3, 2, 9):
+        raise AssertionError((degree, intact, delayed))
+    if check_two_round_bound(degree, 0, full_arrivals, delayed_arrivals) != 8:
+        raise AssertionError(delayed_arrivals)
+    expected = [{14}, {12}, {5}, {7}, {4}, {1}, {0, 2}, {3}, {6}]
+    actual = [{v for v, arrival in enumerate(delayed_arrivals) if arrival == round_number}
+              for round_number in range(1, delayed + 1)]
+    if actual != expected:
+        raise AssertionError(actual)
+    MODEL['certify'](adj, blue, mask([17, 18]), 1, 2, 9)
+
+
 def main():
     extremal_examples()
     print('Sharp one-round examples: two certificates at times 1/5 and 1/4')
@@ -210,6 +232,8 @@ def main():
     print('Subcubic example: exact restricted time 2 and delayed time 7')
     check_eight_round_example()
     print('Saturated subcubic example: exact restricted time 2 and delayed time 8')
+    check_nine_round_example()
+    print('Sharp subcubic example: exact restricted time 2 and delayed time 9')
 
 
 if __name__ == '__main__':
