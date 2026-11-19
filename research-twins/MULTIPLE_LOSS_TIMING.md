@@ -5,7 +5,7 @@ Use the synchronous rule and initial-color loss model of the [single-loss bounds
 - **Degree two.** For $t\geq1$ and $k\geq1$, the exact value is $M_{2,t,k}=t+k(2t+1)$. On cycles the exact value is $t(k+1)+\lceil k/2\rceil$.
 - **Forests and cycle rank.** The exact value on forests of unrestricted degree is $t+k(2t+1)$. At cycle rank $\beta$ and $t\geq1$, an upper bound is $t+k(2t+1)+(2t-1)\beta$. For one intact round the exact worst-case time is determined at every cycle rank.
 - **One intact round.** The exact value is $1$ for $d=1$ and $1+3k$ for $d=2,3$. For $d\geq4$ one loss gives $5$. For $d\geq4$ and $k\geq2$, put $U=1+\lfloor kd/2\rfloor+2k$. The exact value is $U$ for even $k$ and for $d=4,5$. For odd $k$ it is $U-1$ at $d=6$, and $U-2+(d\bmod2)$ at $d\geq7$.
-- **Joint degree and cycle rank.** For one intact round the exact maximum is determined at every cycle rank for degree caps three through eight and for every cap at least three with an even loss budget. The remaining upper and lower bounds differ by at most one round.
+- **Joint degree and cycle rank.** For one intact round the exact maximum is determined jointly for every degree cap at least three, cycle rank, and loss budget.
 - **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$.
 - **At least two intact rounds allowed.** Put $P=d(d-1)^{t-1}$. For $d\geq6$, $t\geq2$ and $k\geq1$,
   $$
@@ -189,108 +189,65 @@ Thus each group of $p$ seeds can spend up to two boundary slots at one incidence
 
 ## One intact round with both degree and cycle rank fixed
 
-Let $M(d,\beta,k)$ be the maximum finite recovery time on connected graphs of maximum degree at most $d$ and cycle rank exactly $\beta$, with intact time at most one and exactly $k$ losses. For $k\geq1$ and $\beta\geq0$,
+Let $M(d,\beta,k)$ be the maximum finite recovery time on connected graphs of maximum degree at most $d$ and cycle rank exactly $\beta$, with intact time at most one and exactly $k\geq1$ losses. For every $\beta\geq0$,
+$$
+M(3,\beta,k)=1+3k,\qquad
+M(4,\beta,k)=1+3k+\min(k,\lfloor\beta/2\rfloor).
+$$
+For $d\geq5$ and $\beta<2k$, the exact value is $1+3k+\lfloor\beta/2\rfloor$. For $d\geq5$ and $\beta\geq2k$, put $\ell=d-4$, $n=\lfloor k/2\rfloor$, and $P=\ell n$. Define $D=P$ except for odd $k\geq3$ and $d\geq9$, when $D=P+\lfloor(\ell-3)/2\rfloor$. Write $\beta-2k=(2\ell+3)a+b$ with $0\leq b<2\ell+3$. Then the exact value is
 $$
 \begin{aligned}
-M(3,\beta,k)&=1+3k,\\
-M(4,\beta,k)&=1+3k+\min(k,\lfloor\beta/2\rfloor).
+E_{\mathrm{pair}}&=\min\{P,\ \ell a+\max(0,\lfloor(b-3)/2\rfloor)\},\\
+E_{\mathrm{triple}}&=\min\{D,\ \lfloor(\beta-2k-3n-5)/2\rfloor\},\\
+M(d,\beta,k)&=1+4k+\max\{E_{\mathrm{pair}},E_{\mathrm{triple}}\}.
 \end{aligned}
 $$
-For $d\geq5$ and $\beta<2k$, the exact value is $1+3k+\lfloor\beta/2\rfloor$. For $d\geq5$ and $\beta\geq2k$, set $\ell=d-4$, $n=\lfloor k/2\rfloor$, and $P=\ell n$. Define the degree budget $D=P$ except for odd $k\geq3$ and $d\geq9$, when $D=P+\lfloor(\ell-3)/2\rfloor$. The upper bound is $1+4k+E_+$, where $E_+$ is the largest integer $0\leq e\leq D$ satisfying
-$$
-2e+3\lceil e/\ell\rceil\leq\beta-2k.
-$$
-Equivalently, write $\beta-2k=(2\ell+3)a+b$ with $0\leq b<2\ell+3$. Then
-$$
-E_+=\min\{D,\ \ell a+\max(0,\lfloor(b-3)/2\rfloor)\}.
-$$
-If $E_+\leq P$, this upper bound is exact. This includes every even $k$ and all $d\leq8$. If $E_+>P$, the lower bound is $1+4k+E_-$ with
-$$
-E_-=\max\{P,\min(D,\lfloor(\beta-2k-3n-5)/2\rfloor)\}.
-$$
-Here $E_+-E_-\leq1$. The two bounds match in particular when the cycle rank is at least $2k+2D+3n+5$.
-
-For two losses and every $d\geq4$, the two separate upper bounds are simultaneously sharp.
-$$
-M(d,\beta,2)=\min(\mathcal{M}_{\beta,2},d+5).
-$$
-All the lower bounds have connected $k$-fault-tolerant witnesses with a minimum killing support of size $k+1$.
+The triple term can exceed the pair term only when it exceeds $P$. If the gain is positive and at most $P$, its least rank is $2k+2e+3\lceil e/\ell\rceil$. For $P<e\leq D$ the least rank is $2k+2e+3n+5$. All maxima have connected $k$-fault-tolerant witnesses with a minimum killing support of size $k+1$.
 
 ### Rank spent by groups of lost seeds
 
-Let $T$ be a finite delayed time, $S=T-1-3k$, and assume $T>1$. Group all lost seeds by consecutive restoration rounds, as in the degree proof. Write $h$ for the number of distinct restoration rounds, $s$ for the number of groups consisting of a single seed, and $g$ for the number of other groups. The trail argument gives $\beta\geq2S+2m+A+B$, where $m$ counts undistinguished roots and $A,B$ count unused near slots and free sides. Every group containing at least two seeds supplies at least three units of $2m+A+B$.
+Let $T>1$ be a finite delayed time, and put $S=T-1-3k$. Group all lost seeds by consecutive restoration rounds, including seeds that return in the same round. The trail argument gives $\beta\geq2S+2m+A+B$, where $m$ counts undistinguished roots and $A,B$ count unused near slots and free trail sides.
 
-- If all roots of the group are distinguished, choose two of them restored in consecutive rounds. These occupy each other's near slots, contributing two to $A$. The two free trail sides facing each other can receive at most one blocking-edge charge, by the step count in the [cycle-rank proof](#the-extra-cost-beyond-one-far-arrival-per-seed). This supplies a unit of $B$.
-- If exactly one root of the group is undistinguished, some distinguished root returns within one round of it, including a possible tie. That time consumes one of the undistinguished root's near slots. This gives one unit of $A$ and two from the undistinguished root.
-- If at least two roots of the group are undistinguished, their contribution from $2m$ is at least four.
+Consider a group of $p$ seeds restored over $r$ distinct consecutive rounds. Write $t_*$ for the number distinguished by the trail and $j$ for the number of distinguished children in their roots' distinguished visits. The group's deficit is $2t_*+3(p-t_*)-j=3p-t_*-j$. Every distinguished child in a root visit and every near extra in the group sits within its $r$ restoration rounds or one of the two boundary rounds. The $t_*$ distinguished roots also occupy distinct times in that same window. Thus the number of near extras in the group is at most $r+2-t_*-j$, and the group contributes at least $3p-r-2$ to $A$.
 
-The charges use root slots, sides and undistinguished roots from disjoint groups. Thus for any degree cap,
+Among the $r$ times, mark the $t_*$ times of distinguished roots. At most $r-t_*+1$ consecutive runs of marked times are possible, so there are at least $2t_*-r-1$ pairs of consecutive marked times. For each such pair the two free trail sides facing each other can receive at most one blocking-edge charge, by the step count in the [cycle-rank proof](#the-extra-cost-beyond-one-far-arrival-per-seed). The sides of different pairs are distinct, including when a distinguished root is in two pairs. The group therefore contributes at least $2t_*-r-1$ to $B$. With the $2(p-t_*)$ units from undistinguished roots, its total contribution is at least
 $$
-\beta\geq 2S+3g.
+w=5p-2r-3=3(p-1)+2(p-r).
 $$
-Group sizes give a finer inequality. In one group of $p$ lost seeds and $r$ distinct restoration times, choose one representative seed per time, taking the distinguished seed whenever there is one. Each pair of consecutive times with two distinguished representatives supplies three units as above. A pair with exactly one distinguished representative supplies one unit through the other representative's unused near slot. Allocate one of the two units in $2m$ for each incident pair at an undistinguished representative, which has at most two incident pairs. Each pair now supplies at least two units, including pairs with two undistinguished representatives. The $p-r$ seeds not chosen as representatives are undistinguished and supply another $2(p-r)$ units. This gives at least $2(p-1)$ per group. Taking the better bound in each nonsingleton group yields
-$$
-\beta\geq 2S+\sum_{\text{groups of size }p\geq2}\max\{3,2(p-1)\}.
-$$
-
-In a three-seed group with a tied return, all times are within one round of each other. With no distinguished root, $2m$ supplies six units. With one distinguished root, the other two lose a near slot each, again giving six. With two distinguished roots, their consecutive times supply three units, and the third seed gives two from $2m$ and at least one unused near slot. Thus the group contributes at least six in every case.
-
-In a five-seed group with a tied return there are at most four distinct times. Start with the representative count giving $2(p-1)=8$. If either endpoint representative is undistinguished, it has one unit in $2m$ left after paying for at most one adjacent pair. Otherwise both endpoint representatives are distinguished, so every time in the group is within one round of a distinguished endpoint. A seed omitted from the representatives because of a tie therefore loses a near slot that the base charge has not used. This gives at least nine in either case.
-
-For $d\geq5$, retaining $h$ and $c=s+g$ in the [degree count](#upper-bound) also gives
-$$
-S\leq h+g+\frac{d-5}{2}(k-s).
-$$
-
-The degree-three and degree-four upper bounds follow from their separate degree bounds and the cycle-rank bound. The trail bound $S\leq\lfloor\beta/2\rfloor$ also gives the upper bound for $\beta<2k$ at all higher degrees.
+Consequently $\beta\geq2S+\sum w$ over all restoration groups. The degree-three and degree-four upper bounds follow from their separate degree bounds and the cycle-rank bound. The trail bound $S\leq\lfloor\beta/2\rfloor$ also gives the upper bound for $\beta<2k$ at all higher degrees.
 
 ### Degree spent within each restoration group
 
-For each round after one that restores no lost seed, select one arriving vertex and one intact source as in the degree count. Assign each direct target to its lost source's group. Assign each single-neighbor or long shared-source target to the group of its latest lost neighbor. These targets use a boundary slot. Assign each short shared-source target to the group containing its two latest lost neighbors. The last two neighbors have equal or consecutive restoration times, so both belong to that group.
+For each round after one that restores no lost seed, select one arriving vertex and one intact source as in the degree count. Assign a direct target to its lost source's group. A single-neighbor or long shared-source target uses a boundary slot of the group of its latest lost neighbor. A short shared-source target uses two incidences in the group containing its two latest lost neighbors, whose returns are equal or consecutive.
 
-In a group of $p$ seeds and $r$ distinct restoration rounds, let $a,b,q$ be the numbers of direct, boundary-slot and short shared-source targets. Charge one incidence for a direct target, one at the latest lost neighbor for a boundary-slot target, and two for a short target. The incidences are distinct at the lost seeds. In particular,
+In a group of $p$ seeds and $r$ distinct restoration rounds, let $a,b,q$ be the numbers of direct, boundary-slot and short shared-source targets. The counted incidences at the lost seeds are distinct, giving
 $$
 a\leq p,\qquad b\leq2,\qquad a+b+2q\leq dp.
 $$
-The group accounts for at most $r+a+b+q$ rounds, and the sum of these bounds covers all rounds after one. A singleton has no short targets and accounts for at most four rounds. For $p\geq2$, its contribution above $4p$ is at most
+The group accounts for at most $r+a+b+q$ rounds. Their sum covers all rounds after one. A singleton has no short targets and accounts for at most four rounds. For $p\geq2$, the contribution above $4p$ is at most
 $$
 r-p+\left\lfloor\frac{(d-5)p}{2}\right\rfloor+1.
 $$
-This takes the integer part within the group, since $a+b+q\leq\lfloor(dp+a+b)/2\rfloor$.
 
-For an odd group with $r=p$, take the seeds in even positions in its consecutive return order. They meet every consecutive pair of seeds. Each short target uses an incidence at one of these seeds, giving $q\leq d(p-1)/2$. Thus $r+a+b+q-4p\leq\ell(p-1)/2$. In particular, if all lost seeds throughout the run return in different rounds, the total gain above $1+4k$ is at most $P$. Odd groups with tied returns instead have the degree bound $\lfloor(d-5)p/2\rfloor$.
+Give each group an integer $u$ defined by $u=\lfloor p/2\rfloor$, except when $p$ is odd and $r<p$, when $u=\lceil p/2\rceil$. The degree contribution above $4p$ is at most $\ell u$. For even $p$, this follows directly from the last bound. For odd $p$ with distinct return times, take the seeds in even positions in their consecutive order. They meet every consecutive pair, so every short target uses an incidence at one of these seeds and $q\leq d(p-1)/2$. The resulting gain is at most $\ell(p-1)/2$. For odd $p$ with ties, the last incidence bound gives a gain of at most $\lfloor(d-5)p/2\rfloor\leq\ell\lceil p/2\rceil$.
 
-Write $c$ for the resulting bound on a group's contribution above $4p$ and $w$ for its rank cost above the $2S$ term. These satisfy
-$$
-w\geq 3\lceil c/\ell\rceil.
-$$
-For a singleton both bounds are zero. For $p=2$ the degree bound is $c\leq\ell$. At $p=3,5$ with distinct returns, use $c\leq\ell(p-1)/2$. With tied returns at these two sizes use $c\leq\ell p/2$ and the rank costs six and nine just proved. For the remaining $p\geq4$, use $c\leq\ell p/2$ and $2(p-1)\geq3\lceil p/2\rceil$.
-
-If $e=T-1-4k$ is positive, then $e\leq\sum c$. The rank count gives
-$$
-\beta\geq 2(k+e)+\sum w\geq 2k+2e+3\lceil e/\ell\rceil.
-$$
-The [separate degree bound](#exact-values-for-one-intact-round) gives $e\leq D$. This proves the upper bound for $\beta\geq2k$.
+The rank cost satisfies $w\geq3u$ in every group. If $p$ is odd and $r<p$, then $p\geq3$ and $w\geq3(p-1)+2\geq3u+2$. With $e=T-1-4k$ positive, the degree bound gives $e\leq\ell\sum u$. In every case, $\beta-2k\geq2e+3\lceil e/\ell\rceil$. If $e>P$, at least one odd group has a tied return, because otherwise $\sum u=\sum\lfloor p/2\rfloor\leq n$. Hence in this case $\sum w\geq3(n+1)+2$, so $\beta-2k\geq2e+3n+5$. The [separate degree bound](#exact-values-for-one-intact-round) gives $e\leq D$. These inequalities give the stated upper bound.
 
 ### Sharp constructions
 
-For degree three, start with the extremal path for intact time one. Attach cycles using bridges in a chain at a retained seed of the last blue pair. The port towards the previous block and the port towards the next block are adjacent on each cycle. The other route between the two ports has $2k+2$ interior vertices. Color every cycle vertex blue. The path's designated loss and killing support leave the attachment seed blue, so their outcomes are preserved. After any loss of at most $k$ seeds, the interior of each long route retains a consecutive blue pair. It restores the entire route and both ports independently of the other blocks. Once the cycles are blue, the remaining path seeds suffice to recover the path. Each cycle adds one to $\beta$ and every vertex has degree at most three.
+For degree three, start with the extremal path for intact time one. Attach cycles using bridges in a chain at a retained seed of the last blue pair. In each cycle the two vertices used as ports are adjacent, and the other route between them has $2k+2$ interior vertices, all initially blue along with the ports. Every loss of at most $k$ leaves two consecutive interior vertices blue. They restore the entire route and its ports without help from outside the cycle. The designated loss and killing support leave the attachment seed blue, preserving their outcomes on the path. Each cycle adds one to the rank while keeping maximum degree at most three.
 
-At degree four, use $\min(k,\lfloor\beta/2\rfloor)$ rank-two blocks from the [cycle-rank construction](#attainment-at-every-cycle-rank), with path blocks for the remaining seeds. Use the same rule for $d\geq5$ and $\beta<2k$. For $\beta\geq2k$, start with $k$ rank-two blocks, of total rank $2k$. Replacing two such blocks by a two-seed block with $2+x$ shared-source targets increases the time by $x$ and the rank by $2x+3$. Any $1\leq x\leq\ell$ fits the degree cap, including after protection. Distribute any feasible gain $e\leq P$ over $\lceil e/\ell\rceil$ replacements, saturating all but the last. This attains the upper bound whenever $E_+\leq P$. These blocks return the lost seeds in distinct rounds, so restricting the maximum to such runs gives the exact formula with $D=P$ for every $d\geq5$.
+At degree four, use $\min(k,\lfloor\beta/2\rfloor)$ rank-two blocks from the [cycle-rank construction](#attainment-at-every-cycle-rank), with path blocks for the remaining seeds. Use the same rule for $d\geq5$ and $\beta<2k$. For $\beta\geq2k$, start with $k$ rank-two blocks, of total rank $2k$. Replacing two of them by a two-seed block with $2+x$ shared-source targets increases the time by $x$ and the rank by $2x+3$. Any $1\leq x\leq\ell$ fits the degree cap, including after protection. Distribute any feasible gain $e\leq P$ over $\lceil e/\ell\rceil$ replacements, saturating all but the last. This attains $E_{\mathrm{pair}}$. The seeds in these blocks return in distinct rounds, so imposing distinct return rounds also gives an exact classification with $D=P$.
 
-For odd $k\geq3$ and $P<e\leq D$, use $n-1$ full two-seed blocks and one three-seed block with $q=e-(n-1)\ell+5$ shared-source targets. Use the pairs of the [degree-bounded three-seed block](#constructions-attaining-the-bounds) with enough pair occurrences removed to leave $q$. Retain at least one occurrence joining the first lost seed to each of the other two, so both of those seeds still return one round after the first. The number of available occurrences is $D-(n-1)\ell+5$, and thinning preserves the degree cap.
+For odd $k\geq3$ and $P<e\leq D$, use $n-1$ full two-seed blocks and one three-seed block with $q=e-(n-1)\ell+5$ shared-source targets. Use the pairs of the [degree-bounded three-seed block](#constructions-attaining-the-bounds), removing enough occurrences to leave $q$. Retain at least one occurrence joining the first lost seed to each of the other two. Both other seeds still return one round after the first. There are $D-(n-1)\ell+5$ available occurrences, and thinning preserves the degree cap.
 
-The three-seed block contributes $q+7$ rounds, including its two seed-restoration rounds. It adds $3q+14$ vertices and $5q+18$ edges, including the incoming relays and excluding the incoming endpoint. Its rank is $2q+4$, so the total rank of these $n$ blocks is $2k+2e+3n+5$. This gives the claimed $E_-$. In this range $E_+<\ell(n+1)$, so its necessary rank is $2k+2E_++3n+3$. Reducing the gain by one covers the two-unit difference in rank, or reaches the pair-only value if $E_+=P+1$.
+The three-seed block contributes $q+7$ rounds, including its two seed-restoration rounds. It adds $3q+14$ vertices and $5q+18$ edges, including the incoming relays and excluding the incoming endpoint. Its rank increment is $2q+4$, so the total rank of these $n$ blocks is $2k+2e+3n+5$. This attains the triple term whenever it exceeds $P$.
 
-For $k=2$ the pair formula specializes to the minimum of the unrestricted cycle-rank maximum and $d+5$. In all degree-four and higher constructions, a chain of all-blue triangles uses the unused rank, and seed protection with a path for $J$ preserves the rank and the two propagation times.
+In the degree-four and higher constructions, a chain of all-blue triangles uses the unused rank, and seed protection with a path for $J$ preserves the rank and both propagation times.
 
 ### Least rank attaining the degree-only bound
 
-For every even $k\geq2$ and $d\geq5$, the minimum rank attaining the degree-only maximum is $(2d-1)k/2$. Indeed, that maximum requires $S=(d-2)k/2$. In the joint degree count, $h\leq k$, $g\leq k/2$ and $k-s\leq k$. Equality requires $g=k/2$, so the rank is at least $2S+3k/2$. Using $k/2$ two-seed blocks with $d-2$ shared-source targets attains the threshold.
-
-For odd $k$ and $5\leq d\leq8$, the exact formula gives minimum rank $(2d-1)(k-1)/2+2$. It uses $(k-1)/2$ two-seed blocks with $d-2$ shared-source targets and a single rank-two block.
-
-For odd $k\geq3$ and $d\geq9$, the minimum rank attaining the degree-only bound lies between $2k+2D+3n+3$ and $2k+2D+3n+5$. For example, at $d=9$ and $k=3$ the degree-only maximum is $19$ rounds. It is attained at rank $26$ and above. Ranks $24$ and $25$ have bounds of $18$ and $19$ rounds, while rank $23$ has exact value $18$.
+For $d\geq5$ the least rank attaining the degree-only maximum is $2k+2D+3n$ when $D=P$, and $2k+2D+3n+5$ when $D>P$. In particular, with $d=9$ and $k=3$, the exact value is $18$ rounds at ranks $24$ and $25$, and $19$ rounds at rank $26$.
 
 ## Two or more intact rounds
 

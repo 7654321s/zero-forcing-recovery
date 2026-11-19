@@ -133,11 +133,8 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
 
 def one_round_group_rank(arrivals):
     size = len(arrivals)
-    if size == 1:
-        return 0
-    if size in (3, 5) and len(set(arrivals)) < size:
-        return 3 * ((size + 1) // 2)
-    return max(3, 2 * (size - 1))
+    tied_returns = size - len(set(arrivals))
+    return 3 * (size - 1) + 2 * tied_returns
 
 
 def check_branched_forest_extremizers():
@@ -616,7 +613,8 @@ def main():
         (9, 2, 16, 13), (9, 2, 17, 14), (9, 2, 22, 14),
         (9, 4, 15, 19), (9, 4, 21, 22), (9, 4, 22, 22), (12, 5, 30, 29),
         (9, 3, 23, 18), (9, 3, 24, 18), (9, 3, 25, 18), (9, 3, 26, 19),
-        (11, 5, 48, 35), (11, 5, 49, 35), (11, 5, 51, 36), (11, 5, 53, 37),
+        (11, 5, 48, 35), (11, 5, 49, 35), (11, 5, 51, 36), (11, 5, 52, 36),
+        (11, 5, 53, 37), (17, 7, 113, 71), (17, 7, 114, 72), (17, 7, 116, 73),
         (12, 4, 31, 25), (12, 4, 32, 26), (12, 4, 45, 32), (12, 4, 46, 33),
     )
     for cap, k, rank, expected in joint_cases:
