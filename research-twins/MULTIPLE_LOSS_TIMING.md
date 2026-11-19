@@ -651,6 +651,45 @@ The smallest activation rank among useful sites is $W_{13}=2\cdot2008-577=3439$.
 
 The replay script counts ordinary gains by their values and keeps only undominated pairs of activation rank and extra-round capacity for the layered subset search. A pair with at least as much rank and no more capacity can be discarded. Identical sites are processed in binary-sized groups. This also supports the numerical queries `subcubic_rank_value` and `subcubic_first_layered_rank` without creating the detour plan or the graph. The threshold uses only the ordinary histograms and the available site types.
 
+#### How extra cycle rank converts into recovery time
+
+Consider the optimum in the combined detour family. Let $B=\beta-R_{\mathrm{ord}}(t,k)\geq0$ be the budget above ordinary saturation, and $E$ its gain in rounds over the saturated ordinary time. Each extra round costs two rank units once its layered site is chosen. Define the deficit from that rate by $D=B/2-E$.
+
+Let $r=1/\rho\approx1.866760$ be the ordinary growth factor from the [site recurrence](#repeated-attachments-at-detour-centers) and put $\alpha=\log_2 r\approx0.900537$. For $x\in[0,1]$, let $C(x)$ be the infimum of $\sum_j r^{-j}$ over finite choices of dyadic sizes $2^{-j}$, $j\geq0$, whose sum is at least $x$. Initially allow repetitions in this definition. Two copies of $2^{-j}$ for $j\geq1$ can merge into $2^{-(j-1)}$ at smaller cost, since $r<2$. A cover with cost arbitrarily close to the infimum can therefore use each size at most once, because $C(x)\leq1$ and two largest sizes would cost two.
+
+Let $n$ tend to infinity with $t\geq n+2$, $k\geq1$, and $B/2^{n+1}\to x$ for some $1/2\leq x\leq1$. Then
+$$
+\frac{D}{r^n}\longrightarrow \frac{w}{2}C(x),
+\qquad
+w=-\frac{1+3\rho-\rho^2+\rho^4}{(1-\rho)\rho Q'(\rho)}
+\approx3.585907,
+\qquad Q(z)=1-z-2z^2+z^3-z^5 .
+$$
+In particular, the deficit is of order $B^\alpha$ whenever $B\to\infty$ and $B/2\leq2^{t-2}$. Its leading coefficient on that scale depends on the position of $B$ between consecutive powers of two.
+
+**Asymptotic costs and capacities.** The [single-site formulas](#combining-layered-and-recursive-detours) give
+$$
+\sum_{n\geq0} R_{n+2}z^n=\frac{1-z^2+z^3}{Q(z)},\qquad
+\sum_{n\geq0} W_{n+2}z^n
+ =2\sum_{n\geq0}U_nz^n-\sum_{n\geq0}R_{n+2}z^n
+ =\frac{1+3z-z^2+z^4}{(1-z)Q(z)} .
+$$
+The smallest pole in modulus is the simple positive root $\rho$ of $Q$, as in the ordinary growth calculation. Its residue gives $W_s\sim w r^{s-2}$. Also $U_{s-2}=O(r^{s-2})$ and $P_s=2^{s-2}-U_{s-2}\sim2^{s-2}$. Thus a site at deadline $s=n+2-j$, for fixed $j$, has normalized cost $W_s/(wr^n)\to r^{-j}$ and normalized capacity $P_s/2^n\to2^{-j}$.
+
+**Upper bound on the deficit.** Choose a finite dyadic cover of $x$ with cost at most $C(x)+\varepsilon$. Merge repeated sizes and add a sufficiently small unused size so that the total size is strictly above $x$, with an additional cost at most $\varepsilon$. For all sufficiently large $n$, the corresponding deadlines are at least 13 and at most $n+2\leq t$. At least one of each site type is available. Their combined capacity exceeds $B/2$ because the cover has a fixed positive size surplus. After paying their total activation rank $W$, the available gain is at least $\lfloor(B-W)/2\rfloor$. Hence $\limsup D/r^n\leq (w/2)C(x)$ by letting $\varepsilon$ decrease to zero.
+
+**Lower bound on the deficit.** The preceding bound gives $D=O(r^n)$, so $E/2^n\to x$. Take a normalized optimal layered set as in the [finite-budget formula](#first-useful-rank-for-layered-detours). Its total activation rank is at most $2D$, and its capacity is at least $E$. If it uses a site with $s>n+2$, its normalized cost is at least $r(1-o(1))$, already larger than $C(x)\leq1$. Otherwise fix a cutoff $L\geq13$. Sites with $s<L$ contribute $o(2^n)$ capacity, since each has positive integer cost and hence there are at most $O(r^n)$ of them. The remaining sites have raw dyadic sizes $2^{s-2-n}$ whose total is at least $x-o(1)$, using $P_s\leq2^{s-2}$. With $L$ large enough, their normalized activation cost is at least $(1-\varepsilon)$ times the sum of the corresponding $r^{s-2-n}$. The minimum such sum is bounded below by $C(x-o(1))$. The function $C$ is continuous: for a demand increase $\delta\leq1$, adding one dyadic size between $\delta$ and $2\delta$ increases cost by at most $r\delta^\alpha$. Letting $n$ and then the cutoff grow gives $\liminf D/r^n\geq (w/2)C(x)$.
+
+For a dyadic $0<x<1$, evaluate $C(x)$ by comparing the cost of its terminating binary expansion, the cost of size one, and the cost of rounding the expansion up at each zero digit before its final nonzero digit. Rounding up at a digit means setting it to one and clearing all later digits. After repeats are merged, any finite cover above $x$ must first differ at such a zero or extend the expansion beyond the last digit. At a first difference, clearing the tail can only reduce cost. An extension beyond the last digit costs at least the expansion itself. For arbitrary $x$, the rounded values on a grid of step $2^{-m}$ bound $C(x)$ within $r^{1-m}$ by continuity.
+
+For instance $C(1)=1$ because a size no greater than one costs at least that size, while $C(3/4)=r^{-1}+r^{-2}\approx0.822648$. In the latter case a cover of cost less than one must use size $1/2$, since after merging repeats the available smaller sizes total at most $1/2$. The remaining size of at least $1/4$ costs at least $r^{-2}$ by subadditivity of $y^\alpha$, and both sizes together attain the value. The normalized coefficient of $B^\alpha$ is strictly larger at $x=3/4$ than at $x=1$, because $(1/2)^\alpha+(1/4)^\alpha>(3/4)^\alpha$.
+
+There is also a leading-order formula on the scale of total layered capacity. As $t\to\infty$, the sum of all useful capacities is $(3/4)k2^t+O(kr^t)$ and their total activation rank is $O(kr^t)$. The subset formula then gives
+$$
+E=\min\{B/2,(3/4)k2^t\}+O(kr^t+1).
+$$
+The upper bound uses the total capacity and the two-unit cost per round. The lower bound takes all useful sites and pays their total activation rank when the budget permits, with the same error bound at smaller budgets. Hence if $B/(k2^t)\to\lambda\geq0$, the extra rounds divided by $k2^t$ tend to $\min(\lambda/2,3/4)$.
+
 <a id="the-first-rank-above-six-per-lost-seed"></a>
 
 #### Counting visits down to the fourth round

@@ -1508,6 +1508,21 @@ def main():
             raise AssertionError(('subcubic first layered rank', t, k, threshold, before, after))
         print('Subcubic first layered rank:', t, k, threshold, after)
 
+    for n, cases in ((17, ((3, 4, 68676), (1, 1, 83441))),
+                     (23, ((3, 4, 2787739), (1, 1, 3359543))),
+                     (29, ((3, 4, 114003691), (1, 1, 138742935)))):
+        t = n + 2
+        _, _, ordinary, _ = subcubic_rank_model(t, 1)
+        rank = sum(ordinary.values())
+        baseline = subcubic_rank_value(t, 1, rank)
+        for numerator, denominator, expected in cases:
+            excess = numerator * 2 ** (n + 1) // denominator
+            gain = subcubic_rank_value(t, 1, rank + excess) - baseline
+            deficit = excess // 2 - gain
+            if deficit != expected:
+                raise AssertionError(('subcubic layered deficit', n, excess, deficit))
+            print('Subcubic layered deficit:', n, excess, deficit)
+
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()
         order = append_subcubic_blue_cycles(edges, 13, start, rank - 4, 1)
