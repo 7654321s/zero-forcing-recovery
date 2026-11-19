@@ -2,7 +2,7 @@
 
 **Theorem.** Take one of the [four positive leafless bicyclic graphs](NEARBY_FAMILIES.md#bicyclic-graphs-of-minimum-degree-two). Attach a nontrivial rooted tree by identifying its root with one core vertex. The resulting graph satisfies `EveryMinimumSupport` in exactly two cases. The attachment consists of direct leaves at the shared vertex of the two triangles, or it consists of direct leaves at a degree-three vertex of the diamond $\Theta(1,2,2)$. Every negative attachment admits a two-vertex minimum killing support with restricted time one and a specified singleton loss that finishes in round two.
 
-The other two cores are $\Theta(2,2,2)$ and $\Theta(2,2,3)$. The theorem concerns one attachment site on these four cores. Several attachment sites and attachments to negative cores are separate questions.
+The other two cores are $\Theta(2,2,2)$ and $\Theta(2,2,3)$. The theorem concerns one tree attachment site on these four cores. For [direct leaves at multiple sites](LEAF_MULTIPLICITIES.md), truncating each leaf multiplicity at two gives a separate classification.
 
 ## Direct leaves at the two positive sites
 
