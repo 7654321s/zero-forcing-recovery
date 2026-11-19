@@ -30,7 +30,7 @@ For [two losses in cubic graphs](MULTIPLE_LOSS_TIMING.md#two-losses-in-cubic-gra
 
 The [complete list of killing pairs for the compact chain](MULTIPLE_LOSS_TIMING.md#which-two-seed-losses-stop-recovery) gives $\lfloor(5k-1)/2\rfloor$ pairs at the construction's smallest rank and $\lfloor5k/2\rfloor-2$ at every larger rank, for $k\geq2$.
 
-The [bipartite double covers](MULTIPLE_LOSS_TIMING.md#bipartite-chains-tolerating-any-three-seed-losses) preserve 3-vertex-connectivity and recover from any $r\leq3$ seed losses by round $2+3r$. The eleven-round deadline is sharp in these covers from four blocks onward. Losing both copies of each of the $k$ designated seeds still takes exactly $6k+2$ rounds, and four arbitrary losses can stop recovery.
+The [3-vertex-connected bipartite chains](MULTIPLE_LOSS_TIMING.md#bipartite-chains-tolerating-any-three-seed-losses) work at every cycle rank from $1+2\lceil(13k+3)/2\rceil$ for $k\geq2$, and from nineteen for $k=1$. Their exact worst times after one and two arbitrary losses are five and eight. After three losses the worst time is eleven from four blocks onward and at the two unpadded three-block ranks, and ten elsewhere. Losing both copies of each of the $k$ designated seeds takes exactly $6k+2$ rounds, and four arbitrary losses can stop recovery.
 
 [Longer intact runs](ONE_LOSS_TIMING.md#more-than-two-intact-rounds) have sharp exponential base $d-1$ for fixed maximum degree $d\geq3$. Their worst finite recovery time divided by $d(d-1)^{t-1}$ approaches $1/2$ as $d$ grows, uniformly over intact deadlines $t\geq3$. At maximum degree two the exact time is $3t+1$. [The two-term expansion](ONE_LOSS_TIMING.md#the-first-two-asymptotic-terms) gives $d^t/2-(t-2)d^{t-1}/2+O_t(d^{t-2})$ for each fixed $t\geq3$.
 

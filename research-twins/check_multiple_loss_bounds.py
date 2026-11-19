@@ -1787,22 +1787,31 @@ def check_compact_cubic_chain_killing_pairs():
 
 
 def bipartite_cubic_chain_certificate(blocks, cycle_rank=None):
-    """Lift the compact chain and its intact and delayed waves to two sheets."""
-    if cycle_rank is not None and cycle_rank % 2 == 0:
-        raise ValueError('The bipartite double cover has odd cycle rank')
+    """Lift the compact chain and add two blue vertices for an even rank."""
+    even_rank = cycle_rank is not None and cycle_rank % 2 == 0
     base_rank = None if cycle_rank is None else (cycle_rank + 1) // 2
     if blocks == 1:
         base_rank = 10 if base_rank is None else base_rank
         if base_rank < 10:
             raise ValueError('The one-block cover needs at least one padding column')
     graph, blue, lost, waves = compact_cubic_two_round_chain_certificate(blocks, base_rank)
-    lifted = adjacency(2 * len(graph), ((2 * v + sheet, 2 * w + 1 - sheet)
-                                       for v, row in enumerate(graph) for w in members(row) if v < w
-                                       for sheet in (0, 1)))
+    edges = [(v, w) for v, row in enumerate(graph) for w in members(row) if v < w]
+    if even_rank:
+        anchor = 9
+        contact = 15 if blocks > 1 else next(v for v in members(graph[anchor]) if v >= 16)
+        edges.remove((anchor, contact))
+    lifted_edges = [(2 * v + sheet, 2 * w + 1 - sheet) for v, w in edges for sheet in (0, 1)]
+    order = 2 * len(graph)
     seeds = mask(2 * v + sheet for v in members(blue) for sheet in (0, 1))
+    if even_rank:
+        x, y = order, order + 1
+        lifted_edges.extend(((2 * anchor, y), (2 * contact, y),
+                             (2 * anchor + 1, x), (2 * contact + 1, x), (x, y)))
+        seeds |= mask((x, y))
+        order += 2
     deleted = mask(2 * v + sheet for v in members(lost) for sheet in (0, 1))
     lifted_waves = [tuple(2 * v + sheet for v in wave for sheet in (0, 1)) for wave in waves]
-    return lifted, seeds, deleted, lifted_waves
+    return adjacency(order, lifted_edges), seeds, deleted, lifted_waves
 
 
 def cubic_loss_deadlines(graph, blue, budget):
@@ -1862,21 +1871,32 @@ def check_bipartite_cubic_chain_deadlines():
     for blocks in range(1, 28):
         minimum_base_rank = (13 * blocks + 4) // 2 + 1
         for padding in range(int(blocks == 1), 6):
-            rank = 2 * (minimum_base_rank + padding) - 1
-            graph, blue, lost, waves = bipartite_cubic_chain_certificate(blocks, rank)
-            deadlines = cubic_loss_deadlines(graph, blue, 3)
-            if any(actual is None or actual > bound for actual, bound in zip(deadlines, (2, 5, 8, 11))):
-                raise AssertionError(('bipartite chain loss deadlines', blocks, padding, deadlines))
-            if len(waves) != 6 * blocks + 2 or completion_time(graph, blue) != 2 or lost.bit_count() != 2 * blocks:
-                raise AssertionError(('bipartite chain metadata', blocks, padding))
-            check_arrival_waves(graph, blue ^ lost, waves)
+            odd_rank = 2 * (minimum_base_rank + padding) - 1
             if blocks >= 4:
                 first_spare = 17 + 13 * (1 + blocks % 2)
                 next_start = first_spare + 13
                 triple = mask((2 * (first_spare + 8), 2 * next_start + 1, 2 * (next_start + 1) + 1))
-                if completion_time(graph, blue ^ triple) != 11:
-                    raise AssertionError(('bipartite chain eleven-round witness', blocks, padding))
-            cases += 1
+                triple_time = 11
+            elif blocks == 3 and padding == 0:
+                triple = mask((16, 35, 37))
+                triple_time = 11
+            else:
+                triple = mask((0, 1, 3))
+                triple_time = 10
+            for rank in (odd_rank, odd_rank + 1):
+                graph, blue, lost, waves = bipartite_cubic_chain_certificate(blocks, rank)
+                if (len(graph) // 2 + 1 != rank or len(waves) != 6 * blocks + 2 or lost.bit_count() != 2 * blocks
+                        or any(row.bit_count() != 3 or any((v - w) % 2 == 0 for w in members(row))
+                               for v, row in enumerate(graph))):
+                    raise AssertionError(('bipartite chain metadata', blocks, rank))
+                check_arrival_waves(graph, blue ^ lost, waves)
+                deadlines = cubic_loss_deadlines(graph, blue, 3)
+                if deadlines != (2, 5, 8, triple_time):
+                    raise AssertionError(('bipartite chain loss deadlines', blocks, rank, deadlines))
+                for actual_loss, expected in ((1, 5), (3, 8), (triple, triple_time)):
+                    if completion_time(graph, blue ^ actual_loss) != expected:
+                        raise AssertionError(('bipartite chain deadline witness', blocks, rank, actual_loss))
+                cases += 1
     return cases
 
 
