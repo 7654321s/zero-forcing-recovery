@@ -126,6 +126,8 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
         excess = delayed - 1 - 3 * len(roots)
         if cycle_rank < 2 * excess + group_cost:
             raise AssertionError(('rank cost of restoration groups', cycle_rank, excess, groups))
+    if intact == 2 and len(roots) == 1 and cycle_rank >= 2:
+        upper = min(upper, cycle_rank + 8)
     if revisits > cycle_rank or delayed > upper:
         raise AssertionError(('cycle rank bound', intact, delayed, cycle_rank, revisits))
     return intact, delayed, revisits
@@ -244,11 +246,13 @@ def relay_arm(edges, blue, parent, order, length):
     return order, vertices
 
 
-def low_rank_recovery_certificate(rounds, losses, cycle_rank):
+def low_rank_recovery_certificate(rounds, losses, cycle_rank, *, degree=4):
     seed, endpoint = 0, rounds
     edges, blue, deliberately_lost = list(pairwise(range(rounds + 1))), [seed], []
     additions = [(v,) for v in range(1, rounds + 1)]
     cyclic_blocks = min(losses, cycle_rank)
+    extra = min((cycle_rank - cyclic_blocks) // 2, cyclic_blocks * (degree - 3))
+    remaining = extra
     order = rounds + 1
     for index in range(losses):
         root = order
@@ -264,16 +268,33 @@ def low_rank_recovery_certificate(rounds, losses, cycle_rank):
             order += 2
             order, first = relay_arm(edges, blue, branch, order, rounds - 1)
             order, second = relay_arm(edges, blue, branch, order, rounds - 1)
-            edges.extend(((root, branch), (branch, guard), (second[-1], entry)))
+            edges.extend(((root, branch), (branch, guard)))
+            targets, arms = [], []
+            for _ in range(min(degree - 3, remaining)):
+                order, arm = relay_arm(edges, blue, root, order, rounds - 1)
+                target = order
+                order += 1
+                edges.extend(((arm[-1], target), (target, entry)))
+                arms.append(arm)
+                targets.append(target)
+            remaining -= len(targets)
+            edges.append((second[-1], targets[0] if targets else entry))
+            for left_target, right_target in pairwise([*targets, entry]):
+                edges.extend(((order, left_target), (order, right_target)))
+                blue.append(order)
+                order += 1
+            for offset, wave in enumerate(zip(*(reversed(arm) for arm in arms)), 1):
+                main[offset] = (*main[offset], *wave)
             entry = first[-1]
-            additions.extend((v,) for v in [*reversed(first), branch, *second])
+            additions.extend((v,) for v in [*reversed(first), branch, *second, *targets])
             main[rounds + 1] = (right[0], guard)
         edges.append((endpoint, entry))
         additions.extend(main)
         endpoint = right[-1]
-    order = append_blue_triangles(edges, blue, seed, order, cycle_rank - cyclic_blocks)
+    unused_rank = cycle_rank - cyclic_blocks - 2 * extra
+    order = append_blue_triangles(edges, blue, seed, order, unused_rank)
     graph, initial, support, paths = protect_seeds(
-        4, edges, blue, order, deliberately_lost, seed, clique_support=False
+        degree, edges, blue, order, deliberately_lost, seed, clique_support=False
     )
     return graph, initial, mask(deliberately_lost), support, paths, additions
 
@@ -597,14 +618,24 @@ def check_ranked_one_round_example(graph, blue, slow, rank, expected):
 def main():
     exhaustive = sampled = 0
     check_branched_forest_extremizers()
-    low_rank_cases = ((2, 1, 0), (2, 1, 1), (2, 2, 1), (2, 4, 3), (2, 4, 4),
-                      (3, 3, 2), (4, 2, 2), (7, 5, 3), (9, 3, 5))
-    for t, k, rank in low_rank_cases:
-        graph, blue, slow, support, paths, additions = low_rank_recovery_certificate(t, k, rank)
-        sampled += check_robust_samples(graph, blue, slow, support, paths, 4, t, k,
+    low_rank_cases = ((2, 1, 0, 4), (2, 1, 1, 4), (2, 1, 2, 4),
+                      (2, 1, 3, 4), (2, 1, 7, 6), (2, 1, 15, 10),
+                      (2, 2, 1, 4), (2, 4, 3, 4), (2, 4, 4, 4),
+                      (3, 3, 2, 4), (3, 2, 7, 5), (4, 2, 2, 4),
+                      (7, 5, 3, 4), (9, 3, 5, 4), (8, 3, 16, 7))
+    for t, k, rank, cap in low_rank_cases:
+        graph, blue, slow, support, paths, additions = low_rank_recovery_certificate(
+            t, k, rank, degree=cap
+        )
+        degree = max(row.bit_count() for row in graph)
+        if degree > cap:
+            raise AssertionError(('low-rank degree cap', t, k, rank, cap, degree))
+        sampled += check_robust_samples(graph, blue, slow, support, paths, degree, t, k,
                                         clique_support=False)
         actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
-        expected = t + k * (2 * t + 1) + min(k, rank) * (2 * t - 1)
+        blocks = min(k, rank)
+        extra = min((rank - blocks) // 2, blocks * (cap - 3))
+        expected = t + k * (2 * t + 1) + blocks * (2 * t - 1) + extra
         intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
         if (intact, delayed, actual_rank) != (t, expected, rank):
             raise AssertionError(('low-rank recovery', t, k, rank, delayed, actual_rank))
@@ -615,7 +646,7 @@ def main():
                 waves[arrival - 1].add(vertex)
         if waves != [set(vertices) for vertices in additions]:
             raise AssertionError(('low-rank arrival order', t, k, rank))
-        if (t, k, rank) == (2, 2, 1):
+        if (t, k, rank) in ((2, 1, 2), (2, 2, 1)):
             exhaustive += check_all_losses(graph, blue, k)
         print('Low-rank recovery:', t, k, rank, len(graph), delayed)
 
