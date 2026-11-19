@@ -300,6 +300,18 @@ def cubic_eight_round_certificate(cycle_rank=9, *, twin_support=False):
     return graph, blue, support
 
 
+def expand_cubic_edge_pair(edges, order, left_edge, right_edge, length):
+    """Subdivide two disjoint edges and join each new pair of subdivision vertices."""
+    u, left = left_edge
+    v, right = right_edge
+    for a in range(order, order + 2 * length, 2):
+        b = a + 1
+        edges.remove((u, left))
+        edges.remove((v, right))
+        edges.extend(((u, a), (a, left), (v, b), (b, right), (a, b)))
+        left, right = a, b
+
+
 def cubic_six_round_gap_certificate(cycle_rank=10):
     """Return an eighteen-vertex gap witness or its expansion by blue edge pairs."""
     if cycle_rank < 10:
@@ -309,13 +321,7 @@ def cubic_six_round_gap_certificate(cycle_rank=10):
              (9, 12), (10, 13), (11, 13), (11, 14), (12, 15), (12, 16), (14, 15),
              (14, 17), (15, 16), (16, 17)]
     order = 2 * (cycle_rank - 1)
-    left, right = 13, 17
-    for a in range(18, order, 2):
-        b = a + 1
-        edges.remove((0, left))
-        edges.remove((1, right))
-        edges.extend(((0, a), (a, left), (1, b), (b, right), (a, b)))
-        left, right = a, b
+    expand_cubic_edge_pair(edges, 18, (0, 13), (1, 17), cycle_rank - 10)
     blue = mask((0, 1, 2, 3, 7, 8, 11, 12, 13, 17, *range(18, order)))
     return adjacency(order, edges), blue, mask((2, 3)), 1 << 11
 

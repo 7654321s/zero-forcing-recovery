@@ -1,4 +1,4 @@
-"""Replay the two-round single-loss census on the House of Graphs cubic lists."""
+"""Replay the two-round seed-loss census on the House of Graphs cubic lists."""
 
 from argparse import ArgumentParser
 from functools import cache, reduce
@@ -17,6 +17,7 @@ CATALOG = {
     12: (85, '21bab16fbf7db826928315b9ca1d64684c0b1f7014b02fab0c6f2fb2f247104b'),
     14: (509, '6657f77868567a7e604a2325b5d748e5a04848b4ab75310ffa3ba695d26c66fe'),
     16: (4060, '26364c59882552ff5d35d41525aa8847ed10affed6eb5d05e94cbd0831644835'),
+    18: (41301, '93b74c92341be1cb3e0f9b45bac681957738f3523dd810160786d0558fa57307'),
 }
 CATALOG_URL = 'https://houseofgraphs.org/data/cubics/'
 EXPECTED = {
@@ -27,6 +28,16 @@ EXPECTED = {
     12: (57, 117877, 56242, 48635, ((6, 6, 3), (6, 6, 3))),
     14: (341, 2459572, 1402778, 1219269, ((7, 7, 4), (7, 7, 4))),
     16: (2828, 69230734, 45667818, 40237777, ((8, 8, 5), (8, 8, 5))),
+}
+EXPECTED_TWO = {
+    4: (1, 5, 0, 0, ((0, 0, 0), (0, 0, 0))),
+    6: (2, 52, 1, 1, ((2, 1, 0), (2, 1, 0))),
+    8: (4, 579, 19, 19, ((3, 2, 1), (3, 2, 1))),
+    10: (14, 7734, 327, 327, ((5, 4, 2), (5, 4, 2))),
+    12: (57, 117877, 8697, 8317, ((6, 5, 3), (6, 5, 3))),
+    14: (341, 2459572, 265766, 257790, ((8, 7, 4), (8, 6, 4))),
+    16: (2828, 69230734, 10915998, 10659077, ((9, 8, 5), (9, 8, 5))),
+    18: (30468, 2495462859, 551648767, 541989397, ((10, 9, 6), (10, 9, 6))),
 }
 
 
@@ -101,7 +112,7 @@ def finished_by_round(graph, initial):
         blue = updated
 
 
-def summarize_graph(graph, records):
+def summarize_graph(graph, records, budget=1):
     n = len(graph)
     full = (1 << n) - 1
     if any(row.bit_count() != 3 for row in graph) or not connected(graph, full):
@@ -112,17 +123,23 @@ def summarize_graph(graph, records):
     finished = finished_by_round(graph, initial)
     nominal = finished[min(2, len(finished) - 1)]
     stalled = domain ^ finished[-1]
+    absent = [domain ^ column for column in initial]
 
-    def before_a_loss(after):
-        before = 0
-        for v, column in enumerate(initial):
-            before |= (after & ~column) << (1 << v)
-        return before
+    def before_losses(after):
+        for _ in range(budget):
+            before = 0
+            for v, column in enumerate(absent):
+                before |= (after & column) << (1 << v)
+            after = before
+        return after
 
-    tolerant = nominal & ~before_a_loss(stalled)
+    tolerant = nominal & ~before_losses(stalled)
     unclassified = tolerant
     for time in range(len(finished) - 1, 0, -1):
-        before = before_a_loss(finished[time] ^ finished[time - 1])
+        # The recovery time also bounds the gap from above.
+        if all(time <= min(record) for record in relevant):
+            break
+        before = before_losses(finished[time] ^ finished[time - 1])
         if before & nominal:
             for record in relevant:
                 record[0] = max(record[0], time)
@@ -135,13 +152,13 @@ def summarize_graph(graph, records):
         best = min(record[2] for record in relevant)
         if time > best:
             cases = worst_at_time & finished[min(2, time - best - 1)]
-            gap = support_gap(cases, time, best, stalled, finished, n)
+            gap = support_gap(cases, time, best, stalled, finished, n, budget)
             for record in relevant:
                 record[2] = max(record[2], gap)
     return three, nominal.bit_count(), tolerant.bit_count()
 
 
-def support_gap(cases, worst, best, stalled, finished, order):
+def support_gap(cases, worst, best, stalled, finished, order, budget=1):
     if not cases:
         return best
     byte_count = 1 << (order - 3)
@@ -161,20 +178,26 @@ def support_gap(cases, worst, best, stalled, finished, order):
         blue = bit.bit_length() - 1
         minimum = killing_size(blue)
         for deadline in range(worst - best):
-            by_time = [seed for seed in bits(blue) if contains(deadlines[deadline], blue ^ seed)]
-            if any(contains(stalled_bytes, blue ^ sum(selected))
-                   for selected in combinations(by_time, minimum)):
-                best = worst - deadline
-                break
+            allowed = deadlines[deadline]
+            by_time = [seed for seed in bits(blue) if contains(allowed, blue ^ seed)]
+            for selected in combinations(by_time, minimum):
+                if (contains(stalled_bytes, blue ^ sum(selected))
+                        and all(contains(allowed, blue ^ sum(loss))
+                                for loss in combinations(selected, budget))):
+                    best = worst - deadline
+                    break
+            else:
+                continue
+            break
     killing_size.cache_clear()
     return best
 
 
-def census(order, directory):
+def census(order, directory, budget=1):
     records = ([0, 0, 0], [0, 0, 0])
     three_count = intact = tolerant = three_tolerant = 0
     for graph in read_catalog(order, directory):
-        three, nominal, stable = summarize_graph(graph, records)
+        three, nominal, stable = summarize_graph(graph, records, budget)
         three_count += three
         intact += nominal
         tolerant += stable
@@ -185,12 +208,16 @@ def census(order, directory):
 def main():
     parser = ArgumentParser(description=__doc__)
     parser.add_argument('--data', type=Path, help='Read the catalog files from this directory')
-    parser.add_argument('--through', type=int, choices=(14, 16), default=16)
+    parser.add_argument('--through', type=int, choices=(14, 16, 18), default=16)
+    parser.add_argument('--losses', type=int, choices=(1, 2), default=1)
     args = parser.parse_args()
+    expected = EXPECTED_TWO if args.losses == 2 else EXPECTED
+    if args.through not in expected:
+        parser.error('The 18-vertex census is available for two losses')
     for order in range(4, args.through + 1, 2):
-        result = census(order, args.data)
-        if result != EXPECTED[order]:
-            raise AssertionError((order, result, EXPECTED[order]))
+        result = census(order, args.data, args.losses)
+        if result != expected[order]:
+            raise AssertionError((order, result, expected[order]))
         print(order, CATALOG[order][0], *result, flush=True)
 
 

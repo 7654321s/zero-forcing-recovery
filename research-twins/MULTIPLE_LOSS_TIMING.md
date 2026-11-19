@@ -1358,6 +1358,36 @@ $$
 $$
 The outgoing relay sees two white endpoints until either its exit or the next entry turns blue. Inductively the next copy stays white at its entry until this relay fires. The shared prefix takes two rounds, and each copy adds seven rounds. This proves the lower bound for the designated losses.
 
+#### Two losses in cubic graphs
+
+For a connected cubic graph with intact time at most two, distinguish the largest finite time of a selected pair loss from the largest time over seed sets that recover from every loss of up to two seeds. For the latter sets, the support gap is the maximum unrestricted time minus the time restricted to a minimum killing support, with budget two in both comparisons.
+
+| Order | Cycle rank | Selected recoverable pair, both classes | Two-fault tolerance, connected | Two-fault tolerance, 3-vertex-connected | Maximum support gap, both classes |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 4 | 3 | — | — | — | — |
+| 6 | 4 | 2 | 1 | 1 | 0 |
+| 8 | 5 | 3 | 2 | 2 | 1 |
+| 10 | 6 | 5 | 4 | 4 | 2 |
+| 12 | 7 | 6 | 5 | 5 | 3 |
+| 14 | 8 | 8 | 7 | 6 | 4 |
+| 16 | 9 | 9 | 8 | 8 | 5 |
+| 18 | 10 | 10 | 9 | 9 | 6 |
+
+The table comes from all initial colorings of the 45,982 connected cubic graphs through order 18 in the [House of Graphs cubic catalog](https://houseofgraphs.org/meta-directory/cubic). Of these graphs, 33,715 are 3-vertex-connected. The [census replay](check_cubic_small_orders.py) uses the [bit-column evolution](ONE_LOSS_TIMING.md#exact-cubic-values-at-every-cycle-rank). Applying the inverse of a singleton deletion twice gives exactly the initial masks that permit a specified pair-loss outcome. The two added vertices are distinct because each inverse step adds a vertex outside the current mask. By monotonicity, excluding stalled pairs excludes stalled singleton losses, and for tolerant seed sets the worst allowed time is achieved by a pair. A minimum killing support then has size at least three. The restricted deadline holds exactly when every pair inside such a support meets the deadline, again by monotonicity. Run `python -B research-twins/check_cubic_small_orders.py --losses 2 --through 18` to check the table.
+
+**Nine rounds and a six-round gap with two-fault tolerance.** The 18-vertex certificate starts with $\{2,4,5,6,9,11,12,13,15,16\}$ blue. Its intact waves are $\{3,7,8,14,17\}$ and $\{0,1,10\}$. Losing $\{9,15\}$ gives $\{8\},\{10\},\{7\},\{15\},\{17\},\{14\},\{9\},\{3\},\{0,1\}$. All pairs recover in at most nine rounds. The triple $\{2,15,16\}$ stalls and is a minimum killing support. Each of its pair losses takes three rounds. Thus the earliest possible order for the six-round gap is 18, even with 3-vertex-connectivity.
+
+The same nine-round time and six-round gap are available at every cycle rank from twelve. In the 18-vertex certificate subdivide each of the blue edges $5$–$6$ and $11$–$12$ equally many times. Join corresponding inserted vertices to form a ladder. This iterates the [disjoint edge expansion](ONE_LOSS_TIMING.md#exact-cubic-values-at-every-cycle-rank) and preserves 3-vertex-connectivity. Its four old endpoints are blue in the intact run, the selected pair loss and all losses inside the killing triple. Thus those waves, including the stall, are preserved.
+
+If the ladder is all blue, it can substitute for any old force across a subdivided edge, and no other old force is blocked. After one new and one old loss, at most one internal neighbor of the missing new vertex can be blocked by the old loss. There are at least two such internal neighbors, so the new vertex returns in one round. The [eight-round single-loss bound](ONE_LOSS_TIMING.md#sharp-eight-round-bound-for-cubic-graphs) then bounds total time by nine. After two new losses all four old endpoints are blue. A ladder with at least three columns has no pair of twins. Adjacent vertices could be twins only if they share another neighbor, giving a triangle. For nonadjacent twins in one row, their vertical neighbors would differ. A twin pair in opposite rows would need both vertices to be endpoints with their columns adjacent, which cannot hold with at least three columns. Hence some internal neighbor sees exactly one of the two missing vertices, and the other returns in the next round. Completion then takes at most four rounds. The two-column case, at rank twelve, is checked directly in the [explicit replay](check_multiple_loss_bounds.py).
+
+**Fourteen rounds after a selected pair loss.** A second 3-vertex-connected family attains fourteen rounds at every cycle rank from sixteen. Its 30-vertex certificate joins two copies of the six-round residual from the [16-vertex single-loss example](ONE_LOSS_TIMING.md#sharp-eight-round-bound-for-cubic-graphs). The first copy has the usual two-round start. Its last two white vertices, $5$ and $6$, both have to turn blue before relay $28$ can force $20$, the entry to the second copy. Old seed $0$ is lost in the first copy and $16$ in the second. The resulting sequence is
+$$
+\{13\},\{12\},\{4\},\{7\},\{3\},\{0\},\{2\},\{5,6\},
+\{20\},\{23\},\{19\},\{16\},\{18\},\{21,22\}.
+$$
+The explicit replay verifies intact time two, the whole delayed sequence and recovery under every singleton loss. Expanding the two blue edges $8$–$29$ and $10$–$26$ keeps the two reference schedules. All new vertices are nominally blue and a single loss within them returns in one round. This family supplies a lower bound for a selected recoverable pair.
+
 <a id="cycle-rank-one-at-degree-three"></a>
 <a id="cycle-rank-two-at-degree-three"></a>
 

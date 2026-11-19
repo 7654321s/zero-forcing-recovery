@@ -1547,6 +1547,36 @@ def subcubic_two_round_certificate(losses):
     return adjacency(order, edges), mask(blue), mask(lost)
 
 
+def cubic_fourteen_round_certificate(cycle_rank=16):
+    """Join two cubic six-round blocks after a common two-round start."""
+    if cycle_rank < 16:
+        raise ValueError('This construction requires cycle rank at least sixteen')
+    edges = [(0, 1), (0, 2), (0, 8), (1, 3), (1, 4), (2, 5), (2, 9), (3, 8),
+             (3, 10), (4, 7), (4, 12), (5, 11), (5, 28), (6, 9), (6, 11), (6, 28),
+             (7, 10), (7, 11), (8, 29), (9, 15), (10, 26), (12, 13), (12, 14),
+             (13, 14), (13, 15), (14, 25), (15, 29), (16, 17), (16, 18), (16, 24),
+             (17, 19), (17, 20), (18, 21), (18, 25), (19, 24), (19, 26), (20, 23),
+             (20, 28), (21, 22), (21, 27), (22, 25), (22, 27), (23, 26), (23, 27), (24, 29)]
+    order = 2 * (cycle_rank - 1)
+    SINGLE['expand_cubic_edge_pair'](edges, 30, (8, 29), (10, 26), cycle_rank - 16)
+    blue = mask((0, 1, 8, 9, 10, 11, 14, 15, 16, 17, 24, 25, 26, 27, 28, 29, *range(30, order)))
+    return adjacency(order, edges), blue, mask((0, 16))
+
+
+def cubic_two_fault_gap_certificate(cycle_rank=10):
+    """Give a two-fault-tolerant cubic witness with unrestricted time nine."""
+    if cycle_rank < 10 or cycle_rank == 11:
+        raise ValueError('This layout is available at rank ten and from rank twelve')
+    edges = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 4), (2, 5), (3, 4), (3, 6),
+             (4, 7), (5, 6), (5, 8), (6, 9), (7, 10), (7, 11), (8, 10), (8, 12),
+             (9, 13), (9, 14), (10, 13), (11, 12), (11, 15), (12, 16), (13, 14),
+             (14, 17), (15, 16), (15, 17), (16, 17)]
+    order = 2 * (cycle_rank - 1)
+    SINGLE['expand_cubic_edge_pair'](edges, 18, (5, 6), (11, 12), cycle_rank - 10)
+    blue = mask((2, 4, 5, 6, 9, 11, 12, 13, 15, 16, *range(18, order)))
+    return adjacency(order, edges), blue, mask((9, 15)), mask((2, 15, 16))
+
+
 def subcubic_mixed_rank_certificate(losses, cycle_rank):
     large = min(losses, max(0, (cycle_rank - losses) // 3))
     small = min(losses - large, cycle_rank - 4 * large)
@@ -2063,6 +2093,37 @@ def main():
             if three_connected and t <= 5:
                 check_no_two_edge_cut(graph)
             print('Cubic single-loss lift:', t + 2, rank, expected, '3-connected:', three_connected)
+
+    for rank in (16, 17, 26):
+        graph, blue, lost = cubic_fourteen_round_certificate(rank)
+        if (any(row.bit_count() != 3 for row in graph) or len(graph) // 2 + 1 != rank
+                or completion_time(graph, blue) != 2):
+            raise AssertionError(('cubic two-loss chain', rank))
+        check_no_two_edge_cut(graph)
+        check_arrival_waves(graph, blue ^ lost, [
+            (13,), (12,), (4,), (7,), (3,), (0,), (2,), (5, 6),
+            (20,), (23,), (19,), (16,), (18,), (21, 22),
+        ])
+        exhaustive += check_all_losses(graph, blue, 1)
+        print('Cubic fourteen-round two-loss chain:', rank, len(graph))
+
+    for rank in (10, 12, 13, 22):
+        graph, blue, lost, support = cubic_two_fault_gap_certificate(rank)
+        if (any(row.bit_count() != 3 for row in graph) or len(graph) // 2 + 1 != rank
+                or completion_time(graph, blue) != 2):
+            raise AssertionError(('cubic two-fault gap graph', rank))
+        check_no_two_edge_cut(graph)
+        check_arrival_waves(graph, blue ^ lost, [
+            (8,), (10,), (7,), (15,), (17,), (14,), (9,), (3,), (0, 1),
+        ])
+        times = [completion_time(graph, blue ^ mask(pair))
+                 for pair in combinations(members(blue), 2)]
+        restricted = max(completion_time(graph, blue ^ mask(pair))
+                         for pair in combinations(members(support), 2))
+        if max(times) != 9 or restricted != 3 or completion_time(graph, blue ^ support) <= len(graph):
+            raise AssertionError(('cubic two-fault support', rank))
+        exhaustive += len(times)
+        print('Cubic six-round gap with two-fault tolerance:', rank, len(graph))
 
     rng = Random(421)
     for t, budget, padding, compact in (
