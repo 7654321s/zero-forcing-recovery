@@ -1,4 +1,4 @@
-"""Certify the wrapped-fort bounds at 28 through 32 sheets."""
+"""Certify the wrapped-fort bounds at 27 through 32 sheets."""
 
 import argparse
 from itertools import product
@@ -16,6 +16,7 @@ SHEETS = 32
 BUDGET = 23
 SHEET_CAP = 4
 CASES = {
+    27: ((21, 3), (22, 4), (23, 5)),
     28: ((20, 2), (21, 3), (22, 4), (23, 5)),
     29: ((21, 3), (22, 4), (23, 5)),
     30: ((21, 3), (22, 4), (23, 5)),
@@ -64,7 +65,7 @@ def check_thresholds(cap=SHEET_CAP):
                         raise AssertionError(('threshold semantics', values, j))
 
 
-def wrapped_formula(graph, blue, sheets=SHEETS, budget=BUDGET, cap=SHEET_CAP):
+def wrapped_formula(graph, blue, sheets=SHEETS, budget=BUDGET, cap=SHEET_CAP, *, band_through=13):
     order = len(graph)
     adjacent = [tuple(members(row)) for row in graph]
     clauses = list(BLOCK['fort_clauses'](graph, range(order)))
@@ -87,7 +88,7 @@ def wrapped_formula(graph, blue, sheets=SHEETS, budget=BUDGET, cap=SHEET_CAP):
     total = CardEnc.equals(lits=selected, bound=budget, top_id=top, encoding=EncType.seqcounter)
     top = total.nv
     clauses.extend(total.clauses)
-    for width in range(10, 14):
+    for width in range(10, band_through + 1):
         for sheet in range(sheets):
             window = [flag for j in range(width) for flag in counters[(sheet + j) % sheets]]
             lower = CardEnc.atleast(lits=window, bound=width - 4, top_id=top, encoding=EncType.seqcounter)
@@ -121,9 +122,10 @@ def main():
     upper = mask(v * args.sheets + sheet for v, sheet in CHECKS['FOUR_BLOCK_FORT'])
     if CHECKS['fort_cost'](graph, blue, upper) != 24:
         raise AssertionError('Missing the 24-seed upper witness')
+    band_through = 16 if args.sheets == 27 else 13
     for budget, cap in CASES[args.sheets]:
         check_thresholds(cap)
-        clauses = wrapped_formula(graph, blue, args.sheets, budget, cap)
+        clauses = wrapped_formula(graph, blue, args.sheets, budget, cap, band_through=band_through)
         with Solver(name='cadical195', bootstrap_with=clauses) as solver:
             if args.conflicts is None:
                 result = solver.solve()

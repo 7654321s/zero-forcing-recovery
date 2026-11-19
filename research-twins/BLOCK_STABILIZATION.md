@@ -4,7 +4,7 @@ Let $\kappa_{k,m}$ be the minimum number of seeds whose loss blocks recovery in 
 $$
 \kappa_{k,m}=\kappa_{26,m} \qquad (k\geq26).
 $$
-The common value is exactly 24 when $k\geq24$ and $m\geq28$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 28 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
+The common value is exactly 24 when $k\geq24$ and $m\geq27$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 27 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
 
 ## The prism stage labels
 
@@ -104,7 +104,11 @@ The same division as at 30 sheets holds at 29 sheets. For costs at most 20, $9\c
 
 ## The 28-sheet case
 
-For costs at most 19, $9\cdot28=252>13\cdot19$ excludes a wrapped fort and the finite result applies. The other 27 sheets around any given sheet contain two disjoint thirteen-sheet bands, so a wrapped fort has at least 18 seeds outside that sheet. The verifier excludes each budget from 20 through 23 using respective sheet caps of two, three, four and five. Its ordered formulas use the ten- through thirteen-sheet inequalities. The inherited cost-24 witness appears at 28 sheets. Block stabilization and opening insertion then prove the exact value 24 for at least 24 blocks and 28 sheets.
+For costs at most 19, $9\cdot28=252>13\cdot19$ excludes a wrapped fort and the finite result applies. The other 27 sheets around any given sheet contain two disjoint thirteen-sheet bands, so a wrapped fort has at least 18 seeds outside that sheet. The verifier excludes each budget from 20 through 23 using respective sheet caps of two, three, four and five. Its ordered formulas use the ten- through thirteen-sheet inequalities. The inherited cost-24 witness appears at 28 sheets. Thus $\kappa_{26,28}=24$.
+
+## The 27-sheet case
+
+For costs at most 20, the sixteen-sheet bound rules out wrapping, since $12\cdot27=324>16\cdot20$. An empty pair then reduces to the finite exclusion. For a wrapped fort of cost 21, 22 or 23, the other 26 sheets around any given sheet form two thirteen-sheet bands and contain at least 18 seeds. The verifier imposes the resulting caps of three, four and five and the band bounds of widths ten through sixteen. The three formulas are unsatisfiable and the inherited cost-24 fort verifies the upper bound. Block stabilization and opening insertion give the full range of at least 24 blocks and 27 sheets.
 
 ## Reproduction
 
@@ -120,6 +124,7 @@ python -B research-twins/check_32_sheet_cover.py --sheets 31
 python -B research-twins/check_32_sheet_cover.py --sheets 30
 python -B research-twins/check_32_sheet_cover.py --sheets 29
 python -B research-twins/check_32_sheet_cover.py --sheets 28
+python -B research-twins/check_32_sheet_cover.py --sheets 27
 python -B research-twins/check_prism_opening_insertion.py
 ```
 
