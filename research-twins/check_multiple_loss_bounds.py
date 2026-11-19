@@ -152,6 +152,18 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
                 upper = min(upper, 8 if cycle_rank <= 3 else 9)
     if intact >= 3:
         upper = min(upper, intact + (2 * intact + 3) * len(roots) + (2 * intact - 3) * cycle_rank)
+        if all(row.bit_count() <= 3 for row in graph):
+            coefficient = 2 * intact - 3
+            linear_bound = intact + (2 * intact + 1) * len(roots) + coefficient * cycle_rank
+            upper = min(upper, linear_bound - (cycle_rank > len(roots)))
+            if delayed == linear_bound:
+                root_size = 2 * intact + 1
+                if len(root_visits) != len(roots) or any(
+                    size != (root_size if index in root_visits else coefficient)
+                    for index, (component, size) in enumerate(zip(visits, visit_sizes))
+                    if component in roots
+                ):
+                    raise AssertionError(('subcubic long equality trail', visit_sizes, root_visits))
     if revisits > cycle_rank or delayed > upper:
         raise AssertionError(('cycle rank bound', intact, delayed, cycle_rank, revisits))
     return intact, delayed, revisits
@@ -667,35 +679,40 @@ def layered_certificate(degree, rounds, losses):
     return graph, initial, mask(deliberately_lost), support, paths, early
 
 
-def append_subcubic_arm_block(edges, blue, lost, endpoint, order, detour):
+def append_subcubic_arm_block(edges, blue, lost, endpoint, order, detour, *, rounds=2):
     root = order
     blue.append(root)
     lost.append(root)
-    order, left = relay_arm(edges, blue, root, order + 1, 2)
-    order, right = relay_arm(edges, blue, root, order, 2)
-    waves = [(left[1],), (left[0],), (root,), (right[0],), (right[1],)]
+    order, left = relay_arm(edges, blue, root, order + 1, rounds)
+    order, right = relay_arm(edges, blue, root, order, rounds)
+    waves = [(v,) for v in [*reversed(left), root, *right]]
     if detour:
-        center, guard, relay, target = range(order, order + 4)
+        parent, guard, relay, center = range(order, order + 4)
         order += 4
         blue.append(relay)
-        edges.extend(((root, center), (center, guard), (center, relay),
-                      (relay, target), (endpoint, target), (target, left[1])))
-        waves[0] += (center,)
-        waves[3] += (guard,)
-        waves.insert(0, (target,))
+        edges.extend(((root, parent), (parent, guard), (parent, relay), (relay, center)))
+        order, incoming = relay_arm(edges, blue, center, order, rounds - 2)
+        order, outgoing = relay_arm(edges, blue, center, order, rounds - 2)
+        entry = incoming[-1] if incoming else center
+        exit_vertex = outgoing[-1] if outgoing else center
+        edges.extend(((endpoint, entry), (exit_vertex, left[-1])))
+        sequence = [*reversed(incoming), center, *outgoing]
+        waves[rounds + 1] += (guard,)
+        waves = [(v,) for v in sequence] + waves
+        waves[len(incoming) + 1] += (parent,)
     else:
-        edges.append((endpoint, left[1]))
-    return order, right[1], waves
+        edges.append((endpoint, left[-1]))
+    return order, right[-1], waves
 
 
-def subcubic_low_rank_certificate(losses, cycle_rank):
-    seed, endpoint = 0, 2
-    edges, blue, lost = [(0, 1), (1, 2)], [seed], []
-    additions = [(1,), (2,)]
-    order = 3
+def subcubic_low_rank_certificate(losses, cycle_rank, *, rounds=2):
+    seed, endpoint = 0, rounds
+    edges, blue, lost = list(pairwise(range(rounds + 1))), [seed], []
+    additions = [(v,) for v in range(1, rounds + 1)]
+    order = rounds + 1
     for block in range(losses):
         order, endpoint, waves = append_subcubic_arm_block(
-            edges, blue, lost, endpoint, order, block < cycle_rank
+            edges, blue, lost, endpoint, order, block < cycle_rank, rounds=rounds
         )
         additions.extend(waves)
     graph, initial, support, paths = protect_seeds(
@@ -952,6 +969,21 @@ def main():
         if (slow.bit_count(), intact, delayed, actual_rank) != (k, 2, expected, rank):
             raise AssertionError(('subcubic mixed-rank recovery', k, rank, intact, delayed, actual_rank))
         print('Subcubic mixed-rank recovery:', k, rank, len(graph), delayed)
+
+    for t, k, rank, expected in ((3, 1, 1, 13), (3, 3, 3, 33), (4, 2, 2, 32),
+                                 (4, 2, 4, 32), (5, 3, 1, 45), (6, 5, 3, 98),
+                                 (8, 2, 1, 55)):
+        graph, blue, slow, support, paths, waves = subcubic_low_rank_certificate(k, rank, rounds=t)
+        sampled += check_robust_samples(graph, blue, slow, support, paths, 3, t, k,
+                                        clique_support=False)
+        intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
+        actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
+        if (intact, delayed, actual_rank) != (t, expected, rank):
+            raise AssertionError(('subcubic long recovery', t, k, rank, intact, delayed, actual_rank))
+        check_arrival_waves(graph, blue ^ slow, waves)
+        if (t, k) == (3, 1):
+            exhaustive += check_all_losses(graph, blue, k)
+        print('Subcubic long recovery:', t, k, rank, len(graph), delayed)
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()
