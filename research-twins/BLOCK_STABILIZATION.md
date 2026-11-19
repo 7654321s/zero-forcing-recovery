@@ -4,7 +4,7 @@ Let $\kappa_{k,m}$ be the minimum number of seeds whose loss blocks recovery in 
 $$
 \kappa_{k,m}=\kappa_{26,m} \qquad (k\geq26).
 $$
-The common value is exactly 24 when $k\geq24$ and $m\geq27$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 27 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
+The common value is exactly 24 when $k\geq24$ and $m\geq26$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 26 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
 
 ## The prism stage labels
 
@@ -54,7 +54,7 @@ More generally, at a budget $b\in\{20,21,22,23\}$ choose three band widths from 
 
 The extended verifier gives the same loss bound $w-5$ at widths fourteen through eighteen. For a wrapped fort and $m\geq16$, counting the sixteen-sheet bands gives $12m\leq16b$. In particular, a cost-at-most-23 fort must unroll when $m\geq31$, so the finite exclusion alone now settles every $m\geq31$. At widths seventeen and eighteen the inequalities are $13m\leq17b$ and $14m\leq18b$. The latter rules out wrapping at budget 23 for $m\geq30$. The explicit wrapped cases below use the smaller bands in their formulas.
 
-The width bounds continue through 24 using extra inequalities from certified shorter bands. For a width-$w$ core under a budget $b=w-5$, take any contained band of a verified width $j$ from $\max(10,w-5)$ through $w-2$. If the core has no empty pair, that subband contains at least $j-4$ lost seeds. Its margin lies within the active strip of the wider test. At most $b-(j-4)$ losses therefore lie in the rest of the core. The verifier adds these bounds on the complements of the subbands, along with the pinned end sheets and the original total loss bound. Every added restriction follows from an earlier width.
+The width bounds continue through 25 using extra inequalities from certified shorter bands. For a width-$w$ core under a budget $b=w-5$, take any contained band of a verified width $j$ from $\max(10,w-5)$ through $w-2$. If the core has no empty pair, that subband contains at least $j-4$ lost seeds. Its margin lies within the active strip of the wider test. At most $b-(j-4)$ losses therefore lie in the rest of the core. The verifier adds these bounds on the complements of the subbands, along with the pinned end sheets and the original total loss bound. Every added restriction follows from an earlier width.
 
 For a wrapped fort in the cyclic cover, apply these local tests to the periodic lift to the integer sheets. A window of width $w$ may pass the same residue more than once, with each occurrence counted on its own integer sheet. Summing over one period counts each lost seed exactly $w$ times, giving $(w-4)m\leq wb$. Width 23 needs at least 19 losses per band and excludes wrapping below cost 24 already at $m\geq28$. Width 21 also rules out any wrapped fort of cost at most 21 at $m=26$, since $17\cdot26>21\cdot21$. Width 24 requires 20 losses and independently rules out wrapping at budget 22 for $m=27$.
 
@@ -112,17 +112,19 @@ For costs at most 19, $9\cdot28=252>13\cdot19$ excludes a wrapped fort and the f
 
 ## The 27-sheet case
 
-For costs at most 20, the sixteen-sheet bound rules out wrapping, since $12\cdot27=324>16\cdot20$. An empty pair then reduces to the finite exclusion. For a wrapped fort of cost 21, 22 or 23, the other 26 sheets around any given sheet form two thirteen-sheet bands and contain at least 18 seeds. The verifier imposes the resulting caps of three, four and five and the band bounds of widths ten through sixteen. The three formulas are unsatisfiable and the inherited cost-24 fort verifies the upper bound. Block stabilization and opening insertion give the full range of at least 24 blocks and 27 sheets.
+For costs at most 20, the sixteen-sheet bound rules out wrapping, since $12\cdot27=324>16\cdot20$. An empty pair then reduces to the finite exclusion. For a wrapped fort of cost 21, 22 or 23, the other 26 sheets around any given sheet form two thirteen-sheet bands and contain at least 18 seeds. The verifier imposes the resulting caps of three, four and five and the band bounds of widths ten through sixteen. The three formulas are unsatisfiable and the inherited cost-24 fort verifies the upper bound. Thus $\kappa_{26,27}=24$.
 
-## Bounds at 26 sheets
+## The 26-sheet case
 
-The width-21 inequality excludes wrapped forts of cost at most 21, and a fort with a pair of empty sheets unrolls to the already excluded finite cost range. At budget 22, the 25 sheets other than a given sheet split into twelve- and thirteen-sheet bands. They require at least $8+9=17$ lost seeds, so the given sheet contains at most five. Rotate a sheet of maximum seed count to zero. In the threshold encoding, every true threshold on another sheet must then be true on sheet zero. With band bounds through width seventeen the cost-22 instance is unsatisfiable. Together with the inherited witness, block stabilization and opening insertion give $23\leq\kappa_{k,26}\leq24$ for every $k\geq24$.
+The width-21 inequality excludes wrapped forts of cost at most 21, and a fort with a pair of empty sheets unrolls to the already excluded finite cost range. At budget 22 or 23, the 25 sheets other than a given sheet split into twelve- and thirteen-sheet bands. They require at least $8+9=17$ lost seeds, so the given sheet contains at most five or six seeds respectively. Rotate a sheet of maximum seed count to zero. In the threshold encoding, every true threshold on another sheet must then be true on sheet zero. With band bounds through width seventeen, both formulas are unsatisfiable. The inherited cost-24 fort gives the upper bound, and block stabilization and opening insertion give $\kappa_{k,26}=24$ for every $k\geq24$.
+
+The width-25 certificate also gives a tighter bound of two seeds per sheet for the wrapped cost-23 case, since the other 25 sheets require at least 21 seeds.
 
 ## Reproduction
 
 ```sh
 python -B research-twins/check_block_stabilization.py
-python -B research-twins/check_block_stabilization.py --band-through 24
+python -B research-twins/check_block_stabilization.py --band-through 25
 python -B research-twins/check_block_stabilization.py --certify-sheets 7 8 9 10
 python -B research-twins/check_finite_fort_strip.py
 python -B research-twins/check_finite_fort_strip.py --sheets 33
