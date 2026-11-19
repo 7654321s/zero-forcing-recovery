@@ -362,14 +362,21 @@ def deep_detour_recovery_certificate(rounds, losses, cycle_rank, degree):
     return graph, initial, mask(deliberately_lost), support, paths, additions
 
 
-def shared_center_recovery_certificate(rounds, losses, cycle_rank):
+def shared_center_recovery_certificate(rounds, losses, cycle_rank, *, detours=0):
     seed, endpoint = 0, rounds
     first, second = rounds + 1, rounds + 2
     edges = list(pairwise(range(rounds + 1)))
     blue, deliberately_lost = [seed, first, second], [first, second]
-    additions = list(range(1, rounds + 1))
-    centers = (cycle_rank + 1) // 2
+    sequence = list(range(1, rounds + 1))
+    centers = (cycle_rank - detours + 1) // 2
     order = second + 1
+    guards = {}
+    for root in (first, second)[:detours]:
+        order, entry, exit_vertex, guard, detour = recovery_detour(edges, blue, root, order, rounds - 1)
+        edges.append((endpoint, entry))
+        sequence.extend(detour)
+        guards[root] = guard
+        endpoint = exit_vertex
     for _ in range(centers):
         source, center = order, order + 1
         order += 2
@@ -378,32 +385,43 @@ def shared_center_recovery_certificate(rounds, losses, cycle_rank):
         order, left = relay_arm(edges, blue, center, order, rounds - 1)
         order, right = relay_arm(edges, blue, center, order, rounds - 1)
         edges.append((endpoint, left[-1]))
-        additions.extend([*reversed(left), center, *right])
+        sequence.extend([*reversed(left), center, *right])
         endpoint = right[-1]
 
     order, approach = relay_arm(edges, blue, first, order, rounds)
     edges.append((endpoint, approach[-1]))
-    additions.extend([*reversed(approach), first, second])
+    sequence.extend([*reversed(approach), first, second])
     order, departure = relay_arm(edges, blue, second, order, rounds)
-    additions.extend(departure)
+    sequence.extend(departure)
     endpoint = departure[-1]
 
-    for _ in range(losses - 2):
+    for index in range(2, losses):
         root = order
         order += 1
         blue.append(root)
         deliberately_lost.append(root)
+        if index < detours:
+            order, entry, exit_vertex, guard, detour = recovery_detour(edges, blue, root, order, rounds - 1)
+            edges.append((endpoint, entry))
+            sequence.extend(detour)
+            guards[root] = guard
+            endpoint = exit_vertex
         order, left = relay_arm(edges, blue, root, order, rounds)
         order, right = relay_arm(edges, blue, root, order, rounds)
         edges.append((endpoint, left[-1]))
-        additions.extend([*reversed(left), root, *right])
+        sequence.extend([*reversed(left), root, *right])
         endpoint = right[-1]
 
-    order = append_blue_triangles(edges, blue, seed, order, cycle_rank - (2 * centers - 1))
-    degree = max(4, centers + 1)
+    spare_rank = cycle_rank - (2 * centers - 1 + detours)
+    order = append_blue_triangles(edges, blue, seed, order, spare_rank)
+    degree = max(4, centers + 1 + bool(detours))
     graph, initial, support, paths = protect_seeds(
         degree, edges, blue, order, deliberately_lost, seed, clique_support=False
     )
+    arrivals = {root: index for index, root in enumerate(sequence) if root in guards}
+    additions = [(vertex,) for vertex in sequence]
+    for root, guard in guards.items():
+        additions[arrivals[root] + 1] += (guard,)
     return graph, initial, mask(deliberately_lost), support, paths, additions, degree
 
 
@@ -785,27 +803,25 @@ def main():
             exhaustive += check_all_losses(graph, blue, k)
         print('Deep-detour recovery:', t, k, rank, cap, len(graph), delayed)
 
-    shared_cases = ((2, 2, 1), (2, 2, 9), (2, 2, 10), (2, 2, 100),
-                    (2, 5, 35), (3, 3, 23), (7, 4, 46))
-    for t, k, rank in shared_cases:
+    shared_cases = ((2, 2, 1, 0), (2, 2, 2, 1), (2, 2, 7, 2), (2, 2, 8, 2),
+                    (2, 2, 100, 2), (2, 2, 101, 2), (2, 5, 35, 5),
+                    (3, 3, 23, 0), (7, 4, 46, 0))
+    for t, k, rank, detours in shared_cases:
         graph, blue, slow, support, paths, additions, degree = shared_center_recovery_certificate(
-            t, k, rank
+            t, k, rank, detours=detours
         )
         sampled += check_robust_samples(graph, blue, slow, support, paths, degree, t, k,
                                         clique_support=False)
         intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
         actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
-        expected = t + (2 * t - 1) * ((rank + 1) // 2) + 2 * t + 2 + (k - 2) * (2 * t + 1)
+        centers = (rank - detours + 1) // 2
+        expected = t + (2 * t - 1) * (centers + detours) + 2 * t + 2 + (k - 2) * (2 * t + 1)
         if (intact, delayed, actual_rank) != (t, expected, rank):
             raise AssertionError(('shared-center recovery', t, k, rank, delayed, actual_rank))
-        _, arrivals = trace(graph, blue ^ slow)
-        selected = sorted((v for v, arrival in enumerate(arrivals) if arrival > 0),
-                          key=arrivals.__getitem__)
-        if selected != additions or [arrivals[v] for v in selected] != list(range(1, delayed + 1)):
-            raise AssertionError(('shared-center arrival order', t, k, rank))
+        check_arrival_waves(graph, blue ^ slow, additions)
         if (t, k, rank) == (2, 2, 1):
             exhaustive += check_all_losses(graph, blue, k)
-        print('Shared-center recovery:', t, k, rank, len(graph), delayed)
+        print('Shared-center recovery:', t, k, rank, detours, len(graph), delayed)
 
     for t in (1, 2, 4, 7):
         for k in (1, 2, 3, 4, 6):

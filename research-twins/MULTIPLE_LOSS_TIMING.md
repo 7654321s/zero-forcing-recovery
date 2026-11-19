@@ -6,7 +6,7 @@ Use the synchronous rule and initial-color loss model of the [single-loss bounds
 - **Forests and cycle rank.** The exact value on forests of unrestricted degree is $t+k(2t+1)$. At cycle rank $\beta$ and $t\geq1$, an upper bound is $t+k(2t+1)+(2t-1)\beta$. The bound is exact for $t\geq2$ when $\beta\leq k$, even at degree cap four. The exact rank classification also holds at every rank for $t\geq3$ without a degree cap. For one intact round the exact worst-case time is determined at every cycle rank.
 - **One intact round.** The exact value is $1$ for $d=1$ and $1+3k$ for $d=2,3$. For $d\geq4$ one loss gives $5$. For $d\geq4$ and $k\geq2$, put $U=1+\lfloor kd/2\rfloor+2k$. The exact value is $U$ for even $k$ and for $d=4,5$. For odd $k$ it is $U-1$ at $d=6$, and $U-2+(d\bmod2)$ at $d\geq7$.
 - **Joint degree and cycle rank.** For one intact round the exact maximum is determined jointly for every degree cap at least three, cycle rank, and loss budget.
-- **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$. For one loss, the exact maximum at positive cycle rank is $\lfloor(\beta+19)/2\rfloor$. For fixed $k\geq2$, the unrestricted leading term in cycle rank is $3\beta/2$.
+- **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$. For one loss, the exact maximum at positive cycle rank is $\lfloor(\beta+19)/2\rfloor$. For two losses and odd rank $\beta\geq7$, it is $(3\beta+25)/2$. For even rank $\beta\geq8$, the two bounds differ by one round. For fixed $k\geq2$, the unrestricted leading term in cycle rank is $3\beta/2$.
 - **At least two intact rounds allowed.** Put $P=d(d-1)^{t-1}$. For $d\geq6$, $t\geq2$ and $k\geq1$,
   $$
   M_{d,t,k}=\frac{kP}{2}+\frac{kP}{2(d-1)}+O\!\left(\frac{kP}{d^2}\right),
@@ -149,11 +149,15 @@ If $O\leq3$, the term in parentheses is at most $8+6+1=15$. If $O=4$, the times 
 
 Write $M_{\beta,k}^{(2)}$ for the largest finite recovery time on connected graphs of cycle rank $\beta$, after $k$ seed losses and with intact time at most two. There is no degree restriction. For $\beta\geq1$ and $k\geq2$,
 $$
-3\left\lfloor\frac{\beta+1}{2}\right\rfloor+5k-2
+3\left\lfloor\frac{\beta-b+1}{2}\right\rfloor+5k-2+3b
 \ \leq\ M_{\beta,k}^{(2)}\
 \leq\ 2+\left\lfloor\frac{3\beta+13k}{2}\right\rfloor.
 $$
-In particular, for each fixed $k\geq2$ the leading term is $3\beta/2$, with an additive error bounded in terms of $k$. The lower bound is attained by an explicit $k$-fault-tolerant construction.
+Here $b=\min(k,\beta-1)$. When $\beta\geq k+1$, the bounds differ by two rounds if $\beta-k$ is odd and four if it is even. For two lost seeds there is a sharper upper bound for $\beta\geq7$,
+$$
+M_{\beta,2}^{(2)}\leq\left\lfloor\frac{3\beta+25}{2}\right\rfloor.
+$$
+Thus $M_{\beta,2}^{(2)}=(3\beta+25)/2$ for odd $\beta\geq7$, and $3\beta/2+11\leq M_{\beta,2}^{(2)}\leq3\beta/2+12$ for even $\beta\geq8$. The lower bounds come from a construction that tolerates every loss of at most $k$ seeds.
 
 #### Counting the visits with shared first-round sources
 
@@ -189,9 +193,21 @@ T-2\leq\tfrac32(V+B-Q)+\tfrac72 k+\tfrac32 k
 $$
 Taking the integer part gives the upper bound.
 
+#### The sharper count for two lost seeds
+
+Let the two lost seeds return at rounds $r_1\leq r_2$. First suppose $r_2-r_1\leq1$. The two root groups in the preceding count use at most six marks in total, since their time windows have a union of at most six rounds. Let $n=n_{z_1}+n_{z_2}$ and $v=v_{z_1}+v_{z_2}$. We show $n-3v/2+3Q/2\leq9/2$.
+
+- With neither root distinguished, $Q=0$. One visit has at most three marks, and at least two visits use at most six marks in total.
+- With one root distinguished, $Q\leq2$. For $v\geq3$ the six-mark bound gives the claim. For $v=1$ the preceding per-root bound applies. For $v=2$, the root visit has one mark if neither side has further marks, at most three if one side does, and at most five if both sides do. The corresponding bounds on $Q$ are two, one and zero. The other visit has at most three marks and the six-mark bound still applies. These bounds give at most $9/2$ in all three cases.
+- With both roots distinguished, their rounds are consecutive. The step joining the two marks crosses between their visits. It uses at most one chosen guard edge, since a two-edge step has a single intermediate source and there is at most one chosen edge per source. Let $a$ be the number of root visits with marks on the side away from that step. Then $Q\leq3-a$. For $v=2$ we have $n\leq2+2a$, which gives $n-3v/2+3Q/2\leq7/2+a/2\leq9/2$. For $v=3$ and $a\geq1$ the six-mark bound suffices. For $v=3$ and $a=0$ the third visit has at most two marks, since a three-mark regular child visit would occupy its already used root round. Hence $n\leq4$. For $v\geq4$, use $n\leq6$ and $Q\leq3$.
+
+The direct-child visits can add at most three marks above their allowance in total. The rank inequality then gives $T-2\leq3(\beta+2)/2+9/2+3$.
+
+Now suppose $r_2-r_1\geq2$. Every shared first-round child returns in $[r_2-1,r_2+1]$. Its retained source has only the two lost roots and the child as possible white neighbors in the delayed run. A child returning by $r_2-2$ would allow that source to return the later root by $r_2-1$. After round $r_2$, the source can return the child in the next round. Therefore every shared rootless visit with at least two marks lies in $[r_2-2,r_2+2]$. Include these visits with the later root's group and make no extra guard claims. Give every visit one mark of allowance. Each group has at most five marks and contributes at most four above its allowance. Each of the at most two direct-child visits contributes at most two above its allowance. All other visits have at most one mark. With $V\leq\beta+2$, this gives $T-2\leq\beta+14$. For $\beta\geq7$, both cases give the stated upper bound.
+
 #### A construction from a pair of lost seeds
 
-The construction works for every intact deadline $t\geq2$. Use two blue seeds $z_1,z_2$ and $q=\lfloor(\beta+1)/2\rfloor$ initially white centers $w_i$. Each center has a separate blue source adjacent to $z_1,z_2,w_i$. Give each center two relay arms of length $t-1$. Join the exit of each center's right arm to the far left endpoint of the next, starting from a prefix path of $t$ edges with just its first vertex blue.
+The construction works for every intact deadline $t\geq2$. Start with two blue seeds $z_1,z_2$ and $q\geq1$ initially white centers $w_i$. Each center has a separate blue source adjacent to $z_1,z_2,w_i$. Give each center two relay arms of length $t-1$. Join the exit of each center's right arm to the far left endpoint of the next, starting from a prefix path of $t$ edges with just its first vertex blue.
 
 Give $z_1$ an approach arm of length $t$, and join its far endpoint to the last center's exit. Give $z_2$ a departure arm of length $t$. After this arm, use $k-2$ ordinary two-arm blocks of the low-rank construction for the other lost seeds. In the intact run the shared sources fill the centers in round one and their arms by round $t$. The other arms and the white prefix also fill in $t$ rounds.
 
@@ -200,7 +216,11 @@ $$
 t+(2t-1)q+2t+2+(k-2)(2t+1).
 $$
 
-The prefix and the two seeds with their approach and departure arms start with $|E|-|V|=-3$. Adding a center, its arms and its source increases $|E|-|V|$ by one, counting the source's two edges to the existing seeds. Adding the $q+1$ links between the prefix, the centers and the approach arm gives $|E|-|V|=2q-2$ in a connected graph. Its rank is $2q-1$. The ordinary blocks add no rank. An all-blue triangle attached by a bridge supplies the last unit when $\beta$ is even. The [private-path protection](#protection-and-a-minimum-killing-support), with a path for $J$, preserves the rank and the two propagation times. The maximum degree is $\max(4,q+1)$ after protection, and the support has minimum killing size $k+1$. Setting $t=2$ gives the stated lower bound.
+The prefix and the two seeds with their approach and departure arms start with $|E|-|V|=-3$. Adding a center, its arms and its source increases $|E|-|V|$ by one, counting the source's two edges to the existing seeds. Adding the $q+1$ links between the prefix, the centers and the approach arm gives $|E|-|V|=2q-2$ in a connected graph. Its rank is $2q-1$. The ordinary blocks add no rank.
+
+Choose $b$ distinct lost seeds and give each one a detour. Its white center is adjacent to the seed and to a private white leaf. It carries two relay arms of length $t-1$. Insert the detours belonging to $z_1,z_2$ between the prefix and the first shared center. Insert any other detour just before the approach arm of its seed's ordinary block. Each insertion replaces one serial edge by two serial edges and an attached tree, raising the rank by one.
+
+In the intact run a seed with a detour forces its center in round one, and by round two the center forces its leaf. The retained relays color the arms by round $t$. In the delayed run the leaf keeps the returned center from restoring its seed early. The run traverses the detour's two arms and center serially in $2t-1$ rounds. The leaf fills one round after the seed returns, in parallel with the return of $z_2$ or with the first departure vertex of its own seed. Thus the detours add $b(2t-1)$ rounds. Set $q=\lfloor(\beta-b+1)/2\rfloor$. An all-blue triangle attached by a bridge supplies the spare rank when $\beta-(2q-1+b)=1$. The [private-path protection](#protection-and-a-minimum-killing-support), with a path for $J$, preserves the rank and the two propagation times and gives a minimum killing support of size $k+1$. The degree is at most $\max(4,q+2)$ for this augmented family. Setting $t=2$ gives the stated lower bounds.
 
 ### All cycle ranks for three or more intact rounds
 
