@@ -3,14 +3,14 @@
 Use the synchronous rule and initial-color loss model of the [single-loss bounds](ONE_LOSS_TIMING.md). Let $M_{d,t,k}$ be the largest finite recovery time over graphs of maximum degree at most $d$, initial blue sets with intact completion by round $t$, and losses of exactly $k$ initial blue vertices. A $k$-fault-tolerant set recovers from every loss of at most $k$ seeds, in the terminology of [Fault Tolerant Zero Forcing](https://arxiv.org/abs/2509.07854).
 
 - **Degree two.** For $t\geq1$ and $k\geq1$, the exact value is $M_{2,t,k}=t+k(2t+1)$. On cycles the exact value is $t(k+1)+\lceil k/2\rceil$.
-- **One intact round.** For $d\geq4$ and $k\geq2$, put $U=1+\lfloor kd/2\rfloor+2k$. The exact value is $U$ for even $k$ and for $d=4,5$. For odd $k$ it is $U-1$ at $d=6$, and $U-2+(d\bmod2)$ at $d\geq7$.
+- **One intact round.** The exact value is $1$ for $d=1$ and $1+3k$ for $d=2,3$. For $d\geq4$ one loss gives $5$. For $d\geq4$ and $k\geq2$, put $U=1+\lfloor kd/2\rfloor+2k$. The exact value is $U$ for even $k$ and for $d=4,5$. For odd $k$ it is $U-1$ at $d=6$, and $U-2+(d\bmod2)$ at $d\geq7$.
 - **At least two intact rounds allowed.** Put $P=d(d-1)^{t-1}$. For $d\geq6$, $t\geq2$ and $k\geq1$,
   $$
   M_{d,t,k}=\frac{kP}{2}+\frac{kP}{2(d-1)}+O\!\left(\frac{kP}{d^2}\right),
   $$
   with one constant for all such $k,t$. For fixed $t$ the expansion is $kd^t/2-k(t-2)d^{t-1}/2+O_t(kd^{t-2})$.
 
-The upper bounds apply whenever the chosen loss recovers. The lower constructions are connected and $k$-fault-tolerant, and have a minimum killing support of size $k+1$. For $d\geq4$ and $k\leq d$, the constructions also have worst restricted time $t$ over losses of at most $k$ from the support.
+The upper bounds apply whenever the chosen loss recovers. For $d\geq2$ the lower constructions are connected and $k$-fault-tolerant, and have a minimum killing support of size $k+1$. For $d\geq4$ and $k\leq d$, the constructions also have worst restricted time $t$ over losses of at most $k$ from the support.
 
 ## A discrepancy forest
 
@@ -82,6 +82,20 @@ The intact coloring finishes in one round. Every pair target, each direct neighb
 
 After the common initial round, a block of size one takes four rounds, a block of size two takes $d+4$, and a block of size three takes $\lfloor3d/2\rfloor+4+(d\bmod2)$. For even $k$ use only blocks of size two, giving $U$. For odd $k$ and $d\in\{4,5,6\}$ use one block of size one and $(k-1)/2$ of size two. This gives $U$ for $d=4,5$ and $U-1$ for $d=6$. For odd $k$ and $d\geq7$ use one block of size three and $(k-3)/2$ of size two, giving $U-2+(d\bmod2)$. The protection below preserves the delays and gives recovery from every loss of at most $k$ seeds.
 
+With just one loss the [general upper bound](ONE_LOSS_TIMING.md#upper-bounds) is five. A single block of size one attains it for every maximum degree cap at least four.
+
+### Maximum degree at most three
+
+At degree one a recoverable loss deletes at most one seed from each edge and no seed from an isolated vertex. Every missing seed returns in one round. A disjoint union of $k$ blue edges attains this time.
+
+For degree at most three, use the same groups of seed restoration times as above. In every round after the first that restores no seed, choose a target with a retained intact source if one is available. A single-neighbor target or a long shared-source target uses a boundary slot of its group and one incidence at the corresponding seed. A short shared-source target uses two incidences in one group, at its latest two neighbors.
+
+It remains to choose a target in a round $j$ whose additions all have direct intact sources. At least one such target $x$ either arrives within one round of its lost source or arrives after that source was restored. Otherwise every addition $x$ would still have its source white in round $j+1$. Choose a delayed source $p$ that forces $x$ in round $j$. The vertex $x$ must see at least two white neighbors after round $j$: its lost source and one other, since otherwise it would restore that seed next. With degree at most three, $p$ is the only blue neighbor of $x$. The source $p$ has used its force, and $x$ cannot force either white neighbor. A newly enabled force in round $j+1$ must come from one of the new blue vertices or a blue neighbor of one. Neither can cause an addition here, so the run would stall with a seed still white.
+
+If the chosen direct target arrives within one round of its source, use the boundary slot of that source's group and one incidence. Otherwise its source was blue by round $j-2$. This source has a lost neighbor still white at round $j-2$, since its only originally white neighbor is $x$ and it would otherwise have forced $x$ by round $j-1$. Charge two incidences in the source's group: the direct edge and the edge to that lost neighbor. The latter is between two lost seeds and cannot be charged as an edge to a direct target or to a retained source. A seed supplies this extra incidence at most once, since it has at most one direct target in the intact run.
+
+Thus each group of $p$ seeds can spend up to two boundary slots at one incidence each, and every other assigned target costs two incidences in the group. The group has at most $3p$ incidences. It can account for at most $\lfloor3p/2\rfloor+1\leq2p$ targets if $p\geq2$, or at most two if $p=1$. There are at most $2k$ selected target rounds and at most $k$ seed-restoration rounds, giving $M_{3,1,k}\leq1+3k$. The degree-two path construction attains equality at both caps.
+
 ## Two or more intact rounds
 
 ### Upper bound
@@ -131,4 +145,4 @@ Run the following from the repository root.
 python -B research-twins/check_multiple_loss_bounds.py
 ~~~
 
-The script exhausts losses through the budget on the degree-two examples and the smallest protected one-round example. It also checks the cycle upper bound on all initial sets through cycle order eleven for up to three losses. On the larger graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
+The script exhausts losses through the budget on the degree-two examples and the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. On the larger graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.

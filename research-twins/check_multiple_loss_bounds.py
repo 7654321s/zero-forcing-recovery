@@ -49,6 +49,29 @@ def check_small_cycles():
     return checked
 
 
+def check_small_subcubic_one_round():
+    checked = 0
+    for order in range(2, 6):
+        possible = list(combinations(range(order), 2))
+        for chosen in range(1 << len(possible)):
+            graph = adjacency(order, (possible[i] for i in members(chosen)))
+            if max(row.bit_count() for row in graph) > 3:
+                continue
+            times = [completion_time(graph, blue) for blue in range(1 << order)]
+            for blue, intact in enumerate(times):
+                if intact > 1:
+                    continue
+                seeds = tuple(members(blue))
+                for size in range(1, len(seeds)):
+                    for lost in combinations(seeds, size):
+                        delayed = times[blue ^ mask(lost)]
+                        if delayed <= order:
+                            if delayed > 1 + 3 * size:
+                                raise AssertionError(('subcubic one-round bound', graph, blue, lost))
+                            checked += 1
+    return checked
+
+
 def protect_seeds(degree, edges, blue, order, deliberately_lost, seed):
     """Add private blue paths and a connected minimum killing support."""
     losses = len(deliberately_lost)
@@ -125,9 +148,9 @@ def one_round_block(degree, roots, edges, blue, order):
 
 
 def sharp_one_round_certificate(degree, losses):
-    """Build a sharp connected example for degree at least four and at least two losses."""
+    """Build a sharp connected example for degree at least four."""
     roots = list(range(losses))
-    tail_size = 0 if losses % 2 == 0 else (1 if degree <= 6 else 3)
+    tail_size = 0 if losses % 2 == 0 else (1 if losses == 1 or degree <= 6 else 3)
     split = losses - tail_size
     groups = [roots[i:i + 2] for i in range(0, split, 2)]
     if tail_size:
@@ -148,6 +171,8 @@ def sharp_one_round_certificate(degree, losses):
 
 
 def sharp_one_round_time(degree, losses):
+    if losses == 1:
+        return 5
     cap = 1 + degree * losses // 2 + 2 * losses
     if losses % 2 and degree >= 6:
         cap -= 1 if degree == 6 else 2 - degree % 2
@@ -266,7 +291,7 @@ def main():
             exhaustive += check_all_losses(graph, blue, k)
         print('One-round family:', d, k, len(graph), n + 1 + k // 2)
 
-    sharp_cases = ((4, 2), (4, 3), (4, 6), (5, 3), (6, 3), (6, 7),
+    sharp_cases = ((4, 1), (4, 2), (4, 3), (4, 6), (5, 3), (6, 3), (6, 7),
                    (7, 2), (7, 3), (8, 3), (8, 4), (9, 5), (12, 2))
     for d, k in sharp_cases:
         graph, blue, slow, support, paths = sharp_one_round_certificate(d, k)
@@ -293,6 +318,8 @@ def main():
 
     print('Exhaustive losses on the degree-two and small one-round examples:', exhaustive)
     print('Recoverable losses checked against the cycle upper bound:', check_small_cycles())
+    print('Recoverable losses checked against the subcubic one-round bound:',
+          check_small_subcubic_one_round())
     print('Sampled losses on the protected examples:', sampled)
 
 
