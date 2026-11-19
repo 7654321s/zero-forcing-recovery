@@ -102,7 +102,7 @@ def check_two_round_bound(degree, lost, full_arrivals, delayed_arrivals):
     if len(missed_second) > bound:
         raise AssertionError((degree, lost, missed_first, missed_second, bound))
     if None not in delayed_arrivals:
-        cap = min(degree**2 + 3, degree**2 // 2 + 8)
+        cap = min(degree**2 + 3, degree**2 // 2 + (6 if degree >= 6 else 7))
         if degree == 3:
             cap = 9
         if degree == 3 and len(missed_second) != 8:
@@ -217,43 +217,133 @@ def check_nine_round_example():
     MODEL['certify'](adj, blue, mask([15, 16]), 1, 2, 9)
 
 
-def quadratic_degree_certificate(degree):
+def check_low_degree_examples():
+    edge = adjacency(2, [(0, 1)])
+    if completion_time(edge, 1) != 1:
+        raise AssertionError('Degree-one recovery should take one round')
+    path_and_edge = adjacency(11, [*zip(range(8), range(1, 9)), (9, 10)])
+    blue = mask([0, 5, 6, 9, 10])
+    if completion_time(path_and_edge, blue) != 2:
+        raise AssertionError('The degree-two example should have intact time two')
+    MODEL['certify'](path_and_edge, blue, mask([9, 10]), 1 << 5, 2, 7)
+
+
+def complete_quadratic_certificate(edges, blue, next_vertex, targets, splice=None):
+    first, second, seed, helper, leaf_a, leaf_b = range(next_vertex, next_vertex + 6)
+    if splice is None:
+        path = [second, *targets]
+        pairs = list(zip(path, path[1:]))
+    else:
+        enter, resume = splice
+        path = [resume, *targets]
+        pairs = [(second, enter), *zip(path, path[1:])]
+    relays = range(leaf_b + 1, leaf_b + 1 + len(pairs))
+    for source, (left, right) in zip(relays, pairs):
+        edges.extend(((source, left), (source, right)))
+    edges.extend(((seed, first), (first, second), (seed, helper),
+                  (helper, leaf_a), (helper, leaf_b)))
+    adj = adjacency(relays.stop, edges)
+    initial = mask([*blue, *relays, seed, helper, leaf_a, leaf_b])
+    return adj, initial, mask([leaf_a, leaf_b])
+
+
+def even_quadratic_degree_certificate(degree):
+    lost = 0
+    missed = range(1, degree + 1)
+    predecessors = range(missed.stop, missed.stop + degree - 1)
+    tail_parent = missed[3]
+    cycle = list(zip(missed, [*missed[1:], missed[0]]))
+    pairs = cycle * ((degree - 2) // 2)
+    pairs.remove((missed[0], missed[1]))
+    pairs.remove((tail_parent, missed[4]))
+    pairs.append((missed[1], missed[4]))
+    outside_sources = range(predecessors.stop, predecessors.stop + len(pairs))
+    outside_targets = range(outside_sources.stop, outside_sources.stop + len(pairs))
+    direct_targets = range(outside_targets.stop, outside_targets.stop + degree - 1)
+    guard, tail, tail_source, last, last_source = range(direct_targets.stop,
+                                                       direct_targets.stop + 5)
+
+    edges = [(lost, missed[0]), *((lost, p) for p in predecessors),
+             *zip(predecessors, missed[1:])]
+    for source, pair, target in zip(outside_sources, pairs, outside_targets):
+        edges.extend((source, v) for v in (*pair, target))
+    edges.extend(zip(missed[1:], direct_targets))
+    edges.extend((x, y) for x in direct_targets for y in (guard, tail))
+    edges.extend(((missed[0], guard), (missed[0], last_source), (last_source, last),
+                  (tail_parent, tail_source), (tail_source, tail)))
+    blue = [lost, *predecessors, *outside_sources, tail_source, last_source]
+    return complete_quadratic_certificate(
+        edges, blue, last_source + 1, [*outside_targets, *direct_targets, last]
+    )
+
+
+def small_quadratic_degree_certificate(degree):
+    lost = 0
+    missed = range(1, degree + 1)
+    ordinary = missed[1:]
+    predecessors = range(missed.stop, missed.stop + len(ordinary))
+    multiplicities = (1, 1) if degree == 4 else (2, 1, 2)
+    pairs = [(left, right) for left, right, count in zip(ordinary, ordinary[1:], multiplicities)
+             for _ in range(count)]
+    outside_sources = range(predecessors.stop, predecessors.stop + len(pairs))
+    outside_targets = range(outside_sources.stop, outside_sources.stop + len(pairs))
+    direct_targets = range(outside_targets.stop, outside_targets.stop + len(ordinary))
+    guard, tail, finish, enter, resume = range(direct_targets.stop, direct_targets.stop + 5)
+    finish_source, tail_source, enter_source, resume_source = range(resume + 1, resume + 5)
+
+    edges = [(lost, missed[0]), *((lost, p) for p in predecessors),
+             *zip(predecessors, ordinary)]
+    for source, pair, target in zip(outside_sources, pairs, outside_targets):
+        edges.extend((source, v) for v in (*pair, target))
+    edges.extend(zip(ordinary, direct_targets))
+    edges.extend((guard, x) for x in direct_targets[:-1])
+    edges.extend(((missed[0], guard), (tail, direct_targets[-1]),
+                  (ordinary[0], finish_source), (finish_source, finish),
+                  (ordinary[-1], tail_source), (tail_source, tail),
+                  (missed[0], enter_source), (enter_source, enter),
+                  (missed[0], resume_source), (resume_source, resume)))
+    blue = [lost, *predecessors, *outside_sources, finish_source, tail_source,
+            enter_source, resume_source]
+    return complete_quadratic_certificate(
+        edges, blue, resume_source + 1, [*outside_targets, *direct_targets, finish],
+        splice=(enter, resume)
+    )
+
+
+def odd_quadratic_degree_certificate(degree):
     lost = 0
     predecessors = range(1, degree + 1)
     missed = range(degree + 1, 2 * degree + 1)
     group = [missed[0], *missed[3:]]
     size = len(group)
     cycle = list(zip(group, [*group[1:], group[0]]))
-    pairs = [(missed[1], missed[2])] * size + cycle * (size // 2)
-    if size % 2:
-        pairs.extend(zip(group[::2], group[1::2]))
+    pairs = [(missed[1], missed[2])] * (size - 1) + cycle * (size // 2)
+    pairs.extend(zip(group[1::2], group[2::2]))
 
     outside_sources = range(missed.stop, missed.stop + len(pairs))
     outside_targets = range(outside_sources.stop, outside_sources.stop + len(pairs))
-    direct_targets = range(outside_targets.stop, outside_targets.stop + degree - 1)
-    last = direct_targets[0]
-    first, second, seed, helper, leaf_a, leaf_b = range(direct_targets.stop,
-                                                       direct_targets.stop + 6)
-    serial_path = [second, *outside_targets, *direct_targets[1:], last]
-    relays = range(leaf_b + 1, leaf_b + len(serial_path))
-
+    direct_targets = range(outside_targets.stop, outside_targets.stop + degree)
+    guard_source, guard, tail_source, tail = range(direct_targets.stop, direct_targets.stop + 4)
     edges = [(lost, p) for p in predecessors] + list(zip(predecessors, missed))
     for source, pair, target in zip(outside_sources, pairs, outside_targets):
         edges.extend((source, v) for v in (*pair, target))
-    edges.extend(zip([missed[0], *missed[2:]], direct_targets))
-    edges.extend((last, x) for x in direct_targets[2:])
-    for source, left, right in zip(relays, serial_path, serial_path[1:]):
-        edges.extend(((source, left), (source, right)))
-    edges.extend(((seed, first), (first, second), (seed, helper),
-                  (helper, leaf_a), (helper, leaf_b)))
+    edges.extend(zip(missed, direct_targets))
+    edges.extend((guard, x) for x in (direct_targets[0], *direct_targets[3:]))
+    edges.extend((tail, x) for x in direct_targets[1:3])
+    edges.extend(((missed[0], guard_source), (guard_source, guard),
+                  (missed[1], tail_source), (tail_source, tail)))
+    blue = [lost, *predecessors, *outside_sources, guard_source, tail_source]
+    return complete_quadratic_certificate(
+        edges, blue, tail + 1, [*outside_targets, *direct_targets, guard]
+    )
 
-    final_source, final_target = relays.stop, relays.stop + 1
-    edges.extend(((missed[1], final_source), (final_source, final_target),
-                  (direct_targets[1], final_target)))
-    adj = adjacency(final_target + 1, edges)
-    blue = mask([lost, *predecessors, *outside_sources, *relays,
-                 seed, helper, leaf_a, leaf_b, final_source])
-    return adj, blue, mask([leaf_a, leaf_b])
+
+def quadratic_degree_certificate(degree):
+    if degree <= 5:
+        return small_quadratic_degree_certificate(degree)
+    if degree % 2:
+        return odd_quadratic_degree_certificate(degree)
+    return even_quadratic_degree_certificate(degree)
 
 
 def check_quadratic_degree_family():
@@ -262,7 +352,7 @@ def check_quadratic_degree_family():
         adj, blue, support = quadratic_degree_certificate(degree)
         if max(row.bit_count() for row in adj) != degree or completion_time(adj, blue) != 2:
             raise AssertionError((degree, len(adj)))
-        MODEL['certify'](adj, blue, support, 1, 2, degree**2 // 2 + 5)
+        MODEL['certify'](adj, blue, support, 1, 2, degree**2 // 2 + (7 if degree <= 5 else 6))
     return len(degrees)
 
 
@@ -284,6 +374,8 @@ def main():
     print('Saturated subcubic example: exact restricted time 2 and delayed time 8')
     check_nine_round_example()
     print('Sharp subcubic example: exact restricted time 2 and delayed time 9')
+    check_low_degree_examples()
+    print('Sharp maximum-degree-one and maximum-degree-two examples: 1 and 7 rounds')
     print('Quadratic-degree examples with exact restricted time 2:', check_quadratic_degree_family())
 
 
