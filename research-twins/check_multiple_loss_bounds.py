@@ -2085,6 +2085,12 @@ def main():
             check_no_two_edge_cut(graph)
             if budget <= 2:
                 exhaustive += check_all_losses(graph, blue, budget)
+        if compact and (t, budget, padding) == (6, 20, 0):
+            killing = mask((328, 332, 334, 337, 341, 343, 348, 350, 352, 354, 1511,
+                            1513, 1515, 1519, 1522, 1524, 1528, 1530, 1531, 1535, 1539))
+            if (killing.bit_count() != 21 or killing & (slow | ~blue)
+                    or completion_time(graph, blue ^ killing) <= len(graph)):
+                raise AssertionError('Missing the 21-seed killing loss in the compact witness')
         print('Cubic leaf cycle protection:', t + 2, rank, budget, len(waves), 'compact:', compact)
 
     for rank in (4, 5, 12):

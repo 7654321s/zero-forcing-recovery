@@ -985,6 +985,8 @@ With the earlier $n_0,Q$, the unpadded rank is $n_0+10+\sum_{i=1}^Q L_i$, where 
 
 At intact time five, the unpadded witnesses for budgets one through four have ranks 44, 46, 57, and 65. The [SAT replay](check_leaf_cycle_forts.py) computes their exact minimum killing sizes as 3, 4, 5, and 6, respectively.
 
+The 2,368-vertex witness has exact minimum killing size 21. The proof gives recovery through budget 20. The standard replay checks an explicit loss of 21 seeds that stalls while retaining the designated root.
+
 <a id="the-first-rank-above-six-per-lost-seed"></a>
 
 #### Counting visits down to the fourth round
