@@ -849,6 +849,21 @@ def subcubic_layer_totals(layers):
     return activation, capacity
 
 
+def subcubic_layer_omissions(layers, limit):
+    groups = ((layer.remaining, layer.copies, layer.extra_capacity, layer.activation_rank)
+              for layer in layers)
+    return subcubic_layer_frontier(groups, limit)
+
+
+def subcubic_saturation_shortfall_limit(layers, lost_rounds):
+    """Largest rank shortfall that costs at most lost_rounds from full capacity."""
+    _, full_capacity = subcubic_layer_totals(layers)
+    if not 0 <= lost_rounds <= full_capacity:
+        raise ValueError('The allowed loss must lie between zero and full layered capacity')
+    _, saved, _ = subcubic_layer_omissions(layers, lost_rounds)[-1]
+    return 2 * lost_rounds + saved
+
+
 def subcubic_layer_selection(layers, budget):
     """Choose layers by activation rank, or choose omissions near saturation."""
     if not layers or budget < min(layer.activation_rank for layer in layers) + 2:
@@ -860,9 +875,7 @@ def subcubic_layer_selection(layers, budget):
 
     deficit = full_capacity - (budget - full_activation) // 2
     if budget >= full_activation and deficit - 1 < budget - 2:
-        groups = ((layer.remaining, layer.copies, layer.extra_capacity, layer.activation_rank)
-                  for layer in layers)
-        frontier = subcubic_layer_frontier(groups, deficit - 1)
+        frontier = subcubic_layer_omissions(layers, deficit - 1)
         loss, saved, excluded = max(
             frontier, key=lambda item: min(full_capacity - item[0],
                                            (budget - full_activation + item[1]) // 2)
@@ -1563,6 +1576,25 @@ def main():
             if actual != expected:
                 raise AssertionError(('subcubic saturation plateau', t, k, shortfall, actual))
         print('Subcubic saturation plateau:', t, k, saturated_rank, saturated)
+
+    for t, k in ((13, 2), (14, 1), (14, 4), (60, 4)):
+        _, _, _, layers = subcubic_rank_model(t, k)
+        activation, capacity = subcubic_layer_totals(layers)
+        full_budget = activation + 2 * capacity
+        count = k if t == 13 else 2 * k
+        for number in range(1, min(8, count) + 1):
+            loss = 40 * number
+            first = 3519 * number - 3440
+            last = 3519 * number
+            if subcubic_saturation_shortfall_limit(layers, loss - 1) != first - 1:
+                raise AssertionError(('subcubic plateau start', t, k, loss, first))
+            if subcubic_saturation_shortfall_limit(layers, loss) != last:
+                raise AssertionError(('subcubic plateau end', t, k, loss, last))
+            for gap in (first, last):
+                gain, _ = subcubic_layer_selection(layers, full_budget - gap)
+                if capacity - gain != loss:
+                    raise AssertionError(('subcubic staircase value', t, k, gap, capacity - gain))
+        print('Subcubic saturation staircase:', t, k, min(8, count), 'plateaus')
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()

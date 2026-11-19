@@ -739,6 +739,57 @@ Choosing all sites gives $E_{\rm all}=\min(P_{\rm all},\lfloor(B-W_{\rm all})/2\
 
 The numerical optimizer can search for omissions instead of activations near saturation. Any omission that improves $E_{\rm all}$ must lose strictly less than $P_{\rm all}-E_{\rm all}$ capacity. The same dominance search now minimizes omitted capacity and maximizes saved activation rank. This gives a small exact search for budgets just below saturation.
 
+#### Inverting the saturation staircase
+
+Work in the combined detour family with $t\geq13$. Let $\Delta=\beta_{\rm sat}-\beta=B_{\rm sat}-B$ be the rank shortfall, with $0\leq\Delta\leq B_{\rm sat}$, and let $F(\Delta)=P_{\rm all}-E$ be the loss of recovery rounds from saturation. For an omitted set $O$ of useful sites, let $P(O)$ be its lost capacity and $W(O)$ its saved activation rank. If $\ell$ is an integer between zero and $P_{\rm all}$, the largest shortfall that loses at most $\ell$ rounds is exactly
+$$
+H_{t,k}(\ell)=2\ell+\max_{O:\,P(O)\leq\ell}W(O).
+$$
+Indeed, retaining at least $P_{\rm all}-\ell$ rounds requires that much capacity after the omissions, so $P(O)\leq\ell$. The required activation and extra rounds then cost $W_{\rm all}-W(O)+2(P_{\rm all}-\ell)$ units of budget. The largest allowed shortfall for this choice is $2\ell+W(O)$. A site that receives zero extra rounds can be switched back to ordinary, which only saves rank. Taking the maximum proves the equivalence $F(\Delta)\leq\ell$ if and only if $\Delta\leq H_{t,k}(\ell)$. The numerical function `subcubic_saturation_shortfall_limit` evaluates this inverse with the same omission frontier as the recovery optimizer.
+
+Only sites of deadline 13 can be omitted if $\ell<349=P_{14}$. If there are $N=k$ such sites at $t=13$ and $N=2k$ at $t>13$, this gives
+$$
+H_{t,k}(\ell)=2\ell+3439\min\{N,\lfloor\ell/40\rfloor\}
+\qquad (0\leq\ell<349,\ \ell\leq P_{\rm all}).
+$$
+In particular, for each $1\leq q\leq\min(N,8)$ the loss is exactly $40q$ for
+$$
+3519q-3440\ \leq\ \Delta\ \leq\ 3519q .
+$$
+These endpoints are $H_{t,k}(40q-1)+1$ and $H_{t,k}(40q)$. The first plateau starts at 79, and the second at 3598 whenever two smallest sites are available.
+
+For a fixed allowance $\ell\geq40$, the inverse is independent of $t$ once $t\geq14+\lfloor\log_2(\ell/40)\rfloor$. Indeed $P_{s+1}>2P_s$ for $s\geq13$, so every type with $P_s\leq\ell$ is then strictly below the top deadline and has $2k$ copies. For $\ell<40$ the inverse is simply $2\ell$ at any deadline where that allowance is in range.
+
+**Growth of the savings just below saturation.** Write $G=\Delta/2-F(\Delta)$ for the savings relative to the unrounded all-sites loss $\Delta/2$. Consider $n\to\infty$, $t\geq n+3$, and $\Delta/(k2^{n+1})\to x$ with $1/2\leq x\leq1$. At fixed $k$, let $A_k(x)$ be the maximum of
+$$
+k^{-1}\sum_{j\geq0}a_jr^{-j}
+\qquad\text{with}\qquad
+\sum_{j\geq0}a_j2^{-j}\leq kx,\quad a_j\in\{0,\ldots,2k\}.
+$$
+With $r,w$ as in the [extra-rank asymptotics](#how-extra-cycle-rank-converts-into-recovery-time),
+$$
+\frac{G}{kr^n}\longrightarrow \frac w2 A_k(x).
+$$
+For growing $k\to\infty$, the same limit uses the fractional relaxation $A_\infty$. On $[1/2,1]$ it is
+$$
+A_\infty(x)=\frac{2}{r^2(r-1)}+(x-1/2)(2/r)^2 .
+$$
+Thus the correction to the all-sites rank loss has scale $kr^n$. The limiting packing optimizes a different quantity from the cover used for the forward budget, because an omission spends capacity and saves activation rank.
+
+**Proof of the packing limit.** At this scale $B\geq W_{\rm all}$ for large $n$. The subset formula gives
+$$
+F(\Delta)=\min_O\max\{P(O),\lceil(\Delta-W(O))/2\rceil\}.
+$$
+The all-sites choice implies $F\leq\lceil\Delta/2\rceil$, so an optimal omission has $P(O)=O(k2^n)$. The [omitted-rank bound](#several-layers-and-the-saturation-window) gives $W(O)=O(kr^n)$, and $G\leq W(O)/2$. Replacing each omitted capacity by its raw size $2^{s-2}$ adds at most $\sum_{s\in O}U_{s-2}\leq W(O)$, since $R_s\leq U_{s-2}$. Thus the normalized raw total is at most $x+o(1)$. For $j=n+2-s$, the normalized cost weights are $r^{-j}$. Replacing the actual saved rank by $wr^n\sum r^{-j}$ has error $o(kr^n)$. For bounded $s$ the error is $O(k)$, and for the other types use the uniform relative approximation $W_s\sim wr^{s-2}$ and the bound $W(O)=O(kr^n)$.
+
+In this raw packing any chosen sizes larger than one may be replaced by sizes at most one with at least as much saved rank. Indeed their total size is an integer, at most $(x+o(1))k$. The spare capacity among types of size at most one exceeds that integer, since these types have total capacity $4k$ and the entire pack uses at most $(x+o(1))k$. This statement uses the limiting supply at all $j\geq0$. Taking available dyadic sizes in descending order fills that integer volume exactly: the residual is always a multiple of the current size, so any residual left over after a type means all its copies were used. Sizes at most one have larger cost per unit than the replaced sizes. Thus the normalized upper bound on saved rank is given by the pack defining $A_k$.
+
+For fixed $k$, a maximizing packing exists by diagonal subsequences and the geometric tails. This also gives right continuity by taking limits of packings for decreasing capacities. For left continuity at positive $x$, a maximizing packing at equality must use arbitrarily small sizes. Otherwise splitting one copy of the smallest used size into two copies at the next type would preserve volume and strictly increase the saved rank. The next type would be empty and has at least two places. Removing a sufficiently small selected size thus gives arbitrarily small loss of weight and strict volume slack. Truncating the tail yields finite packings with slack and weights arbitrarily close to the optimum.
+
+For the fractional packing the weight per unit size increases with $j$, so the deepest types are filled first. The types $j\geq3$ supply total normalized size $1/2$. For $x\in[1/2,1]$ the remaining demand fits within type 2, giving the formula for $A_\infty$. Rounding its last partially used type down loses at most $1/k$ in normalized weight. The same rounding comparison holds for nearby positive capacities, with their corresponding boundary type.
+
+To attain the lower limit at fixed $k$, use a finite near-optimal packing with strict volume slack. At growing $k$, use the fractional solution at a slightly smaller demand, truncate its tail and round down. These choices use only fixed types $j\geq0$, which exist with the required copies for large $n$ because $t\geq n+3$. Their actual omitted capacities stay below $\Delta/2$ by order $k2^n$, whereas their saved rank is $O(kr^n)$. Thus their capacity loss does not bind in the formula for $F$, and they save half their activation rank up to the rounding of one round. Taking limits gives the claimed value of $G/(kr^n)$.
+
 <a id="the-first-rank-above-six-per-lost-seed"></a>
 
 #### Counting visits down to the fourth round
