@@ -86,7 +86,7 @@ For maximum degree three and intact time at most two, this gives 15 rounds. The 
 
 ## Two-round colorings at bounded degree
 
-**Theorem.** Let the maximum degree be $\Delta\geq1$ and let the intact coloring finish by round two. If the delayed run finishes, it does so within $\Delta^2+3$ rounds. For maximum degree at most three it finishes within **11 rounds**.
+**Theorem.** Let the maximum degree be $\Delta\geq1$ and let the intact coloring finish by round two. If the delayed run finishes, it does so within $\Delta^2+3$ rounds. For maximum degree at most three it finishes within **10 rounds**. If exactly ten vertices remain white after delayed round two, the bound improves to **eight rounds** and is attained. The subcubic result uses a finite enumeration for the ten-white case.
 
 Write $m=|D_1\setminus\{z\}|$. For each of these $m$ missed targets, choose an intact round-one source. If $z$ forced a missed target, choose $z$ as its source and call that target $w_0$. Every other chosen source is an initially blue neighbor of $z$. The chosen sources are distinct and have no white neighbors in the intact run after round one. Counting these neighbors of $z$, together with $w_0$ if present, gives $m\leq\Delta$.
 
@@ -102,20 +102,46 @@ $$
 
 At round two the intact coloring is full. Every subsequent round of a finite delayed run colors at least one of the remaining whites, so it finishes by round $\Delta^2+3$.
 
-For maximum degree at most three, it suffices to consider equality $|D_2|=10$. The inequalities force $\Delta=m=3$, with $z\in D_1$ and all four discrepancies of $D_1$ still white after round two. Each of the three missed targets accounts for exactly two new discrepancies in round two. A delayed time of 12 would require exactly one new blue vertex in each round from three to twelve. We exclude that schedule in both cases.
+### Nine whites after round two
 
-- If $z$ was not a chosen source, write $p_i$ for the chosen source of $w_i$, for $1\leq i\leq3$. Each $p_i$ has only $z$ and $w_i$ as possible white neighbors. If $z$ fills first among these four vertices, all three $w_i$ fill together in the next round. If some $w_i$ fills first, the next round fills $z$ from $p_i$, or already has more than one addition. In the former case both remaining $w_i$ fill together in the following round.
-- If $z$ was chosen, its neighbors are $p_1,p_2,w_0$, where $p_i$ is the chosen source of $w_i$. If $z$ fills before both $w_1,w_2$, they fill together in the next round. Under the one-addition assumption, we may therefore take $w_1$ to fill in round $r$, then $z$ in round $r+1$ and $w_2$ in round $r+2$. The vertex $w_0$ must fill before round $r$, since otherwise $z$ would force it along with the force into $w_2$. Now consider the two new discrepancies attributed to $w_0$ in intact round two. Beyond its neighbor $z$, either both neighbors of $w_0$ are sources blue in both runs at round one, or one is such a source and the other is a new discrepancy $x$ forced by $w_0$. In the first case $w_0$ forces $z$ by round $r$. In the second case, if $x$ is blue before round $r$, the same contradiction follows. Nor can $x$ fill in rounds $r,r+1$, which add $w_1,z$. So $w_0$ forces $x$ in round $r+2$, alongside the force into $w_2$.
+For $\Delta=3$, $|D_2|=9$ requires $m=3$ and $z\in D_1$. The chosen round-one sources occupy all three neighbors of $z$, counting $z$'s own target as a neighbor when it was chosen to act. No new discrepancy is attributed to $z$. Each of the three other vertices of $D_1$ receives at most two attributions.
 
-Thus even with ten whites after round two, at least two of them fill in the same round, giving the bound of eleven. A graph of maximum degree zero has no successful singleton recovery.
+The six-attribution case cannot leave nine whites. If all three missed targets receive two attributions, each has degree three. Besides its round-one source, its two neighbors are either two chosen outside blue sources, or one such source and a white target it forces in intact round two. Every such outside source sees both the missed target and the new discrepancy white in delayed round one. Each blue round-one source also sees $z$ and its target white. All blue neighbors of $D_1$ are among these blocked sources, so no vertex of $D_1$ is restored in round two. Hence $|D_2|=9$ requires exactly five attributions and all four vertices of $D_1$ retained. The attribution counts for the three missed targets are two, two and one.
 
-The [17-vertex certificate in the replay](check_single_loss_bounds.py) has maximum degree three, restricted time two, and delayed time seven. Its initial blue set is $\{0,1,2,6,7,9,11,12,14\}$, its killing pair is $\{0,11\}$, and its slow loss is $9$. The maximum possible delay for this class lies between seven and eleven.
+Suppose every delayed round after round two adds exactly one vertex. If $z$ had three blue round-one neighbors $p_i$ with missed targets $w_i$, then each $p_i$ sees only $z,w_i$ as possible whites. If $z$ fills first among the four vertices, the next round fills all three $w_i$. If some $w_i$ fills first, then $z$ fills next and both remaining $w_i$ fill in the following round. Neither permits a single addition in every round.
+
+If $z$ was chosen to act in round one, its neighbors are two blue sources $p_1,p_2$ and its own target $w_0$. Under the one-addition assumption, $z$ cannot fill before both of the targets $w_1,w_2$ of $p_1,p_2$. Renaming them if necessary, let $w_1$ fill in round $r$, then $z$ in round $r+1$ and $w_2$ in round $r+2$. The vertex $w_0$ must fill before round $r$, since otherwise $z$ would force it alongside $w_2$.
+
+At time $r-1$, the blue vertex $w_0$ can have at most one white neighbor other than $z$, and that neighbor cannot be $w_1$ or $w_2$. If $w_0$ receives two attributions, this follows from the saturated degree-three description above. If it receives one, both $w_1,w_2$ are saturated and their incident edges leave no room for an edge to $w_0$. In this case the attribution to $w_0$ either comes from a permanently blue neighbor, or is a force from $w_0$ itself, whose only white neighbor in intact round one is its new target. In each case at most one neighbor besides $z$ can still be white at time $r-1$.
+
+If no such neighbor remains white, $w_0$ would restore $z$ by round $r$. If such a white neighbor $x$ remains, it cannot fill in rounds $r$ and $r+1$, which add only $w_1$ and $z$. Then $w_0$ forces $x$ alongside the force into $w_2$ in round $r+2$. This contradicts the one-addition assumption. Thus a successful run with nine whites after round two finishes within ten rounds.
+
+### Ten whites after round two
+
+For $|D_2|=10$, all the inequalities in the round-two count are equalities. In particular $\Delta=m=3$, all four members of $D_1$ remain white, and each missed round-one target has exactly two new discrepancies attributed to it. The [finite replay](check_saturated_subcubic.py) proves that any successful delayed run in this case finishes within six more rounds. The following reduction explains why the replay covers arbitrary graph order.
+
+After round two every vertex outside $D_2$ is blue forever. Its contribution is fully described by its set of neighbors in $D_2$. In each round it forces the sole white member of that set if one exists. A vertex in $D_2$ uses its neighbors within $D_2$ once it becomes blue.
+
+Label the four old discrepancies by $z,w_1,w_2,w_3$. Each $w_i$ has two distinct new discrepancies associated with it, one of which is the target of an outside source. The other is the target of a second outside source or of $w_i$ itself. If $z$ acted in round one, relabel its target as $w_1$. The required edges and permanently blue sources are as follows.
+
+- For each $w_i$ whose round-one source is not $z$, that source has exactly $\{z,w_i\}$ as its neighbor set in $D_2$. Its other neighbors were blue initially. For a target of $z$, use the direct edge $zw_1$.
+- For each new discrepancy forced by an outside source in round two, that source contributes the two-element set consisting of $w_i$ and the new target. The source cannot neighbor another new discrepancy because only its chosen target is white in intact round one. It cannot neighbor another old discrepancy either. All the $z$ edges are occupied by the round-one choices, and every other $w_j$ uses its slots for its own predecessor and its own two attributions. The chosen sources for different new targets are distinct.
+- A new discrepancy forced by $w_i$ itself uses a direct edge to $w_i$. All incident edges of $z,w_1,w_2,w_3$ have now been accounted for. Each of the six new discrepancies has used one incident edge, leaving at most two additional edges.
+
+There are ten templates up to relabeling the three branches. When $z$ did not act there are four possible numbers of branches with a direct second edge. When it did act the branch $zw_1$ has two choices, and the other two branches have three possible counts. For each template the program enumerates direct edges among the six new discrepancies and extra neighbor sets of size one through three for permanently blue sources. Each extra incidence spends one of the two remaining slots at its endpoint. The program may drop duplicate blue neighbor sets because they give the same force in every round. A configuration without a singleton blue neighbor set stalls immediately, since all ten residual vertices start white.
+
+The program checks 6,176,870 configurations with at least one singleton source. Of these, 5,921,708 finish, and the largest number of additional rounds is six. The largest total time in the ten-white case is therefore eight. The global subcubic bound is ten, using this enumeration for ten whites, the argument above for nine, and the white count itself for eight or fewer.
+
+### Eight-round witness with all singleton losses recoverable
+
+A connected 24-vertex subcubic graph in [the replay](check_single_loss_bounds.py) attains eight rounds with ten white vertices left after round two. Its initial blue set is $\{0,10,11,12,13,14,15,16,18,20,21,22,23\}$. Its intact time is two, and its minimum killing support $\{22,23\}$ has restricted time two. Without initial blue vertex $0$, the new blue sets in order are $\{19\},\{17\},\{4\},\{1,6\},\{2,5\},\{0,7,9\},\{3\},\{8\}$. The replay checks that every singleton loss recovers and that loss of both support vertices stalls. Together the lower and upper bounds put the overall maximum between eight and ten rounds.
 
 ## Reproduction
 
 ```sh
 python -B research-twins/check_single_loss_bounds.py
+python -B research-twins/check_saturated_subcubic.py
 lake env lean -DwarningAsError=true research-twins/SingleLossBound.lean
 ```
 
-The replay verifies both sharp examples and 147 instances of the unbounded family, using 49 path lengths and three variants of the lost vertex. The largest path has 100 vertices before $g$. It also checks 25,392 recoverable singleton cases with intact time at most one across all labeled simple graphs through order five. In 7,914 of those cases a blue twin of the lost vertex remains. On the same small graph range, the replay checks the degree-weighted inequality on 78,122 transitions and the refined round-two count on 51,658 singleton losses, including stalled runs. Two additional subcubic examples attain ten white vertices after round two, one for each possible role of the lost vertex as a round-one source. The Lean proof establishes the one-round upper bounds without a graph-order restriction.
+The replay verifies both sharp examples and 147 instances of the unbounded family, using 49 path lengths and three variants of the lost vertex. The largest path has 100 vertices before $g$. It also checks 25,392 recoverable singleton cases with intact time at most one across all labeled simple graphs through order five. In 7,914 of those cases a blue twin of the lost vertex remains. On the same small graph range, the replay checks the degree-weighted inequality on 78,122 transitions and the refined round-two count on 51,658 singleton losses, including stalled runs. Three subcubic examples attain ten white vertices after round two, one of them at the sharp eight-round deadline. The Lean proof establishes the one-round upper bounds without a graph-order restriction.

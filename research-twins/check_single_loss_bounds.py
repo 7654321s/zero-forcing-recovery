@@ -102,7 +102,9 @@ def check_two_round_bound(degree, lost, full_arrivals, delayed_arrivals):
     if len(missed_second) > bound:
         raise AssertionError((degree, lost, missed_first, missed_second, bound))
     if None not in delayed_arrivals:
-        cap = 11 if degree == 3 else degree**2 + 3
+        cap = 10 if degree == 3 else degree**2 + 3
+        if degree == 3 and len(missed_second) == 10:
+            cap = 8
         if max(delayed_arrivals) > cap:
             raise AssertionError((degree, lost, delayed_arrivals, cap))
     return len(missed_second)
@@ -170,6 +172,28 @@ def check_subcubic_example():
     MODEL['certify'](adj, blue, mask([0, 11]), 1 << 9, 2, 7)
 
 
+def check_eight_round_example():
+    edges = [(0, 1), (0, 11), (0, 14), (1, 5), (1, 10), (2, 11), (2, 12),
+             (2, 13), (3, 14), (3, 15), (3, 16), (4, 6), (4, 10), (4, 17),
+             (5, 6), (5, 9), (6, 12), (7, 9), (7, 13), (8, 15), (9, 16),
+             (17, 18), (18, 19), (19, 20), (20, 21), (21, 22), (21, 23)]
+    adj = adjacency(24, edges)
+    blue = mask([0, 10, 11, 12, 13, 14, 15, 16, 18, 20, 21, 22, 23])
+    intact, full_arrivals = trace(adj, blue)
+    delayed, delayed_arrivals = trace(adj, blue ^ 1)
+    degree = max(row.bit_count() for row in adj)
+    if (degree, intact, delayed) != (3, 2, 8):
+        raise AssertionError((degree, intact, delayed))
+    if check_two_round_bound(degree, 0, full_arrivals, delayed_arrivals) != 10:
+        raise AssertionError(delayed_arrivals)
+    expected = [{19}, {17}, {4}, {1, 6}, {2, 5}, {0, 7, 9}, {3}, {8}]
+    actual = [{v for v, arrival in enumerate(delayed_arrivals) if arrival == round_number}
+              for round_number in range(1, delayed + 1)]
+    if actual != expected:
+        raise AssertionError(actual)
+    MODEL['certify'](adj, blue, mask([22, 23]), 1, 2, 8)
+
+
 def main():
     extremal_examples()
     print('Sharp one-round examples: two certificates at times 1/5 and 1/4')
@@ -184,6 +208,8 @@ def main():
     print('Saturated subcubic cases with ten whites after round two: 2')
     check_subcubic_example()
     print('Subcubic example: exact restricted time 2 and delayed time 7')
+    check_eight_round_example()
+    print('Saturated subcubic example: exact restricted time 2 and delayed time 8')
 
 
 if __name__ == '__main__':
