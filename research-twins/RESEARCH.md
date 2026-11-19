@@ -40,7 +40,7 @@ The [five-sheet prism chains](MULTIPLE_LOSS_TIMING.md#five-sheet-chains-tolerati
 
 The [six-sheet bipartite chains](MULTIPLE_LOSS_TIMING.md#six-sheet-bipartite-chains-tolerating-any-eleven-seed-losses) give exact eleven-fault tolerance at every integer cycle rank from $48k+7$ for $k\geq2$. They are 3-vertex-connected, finish in two intact rounds and take $6k+2$ rounds after losing the $6k$ designated copies.
 
-The [cyclic-cover gap criterion](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers) identifies when increasing the sheet count yields an eventual constant minimum blocking size. In the signed unpadded prism family, every fixed block count has such a constant. For two blocks the constant is exactly sixteen, valid at every sheet count from 106, and the sixteen-seed obstruction is already available once the sheet count reaches eight.
+The [cyclic-cover gap criterion](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers) gives eventual constant blocking sizes in the signed unpadded prism family. The exact constants for two, three and four blocks are sixteen, twenty-one and twenty-four, with guaranteed stabilization at 31, 41 and 47 sheets, respectively. One finite fort with twenty-four seeds also works for every longer chain, so every fixed block count stabilizes by 162 sheets.
 
 The [high-girth homology covers](HIGH_GIRTH_COVERS.md) give three-connected cubic bipartite examples with arbitrarily large fault budgets. A girth bound on forts controls the minimum number of lost seeds, and the local covering bijections preserve the intact two rounds and the exact designated delay of $6k+2$ rounds.
 
