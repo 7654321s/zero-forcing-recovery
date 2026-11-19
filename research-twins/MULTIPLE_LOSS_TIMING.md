@@ -6,7 +6,7 @@ Use the synchronous rule and initial-color loss model of the [single-loss bounds
 - **Forests and cycle rank.** The exact value on forests of unrestricted degree is $t+k(2t+1)$. At cycle rank $\beta$ and $t\geq1$, an upper bound is $t+k(2t+1)+(2t-1)\beta$. The bound is exact for $t\geq2$ when $\beta\leq k$, even at degree cap four. For one intact round the exact worst-case time is determined at every cycle rank.
 - **One intact round.** The exact value is $1$ for $d=1$ and $1+3k$ for $d=2,3$. For $d\geq4$ one loss gives $5$. For $d\geq4$ and $k\geq2$, put $U=1+\lfloor kd/2\rfloor+2k$. The exact value is $U$ for even $k$ and for $d=4,5$. For odd $k$ it is $U-1$ at $d=6$, and $U-2+(d\bmod2)$ at $d\geq7$.
 - **Joint degree and cycle rank.** For one intact round the exact maximum is determined jointly for every degree cap at least three, cycle rank, and loss budget.
-- **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$. For one loss, the exact maximum at positive cycle rank is $\lfloor(\beta+19)/2\rfloor$.
+- **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$. For one loss, the exact maximum at positive cycle rank is $\lfloor(\beta+19)/2\rfloor$. For fixed $k\geq2$, the unrestricted leading term in cycle rank is $3\beta/2$.
 - **At least two intact rounds allowed.** Put $P=d(d-1)^{t-1}$. For $d\geq6$, $t\geq2$ and $k\geq1$,
   $$
   M_{d,t,k}=\frac{kP}{2}+\frac{kP}{2(d-1)}+O\!\left(\frac{kP}{d^2}\right),
@@ -144,6 +144,63 @@ $$
 \beta\geq2(T-2)-(n+2O+1-L-B).
 $$
 If $O\leq3$, the term in parentheses is at most $8+6+1=15$. If $O=4$, the times $r-1,r,r+1$ are all occupied by distinguished old vertices, so $L+B\geq2$. The term is again at most $8+8+1-2=15$. Hence $\beta\geq2T-19$, proving the claimed positive-rank upper bound.
+
+### Two intact rounds and multiple lost seeds at large cycle rank
+
+Write $M_{\beta,k}^{(2)}$ for the largest finite recovery time on connected graphs of cycle rank $\beta$, after $k$ seed losses and with intact time at most two. There is no degree restriction. For $\beta\geq1$ and $k\geq2$,
+$$
+3\left\lfloor\frac{\beta+1}{2}\right\rfloor+5k-2
+\ \leq\ M_{\beta,k}^{(2)}\
+\leq\ 2+\left\lfloor\frac{3\beta+13k}{2}\right\rfloor.
+$$
+In particular, for each fixed $k\geq2$ the leading term is $3\beta/2$, with an additive error bounded in terms of $k$. The lower bound is attained by an explicit $k$-fault-tolerant construction.
+
+#### Counting the visits with shared first-round sources
+
+If $T>2$, take the late trail and the discrepancy forest $F$ at $t=2$. Let $V$ be the number of trail visits to the subtrees of $F$, including visits with no distinguished marks. Each visit with the distinguished root has at most five marks. A visit with no distinguished root has its marks in at most one branch and has at most three marks. If it has at least two marks, it must distinguish the first-round child heading the branch. The argument is the same as for one loss. Joining two depth-two leaves without distinguishing their common parent would require two direct intact forces from that parent. When the visit has three marks, the first-round child occupies the middle of its three consecutive times.
+
+Classify a first-round child according to its chosen intact source. It can be direct from a lost root, from a retained source with one lost neighbor, or from a retained source with two or more lost neighbors. Call the last type shared. Let $B$ be the number of visits without the distinguished root that have at least two marks and distinguish a shared child. For each such visit choose the edge from the retained intact source to a lost neighbor other than its parent in $F$. These edges are distinct and outside $F$, since each intact source is chosen for only one target.
+
+Suppose $Q$ of the chosen edges are used by the trail. Such an edge must use its lost endpoint as a distinguished vertex, since the retained source is blue throughout the delayed run. It exits the visit on a side of that distinguished root with no further mark in the same visit. Each such free side can pay for at most one chosen edge.
+
+The other $B-Q$ edges can be added to the union of $F$ and the trail. If the trail visits $v$ distinct subtrees, that union has rank at least $V-v$ by contraction, and has $k-v+1$ components. At most $k-v$ of the added edges can join components. It follows that
+$$
+\beta\geq V+B-Q-k.
+$$
+
+#### Counting the remaining visits
+
+Give each visit an allowance of $3/2$ marks, or three marks if it is one of the $B$ shared visits. The shared visits stay within their allowance. The rootless visits of size at least two centered at direct children can each exceed their allowance by at most $3/2$. There are at most $k$ direct children.
+
+For a lost root $z$ returning at round $r$, group its distinguished-root visit with the rootless visits of size at least two centered at its single-neighbor children. Let $v_z$ be the number of these visits and $n_z$ the number of marks in them. Each of these marks is in $[r-2,r+2]$. For the root visit this follows from its path lengths, and for the others the retained first-round source puts the center within one round of $z$. Thus $n_z\leq5$. Let $Q_z$ count the chosen edges paid by the free sides of $z$. We claim
+$$
+n_z-\tfrac32 v_z+\tfrac32 Q_z\leq\tfrac72 .
+$$
+
+- If the root is undistinguished then $Q_z=0$. One visit contributes at most three marks, and two or more have at most five marks together.
+- If the root visit has marks on both sides then $Q_z=0$. The bound follows from $n_z\leq5$ and $v_z\geq1$.
+- If the root visit has marks on just one side then $Q_z\leq1$. With one visit there are at most three marks. With two or more, use $n_z\leq5$.
+- If the root is the only mark in its visit then $Q_z\leq2$. A separate visit centered at a single-neighbor child has at most two marks, since a three-mark visit would occupy round $r$ already used by $z$. Thus $n_z\leq1$ for one visit, $n_z\leq3$ for two visits, and $n_z\leq5$ for three or more.
+
+All visits left out of this count have at most one mark. The $Q_z$ sum to $Q$, so altogether
+$$
+T-2\leq\tfrac32(V+B-Q)+\tfrac72 k+\tfrac32 k
+\leq\tfrac32\beta+\tfrac{13}{2}k .
+$$
+Taking the integer part gives the upper bound.
+
+#### A construction from a pair of lost seeds
+
+The construction works for every intact deadline $t\geq2$. Use two blue seeds $z_1,z_2$ and $q=\lfloor(\beta+1)/2\rfloor$ initially white centers $w_i$. Each center has a separate blue source adjacent to $z_1,z_2,w_i$. Give each center two relay arms of length $t-1$. Join the exit of each center's right arm to the far left endpoint of the next, starting from a prefix path of $t$ edges with just its first vertex blue.
+
+Give $z_1$ an approach arm of length $t$, and join its far endpoint to the last center's exit. Give $z_2$ a departure arm of length $t$. After this arm, use $k-2$ ordinary two-arm blocks of the low-rank construction for the other lost seeds. In the intact run the shared sources fill the centers in round one and their arms by round $t$. The other arms and the white prefix also fill in $t$ rounds.
+
+Delete all $k$ designated seeds. While the shared sources are blocked by both lost seeds, the run traverses the two arms and the center of each block serially from left to right, taking $2t-1$ rounds per center. After the last center, the approach arm brings the run to $z_1$. The shared sources now restore $z_2$ in one round, since all centers are already blue. The departure arm and the remaining ordinary blocks fill in order. The delayed time is
+$$
+t+(2t-1)q+2t+2+(k-2)(2t+1).
+$$
+
+The prefix and the two seeds with their approach and departure arms start with $|E|-|V|=-3$. Adding a center, its arms and its source increases $|E|-|V|$ by one, counting the source's two edges to the existing seeds. Adding the $q+1$ links between the prefix, the centers and the approach arm gives $|E|-|V|=2q-2$ in a connected graph. Its rank is $2q-1$. The ordinary blocks add no rank. An all-blue triangle attached by a bridge supplies the last unit when $\beta$ is even. The [private-path protection](#protection-and-a-minimum-killing-support), with a path for $J$, preserves the rank and the two propagation times. The maximum degree is $\max(4,q+1)$ after protection, and the support has minimum killing size $k+1$. Setting $t=2$ gives the stated lower bound.
 
 <a id="one-intact-round-at-small-cycle-rank"></a>
 
@@ -502,4 +559,4 @@ Run the following from the repository root.
 python -B research-twins/check_multiple_loss_bounds.py
 ~~~
 
-The script replays the full arrival sequence of the low-rank constructions and the contracted trails on five branched trees attaining the forest bound, on the cyclic degree-three construction with up to 32 designated lost seeds, and on the one-round constructions at prescribed cycle rank and degree cap. It exhausts losses through the budget on the degree-two examples, on the small cycle-rank constructions with one or two losses, and on the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It also checks the exact local arrival rounds of the degree-three construction and seven higher-degree concatenated examples. On the larger protected graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
+The script replays the full arrival sequence of the low-rank and shared-center constructions and the contracted trails on five branched trees attaining the forest bound, on the cyclic degree-three construction with up to 32 designated lost seeds, and on the one-round constructions at prescribed cycle rank and degree cap. It exhausts losses through the budget on the degree-two examples, on the small cycle-rank constructions with one or two losses, and on the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It also checks the exact local arrival rounds of the degree-three construction and seven higher-degree concatenated examples. On the larger protected graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.

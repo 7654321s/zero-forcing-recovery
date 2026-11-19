@@ -126,8 +126,11 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
         excess = delayed - 1 - 3 * len(roots)
         if cycle_rank < 2 * excess + group_cost:
             raise AssertionError(('rank cost of restoration groups', cycle_rank, excess, groups))
-    if intact == 2 and len(roots) == 1 and cycle_rank:
-        upper = min(upper, (cycle_rank + 19) // 2)
+    if intact == 2:
+        if len(roots) == 1 and cycle_rank:
+            upper = min(upper, (cycle_rank + 19) // 2)
+        elif len(roots) >= 2:
+            upper = min(upper, 2 + (3 * cycle_rank + 13 * len(roots)) // 2)
     if revisits > cycle_rank or delayed > upper:
         raise AssertionError(('cycle rank bound', intact, delayed, cycle_rank, revisits))
     return intact, delayed, revisits
@@ -297,6 +300,51 @@ def low_rank_recovery_certificate(rounds, losses, cycle_rank, *, degree=4):
         degree, edges, blue, order, deliberately_lost, seed, clique_support=False
     )
     return graph, initial, mask(deliberately_lost), support, paths, additions
+
+
+def shared_center_recovery_certificate(rounds, losses, cycle_rank):
+    seed, endpoint = 0, rounds
+    first, second = rounds + 1, rounds + 2
+    edges = list(pairwise(range(rounds + 1)))
+    blue, deliberately_lost = [seed, first, second], [first, second]
+    additions = list(range(1, rounds + 1))
+    centers = (cycle_rank + 1) // 2
+    order = second + 1
+    for _ in range(centers):
+        source, center = order, order + 1
+        order += 2
+        edges.extend(((source, first), (source, second), (source, center)))
+        blue.append(source)
+        order, left = relay_arm(edges, blue, center, order, rounds - 1)
+        order, right = relay_arm(edges, blue, center, order, rounds - 1)
+        edges.append((endpoint, left[-1]))
+        additions.extend([*reversed(left), center, *right])
+        endpoint = right[-1]
+
+    order, approach = relay_arm(edges, blue, first, order, rounds)
+    edges.append((endpoint, approach[-1]))
+    additions.extend([*reversed(approach), first, second])
+    order, departure = relay_arm(edges, blue, second, order, rounds)
+    additions.extend(departure)
+    endpoint = departure[-1]
+
+    for _ in range(losses - 2):
+        root = order
+        order += 1
+        blue.append(root)
+        deliberately_lost.append(root)
+        order, left = relay_arm(edges, blue, root, order, rounds)
+        order, right = relay_arm(edges, blue, root, order, rounds)
+        edges.append((endpoint, left[-1]))
+        additions.extend([*reversed(left), root, *right])
+        endpoint = right[-1]
+
+    order = append_blue_triangles(edges, blue, seed, order, cycle_rank - (2 * centers - 1))
+    degree = max(4, centers + 1)
+    graph, initial, support, paths = protect_seeds(
+        degree, edges, blue, order, deliberately_lost, seed, clique_support=False
+    )
+    return graph, initial, mask(deliberately_lost), support, paths, additions, degree
 
 
 def sparse_one_round_certificate(losses, cycle_rank):
@@ -650,6 +698,28 @@ def main():
         if (t, k, rank) in ((2, 1, 2), (2, 2, 1)):
             exhaustive += check_all_losses(graph, blue, k)
         print('Low-rank recovery:', t, k, rank, len(graph), delayed)
+
+    shared_cases = ((2, 2, 1), (2, 2, 9), (2, 2, 10), (2, 2, 100),
+                    (2, 5, 35), (3, 3, 23), (7, 4, 46))
+    for t, k, rank in shared_cases:
+        graph, blue, slow, support, paths, additions, degree = shared_center_recovery_certificate(
+            t, k, rank
+        )
+        sampled += check_robust_samples(graph, blue, slow, support, paths, degree, t, k,
+                                        clique_support=False)
+        intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
+        actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
+        expected = t + (2 * t - 1) * ((rank + 1) // 2) + 2 * t + 2 + (k - 2) * (2 * t + 1)
+        if (intact, delayed, actual_rank) != (t, expected, rank):
+            raise AssertionError(('shared-center recovery', t, k, rank, delayed, actual_rank))
+        _, arrivals = trace(graph, blue ^ slow)
+        selected = sorted((v for v, arrival in enumerate(arrivals) if arrival > 0),
+                          key=arrivals.__getitem__)
+        if selected != additions or [arrivals[v] for v in selected] != list(range(1, delayed + 1)):
+            raise AssertionError(('shared-center arrival order', t, k, rank))
+        if (t, k, rank) == (2, 2, 1):
+            exhaustive += check_all_losses(graph, blue, k)
+        print('Shared-center recovery:', t, k, rank, len(graph), delayed)
 
     for t in (1, 2, 4, 7):
         for k in (1, 2, 3, 4, 6):
