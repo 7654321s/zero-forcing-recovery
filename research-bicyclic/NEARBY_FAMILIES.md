@@ -8,9 +8,9 @@ In each parametric exclusion the initial blue set is $B$, the killing pair is $H
 
 Write $\Theta(p,q,r)$ for the union of three internally disjoint paths of edge lengths $p\leq q\leq r$ with common endpoints $x,y$. Here $p\geq 1$ and $q\geq 2$, so at most one path is the edge $xy$. The order is $p+q+r-1$. Write the internal vertices on each path as $a_i,b_i,c_i$ in order from $x$.
 
-Through order 15 there are 109 such length triples. The three positive graphs are $\Theta(1,2,2)$, $\Theta(2,2,2)$ and $\Theta(2,2,3)$. The other 106 graphs each have an explicit two-loss certificate at budget one. The replay computes these certificates from the graph and verifies each loss condition. [ThetaSeeds.lean](ThetaSeeds.lean) checks the three positive graphs against the full quantified property.
+**Theorem.** A theta graph satisfies `EveryMinimumSupport` exactly for the three triples $(1,2,2)$, $(2,2,2)$ and $(2,2,3)$. Every other theta graph has a two-element minimum killing support that violates the property at budget one, with finite recovery under every singleton loss.
 
-The constructions below classify the whole shortest-path-one family and three shortest-path-two families. The other theta length triples of arbitrary order remain open here.
+[ThetaSeeds.lean](ThetaSeeds.lean) checks the three positive graphs against the full quantified property. The constructions below cover all other lengths. Independently, there are 109 length triples through order 15, and a direct search finds and replays a two-point certificate in each of the 106 negative instances.
 
 ### Two cycles sharing an edge
 
@@ -63,6 +63,49 @@ When $z=c_{r-1}$ is lost, its only initially blue neighbor is $y$, which sees bo
 
 This gives $R=1$ in both families.
 
+### Remaining theta graphs
+
+Suppose $p\geq2$, $q\geq3$ and $r\geq5$. Set aside $(p,r)=(2,6)$ and $(p,r)=(3,5)$ for the finite table below. Use the $b$-path to restore $x$ and the length-$r$ path to create the time difference. Initially color the entire $b$-path except $x$ blue, together with $c_1,c_2,c_3$ and the even-indexed $a_i$ with $2\leq i\leq p-2$. Let $U$ count the white internal vertices on the $a$-path and $T$ the white vertices in the $c$-tail $c_4,\ldots,c_{r-1}$.
+
+If $U+T$ is odd, remove the initial blue at $a_2$ when $p\geq4$, increasing $U$ by one. If $p$ is two or three, odd parity outside the two exceptions requires $r\geq7$. In that case color $c_5$ blue, decreasing $T$ by one. Now $U+T$ is even, and both counts are positive. The $a$-path still has white vertices next to both endpoints. Its internal blue vertices are isolated between whites. The same is true of the internal blue separator if present in the white $c$-tail, whose last vertex $c_{r-1}$ is white.
+
+Take $H=\{c_1,c_3\}$ and $z=c_2$. In the double loss, the white internal vertices form a fort. Each endpoint has a white neighbor on both the $a$-path and the $c$-path. The retained $c_2$ and all isolated blue vertices on either path each see two white neighbors. The $b$-path can restore the initially white $x$, but none of its internal vertices has a neighbor in the fort.
+
+In the two restricted singleton runs, $x$ turns blue in round one from $b_1$. The vertex $c_2$ also restores the lost member of $H$. The run losing $c_1$ additionally fills $c_4$ in round one, so the run losing $c_3$ determines the worse time by monotonicity. In that run the first forces into the $a$-path and the $c$-tail both occur in round two. Their left-only completion times are $U+1$ and $T+1$. The first completed path frees $y$ to start a right advance on the other path. Each active front fills one white per round, by the same isolated-blue-vertex argument as in the shared-edge case. Hence the time is
+
+$$
+R=1+(U+T)/2.
+$$
+
+For loss of $c_2$, the blue $b_1$ still restores $x$ in round one. The adjacent pairs around the start of the $c$-path are blocked until $c_1$ restores $c_2$ in round two. The $a$-advance starts in round two as before, but the $c$-advance starts in round three. The first completed path again frees $y$ to advance into the remaining path. The left-only completion times are now $U+1$ and $T+2$, and both left advances are available by the time any right advance can start. The total time is $\lceil(U+T+3)/2\rceil=R+1$.
+
+For a loss elsewhere on the $a$-path or $c$-path, the initial $c_1,c_2,c_3$ remain. The $b$-path restores $x$, and left advances on the other two paths eventually fill them even with an additional white vertex. If $y$ is lost, the two ends of the blue interior of the $b$-path restore $x,y$ in round one. This uses $q\geq3$. If an internal $b$-vertex is lost, the intact pair $c_1,c_2$ restores $x$. With $x,y$ blue, the remaining blue interior of the $b$-path can restore its one lost vertex. Thus every singleton loss completes.
+
+The remaining short triples have the following certificates. Number $x,y$ by $0,1$ and then number the interiors of the $a$-, $b$- and $c$-paths consecutively from $x$ to $y$. The last column gives the propagation times for singleton losses in the listed order of $B$. Every double loss of $H$ leaves white vertices, as checked by the indicated synchronous simulation. The intact times are bounded by the restricted times by monotonicity.
+
+| $(p,q,r)$ | $B$ | $H$ | $z$ | Singleton times |
+| --- | --- | --- | --- | --- |
+| $(2,3,3)$ | $0,1,2,3,6$ | $0,1$ | 2 | $1,1,2,2,2$ |
+| $(2,3,4)$ | $0,1,2,3,5,7$ | $0,1$ | 7 | $1,1,1,1,1,2$ |
+| $(2,3,6)$ | $0,1,2,3,5,6,9$ | $2,3$ | 1 | $1,2,1,1,2,2,2$ |
+| $(2,4,4)$ | $0,1,2,3,4,6,8$ | $2,3$ | 8 | $1,1,1,1,1,1,2$ |
+| $(2,4,6)$ | $0,1,2,3,4,6,7,10$ | $2,3$ | 1 | $1,2,1,1,1,2,2,2$ |
+| $(2,5,6)$ | $0,1,3,6,7,11$ | $3,6$ | 0 | $3,3,2,2,3,3$ |
+| $(2,6,6)$ | $0,1,2,3,7,9,10$ | $2,9$ | 3 | $2,2,2,3,3,2,2$ |
+| $(3,3,3)$ | $0,1,2,4,7$ | $2,4$ | 0 | $3,2,2,2,2$ |
+| $(3,3,4)$ | $0,2,3,4,6$ | $4,6$ | 0 | $3,2,2,2,2$ |
+| $(3,3,5)$ | $0,2,3,6,9$ | $0,3$ | 9 | $2,5,2,4,3$ |
+| $(3,4,4)$ | $0,2,3,4,9$ | $0,3$ | 9 | $2,5,2,4,3$ |
+| $(3,4,5)$ | $0,1,2,3,7,10$ | $2,3$ | 7 | $2,2,2,2,3,3$ |
+| $(3,5,5)$ | $0,1,2,3,4,7,9$ | $2,3$ | 4 | $2,2,2,2,3,3,2$ |
+| $(4,4,4)$ | $0,1,2,4,5,10$ | $0,1$ | 5 | $2,2,2,2,3,3$ |
+
+## Bicyclic graphs of minimum degree two
+
+**Corollary.** A finite connected simple graph with $|E|=|V|+1$ and minimum degree at least two satisfies `EveryMinimumSupport` exactly in four isomorphism classes. They are two triangles sharing one vertex and the three positive theta graphs above. Every other graph in this class has a budget-one certificate from a two-element minimum killing support.
+
+Indeed, $\sum_v(\deg(v)-2)=2$. There is either one vertex of degree four or there are two vertices of degree three. Suppress all chains of degree-two vertices, allowing loops and parallel edges in the resulting multigraph. There is no separate cycle of degree-two vertices because the graph is connected and has a branch vertex. A single degree-four vertex gives two loops, so the original graph is two cycles sharing one vertex. For two degree-three vertices, the number of parallel edges between them is positive and odd, because each loop contributes two to the degree. Three parallel edges give a theta graph. One edge gives a loop at each endpoint, so the graph is two cycles joined by a path. The [two-cycle classification](RESEARCH.md) and the theta theorem exhaust the three cases.
+
 ## Leaves and paths on a diamond
 
 Let the diamond $\Theta(1,2,2)$ have adjacent degree-three vertices $x,y$ and two degree-two vertices $a,b$ adjacent to both. Attach $s$ leaves at $x$ and $t$ leaves at $y$ with no other attachments. The graph satisfies `EveryMinimumSupport` exactly when one count is zero or both counts are at least two.
@@ -100,4 +143,4 @@ python -B research-bicyclic/check_theta.py
 lake env lean -DwarningAsError=true research-bicyclic/ThetaSeeds.lean
 ```
 
-The Python command checks the 109 theta graphs through order 15. It checks 979 shared-edge cases, including every length pair through 40 and five choices of the shorter path for each longer length through 80. It also replays 229 other theta certificates and 239 diamond certificates for parameters through 80. It exhaustively checks 21 small leaf-count pairs on the diamond and four triangle bouquets. The bouquet checker additionally replays 451 negative cases with two to five petals of lengths three through eight. The Lean command assumes the pinned core modules were built first. It checks the three finite theta examples. The parameterized results above have mathematical proofs for the indicated families.
+The Python command checks the 109 theta graphs through order 15. It checks 979 shared-edge cases, including every length pair through 40 and five choices of the shorter path for each longer length through 80. It also replays the 14 finite exceptions, 1,657 cases using the general parity construction, 229 theta certificates from the shorter-path constructions and 239 diamond certificates. The parity checker exhausts length triples through 20 in its domain and samples six triples per larger maximum length through 80. The diamond checker exhausts 21 small leaf-count pairs. The bouquet checker exhausts four triangle bouquets and replays 451 negative cases with two to five petals of lengths three through eight. The Lean command assumes the pinned core modules were built first. It checks the three positive theta graphs. The fourth positive bicyclic graph is verified by [Bowtie.lean](Bowtie.lean).

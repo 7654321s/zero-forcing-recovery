@@ -20,6 +20,23 @@ SHORT_SHARED_EDGE = {
     (3, 4): ((2, 6), (3, 4), 1, 2, 3),
     (4, 4): ((5, 6, 7), (2, 4), 0, 2, 3),
 }
+# Remaining finite cases give blue vertices, support, slow loss and restricted time.
+THETA_EXCEPTIONS = {
+    (2, 3, 3): ((0, 1, 2, 3, 6), (0, 1), 2, 1),
+    (2, 3, 4): ((0, 1, 2, 3, 5, 7), (0, 1), 7, 1),
+    (2, 3, 6): ((0, 1, 2, 3, 5, 6, 9), (2, 3), 1, 1),
+    (2, 4, 4): ((0, 1, 2, 3, 4, 6, 8), (2, 3), 8, 1),
+    (2, 4, 6): ((0, 1, 2, 3, 4, 6, 7, 10), (2, 3), 1, 1),
+    (2, 5, 6): ((0, 1, 3, 6, 7, 11), (3, 6), 0, 2),
+    (2, 6, 6): ((0, 1, 2, 3, 7, 9, 10), (2, 9), 3, 2),
+    (3, 3, 3): ((0, 1, 2, 4, 7), (2, 4), 0, 2),
+    (3, 3, 4): ((0, 2, 3, 4, 6), (4, 6), 0, 2),
+    (3, 3, 5): ((0, 2, 3, 6, 9), (0, 3), 9, 2),
+    (3, 4, 4): ((0, 2, 3, 4, 9), (0, 3), 9, 2),
+    (3, 4, 5): ((0, 1, 2, 3, 7, 10), (2, 3), 7, 2),
+    (3, 5, 5): ((0, 1, 2, 3, 4, 7, 9), (2, 3), 4, 2),
+    (4, 4, 4): ((0, 1, 2, 4, 5, 10), (0, 1), 5, 2),
+}
 
 
 def theta(lengths):
@@ -103,6 +120,38 @@ def shared_edge_families(limit):
             count += 1
             largest_gap = max(largest_gap, delayed - restricted)
     return count, largest_gap
+
+
+def remaining_theta_families(limit):
+    finite = general = 0
+    for lengths, (blue, support, slow, restricted) in THETA_EXCEPTIONS.items():
+        if lengths[-1] <= limit:
+            adj, _ = theta(lengths)
+            certify(adj, mask(blue), mask(support), 1 << slow, restricted, restricted + 1)
+            finite += 1
+
+    for r in range(5, limit + 1):
+        pairs = (combinations_with_replacement(range(2, r + 1), 2) if r <= 20 else
+                 ((2, 3), (3, 3), (4, 4), (r // 2, r - 1), (r - 1, r), (r, r)))
+        for p, q in pairs:
+            if q < 3 or (p, q, r) in THETA_EXCEPTIONS:
+                continue
+            adj, (a, b, c) = theta((p, q, r))
+            alternating = set(a[2:p - 1:2])
+            blue = set(b[1:]) | set(c[1:4])
+            white_count = p - 1 - len(alternating) + r - 4
+            if white_count % 2:
+                if p >= 4:
+                    alternating.remove(a[2])
+                    white_count += 1
+                else:
+                    blue.add(c[5])
+                    white_count -= 1
+            restricted = 1 + white_count // 2
+            certify(adj, mask(blue | alternating), mask([c[1], c[3]]), 1 << c[2],
+                    restricted, restricted + 1)
+            general += 1
+    return finite, general
 
 
 def append_leaves(adj, root, count):
@@ -195,6 +244,8 @@ def main():
     print('Parametric theta certificate replays:', theta_families(args.parameter_limit), flush=True)
     shared_edge_count, largest_gap = shared_edge_families(args.parameter_limit)
     print(f'Shared-edge certificates: {shared_edge_count}, largest gap: {largest_gap}', flush=True)
+    finite_theta, general_theta = remaining_theta_families(args.parameter_limit)
+    print(f'Remaining theta certificates: {finite_theta} exceptions, {general_theta} parametric', flush=True)
     census_count, certificates = diamond_families(args.parameter_limit)
     print('Exact diamond root-leaf census:', census_count, flush=True)
     print('Parametric diamond certificate replays:', certificates, flush=True)
