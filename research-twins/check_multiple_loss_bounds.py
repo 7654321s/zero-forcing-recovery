@@ -1,6 +1,7 @@
 """Replay extremal recovery examples for several lost initial blue vertices."""
 
 from collections import Counter, defaultdict, namedtuple
+from fractions import Fraction
 from heapq import heappop, heappush
 from itertools import combinations, pairwise
 from pathlib import Path
@@ -864,6 +865,63 @@ def subcubic_saturation_shortfall_limit(layers, lost_rounds):
     return 2 * lost_rounds + saved
 
 
+def subcubic_growth_factor_bounds(bits):
+    """Enclose the ordinary growth factor by rational bisection."""
+    low, high = Fraction(9, 5), Fraction(2)
+    for _ in range(bits):
+        mid = (low + high) / 2
+        if mid ** 4 - 2 * mid ** 3 + mid - 1 < 0:
+            low = mid
+        else:
+            high = mid
+    return low, high
+
+
+def subcubic_dyadic_cover_cost(numerator, bits, growth):
+    """Evaluate the cover cost of a dyadic demand for a fixed growth factor."""
+    if numerator == 1 << bits:
+        return Fraction(1)
+    prefix, best, price = Fraction(0), Fraction(1), Fraction(1)
+    for digit in range(bits - 1, -1, -1):
+        price /= growth
+        if numerator & (1 << digit):
+            prefix += price
+        else:
+            best = min(best, prefix + price)
+    return min(best, prefix)
+
+
+def subcubic_omission_profile_bounds(losses, normalized_shortfall, bits=24):
+    """Enclose the fixed-loss dyadic packing coefficient A_k(x)."""
+    x = Fraction(normalized_shortfall)
+    if not isinstance(losses, int) or losses < 1 or not isinstance(bits, int) or bits < 1:
+        raise ValueError('The loss count and precision must be positive integers')
+    if not Fraction(1, 2) <= x <= 1:
+        raise ValueError('The normalized shortfall must lie in [1/2, 1]')
+    low_r, high_r = subcubic_growth_factor_bounds(bits + 8)
+    cells = 4 * losses * (x - Fraction(1, 2))
+    whole = int(cells)
+    demand = 1 - (cells - whole)
+    needs_half = demand > Fraction(1, 2)
+    if needs_half:
+        demand -= Fraction(1, 2)
+
+    grid = demand * (1 << bits)
+    low_digit = grid.numerator // grid.denominator
+    high_digit = -(-grid.numerator // grid.denominator)
+    low_cost = subcubic_dyadic_cover_cost(low_digit, bits, high_r)
+    high_cost = subcubic_dyadic_cover_cost(high_digit, bits, low_r)
+    if needs_half:
+        low_cost += 1 / high_r
+        high_cost += 1 / low_r
+
+    lower = 2 / (high_r ** 2 * (high_r - 1))
+    upper = 2 / (low_r ** 2 * (low_r - 1))
+    lower += (whole + max(0, 1 - high_cost)) / (losses * high_r ** 2)
+    upper += (whole + max(0, 1 - low_cost)) / (losses * low_r ** 2)
+    return lower, upper
+
+
 def subcubic_layer_selection(layers, budget):
     """Choose layers by activation rank, or choose omissions near saturation."""
     if not layers or budget < min(layer.activation_rank for layer in layers) + 2:
@@ -1595,6 +1653,19 @@ def main():
                 if capacity - gain != loss:
                     raise AssertionError(('subcubic staircase value', t, k, gap, capacity - gain))
         print('Subcubic saturation staircase:', t, k, min(8, count), 'plateaus')
+
+    for k in (1, 3, 8):
+        for cell in (0, 2 * k - 1):
+            base = Fraction(1, 2) + Fraction(cell, 4 * k)
+            flat = subcubic_omission_profile_bounds(k, base, bits=30)
+            below = subcubic_omission_profile_bounds(k, base + Fraction(1, 48 * k), bits=30)
+            edge = subcubic_omission_profile_bounds(k, base + Fraction(1, 36 * k), bits=30)
+            above = subcubic_omission_profile_bounds(k, base + Fraction(1, 32 * k), bits=30)
+            coarse = subcubic_omission_profile_bounds(k, base + Fraction(1, 32 * k), bits=14)
+            if not (flat == below and max(flat[0], edge[0]) <= min(flat[1], edge[1])
+                    and flat[1] < above[0] and coarse[0] <= above[0] <= above[1] <= coarse[1]):
+                raise AssertionError(('subcubic packing profile', k, cell))
+        print('Subcubic packing profile:', k, 'first and last cell thresholds verified')
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()

@@ -790,6 +790,42 @@ For the fractional packing the weight per unit size increases with $j$, so the d
 
 To attain the lower limit at fixed $k$, use a finite near-optimal packing with strict volume slack. At growing $k$, use the fractional solution at a slightly smaller demand, truncate its tail and round down. These choices use only fixed types $j\geq0$, which exist with the required copies for large $n$ because $t\geq n+3$. Their actual omitted capacities stay below $\Delta/2$ by order $k2^n$, whereas their saved rank is $O(kr^n)$. Thus their capacity loss does not bind in the formula for $F$, and they save half their activation rank up to the rounding of one round. Taking limits gives the claimed value of $G/(kr^n)$.
 
+#### Exact packing formula for a fixed number of losses
+
+For $1/2\leq x\leq1$, put $\ell=\lfloor4k(x-1/2)\rfloor$ and $\theta=4k(x-1/2)-\ell$. In terms of the [forward cover cost](#how-extra-cycle-rank-converts-into-recovery-time) $C$, define
+$$
+\widehat C(y)=
+\begin{cases}
+ C(y), & 0\leq y\leq1/2,\\
+ r^{-1}+C(y-1/2), & 1/2<y\leq1,
+\end{cases}
+\qquad
+\Phi(\theta)=\max\{0,1-\widehat C(1-\theta)\}.
+$$
+The fixed-$k$ packing limit in the [saturation staircase](#inverting-the-saturation-staircase) is exactly
+$$
+A_k(x)=\frac{2}{r^2(r-1)}+\frac{\ell+\Phi(\theta)}{kr^2}.
+$$
+In each of the $2k$ cells of width $1/(4k)$, the curve stays at its initial value exactly through $\theta=1/9$. The difference from the fractional value is $(\theta-\Phi(\theta))/(kr^2)$. At $x=1$, the value is $2/(r(r-1))=\sqrt5-1$. Indeed $r^4-2r^3+r-1=(r^2-r)^2-(r^2-r)-1=0$, so $r(r-1)=(1+\sqrt5)/2$.
+
+**Reduce to one possible additional quarter.** The raw packing has volume at most $kx\leq k$, and each size has $2k$ copies. If its largest chosen size $d$ is at least $1/2$, the smaller types have total capacity $2kd\geq k$. Their vacant capacity is at least $d$, because the pack already contains a copy of size $d$. Any vacancy of total at least $d$ can supply volume exactly $d$. Choose available sizes from largest to smallest, using as many as fit. The residual at each step is a multiple of that step's size, so a positive residual after a type means all its copies were used. The exact volume is obtained in the limit if infinitely many types are needed. Replacing the selected size $d$ by these smaller pieces strictly increases the weight, because their weight per unit size is larger. Therefore no optimum uses sizes at least $1/2$.
+
+Now the sizes strictly below $1/4$ have full volume $k/2$. The feasible choice with all those sizes and $\ell$ quarters has normalized weight $2/(r^2(r-1))+\ell/(kr^2)$. Any choice with at most $\ell$ quarters has at most this weight. A choice with at least $\ell+2$ quarters leaves more than a quarter of vacant smaller capacity. It admits the same strict exchange. The only alternative is to take $\ell+1$ quarters and omit smaller pieces of total volume at least $(1-\theta)/4$, if that extra quarter is available.
+
+Relative to a quarter, the smaller sizes are powers of two starting at $1/2$, and the minimum cost of omitting volume at least $y$ is $\widehat C(y)$. For $y\leq1/2$, a cover of cost at most $r^{-1}$ is available, so the size one from the unrestricted definition of $C$ is unnecessary. For $y>1/2$, merge repeated sizes below $1/2$ in a finite cover. A half must then be present, since the distinct sizes strictly below it total less than a half. The remaining demand is at most a half and has cover cost $C(y-1/2)$. A second half is allowed because $2k\geq2$. Merging and discarding excess halves gives a cover with at most two halves and at most one of each smaller size, within the available copies. The same lower bound applies to infinite covers by truncation and adding a dyadic piece of vanishing size to cover any remaining demand. Thus the additional quarter increases the unnormalized weight by at most $r^{-2}(1-\widehat C(1-\theta))$, and the infimum cover cost can be approached by feasible omissions. At the endpoint $x=1$, the extra quarter is unavailable and $\Phi(0)=0$. This proves the formula throughout the interval.
+
+**An exact threshold for the extra quarter.** Write $\rho=1/r$. The growth-factor equation factors as $(r+1)(r^4-2r^3+r-1)=0$, which implies
+$$
+\rho+\rho^2+\rho^3+\rho^6=1.
+$$
+For a finite binary cover with cost strictly below a given budget, the largest attainable binary size has a simple supremum. Process the bits in order and take a bit whenever its cost fits strictly in the remaining budget. Any finite cover that differs first at a skipped bit cannot set it to one. Conversely every finite greedy prefix fits, so its limiting binary size is the supremum.
+
+At strict cost budget one the greedy pattern repeats $111000$. The first three bits leave budget $\rho^6$. Bits four and five exceed that amount, and bit six equals it and is skipped. Rescaling by $\rho^6$ then repeats the argument. The limiting binary size is $(7/8)/(1-2^{-6})=8/9$. For strict cost budget $1-\rho$, the first bit is skipped, bits two and three are taken, and bits four through six are skipped, leaving the same $\rho^6$ tail. The supremum size is therefore $3/8+2^{-6}(8/9)=7/18$. No finite cover at strict cost can reach that supremum because an unused sufficiently small bit could always be added. Thus $C(y)<1-\rho$ holds exactly for $y<7/18$ within $[0,1]$.
+
+For $\theta\leq1/2$, the inequality $\widehat C(1-\theta)<1$ reduces to $C(1/2-\theta)<1-\rho$. This holds precisely for $\theta>1/9$. For $\theta>1/2$, the demand $1-\theta$ already has a cover of cost at most $\rho<1$. Consequently the initial flat interval in each cell has length $1/(36k)$ in $x$, and the profile is strictly above that flat value everywhere else in the cell.
+
+The replay script's `subcubic_omission_profile_bounds` encloses $A_k(x)$ with rational arithmetic at any rational $x\in[1/2,1]$. It rounds the cover demand down and up on a dyadic grid, evaluates the binary covers from those endpoints, and bisects the positive root of $r^4-2r^3+r-1$ in $[9/5,2]$. Cover costs decrease with $r$ and increase with demand, so choosing the corresponding endpoints gives lower and upper bounds. Both enclosures converge as the grid is refined.
+
 <a id="the-first-rank-above-six-per-lost-seed"></a>
 
 #### Counting visits down to the fourth round
