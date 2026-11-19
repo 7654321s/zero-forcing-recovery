@@ -222,6 +222,62 @@ def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique
     return adjacency(order, edges), mask([*blue, *support]), mask(support), paths
 
 
+def append_blue_triangles(edges, blue, anchor, order, count):
+    for _ in range(count):
+        x, y, z = range(order, order + 3)
+        edges.extend(((anchor, x), (x, y), (y, z), (z, x)))
+        blue.extend((x, y, z))
+        anchor = y
+        order += 3
+    return order
+
+
+def relay_arm(edges, blue, parent, order, length):
+    vertices = []
+    for _ in range(length):
+        relay, child = order, order + 1
+        edges.extend(((parent, relay), (relay, child)))
+        blue.append(relay)
+        vertices.append(child)
+        parent = child
+        order += 2
+    return order, vertices
+
+
+def low_rank_recovery_certificate(rounds, losses, cycle_rank):
+    seed, endpoint = 0, rounds
+    edges, blue, deliberately_lost = list(pairwise(range(rounds + 1))), [seed], []
+    additions = [(v,) for v in range(1, rounds + 1)]
+    cyclic_blocks = min(losses, cycle_rank)
+    order = rounds + 1
+    for index in range(losses):
+        root = order
+        order += 1
+        deliberately_lost.append(root)
+        blue.append(root)
+        order, left = relay_arm(edges, blue, root, order, rounds)
+        order, right = relay_arm(edges, blue, root, order, rounds)
+        entry = left[-1]
+        main = [(v,) for v in [*reversed(left), root, *right]]
+        if index < cyclic_blocks:
+            branch, guard = order, order + 1
+            order += 2
+            order, first = relay_arm(edges, blue, branch, order, rounds - 1)
+            order, second = relay_arm(edges, blue, branch, order, rounds - 1)
+            edges.extend(((root, branch), (branch, guard), (second[-1], entry)))
+            entry = first[-1]
+            additions.extend((v,) for v in [*reversed(first), branch, *second])
+            main[rounds + 1] = (right[0], guard)
+        edges.append((endpoint, entry))
+        additions.extend(main)
+        endpoint = right[-1]
+    order = append_blue_triangles(edges, blue, seed, order, cycle_rank - cyclic_blocks)
+    graph, initial, support, paths = protect_seeds(
+        4, edges, blue, order, deliberately_lost, seed, clique_support=False
+    )
+    return graph, initial, mask(deliberately_lost), support, paths, additions
+
+
 def sparse_one_round_certificate(losses, cycle_rank):
     extra_from_pair = (cycle_rank - 3) // 2
     if losses >= 2 and extra_from_pair > losses:
@@ -274,13 +330,7 @@ def assemble_one_round_certificate(losses, cycle_rank, cyclic_blocks, pair_targe
             endpoint = b
             order += 4
         deliberately_lost.append(z)
-    anchor = seed
-    for _ in range(spare_cycles):
-        x, y, z = range(order, order + 3)
-        edges.extend(((anchor, x), (x, y), (y, z), (z, x)))
-        blue.extend((x, y, z))
-        anchor = y
-        order += 3
+    order = append_blue_triangles(edges, blue, seed, order, spare_cycles)
     graph, initial, support, paths = protect_seeds(
         degree, edges, blue, order, deliberately_lost, seed, clique_support=False
     )
@@ -547,6 +597,28 @@ def check_ranked_one_round_example(graph, blue, slow, rank, expected):
 def main():
     exhaustive = sampled = 0
     check_branched_forest_extremizers()
+    low_rank_cases = ((2, 1, 0), (2, 1, 1), (2, 2, 1), (2, 4, 3), (2, 4, 4),
+                      (3, 3, 2), (4, 2, 2), (7, 5, 3), (9, 3, 5))
+    for t, k, rank in low_rank_cases:
+        graph, blue, slow, support, paths, additions = low_rank_recovery_certificate(t, k, rank)
+        sampled += check_robust_samples(graph, blue, slow, support, paths, 4, t, k,
+                                        clique_support=False)
+        actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
+        expected = t + k * (2 * t + 1) + min(k, rank) * (2 * t - 1)
+        intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
+        if (intact, delayed, actual_rank) != (t, expected, rank):
+            raise AssertionError(('low-rank recovery', t, k, rank, delayed, actual_rank))
+        _, arrivals = trace(graph, blue ^ slow)
+        waves = [set() for _ in additions]
+        for vertex, arrival in enumerate(arrivals):
+            if arrival > 0:
+                waves[arrival - 1].add(vertex)
+        if waves != [set(vertices) for vertices in additions]:
+            raise AssertionError(('low-rank arrival order', t, k, rank))
+        if (t, k, rank) == (2, 2, 1):
+            exhaustive += check_all_losses(graph, blue, k)
+        print('Low-rank recovery:', t, k, rank, len(graph), delayed)
+
     for t in (1, 2, 4, 7):
         for k in (1, 2, 3, 4, 6):
             graph, blue, slow, support = path_certificate(t, k)
