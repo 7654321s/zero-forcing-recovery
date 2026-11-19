@@ -103,7 +103,7 @@ def check_two_round_bound(degree, lost, full_arrivals, delayed_arrivals):
         raise AssertionError((degree, lost, missed_first, missed_second, bound))
     if None not in delayed_arrivals:
         cap = 9 if degree == 3 else degree**2 + 3
-        if degree == 3 and len(missed_second) in (9, 10):
+        if degree == 3 and len(missed_second) != 8:
             cap = 8
         if max(delayed_arrivals) > cap:
             raise AssertionError((degree, lost, delayed_arrivals, cap))
@@ -197,10 +197,9 @@ def check_eight_round_example():
 def check_nine_round_example():
     edges = [(0, 1), (0, 8), (0, 9), (1, 4), (1, 10), (2, 8), (2, 10),
              (2, 11), (3, 6), (3, 9), (3, 11), (4, 7), (5, 7), (5, 10),
-             (5, 12), (7, 11), (12, 13), (13, 14), (14, 15), (15, 16),
-             (16, 17), (16, 18)]
-    adj = adjacency(19, edges)
-    blue = mask([0, 8, 9, 10, 11, 13, 15, 16, 17, 18])
+             (5, 12), (7, 11), (12, 13), (13, 14), (14, 15), (14, 16)]
+    adj = adjacency(17, edges)
+    blue = mask([0, 8, 9, 10, 11, 13, 15, 16])
     intact, full_arrivals = trace(adj, blue)
     delayed, delayed_arrivals = trace(adj, blue ^ 1)
     degree = max(row.bit_count() for row in adj)
@@ -213,7 +212,7 @@ def check_nine_round_example():
               for round_number in range(1, delayed + 1)]
     if actual != expected:
         raise AssertionError(actual)
-    MODEL['certify'](adj, blue, mask([17, 18]), 1, 2, 9)
+    MODEL['certify'](adj, blue, mask([15, 16]), 1, 2, 9)
 
 
 def main():

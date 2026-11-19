@@ -86,7 +86,7 @@ For maximum degree three and intact time at most two, this gives 15 rounds. The 
 
 ## Two-round colorings at bounded degree
 
-**Theorem.** Let the maximum degree be $\Delta\geq1$ and let the intact coloring finish by round two. If the delayed run finishes, it does so within $\Delta^2+3$ rounds. For maximum degree at most three the sharp bound is **nine rounds**. The subcubic proof uses a finite enumeration when eight, nine or ten vertices remain white at the end of round two.
+**Theorem.** Let the maximum degree be $\Delta\geq1$ and let the intact coloring finish by round two. If the delayed run finishes, it does so within $\Delta^2+3$ rounds. For maximum degree at most three the sharp bound is **nine rounds**. Every nine-round run in this class has exactly eight white vertices after its second round. The subcubic proof uses a finite enumeration for seven to ten remaining whites.
 
 Write $m=|D_1\setminus\{z\}|$. For each of these $m$ missed targets, choose an intact round-one source. If $z$ forced a missed target, choose $z$ as its source and call that target $w_0$. Every other chosen source is an initially blue neighbor of $z$. The chosen sources are distinct and have no white neighbors in the intact run after round one. Counting these neighbors of $z$, together with $w_0$ if present, gives $m\leq\Delta$.
 
@@ -102,9 +102,9 @@ $$
 
 At round two the intact coloring is full. Every subsequent round of a finite delayed run colors at least one of the remaining whites, so it finishes by round $\Delta^2+3$.
 
-### A finite reduction for eight to ten whites
+### A finite reduction for seven to ten whites
 
-Let $k=|D_2|$. If $k\leq7$, a successful run finishes by round nine by adding at least one vertex per unfinished round. For $k\geq8$ in a subcubic graph, the preceding count gives $z\in D_1$ and $m\in\{2,3\}$. Use the same round-one sources and round-two attributions as above. Call the vertices of $D_1$ old, and the vertices of $D_2\setminus D_1$ new. All old and new vertices are white in the delayed run at time one.
+Let $k=|D_2|$. If $k\leq6$, a successful run finishes by round eight by adding at least one vertex per unfinished round. For $k\geq7$ in a subcubic graph, the preceding count gives $z\in D_1$ and $m\in\{2,3\}$. Use the same round-one sources and round-two attributions as above. Call the vertices of $D_1$ old, and the vertices of $D_2\setminus D_1$ new. All old and new vertices are white in the delayed run at time one.
 
 The replay builds a small graph on the old and new vertices and records each relevant outside blue vertex by its set of neighbors in that graph. In later rounds, an outside vertex forces the sole remaining white in its set if one exists. An old or new vertex can act once it is blue, using its edges inside the small graph. This preserves the evolution after round two because every outside vertex is blue from then on.
 
@@ -118,19 +118,20 @@ The lost vertex can receive at most $3-m$ new attributions. For $m=3$ it receive
 
 **Remaining edges.** The replay fills the available degree slots with optional edges within the small graph and optional outside blue sources with one to three white neighbors at time two. It allows an extra old neighbor for each chosen outside round-two source as described above. Neighbors already blue at time two can be dropped from outside source sets. Edges between blue vertices and duplicate outside source sets have no effect on future forces. The allowed configurations include every actual residual process and can also include configurations without a realizing intact run.
 
-Up to permutation of the missed round-one targets that share the same type of predecessor, the replay considers the following configurations. It skips runs that cannot start, and for eight or nine whites it stops evaluating a run once the elapsed rounds plus the remaining white count is below seven.
+Up to permutation of the missed round-one targets that share the same type of predecessor, the replay considers the following configurations. It skips configurations without a potential initial force. For seven, eight or nine whites it stops evaluating a run once the elapsed rounds plus the remaining white count is below seven.
 
 | Whites after round two | Templates | Configurations evaluated | Finishing runs with at least seven further rounds | Maximum further rounds |
 | ---: | ---: | ---: | ---: | ---: |
 | 10 | 10 | 6,176,870 | 0 | 6 |
 | 9 | 20 | 5,390,980 | 0 | At most 6 |
 | 8 | 57 | 3,470,951 | 1,168 | 7 |
+| 7 | 95 | 1,535,427 | 0 | At most 6 |
 
-Thus the global subcubic upper bound is nine rounds. When nine or ten vertices are still white after round two, the bound is eight. A 24-vertex witness in the [example replay](check_single_loss_bounds.py) attains eight rounds with ten whites, while recovering from every singleton loss and having restricted time two.
+Thus nine rounds require exactly eight remaining whites at time two. Rounds three through nine then have one two-vertex addition and six single additions. A 24-vertex witness in the [example replay](check_single_loss_bounds.py) attains eight rounds with ten whites, while recovering from every singleton loss and having restricted time two.
 
 ### Sharp nine-round witness
 
-A connected 19-vertex graph in the [example replay](check_single_loss_bounds.py) attains the global bound. The initial blue set is $\{0,8,9,10,11,13,15,16,17,18\}$. Its intact time is two and its minimum killing support $\{17,18\}$ has restricted time two. Without initial blue vertex $0$, the successive additions are $\{14\},\{12\},\{5\},\{7\},\{4\},\{1\},\{0,2\},\{3\},\{6\}$. The replay checks that every singleton loss recovers and the two-vertex support loss stalls.
+A connected 17-vertex graph in the [example replay](check_single_loss_bounds.py) attains the global bound. The initial blue set is $\{0,8,9,10,11,13,15,16\}$. Its intact time is two and its minimum killing support $\{15,16\}$ has restricted time two. The two support vertices are leaves at vertex $14$. Either leaf forces $14$ in round one, and $14$ restores a missing leaf in round two. With both leaves white, $14$ cannot force either of them. Without initial blue vertex $0$, the successive additions are $\{14\},\{12\},\{5\},\{7\},\{4\},\{1\},\{0,2\},\{3\},\{6\}$. The replay checks that every singleton loss recovers and the two-vertex support loss stalls.
 
 ## Reproduction
 

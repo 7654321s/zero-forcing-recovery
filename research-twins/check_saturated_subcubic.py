@@ -1,4 +1,4 @@
-"""Exhaust the subcubic round-two residuals with eight to ten whites."""
+"""Exhaust the subcubic round-two residuals with seven to ten whites."""
 
 from itertools import combinations, combinations_with_replacement
 
@@ -177,6 +177,7 @@ if __name__ == '__main__':
         (10, 1, (10, 6176870, 5921708, 6)),
         (9, 7, (20, 5390980, 0, 0)),
         (8, 7, (57, 3470951, 1168, 7)),
+        (7, 7, (95, 1535427, 0, 0)),
     ):
         observed = enumerate_residuals(whites, minimum)
         if observed != expected:
