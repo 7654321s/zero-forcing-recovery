@@ -157,11 +157,7 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
             coefficient = 2 * intact - 3
             linear_bound = intact + (2 * intact + 1) * len(roots) + coefficient * cycle_rank
             excess_rank = max(0, cycle_rank - len(roots))
-            penalty = min(2, 2 * excess_rank)
-            if intact >= 4 and excess_rank >= 2:
-                penalty = min(4, intact - 2)
-            if intact >= 4 and len(root_visits) == len(roots):
-                penalty = max(penalty, min(intact - 2, 2 * excess_rank))
+            penalty = min(2 if intact == 3 else intact, 2 * excess_rank)
             upper = min(upper, linear_bound - penalty)
             if delayed == linear_bound:
                 root_size = 2 * intact + 1
@@ -1054,10 +1050,12 @@ def main():
         print('Subcubic long recovery:', t, k, rank, len(graph), delayed)
 
     for t, k, rank, expected in ((3, 1, 2, 14), (3, 2, 3, 24), (3, 2, 6, 27), (3, 3, 4, 34),
-                                 (4, 1, 2, 21), (4, 2, 3, 35),
-                                 (4, 1, 6, 27), (5, 1, 8, 44), (5, 1, 12, 48),
-                                 (6, 1, 3, 42), (6, 2, 4, 64), (6, 2, 47, 166),
-                                 (8, 3, 5, 120), (8, 1, 80, 281)):
+                                 (4, 1, 2, 21), (4, 1, 3, 24), (4, 2, 3, 35),
+                                 (4, 1, 6, 27), (5, 1, 3, 33), (5, 1, 8, 44), (5, 1, 12, 48),
+                                 (6, 1, 3, 42), (6, 2, 4, 64), (6, 2, 5, 71), (6, 2, 47, 166),
+                                 (7, 2, 5, 86), (8, 3, 5, 120), (8, 2, 6, 112), (8, 1, 80, 281),
+                                 (9, 3, 7, 163), (10, 3, 8, 199), (11, 3, 8, 222),
+                                 (12, 3, 9, 264), (13, 3, 9, 289)):
         graph, blue, slow, support, paths, waves = subcubic_recursive_rank_certificate(t, k, rank)
         sampled += check_robust_samples(graph, blue, slow, support, paths, 3, t, k,
                                         clique_support=False)
