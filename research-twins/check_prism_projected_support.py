@@ -1,0 +1,136 @@
+"""Exclude projected supports of low-cost finite forts in shorter prism chains."""
+
+from itertools import product
+from pathlib import Path
+import runpy
+
+from pysat.card import ITotalizer
+from pysat.solvers import Solver
+
+
+HERE = Path(__file__).resolve().parent
+PROJECTION = runpy.run_path(str(HERE / 'check_finite_fort_projection.py'))
+OPENING = runpy.run_path(str(HERE / 'check_prism_opening_insertion.py'))
+BLOCK = OPENING['BLOCK']
+members = BLOCK['members']
+CERTIFIED_FIRST = 11
+CERTIFIED_LAST = 23
+BUDGET = 23
+
+
+class Formula:
+    def __init__(self, top=0):
+        self.top = top
+        self.true = self.fresh()
+        self.clauses = [[self.true]]
+        self.sums = {}
+        self.comparisons = {}
+
+    def fresh(self):
+        self.top += 1
+        return self.top
+
+    def word(self, width):
+        return tuple(self.fresh() for _ in range(width))
+
+    def xor(self, a, b):
+        c = self.fresh()
+        self.clauses.extend(([-a, -b, -c], [-a, b, c], [a, -b, c], [a, b, -c]))
+        return c
+
+    def both(self, a, b):
+        c = self.fresh()
+        self.clauses.extend(([-a, -b, c], [a, -c], [b, -c]))
+        return c
+
+    def majority(self, a, b, c):
+        out = self.fresh()
+        self.clauses.extend(([-a, -b, out], [-a, -c, out], [-b, -c, out],
+                             [a, b, -out], [a, c, -out], [b, c, -out]))
+        return out
+
+    def plus_small(self, word, amount):
+        """Extend the word and add zero, one or two without overflow."""
+        key = (word, amount)
+        if key not in self.sums:
+            bits = list((*word, -self.true))
+            if amount:
+                carry = self.true
+                for i in range(amount - 1, len(bits)):
+                    bit = bits[i]
+                    bits[i] = self.xor(bit, carry)
+                    carry = self.both(bit, carry)
+            self.sums[key] = tuple(bits)
+        return self.sums[key]
+
+    def ge(self, first, second, offset):
+        """Encode the comparison first >= second + offset."""
+        key = (first, second, offset)
+        if key not in self.comparisons:
+            lhs = self.plus_small(first, max(0, -offset))
+            rhs = self.plus_small(second, max(0, offset))
+            value = self.true
+            for a, b in zip(lhs, rhs):
+                value = self.majority(a, -b, value)
+            self.comparisons[key] = value
+        return self.comparisons[key]
+
+
+def check_comparators():
+    formula = Formula()
+    a, b = formula.word(3), formula.word(3)
+    outputs = {offset: formula.ge(a, b, offset) for offset in range(-2, 3)}
+    with Solver(name='cadical195', bootstrap_with=formula.clauses) as solver:
+        for i, j in product(range(8), repeat=2):
+            inputs = [u if n & (1 << k) else -u for word, n in ((a, i), (b, j))
+                      for k, u in enumerate(word)]
+            for offset, literal in outputs.items():
+                wrong = literal if i < j + offset else -literal
+                if solver.solve(assumptions=[*inputs, wrong]):
+                    raise AssertionError(('integer comparator', i, j, offset))
+
+
+def projected_formula(blocks):
+    graph, blue, _, _ = BLOCK['chain'](blocks)
+    order = len(graph)
+    lift = PROJECTION['neighborhoods'](order, ((u, v, -1 if (u, v) == (0, 1) else 1)
+                                              for u, row in enumerate(graph)
+                                              for v in members(row) if u < v))
+    formula = Formula(order)
+    formula.clauses.extend(BLOCK['fort_clauses'](graph, range(order)))
+    formula.clauses.append([v + 1 for v in members(blue) if v < OPENING['OPENING']])
+    for stage in range(1, blocks - 1):
+        start = BLOCK['stage_start'](stage)
+        formula.clauses.append(list(range(start + 1, start + 33)))
+
+    width = (2 * (order - 1)).bit_length()
+    for direction in (1, -1):
+        rank = [formula.word(width) for _ in range(order)]
+        for u, row in enumerate(lift):
+            for v, shift in row:
+                choices = [(u, direction * shift)]
+                choices.extend((w, direction * (shift - other)) for w, other in row if w != v)
+                witnesses = []
+                for w, difference in choices:
+                    marker = formula.fresh()
+                    compare = formula.ge(rank[v], rank[w], difference)
+                    formula.clauses.extend(([-marker, w + 1], [-marker, compare]))
+                    witnesses.append(marker)
+                formula.clauses.append([-(v + 1), *witnesses])
+    return formula, [v + 1 for v in members(blue)]
+
+
+def check_projected_case(blocks):
+    OPENING['check_insertion'](blocks)
+    formula, seeds = projected_formula(blocks)
+    with ITotalizer(lits=seeds, ubound=BUDGET, top_id=formula.top) as counter:
+        with Solver(name='cadical195', bootstrap_with=formula.clauses + counter.cnf.clauses) as solver:
+            if solver.solve(assumptions=[-counter.rhs[BUDGET]]):
+                raise AssertionError(('a projected support survives', blocks))
+
+
+if __name__ == '__main__':
+    check_comparators()
+    for blocks in range(CERTIFIED_LAST, CERTIFIED_FIRST - 1, -1):
+        check_projected_case(blocks)
+        print(f'Projected obstruction excluded at {blocks} blocks', flush=True)

@@ -1,4 +1,4 @@
-"""Exclude a wrapped fort of cost 23 in the 32-sheet prism cover."""
+"""Certify the wrapped-fort bounds at 30 through 32 sheets."""
 
 import argparse
 from itertools import product
@@ -15,6 +15,7 @@ members, mask = STRIP['members'], STRIP['mask']
 SHEETS = 32
 BUDGET = 23
 SHEET_CAP = 4
+CASES = {30: ((21, 3), (22, 4), (23, 5)), 31: ((22, 4), (23, 5)), 32: ((23, 4),)}
 
 
 def thresholds(seed_vars, top, clauses, cap):
@@ -40,24 +41,24 @@ def thresholds(seed_vars, top, clauses, cap):
     return previous[:cap], top
 
 
-def check_thresholds():
+def check_thresholds(cap=SHEET_CAP):
     clauses = []
     seeds = list(range(1, 7))
-    flags, _ = thresholds(seeds, len(seeds), clauses, SHEET_CAP)
+    flags, _ = thresholds(seeds, len(seeds), clauses, cap)
     with Solver(name='cadical195', bootstrap_with=clauses) as solver:
         for values in product((False, True), repeat=len(seeds)):
             assumptions = [u if value else -u for u, value in zip(seeds, values)]
             count = sum(values)
-            if solver.solve(assumptions=assumptions) != (count <= SHEET_CAP):
+            if solver.solve(assumptions=assumptions) != (count <= cap):
                 raise AssertionError(('threshold cap', values))
-            if count <= SHEET_CAP:
+            if count <= cap:
                 for j, flag in enumerate(flags, 1):
                     opposite = -flag if count >= j else flag
                     if solver.solve(assumptions=[*assumptions, opposite]):
                         raise AssertionError(('threshold semantics', values, j))
 
 
-def wrapped_formula(graph, blue):
+def wrapped_formula(graph, blue, sheets=SHEETS, budget=BUDGET, cap=SHEET_CAP):
     order = len(graph)
     adjacent = [tuple(members(row)) for row in graph]
     clauses = list(BLOCK['fort_clauses'](graph, range(order)))
@@ -69,20 +70,20 @@ def wrapped_formula(graph, blue):
 
     top = 3 * order
     counters = []
-    for sheet in range(SHEETS):
-        seeds = [v + 1 for v in range(sheet, order, SHEETS) if blue & (1 << v)]
-        row, top = thresholds(seeds, top, clauses, SHEET_CAP)
+    for sheet in range(sheets):
+        seeds = [v + 1 for v in range(sheet, order, sheets) if blue & (1 << v)]
+        row, top = thresholds(seeds, top, clauses, cap)
         counters.append(row)
-        clauses.append([v + 1 for s in (sheet, (sheet + 1) % SHEETS)
-                        for v in range(s, order, SHEETS)])
+        clauses.append([v + 1 for s in (sheet, (sheet + 1) % sheets)
+                        for v in range(s, order, sheets)])
     clauses.append([counters[0][0]])
     selected = [flag for row in counters for flag in row]
-    total = CardEnc.equals(lits=selected, bound=BUDGET, top_id=top, encoding=EncType.seqcounter)
+    total = CardEnc.equals(lits=selected, bound=budget, top_id=top, encoding=EncType.seqcounter)
     top = total.nv
     clauses.extend(total.clauses)
     for width in range(10, 14):
-        for sheet in range(SHEETS):
-            window = [flag for j in range(width) for flag in counters[(sheet + j) % SHEETS]]
+        for sheet in range(sheets):
+            window = [flag for j in range(width) for flag in counters[(sheet + j) % sheets]]
             lower = CardEnc.atleast(lits=window, bound=width - 4, top_id=top, encoding=EncType.seqcounter)
             top = lower.nv
             clauses.extend(lower.clauses)
@@ -92,7 +93,7 @@ def wrapped_formula(graph, blue):
         top += 1
         empty_stages[stage] = top
         start = BLOCK['stage_start'](stage)
-        clauses.extend([-top, -(v + 1)] for v in range(start * SHEETS, (start + 16) * SHEETS))
+        clauses.extend([-top, -(v + 1)] for v in range(start * sheets, (start + 16) * sheets))
     gaps = []
     for stage in range(1, 25):
         top += 1
@@ -104,30 +105,33 @@ def wrapped_formula(graph, blue):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--conflicts', type=int, help='optionally cap the SAT search')
+    parser.add_argument('--sheets', type=int, choices=CASES, default=SHEETS)
+    parser.add_argument('--conflicts', type=int, help='optionally cap each SAT search')
     args = parser.parse_args()
     if args.conflicts is not None and args.conflicts < 1:
         parser.error('--conflicts must be positive')
 
-    check_thresholds()
-    graph, blue, _, _ = CHECKS['signed_prism_cover'](26, SHEETS)
-    upper = mask(v * SHEETS + sheet for v, sheet in CHECKS['FOUR_BLOCK_FORT'])
+    graph, blue, _, _ = CHECKS['signed_prism_cover'](26, args.sheets)
+    upper = mask(v * args.sheets + sheet for v, sheet in CHECKS['FOUR_BLOCK_FORT'])
     if CHECKS['fort_cost'](graph, blue, upper) != 24:
         raise AssertionError('Missing the 24-seed upper witness')
-    clauses = wrapped_formula(graph, blue)
-    with Solver(name='cadical195', bootstrap_with=clauses) as solver:
-        if args.conflicts is None:
-            result = solver.solve()
-        else:
-            solver.conf_budget(args.conflicts)
-            result = solver.solve_limited()
-        if result:
-            fort = mask(v - 1 for v in solver.get_model() if 0 < v <= len(graph))
-            raise AssertionError(('wrapped fort', CHECKS['fort_cost'](graph, blue, fort)))
-    if result is None:
-        print('32-sheet search inconclusive')
-        return 2
-    print('No wrapped 23-seed fort and a valid 24-seed witness at 32 sheets')
+    for budget, cap in CASES[args.sheets]:
+        check_thresholds(cap)
+        clauses = wrapped_formula(graph, blue, args.sheets, budget, cap)
+        with Solver(name='cadical195', bootstrap_with=clauses) as solver:
+            if args.conflicts is None:
+                result = solver.solve()
+            else:
+                solver.conf_budget(args.conflicts)
+                result = solver.solve_limited()
+            if result:
+                fort = mask(v - 1 for v in solver.get_model() if 0 < v <= len(graph))
+                raise AssertionError(('wrapped fort', args.sheets, CHECKS['fort_cost'](graph, blue, fort)))
+        if result is None:
+            print(f'{args.sheets}-sheet search at budget {budget} inconclusive')
+            return 2
+        print(f'No wrapped {budget}-seed fort at {args.sheets} sheets')
+    print(f'Valid 24-seed witness at {args.sheets} sheets')
     return 0
 
 

@@ -4,7 +4,7 @@ Let $\kappa_{k,m}$ be the minimum number of seeds whose loss blocks recovery in 
 $$
 \kappa_{k,m}=\kappa_{26,m} \qquad (k\geq26).
 $$
-The common value is exactly 24 when $k\geq24$ and $m\geq32$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 32 and 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
+The common value is exactly 24 when $k\geq24$ and $m\geq30$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 30 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
 
 ## The prism stage labels
 
@@ -84,7 +84,15 @@ A candidate with cost below 24 at 32 sheets must have cost exactly 23 and meet e
 
 The [32-sheet verifier](check_32_sheet_cover.py) encodes four exact count flags on each sheet. Flag $j$ means that at least $j$ of that sheet's seeds are selected. As a new seed is scanned, a successful threshold comes from either the previous prefix at the same threshold or the previous prefix one below the threshold together with that seed. The fifth threshold is fixed false. The sum of all final flags is the total seed cost. For each cyclic band of width $w$ from ten to thirteen the flags in the band sum to at least $w-4$. The total is fixed at 23, and rotation places one selected seed on sheet zero.
 
-Along with the fort, ancestry, local minimality, occupied sheet-pair and empty stage-pair clauses, these requirements are unsatisfiable. The verifier also checks the cost-24 witness. Hence $\kappa_{26,32}=24$. Block stabilization and the opening insertion give the stated range of at least 24 blocks and 32 sheets.
+Along with the fort, ancestry, local minimality, occupied sheet-pair and empty stage-pair clauses, these requirements are unsatisfiable. The verifier also checks the cost-24 witness. Hence $\kappa_{26,32}=24$.
+
+## The 31-sheet case
+
+At 31 sheets a fort of cost at most 21 would contain two consecutive empty sheets, since $9\cdot31>13\cdot21$. Such a fort would unroll to an excluded finite fort. The only remaining costs below 24 are 22 and 23, and both require a fort meeting every adjacent sheet pair. The 30 sheets other than a given sheet split into three ten-sheet bands, requiring at least 18 seeds in total. The cap on the given sheet is therefore four at budget 22 and five at budget 23. The same count-flag verifier excludes both cases and verifies the cost-24 witness at 31 sheets.
+
+## The 30-sheet case
+
+At 30 sheets a fort of cost at most 20 would unroll by the sheet-band inequality. In a wrapped fort of cost 21, 22 or 23, two disjoint thirteen-sheet bands avoiding a given sheet require at least 18 seeds. This caps the given sheet at three, four or five seeds, respectively. The count-flag verifier excludes all three formulas and checks the cost-24 witness. Block stabilization and opening insertion give the full range of at least 24 blocks and 30 sheets.
 
 ## Reproduction
 
@@ -94,6 +102,8 @@ python -B research-twins/check_block_stabilization.py --certify-sheets 7 8 9 10
 python -B research-twins/check_finite_fort_strip.py
 python -B research-twins/check_33_sheet_profiles.py
 python -B research-twins/check_32_sheet_cover.py
+python -B research-twins/check_32_sheet_cover.py --sheets 31
+python -B research-twins/check_32_sheet_cover.py --sheets 30
 python -B research-twins/check_prism_opening_insertion.py
 ```
 
