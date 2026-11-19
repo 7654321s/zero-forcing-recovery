@@ -77,10 +77,10 @@ def check_band(blocks):
                 raise AssertionError(('23 seed labels block the band', blocks))
 
 
-def check_sheet_band(width, budget, pin_ends=False):
+def check_sheet_band(width, budget, pin_ends=False, *, blocks=26):
     margin = 2
     sheets = width + 2 * (margin + 1)
-    graph, blue, _, _ = MODEL['cyclic_cubic_chain_lift'](chain(26), sheets, reversed_edge=(0, 1))
+    graph, blue, _, _ = MODEL['cyclic_cubic_chain_lift'](chain(blocks), sheets, reversed_edge=(0, 1))
     order = len(graph)
     active = mask(v for v in range(order) if 0 < v % sheets < sheets - 1)
     sources = [v for v in members(active) if not graph[v] & ~active]
@@ -139,14 +139,21 @@ if __name__ == '__main__':
                         help='replay the selected small-sheet thresholds at 26 blocks')
     parser.add_argument('--band-through', type=int, choices=range(13, 17), default=13,
                         help='replay the sheet-band bounds through this width')
+    parser.add_argument('--band-blocks', type=int, nargs='+', default=[26], metavar='BLOCKS',
+                        help='check the sheet-band bounds on these base chain lengths')
     args = parser.parse_args()
+    if any(blocks < 2 for blocks in args.band_blocks):
+        parser.error('--band-blocks requires lengths of at least two blocks')
+
     print(f'{check_contractions()} stage contractions checked', flush=True)
     check_band(26)
     check_band(27)
     print('Every 25-stage prefix band with at most 23 losses fills an adjacent pair', flush=True)
-    for width in range(10, args.band_through + 1):
-        check_sheet_band(width, width - 5, pin_ends=width > 10)
-        print(f'A {width}-sheet band fills a pair after up to {width - 5} losses', flush=True)
+    for blocks in args.band_blocks:
+        for width in range(10, args.band_through + 1):
+            check_sheet_band(width, width - 5, pin_ends=width > 10, blocks=blocks)
+            print(f'{blocks} blocks: a {width}-sheet band fills a pair after up to {width - 5} losses',
+                  flush=True)
     for sheets in args.certify_sheets:
         check_small_cover(sheets)
         print(f'The 26-block {sheets}-sheet cover has minimum blocking cost {2 * sheets}',

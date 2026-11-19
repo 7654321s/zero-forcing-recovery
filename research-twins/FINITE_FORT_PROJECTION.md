@@ -48,11 +48,17 @@ For the four-cycle example above, the integer lift has no finite fort. In the cy
 
 ## Application to shorter prism chains
 
-In the [signed unpadded prism chain](BLOCK_STABILIZATION.md), the finite blocking number is 24 for every fixed chain with at least 11 blocks. Its cyclic blocking number is therefore 24 at every sheet count of at least 162 by the [seven-sheet gap bound](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers). The sharper guarantee of 28 sheets applies when the chain has at least 24 blocks.
+In the [signed unpadded prism chain](BLOCK_STABILIZATION.md), the finite blocking number is 24 for every fixed chain with at least 11 blocks. Its cyclic blocking number is also 24 at every sheet count of at least 34. The guarantee starts at 28 sheets for every chain with at least 24 blocks.
 
 The finite result for at least 24 blocks follows from [block and sheet stabilization](BLOCK_STABILIZATION.md). To descend from $k+1$ blocks to $k$, consider a hypothetical finite fort of cost at most 23. If the fort has two successive empty appended stages, insert a new empty stage between them to preserve the cost. If the fort avoids all opening seeds, the opening fills from its own seeds in two rounds. The fort then avoids the opening and the old stage ports adjacent to it, so the opening insertion preserves its cost. Each insertion would produce a finite fort at the excluded budget on $k+1$ blocks.
 
 In the remaining case the projection meets the opening seeds and every adjacent pair of appended stages. Its base seed count is at most 23 because every selected seed label costs at least one lifted seed. It also satisfies both endpoint systems. The verifier rules out these conditions together for each $k$ from 23 down through 11. It gives every base label two binary endpoint variables, each with enough bits to represent $2(|V(G)|-1)$, since the edge shifts have magnitude one. For each projected neighbor it requires a selected witness label and the corresponding shifted comparison in each direction. An extra bit handles the shift differences without overflow. The 24-seed witness inherited from the four-block chain supplies the upper bound throughout this range.
+
+## A lower cyclic threshold for shorter chains
+
+For each of the thirteen lengths from 11 through 23 blocks, the verifier checks the sheet bands of widths 10 through 13. The ten-sheet test permits five lost seeds and forces a consecutive pair of sheets in the core. The larger widths use the two overlapping shorter bands exactly as in the [26-block proof](BLOCK_STABILIZATION.md#a-smaller-sheet-threshold-for-long-chains), including the two-sheet margins. Thus each thirteen-sheet band of a wrapped fort contains at least nine seeds. Counting cyclic translates gives $9m\leq13b$ for a wrapped fort of cost $b$. At $m\geq34$ and $b\leq23$ this is impossible. The two empty sheets then give a finite fort of the same cost, excluded by the projected-support argument above.
+
+The same checks extend through width 16 for the 11- and 15-block chains. There the inequality $12m\leq16b$ excludes a wrapped fort below cost 24 from 31 sheets onward. The inherited cost-24 fort supplies the matching upper bound at all these moduli.
 
 ## Reproduction
 
@@ -66,4 +72,11 @@ The optional PySAT verifier checks the binary comparisons and replays the thirte
 
 ```sh
 python -B research-twins/check_prism_projected_support.py
+```
+
+The sheet-band checks for the shorter chains can be replayed with the same verifier as at 26 blocks.
+
+```sh
+python -B research-twins/check_block_stabilization.py --band-blocks 11 12 13 14 15 16 17 18 19 20 21 22 23
+python -B research-twins/check_block_stabilization.py --band-through 16 --band-blocks 11 15
 ```
