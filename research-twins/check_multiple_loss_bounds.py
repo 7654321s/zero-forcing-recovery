@@ -96,6 +96,32 @@ def one_round_certificate(degree, losses):
     return graph, initial, mask(deliberately_lost), support, paths, len(terminal)
 
 
+def exact_two_loss_certificate(degree):
+    first, second = 0, 1
+    edges, blue, targets = [], [first, second], []
+    order = 2
+    for _ in range(degree - 2):
+        source, target = order, order + 1
+        order += 2
+        edges.extend(((source, first), (source, second), (source, target)))
+        blue.append(source)
+        targets.append(target)
+    direct_a, direct_b, guard_a, guard_b, source_a, source_b, seed, prefix = range(order, order + 8)
+    order += 8
+    edges.extend(((first, direct_a), (second, direct_b),
+                  (direct_a, guard_a), (direct_b, guard_b),
+                  (source_a, first), (source_a, guard_a),
+                  (source_b, second), (source_b, guard_b), (seed, prefix)))
+    blue.extend((source_a, source_b, seed))
+    for left, right in pairwise([prefix, *targets, direct_a, direct_b, guard_a]):
+        edges.extend(((order, left), (order, right)))
+        blue.append(order)
+        order += 1
+    lost = [first, second]
+    graph, initial, support, paths = protect_seeds(degree, edges, blue, order, lost, seed)
+    return graph, initial, mask(lost), support, paths
+
+
 def layered_certificate(degree, rounds, losses):
     block, block_blue, size, _, branches = SINGLE['nonterminal_layers'](degree, rounds, False)
     block_parents = [v for branch in branches for v in branch]
@@ -207,6 +233,15 @@ def main():
         if (d, k) == (4, 2):
             exhaustive += check_all_losses(graph, blue, k)
         print('One-round family:', d, k, len(graph), n + 1 + k // 2)
+
+    for d in (4, 5, 7, 12):
+        graph, blue, slow, support, paths = exact_two_loss_certificate(d)
+        sampled += check_robust_samples(graph, blue, slow, support, paths, d, 1, 2)
+        if completion_time(graph, blue ^ slow) != d + 5:
+            raise AssertionError(('sharp two-loss deadline', d))
+        if d == 4:
+            exhaustive += check_all_losses(graph, blue, 2)
+        print('Sharp two-loss one-round family:', d, len(graph), d + 5)
 
     for d, t, k in ((4, 2, 2), (5, 2, 3), (4, 3, 2), (5, 3, 3), (4, 2, 5)):
         graph, blue, slow, support, paths, early = layered_certificate(d, t, k)

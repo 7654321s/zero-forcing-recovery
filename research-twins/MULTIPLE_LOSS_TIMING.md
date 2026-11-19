@@ -8,7 +8,7 @@ Use the synchronous rule and initial-color loss model of the [single-loss bounds
   \left\lfloor\frac{k(d-1)}2\right\rfloor+1+\left\lfloor\frac{k}2\right\rfloor
   \leq M_{d,1,k}\leq 1+\left\lfloor\frac{(d+5)k}{2}\right\rfloor.
   $$
-  Thus $M_{d,1,k}=kd/2+O(k)$, uniformly in $k\geq2$.
+  Thus $M_{d,1,k}=kd/2+O(k)$, uniformly in $k\geq2$. With two losses, the exact value is $M_{d,1,2}=d+5$.
 - **At least two intact rounds allowed.** Put $P=d(d-1)^{t-1}$. For $d\geq6$, $t\geq2$ and $k\geq1$,
   $$
   M_{d,t,k}=\frac{kP}{2}+\frac{kP}{2(d-1)}+O\!\left(\frac{kP}{d^2}\right),
@@ -49,6 +49,18 @@ $$
 For the lower bound put the $k$ designated seeds in cyclic order. Take the consecutive pairs, including the closing pair, $\lfloor(d-1)/2\rfloor$ times and add one matching of disjoint consecutive pairs if $d-1$ is odd. For $k=2$ a traversal counts the same pair twice. Each occurrence gets a distinct blue source adjacent to its two endpoints and a new white target. Join the $n=\lfloor k(d-1)/2\rfloor$ targets into a path. Attach a blue seed $s$ to its first vertex and the first designated seed to its last vertex. Each designated seed has degree at most $d$, and each target and pair source has degree at most three.
 
 Initially every target can fill from its pair source in round one. On loss of all designated seeds, every pair source sees two white endpoints. The path fills from $s$, one vertex per round, until its last vertex restores the first designated seed at $n+1$. The pair sources then spread blue around the cycle in $\lfloor k/2\rfloor$ more rounds. The protection below leaves both runs unchanged.
+
+### Exact value with two losses
+
+For $d\geq4$, the sharp value is $d+5$. To prove the upper bound, choose first-round sources as above. Write $m$ for the targets whose chosen retained source sees both lost seeds, and $a$ for the targets whose chosen source is one of those seeds. Thus $a\leq2$. Call the remaining discrepant targets single-neighbor targets, each associated with its sole lost neighbor at its chosen source. Each lost seed spends $m$ incidences on the shared sources. If $m=d$, neither seed has any other neighbor, and the shared sources cannot restore either seed while both are white. Hence every finite recovery has $m\leq d-1$.
+
+Let the two lost seeds return at rounds $r\leq s$. The roots and their single-neighbor targets are confined to the rounds within one of $r$ or $s$, respectively. If $r=s$ they occupy at most three rounds, giving $1+m+a+3\leq d+4$ for $m\leq d-2$. If $m=d-1$, the two seeds have only two available incidences in total. The number of direct and single-neighbor targets is at most two, and the roots occupy one round, so the time is at most $m+4$. If $s=r+1$, the two neighborhoods of arrival rounds occupy at most four rounds, for a bound of $1+m+a+4\leq d+5$ when $m\leq d-2$. For $m=d-1$, the two available incidences and the two root rounds give at most $m+5$.
+
+If $s\geq r+2$, no shared-source target can be blue by round $s-2$. Its source would then restore the second seed before $s$, since the first seed is already blue by $s-2$. After both seeds return, every shared-source target is blue by $s+1$. Thus the shared-source targets, the second seed and its single-neighbor targets occupy at most the three rounds $s-1,s,s+1$. The first seed and its single-neighbor targets occupy at most three more, and the direct targets at most two. The full time is at most $1+3+3+2=9\leq d+5$.
+
+For equality take $d-2$ distinct shared sources adjacent to both designated seeds, each with its own white target. Add two direct white targets $x_1,x_2$, one adjacent to each designated seed. Also add two white targets $y_1,y_2$, each with a distinct blue source observing just that target and its respective designated seed. Join $x_i$ to $y_i$. Use a blue seed $s$ with a white neighbor $b$, and place blue relays between consecutive entries of the list $b$, all shared-source targets, $x_1,x_2,y_1$. The white $y_2$ is outside the list. The degree cap holds, and the intact run completes in round one.
+
+With both designated seeds lost, the list advances serially from $s$. The $x_i$ each see a white seed and white $y_i$ until $y_1$ fills. Then the source of $y_1$ restores the first seed, a shared source restores the second, and $y_2$ fills last. This takes $1+(d-2)+3+3=d+5$ rounds. The protection below again makes the set fault-tolerant for every pair of losses and gives restricted time one on a minimum killing support of size three.
 
 ## Two or more intact rounds
 
