@@ -12,6 +12,14 @@ TOOLS = runpy.run_path(str(ROOT / 'research-unicyclic' / 'verify_size_two_witnes
 completion_time = SIMULATOR['completion_time']
 every_minimum_support = SIMULATOR['every_minimum_support']
 POSITIVE_CORES = {(1, 2, 2), (2, 2, 2), (2, 2, 3)}
+# With theta's numbering, the entries give whites, support, slow loss and the two times.
+SHORT_SHARED_EDGE = {
+    (2, 3): ((4,), (2, 3), 0, 1, 2),
+    (2, 4): ((2,), (3, 5), 1, 1, 2),
+    (3, 3): ((2, 5), (3, 4), 0, 2, 3),
+    (3, 4): ((2, 6), (3, 4), 1, 2, 3),
+    (4, 4): ((5, 6, 7), (2, 4), 0, 2, 3),
+}
 
 
 def theta(lengths):
@@ -73,6 +81,28 @@ def theta_families(limit):
             certify(adj, blue, mask([a[1], b[1]]), 1 << delayed, 1, 2)
             count += 1
     return count
+
+
+def shared_edge_families(limit):
+    count = largest_gap = 0
+    for r in range(3, limit + 1):
+        lengths = range(2, r + 1) if r <= 40 else (2, 3, 4, r - 1, r)
+        for q in lengths:
+            adj, (_, b, c) = theta((1, q, r))
+            if r < 5:
+                white, support, slow, restricted, delayed = SHORT_SHARED_EDGE[q, r]
+                blue = ((1 << len(adj)) - 1) ^ mask(white)
+            else:
+                blue = mask([0, 1, c[1], c[3], *b[2:q - 1:2], *c[2:r - 1:2]])
+                support, slow = (c[1], c[3]), 1
+                short_whites = (q + 1) // 2
+                long_whites = (r - 3) // 2
+                restricted = (short_whites + long_whites + 2) // 2
+                delayed = long_whites + 1 + (short_whites + 1) // 2
+            certify(adj, blue, mask(support), 1 << slow, restricted, delayed)
+            count += 1
+            largest_gap = max(largest_gap, delayed - restricted)
+    return count, largest_gap
 
 
 def append_leaves(adj, root, count):
@@ -163,6 +193,8 @@ def main():
     print('Positive path triples:', positive, flush=True)
     print('Negative theta certificates:', negative, flush=True)
     print('Parametric theta certificate replays:', theta_families(args.parameter_limit), flush=True)
+    shared_edge_count, largest_gap = shared_edge_families(args.parameter_limit)
+    print(f'Shared-edge certificates: {shared_edge_count}, largest gap: {largest_gap}', flush=True)
     census_count, certificates = diamond_families(args.parameter_limit)
     print('Exact diamond root-leaf census:', census_count, flush=True)
     print('Parametric diamond certificate replays:', certificates, flush=True)

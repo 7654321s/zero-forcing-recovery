@@ -2,7 +2,7 @@
 
 We use the same [synchronous forcing and loss model](../README.md#模型与定理) as the two-cycle classification. A fort is a nonempty set such that every outside vertex has zero or at least two neighbors in it. An initially white fort never turns blue. In particular, any two vertices with the same neighbors outside the pair form a fort. A connected graph with just one white vertex fills it in the next round.
 
-In each parametric exclusion the initial blue set is $B$, the killing pair is $H$, and the delayed singleton is $z\in B\setminus H$. The intact run and both singleton losses from $H$ finish by round $R$. All singleton losses finish, the double loss of $H$ fails, and the loss of $z$ takes $R+1$ rounds. This gives a minimum killing support and a counterexample at budget one by [the certificate implication](../research-unicyclic/CertificateDeadline.lean).
+In each parametric exclusion the initial blue set is $B$, the killing pair is $H$, and the delayed singleton is $z\in B\setminus H$. The intact run and both singleton losses from $H$ finish by round $R$. All singleton losses finish, the double loss of $H$ fails, and the loss of $z$ takes strictly more than $R$ rounds. This gives a minimum killing support and a counterexample at budget one by [the certificate implication](../research-unicyclic/CertificateDeadline.lean).
 
 ## Theta graphs
 
@@ -10,7 +10,38 @@ Write $\Theta(p,q,r)$ for the union of three internally disjoint paths of edge l
 
 Through order 15 there are 109 such length triples. The three positive graphs are $\Theta(1,2,2)$, $\Theta(2,2,2)$ and $\Theta(2,2,3)$. The other 106 graphs each have an explicit two-loss certificate at budget one. The replay computes these certificates from the graph and verifies each loss condition. [ThetaSeeds.lean](ThetaSeeds.lean) checks the three positive graphs against the full quantified property.
 
-The following two constructions exclude three infinite families. The classification of all theta length triples of arbitrary order remains open here.
+The constructions below classify the whole shortest-path-one family and three shortest-path-two families. The other theta length triples of arbitrary order remain open here.
+
+### Two cycles sharing an edge
+
+The graph $\Theta(1,q,r)$ satisfies `EveryMinimumSupport` exactly when $q=r=2$. This class consists of two cycles with their common edge $xy$ and no other shared vertices. For $r\geq5$ the construction gives the exact times
+
+$$
+T=\lfloor(r-3)/2\rfloor,\qquad U=\lceil q/2\rceil,\qquad
+R=\lceil(T+U+1)/2\rceil,\qquad S=T+1+\lceil U/2\rceil.
+$$
+
+Here $S-R\geq\lceil T/2\rceil\geq1$. In particular, if the shorter cycle is a triangle then $U=1$ and $S-R=\lfloor(r+1)/4\rfloor$. This shows that the unrestricted worst time can exceed the restricted one by arbitrarily many rounds even at budget one with a two-element support.
+
+For $r\leq4$ the positive case is the diamond $\Theta(1,2,2)$ from the finite Lean checks. The table gives the other cases. The singleton times are ordered by the blue vertices in the list $x,y,b_1,\ldots,b_{q-1},c_1,\ldots,c_{r-1}$, skipping the initially white vertices. Direct synchronous steps give the displayed times. In every row the coloring after the double loss of $H$ is already fixed and has whites.
+
+| $(q,r)$ | Initially white | $H$ | $z$ | Intact time | Singleton times |
+| --- | --- | --- | --- | --- | --- |
+| $(2,3)$ | $c_2$ | $\{b_1,c_1\}$ | $x$ | 1 | $(2,1,1,1)$ |
+| $(2,4)$ | $b_1$ | $\{c_1,c_3\}$ | $y$ | 1 | $(2,2,1,1,1)$ |
+| $(3,3)$ | $b_1,c_2$ | $\{b_2,c_1\}$ | $x$ | 1 | $(3,3,2,2)$ |
+| $(3,4)$ | $b_1,c_3$ | $\{b_2,c_1\}$ | $y$ | 1 | $(1,3,2,2,1)$ |
+| $(4,4)$ | $c_1,c_2,c_3$ | $\{b_1,b_3\}$ | $x$ | 2 | $(3,3,2,2,2)$ |
+
+For $r\geq5$, color $x,y,c_1,c_3$ blue. Also color each even-indexed $b_i$ with $2\leq i\leq q-2$ and each even-indexed $c_i$ with $2\leq i\leq r-2$ blue. Put $H=\{c_1,c_3\}$ and $z=y$. The $b$-path has $U$ white vertices, and the tail of the $c$-path has $T$ white vertices. Both neighbors of $y$ on these paths start white. In the double loss all blue internal path vertices are isolated between two white vertices, and each endpoint has two white neighbors. Thus the double loss stalls.
+
+Within either of these two white intervals, successive whites are adjacent or separated by one blue vertex. Every blue vertex in the interior of such an interval has two white neighbors at the start. Consequently, all forces into the interval advance from its ends. Each activated end fills one white per round until the intervals meet, since a blue separator can force the next white as soon as its other neighbor turns blue. The two advances cover distinct whites until possibly meeting on the last round.
+
+For loss of $c_1$, $c_2$ restores $c_1$ in round one. The advance from the intact $c$-run starts in round one, and $x$ begins the $b$-path in round two. For loss of $c_3$, $x$ starts the $b$-path and $c_2$ restores $c_3$ in round one. The $c$-tail begins to fill in round two. The two left advances therefore begin at rounds one and two in either order. As long as both path neighbors of $y$ are white, $y$ cannot help. The first path finishes in the round when its left advance alone would finish. If the two left-only completion times are $F_1,F_2$, they sum to $T+U+1$. After round $\min(F_1,F_2)$ the remaining path needs $|F_1-F_2|$ more forces, which now proceed from both ends. Thus both restricted singleton runs finish in round $\lceil(F_1+F_2)/2\rceil=R$. The intact run is at least as fast by monotonicity.
+
+When $y$ is lost, $x$ sees both $y$ and $b_1$ white, and the $b$-path cannot advance. The only advance is from the $c$-run, which reaches $c_{r-1}$ in round $T$. That vertex can then force $y$ in round $T+1$. The two endpoints now fill the $b$-path from both ends in $\lceil U/2\rceil$ more rounds, giving $S$. Subtracting $R$ gives $\lceil T/2\rceil$, plus one when $T$ is even and $U$ is odd.
+
+If $x$ is lost, $c_1$ restores it using $c_2$ in round one and the intact blue set is available. Any remaining single loss outside $H\cup\{x,y\}$ keeps $x,y,c_1$ blue, so $x$ can force $b_1$ in round one. This advance along a degree-two path eventually fills the entire $b$-path even if it has one additional white vertex. The endpoint $y$ can then advance through the remaining $c$-path. Thus every singleton loss finishes.
 
 ### Two paths of length two
 
@@ -69,4 +100,4 @@ python -B research-bicyclic/check_theta.py
 lake env lean -DwarningAsError=true research-bicyclic/ThetaSeeds.lean
 ```
 
-The Python command checks the 109 theta graphs through order 15. It also replays 229 theta and 239 diamond certificates for parameters through 80. It exhaustively checks 21 small leaf-count pairs on the diamond and four triangle bouquets. The bouquet checker additionally replays 451 negative cases with two to five petals of lengths three through eight. The Lean command assumes the pinned core modules were built first. It checks the three finite theta examples. The parameterized results above have mathematical proofs for the indicated families.
+The Python command checks the 109 theta graphs through order 15. It checks 979 shared-edge cases, including every length pair through 40 and five choices of the shorter path for each longer length through 80. It also replays 229 other theta certificates and 239 diamond certificates for parameters through 80. It exhaustively checks 21 small leaf-count pairs on the diamond and four triangle bouquets. The bouquet checker additionally replays 451 negative cases with two to five petals of lengths three through eight. The Lean command assumes the pinned core modules were built first. It checks the three finite theta examples. The parameterized results above have mathematical proofs for the indicated families.
