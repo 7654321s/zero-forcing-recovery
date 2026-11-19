@@ -4,7 +4,7 @@ Let $\kappa_{k,m}$ be the minimum number of seeds whose loss blocks recovery in 
 $$
 \kappa_{k,m}=\kappa_{26,m} \qquad (k\geq26).
 $$
-The [sheet stabilization theorem](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers) gives a single constant when $k\geq26$ and $m\geq34$, by the sheet-band refinement below. The constant is at most 24 by the common finite fort, and at least 23 by the finite-fort exclusion below.
+The common value is exactly 24 when $k\geq26$ and $m\geq33$. The sheet-band refinement below reduces the lower bound to a finite strip for at least 34 sheets. At 33 sheets the remaining cyclic seed profiles can also be excluded. The common 24-seed fort gives the upper bound.
 
 ## The prism stage labels
 
@@ -60,7 +60,15 @@ For a selected nonseed, follow a chosen force from its intact arrival round. If 
 
 Projection to the ten-sheet cover identifies selected seeds with the same base label and sheet residue modulo ten. The seed cost of the image fort is exactly the number of occupied projected seed labels. It is at least 20, so at budget $b$ the number of selections beyond the first in each projected fiber, summed over fibers, is at most $b-20$. In particular at budget 20 no fiber can contain two selected seeds. For larger budgets, a Boolean variable counts a selected seed when any earlier seed in its fiber is also selected. The same argument gives a repetition bound of $b-18$ using the nine-sheet cover.
 
-The [finite-strip verifier](check_finite_fort_strip.py) finds the budget-20, budget-21 and budget-22 formulas unsatisfiable and checks the 24-seed witness on the same strip. The guarded strip contains every possible inclusion-minimal finite fort at the excluded budgets, so the common stabilized value is either 23 or 24. Moreover, for any $k\geq26$ and $m\geq32$, a cyclic fort of cost at most 22 must have two consecutive empty sheets, since $9m>13\cdot22$. It would then unroll to an excluded finite fort. Thus these covers recover after any loss of at most 22 seeds.
+The [finite-strip verifier](check_finite_fort_strip.py) finds the budget-23 formula unsatisfiable and checks the 24-seed witness on the same strip. The guarded strip contains every possible inclusion-minimal finite fort at cost at most 23, so the minimum finite cost is exactly 24. For any $k\geq26$ and $m\geq34$, a cyclic fort of cost at most 23 must have two consecutive empty sheets, since $9m>13\cdot23$. It would then unroll to an excluded finite fort. Hence $\kappa_{k,m}=24$ in this range, and recovery survives any loss of at most 23 seeds. The same argument with budget 22 gives recovery after any loss of at most 22 seeds already at $m\geq32$.
+
+## The 33-sheet case
+
+At 33 sheets, any fort of cost at most 23 would have cost exactly 23 by the budget-22 exclusion and the sheet-band bound. It cannot have consecutive empty sheets, since that would give a finite fort of cost 23. Write $x_i$ for the number of selected seeds on sheet $i$ and $y_i=\sum_{j=0}^{12}x_{i+j}$ for the count in each cyclic thirteen-sheet band. Each $y_i$ is at least nine. Their sum is $13\cdot23=299$, two above $9\cdot33$.
+
+Up to cyclic rotation the two excess units are on the same band, or in two bands separated by a distance of one through sixteen. Each of the seventeen choices fixes the $y_i$. The identities $x_{i+13}-x_i=y_{i+1}-y_i$ determine the sheet counts up to a common additive constant, because stepping by thirteen visits every sheet modulo 33. The total cost of 23 fixes that constant. Discarding nonintegral or negative profiles and those that violate any of the certified ten- through thirteen-sheet bounds leaves twelve profiles, all with at most one seed on each sheet.
+
+The [profile verifier](check_33_sheet_profiles.py) excludes a fort for each of the twelve profiles. It enforces the ordinary fort clauses, the local minimality and seed-ancestry conditions, at least one occupied sheet in every consecutive sheet pair, and an empty adjacent stage pair from the 25-stage band. Boolean sheet flags fix the occupied seed sheets in each case. It also checks the 24-seed witness. Together with block stabilization, this proves $\kappa_{k,33}=24$ for every $k\geq26$.
 
 ## Reproduction
 
@@ -68,10 +76,11 @@ The [finite-strip verifier](check_finite_fort_strip.py) finds the budget-20, bud
 python -B research-twins/check_block_stabilization.py
 python -B research-twins/check_block_stabilization.py --certify-sheets 7 8 9 10
 python -B research-twins/check_finite_fort_strip.py
+python -B research-twins/check_33_sheet_profiles.py
 ```
 
 The script checks both stage band types and the sheet bands with PySAT and the normalized seed and edge identifications in 120 interior contractions, including splices next to the first or terminal stage.
 
 The optional run also checks the four exact small-sheet thresholds.
 
-The finite-strip command replays the certified budget-22 exclusion. Other budgets can be selected with the budget argument. A capped run reports an inconclusive search if the cap is exhausted. [PySAT cardinality encodings](https://pysathq.github.io/docs/html/api/card.html)
+The finite-strip command replays the certified budget-23 exclusion and checks the 24-seed witness. Smaller budgets can be selected with the budget argument. A capped run reports an inconclusive search if the cap is exhausted. [PySAT cardinality encodings](https://pysathq.github.io/docs/html/api/card.html)

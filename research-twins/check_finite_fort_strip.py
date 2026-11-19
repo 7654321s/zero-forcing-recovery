@@ -16,7 +16,7 @@ members = CHECKS['members']
 mask = CHECKS['mask']
 BLOCKS = 26
 SHEETS = 37
-CERTIFIED_BUDGET = 22
+CERTIFIED_BUDGET = 23
 
 
 def minimal_fort_clauses(neighborhoods):
@@ -122,7 +122,8 @@ def main():
 
     graph, blue, _, _ = CHECKS['signed_prism_cover'](BLOCKS, SHEETS)
     upper_witness = mask(v * SHEETS + sheet for v, sheet in CHECKS['FOUR_BLOCK_FORT'])
-    if CHECKS['fort_cost'](graph, blue, upper_witness) != 24:
+    if (CHECKS['fort_cost'](graph, blue, upper_witness) != 24
+            or any(v % SHEETS in (0, SHEETS - 1) for v in members(upper_witness))):
         raise AssertionError('Missing the 24-seed upper witness')
     clauses, seed_vars, top = strip_formula(graph, blue, args.budget)
     with ITotalizer(lits=seed_vars, ubound=args.budget, top_id=top) as counter:
@@ -138,10 +139,8 @@ def main():
                 cost = CHECKS['fort_cost'](graph, blue, fort)
                 if cost > args.budget or any(v % SHEETS in (0, SHEETS - 1) for v in members(fort)):
                     raise AssertionError('Invalid guarded witness')
-                if args.budget <= CERTIFIED_BUDGET:
-                    raise AssertionError(('fort below the certified lower bound', cost))
-                print(f'Finite fort of seed cost {cost}')
-                print(tuple(divmod(v, SHEETS) for v in members(fort)))
+                raise AssertionError(('fort below the certified lower bound', cost,
+                                      tuple(divmod(v, SHEETS) for v in members(fort))))
             elif result is False:
                 print(f'No finite fort of seed cost at most {args.budget}')
             else:
