@@ -105,13 +105,34 @@ def deletion_cost(graph, seeds, sheets):
     raise AssertionError('Deleting all seeds did not block recovery')
 
 
+def reduced_shifts(graph):
+    potentials = {0: 0}
+    pending = [0]
+    while pending:
+        u = pending.pop()
+        for v, shift in graph[u]:
+            if v not in potentials:
+                potentials[v] = potentials[u] + shift
+                pending.append(v)
+    if len(potentials) != len(graph):
+        return None
+    adjusted = [(u, v, shift + potentials[u] - potentials[v])
+                for u, row in enumerate(graph) for v, shift in row if u < v]
+    divisor = gcd(*(shift for _, _, shift in adjusted))
+    primitive = neighborhoods(len(graph), ((u, v, shift // (divisor or 1))
+                                           for u, v, shift in adjusted))
+    return divisor, primitive
+
+
 def main():
     tested = 0
     by_finite = 0
+    by_reduction = 0
     pairs = tuple(combinations(range(3), 2))
     for shifts in product((None, -1, 0, 1), repeat=len(pairs)):
         graph = neighborhoods(3, ((u, v, d) for (u, v), d in zip(pairs, shifts) if d is not None))
         has_finite = bool(PROJECTION['maximal_projection'](graph, range(len(graph))))
+        reduction = reduced_shifts(graph)
         for seeds in range(1, 1 << len(graph)):
             adjacent, lifted_seeds = reduce(graph, seeds, 1)
             if not forces(adjacent, sum(lifted_seeds)):
@@ -122,6 +143,12 @@ def main():
                 if value != deletion_cost(graph, seeds, sheets):
                     raise AssertionError(('cyclic cost', shifts, seeds, sheets, value))
                 tested += 1
+                if reduction is not None:
+                    divisor, primitive = reduction
+                    modulus = sheets // gcd(sheets, divisor)
+                    if value != deletion_cost(primitive, seeds, modulus):
+                        raise AssertionError(('closed-walk reduction', shifts, seeds, sheets))
+                    by_reduction += 1
             finite = finite_cost(edges, zero)
             if has_finite != (finite < float('inf')) or max(costs) > finite:
                 raise AssertionError(('finite cost', shifts, seeds, costs, finite))
@@ -139,6 +166,7 @@ def main():
             raise AssertionError(('shifted cycle has a finite fort', q))
     print(f'{tested} cyclic transfer costs checked by deletion, {by_finite} finite existence comparisons')
     print('Shifted four-cycle formula verified on 21 cyclic covers')
+    print(f'{by_reduction} closed-walk reductions verified by deletion')
 
 
 if __name__ == '__main__':

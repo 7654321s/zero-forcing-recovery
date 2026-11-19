@@ -38,6 +38,43 @@ alpha_r=min_{C: d_Cmid r}mu_C .
 $$
 The all-full state is eligible and has a loop, so every residue has a candidate. The [finite-fort gap bound](FINITE_FORT_PROJECTION.md#blocking-numbers-of-the-cyclic-reductions) gives eventual constancy in the finite-fort case and a positive linear lower bound otherwise. Together these give the two assertions about the slopes.
 
+## Minimum density and convergence
+
+Suppose there is no finite fort, and write $
+ho=min_Cmu_C$ over the eligible components. Every closed walk in such a component has cost at least $
+ho$ times its length, by decomposition into cycles. A simple cycle attaining $
+ho$ can be taken to contain a nonempty state: the all-empty state forms its own strongly connected component when no finite fort exists. This cycle attains $kappa_m/m=
+ho$ at its length, and repeating it attains equality at every multiple. In particular $
+ho=min_{mgeq1}kappa_m/m$ and $
+ho=liminf_{m	oinfty}kappa_m/m$.
+
+The normalized blocking numbers converge exactly when some eligible component of period $d_C=1$ has mean $mu_C=
+ho$. That component supplies slope $
+ho$ on every residue. Conversely, on the residue $1$ modulo the common period, only components with $d_C=1$ contribute, so their smallest mean must be $
+ho$ if there is a limit.
+
+There is also a criterion for attaining the exact minimum density at sufficiently large moduli. In each component with mean $
+ho$, keep the edges belonging to cycles of mean $
+ho$. Call the resulting subgraph the critical graph. A closed walk attains density $
+ho$ exactly when its edges lie in this graph. One implication follows by decomposing a minimum-weight closed walk into cycles. For the converse, write $
+ho=p/q$ with $q>0$ and give each edge adjusted weight $qw-p$. There are no negative-weight cycles in such a component. Distances $h$ from a new zero-weight source give nonnegative reduced weights $qw-p+h(u)-h(v)$. Every edge on a minimum-mean cycle has reduced weight zero, because the cycle has total reduced weight zero. Any closed walk along these edges therefore attains density $
+ho$.
+
+It follows that at sufficiently large $m$ equality $kappa_m=
+ho m$ holds precisely when $m$ is divisible by the period of at least one strongly connected component of a critical graph. Only components containing a cycle enter this criterion. The periods here are those of the critical graphs, while the criterion for convergence uses periods of the full eligible components.
+
+## Reduction by closed-walk shifts
+
+For a connected base, let $g$ be the nonnegative generator of the subgroup of $mathbb Z$ consisting of total shifts along closed walks at a fixed vertex. Choose a spanning tree and let $p_v$ be the total shift on its path from the root to $v$. Reindex each copy by $(v,s)mapsto(v,s-p_v)$. The new shifts $delta'_{uv}=delta_{uv}+p_u-p_v$ vanish on the tree. Each non-tree shift equals the total shift on a walk along the tree to $u$, the edge $uv$, and back along the tree. These shifts thus have gcd $g$. This is the spanning-tree normalization of a voltage graph. See [Gross and Tucker](https://doi.org/10.1111/j.1749-6632.1979.tb32796.x).
+
+For $g>0$, let $widehat{delta}=delta'/g$ and write $d=gcd(m,g)$. The $m$-sheet cover splits into $d$ components, one for each sheet residue modulo $d$, since the attainable translations generate the subgroup of multiples of $d$ modulo $m$. The component at residue $r$ is isomorphic to the $(m/d)$-sheet cover of $widehat{delta}$ via $(v,a)mapsto(v,r+gamod m)$. The map is bijective onto that component since $gaequiv gbpmod m$ is equivalent to $aequiv bpmod{m/d}$. It preserves edges and seed labels. Applying the same coordinate change over the integers gives $g$ copies of the primitive integer-sheet cover.
+
+Writing $widehat{kappa}$ for the blocking numbers of $widehat{delta}$, this yields the exact formula
+$$
+kappa_m=widehat{kappa}_{m/gcd(m,g)} .
+$$
+A disjoint union blocks when one of its components blocks, so repeating an isomorphic component does not change the minimum. If $g=0$, the sheet components are copies of the base and $kappa_m=kappa_1$. A disconnected base is handled by taking the minimum of the values for its base components.
+
 ## Divisibility and an example with unequal slopes
 
 If $mmid n$, projection from the $n$-sheet cover to the $m$-sheet cover takes any fort to a fort. At an outside vertex adjacent to the projected set, lift the adjacency using a selected preimage of the neighbor. The resulting outside preimage has another selected neighbor, and its two neighbors project to distinct vertices by the local bijection. Pulling back a fort in the other direction also preserves the fort condition and multiplies its seed cost by $n/m$. Consequently
@@ -53,4 +90,4 @@ On a base four-cycle, put shift zero on three consecutive edges and shift $q>0$ 
 python -B research-twins/check_cyclic_fort_growth.py
 ```
 
-The checker compares 1,192 transfer costs to exhaustive seed deletion on small cyclic covers and compares 298 all-empty round-trip existence tests with the endpoint criterion. It verifies the shifted four-cycle formula on 21 moduli and shift choices with both direct forcing and the transfer graph.
+The checker compares 1,192 transfer costs to exhaustive seed deletion on small cyclic covers and compares 298 all-empty round-trip existence tests with the endpoint criterion. It verifies the shifted four-cycle formula on 21 moduli and shift choices with both direct forcing and the transfer graph. It also verifies the closed-walk reduction by direct seed deletion on every connected three-vertex case used in the transfer tests.
