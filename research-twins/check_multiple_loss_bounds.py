@@ -37,6 +37,13 @@ def force_source(graph, arrivals, vertex):
                         for w in members(graph[source] & ~(1 << vertex))))
 
 
+def one_round_cycle_rank_time(losses, cycle_rank):
+    extra = min(losses, cycle_rank // 2)
+    if losses >= 2:
+        extra = max(extra, (cycle_rank - 3) // 2)
+    return 1 + 3 * losses + extra
+
+
 def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
     intact, full = trace(graph, blue)
     delayed, late = trace(graph, blue ^ lost)
@@ -53,8 +60,9 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
         if full[source] < late[source]:
             parent = source
         else:
-            parent = next(w for w in members(graph[source] & ~(1 << vertex))
-                          if late[w] >= full[vertex])
+            blockers = (w for w in members(graph[source] & ~(1 << vertex))
+                        if late[w] >= full[vertex])
+            parent = max(blockers, key=late.__getitem__) if intact == 1 else next(blockers)
             if source in representative:
                 raise AssertionError(('repeated intermediate vertex', source))
             representative[source] = representative[parent]
@@ -105,8 +113,8 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
             raise AssertionError(('too many arrivals in one visit', index, size, limit))
     revisits = len(visits) - len(set(visits))
     upper = intact + (2 * intact + 1) * len(roots) + surcharge * revisits
-    if intact == 1 and cycle_rank > 0:
-        upper = min(upper, 3 * len(roots) + cycle_rank)
+    if intact == 1:
+        upper = min(upper, one_round_cycle_rank_time(len(roots), cycle_rank))
     if revisits > cycle_rank or delayed > upper:
         raise AssertionError(('cycle rank bound', intact, delayed, cycle_rank, revisits))
     return intact, delayed, revisits
@@ -197,11 +205,33 @@ def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique
     return adjacency(order, edges), mask([*blue, *support]), mask(support), paths
 
 
-def sparse_one_round_certificate(losses, cyclic_blocks, extra_cycle):
+def sparse_one_round_certificate(losses, cycle_rank):
+    extra_from_pair = (cycle_rank - 3) // 2
+    if losses >= 2 and extra_from_pair > losses:
+        cyclic_blocks = losses - 2
+        pair_targets = extra_from_pair - cyclic_blocks
+        spare_cycles = cycle_rank - (2 * extra_from_pair + 3)
+    else:
+        cyclic_blocks = min(losses, cycle_rank // 2)
+        pair_targets = 0
+        spare_cycles = cycle_rank - 2 * cyclic_blocks
+
     seed, endpoint = 0, 1
     edges, blue, deliberately_lost = [(seed, endpoint)], [seed], []
     order = 2
-    for index in range(losses):
+    if pair_targets:
+        roots = (order, order + 1)
+        blue.extend(roots)
+        deliberately_lost.extend(roots)
+        order, targets, tail = one_round_block(pair_targets + 2, roots, edges, blue, order + 2)
+        for left, right in pairwise([endpoint, *targets]):
+            edges.extend(((order, left), (order, right)))
+            blue.append(order)
+            order += 1
+        endpoint = tail
+
+    remaining_seeds = losses - len(deliberately_lost)
+    for index in range(remaining_seeds):
         if index < cyclic_blocks:
             a, b, c, z, p, q, u = range(order, order + 7)
             edges.extend(((endpoint, a), (a, z), (a, b), (a, u), (b, u),
@@ -216,15 +246,18 @@ def sparse_one_round_certificate(losses, cyclic_blocks, extra_cycle):
             endpoint = b
             order += 4
         deliberately_lost.append(z)
-    if extra_cycle:
+    anchor = seed
+    for _ in range(spare_cycles):
         x, y, z = range(order, order + 3)
-        edges.extend(((seed, x), (x, y), (y, z), (z, x)))
+        edges.extend(((anchor, x), (x, y), (y, z), (z, x)))
         blue.extend((x, y, z))
+        anchor = y
         order += 3
+    degree = max(4, pair_targets + 2)
     graph, initial, support, paths = protect_seeds(
-        4, edges, blue, order, deliberately_lost, seed, clique_support=False
+        degree, edges, blue, order, deliberately_lost, seed, clique_support=False
     )
-    return graph, initial, mask(deliberately_lost), support, paths
+    return graph, initial, mask(deliberately_lost), support, paths, degree
 
 
 def one_round_certificate(degree, losses):
@@ -455,17 +488,18 @@ def main():
             raise AssertionError(('cycle support survives', t, k))
         exhaustive += check_all_losses(graph, blue, k)
 
-    for k, blocks, extra in ((1, 0, True), (2, 0, True), (8, 0, True),
-                              (1, 1, False), (2, 1, False), (8, 1, False), (5, 4, True)):
-        graph, blue, slow, support, paths = sparse_one_round_certificate(k, blocks, extra)
-        sampled += check_robust_samples(graph, blue, slow, support, paths, 4, 1, k,
+    sparse_cases = ((1, 0), (1, 1), (1, 2), (1, 13), (2, 1), (2, 2), (2, 4),
+                    (2, 8), (2, 9), (2, 10), (2, 35), (3, 10), (3, 11), (5, 9),
+                    (5, 36), (8, 1), (8, 2), (8, 20), (8, 21), (8, 47))
+    for k, rank in sparse_cases:
+        graph, blue, slow, support, paths, degree = sparse_one_round_certificate(k, rank)
+        sampled += check_robust_samples(graph, blue, slow, support, paths, degree, 1, k,
                                         clique_support=False)
         actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
-        rank = 2 * blocks + extra
         intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
-        if (intact, delayed, actual_rank) != (1, 1 + 3 * k + blocks, rank):
-            raise AssertionError(('sparse one-round delay', k, blocks, extra, delayed, actual_rank))
-        if k <= 2:
+        if (intact, delayed, actual_rank) != (1, one_round_cycle_rank_time(k, rank), rank):
+            raise AssertionError(('sparse one-round delay', k, rank, delayed, actual_rank))
+        if k <= 2 and rank <= 4:
             exhaustive += check_all_losses(graph, blue, k)
         print('Sparse one-round family:', rank, k, len(graph), delayed)
 

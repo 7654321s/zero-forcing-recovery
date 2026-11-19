@@ -3,7 +3,7 @@
 Use the synchronous rule and initial-color loss model of the [single-loss bounds](ONE_LOSS_TIMING.md). Let $M_{d,t,k}$ be the largest finite recovery time over graphs of maximum degree at most $d$, initial blue sets with intact completion by round $t$, and losses of exactly $k$ initial blue vertices. A $k$-fault-tolerant set recovers from every loss of at most $k$ seeds, in the terminology of [Fault Tolerant Zero Forcing](https://arxiv.org/abs/2509.07854).
 
 - **Degree two.** For $t\geq1$ and $k\geq1$, the exact value is $M_{2,t,k}=t+k(2t+1)$. On cycles the exact value is $t(k+1)+\lceil k/2\rceil$.
-- **Forests and cycle rank.** The exact value on forests of unrestricted degree is $t+k(2t+1)$. At cycle rank $\beta$ and $t\geq1$, an upper bound is $t+k(2t+1)+(2t-1)\beta$. For one intact round the exact values are $1+3k$ on connected unicyclic graphs and $2+3k$ on connected bicyclic graphs.
+- **Forests and cycle rank.** The exact value on forests of unrestricted degree is $t+k(2t+1)$. At cycle rank $\beta$ and $t\geq1$, an upper bound is $t+k(2t+1)+(2t-1)\beta$. For one intact round the exact worst-case time is determined at every cycle rank.
 - **One intact round.** The exact value is $1$ for $d=1$ and $1+3k$ for $d=2,3$. For $d\geq4$ one loss gives $5$. For $d\geq4$ and $k\geq2$, put $U=1+\lfloor kd/2\rfloor+2k$. The exact value is $U$ for even $k$ and for $d=4,5$. For odd $k$ it is $U-1$ at $d=6$, and $U-2+(d\bmod2)$ at $d\geq7$.
 - **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$.
 - **At least two intact rounds allowed.** Put $P=d(d-1)^{t-1}$. For $d\geq6$, $t\geq2$ and $k\geq1$,
@@ -42,21 +42,73 @@ During a visit, the original trail follows a simple path in one subtree. A visit
 
 For equality when $t\geq1$, use the [degree-two path construction](#degree-two). At $t=0$, start with all $2k+1$ vertices of a path blue and delete its final $k$ vertices. They fill one per round. Any loss of at most $k$ leaves an endpoint or a consecutive blue pair, and keeping just the $k$ alternating internal vertices stalls. The minimum killing size is therefore $k+1$ here as well.
 
-### One intact round at small cycle rank
+<a id="one-intact-round-at-small-cycle-rank"></a>
 
-If the intact run finishes by round one and $\beta\geq1$, every finite delayed run finishes by round $1+3k+\beta-1$. The exact maxima on connected graphs at $\beta=1,2$ are therefore $1+3k$ and $2+3k$, respectively, by the construction below.
+### Exact one-round values by cycle rank
 
-To prove the improvement, suppose $T=1+3k+\beta$ in the preceding trail count. There must be $k$ visits distinguishing their roots, each with three distinguished vertices, and $\beta$ further visits to subtrees with one distinguished vertex each. The three-vertex visits use two children with the root between them. Read forward in time, each triple occupies three consecutive rounds, and both incident trail edges at its distinguished root belong to $F$. Let $H$ be the union of $F$ and the original trail. Every subtree meets the trail, so $H$ is connected. After contracting $F$ the trail revisits subtree vertices $\beta$ times, giving $\beta(H)=\beta(G)$. Any edge of $G$ with both endpoints in $H$ already belongs to $H$, since adding such an edge to this connected subgraph would increase its cycle rank.
+Let $\mathcal{M}_{\beta,k}$ be the maximum finite delayed time over connected graphs of cycle rank $\beta$ whose intact run finishes by round one, after exactly $k$ seed losses. For $k\geq1$ and $\beta\geq0$,
+$$
+\mathcal{M}_{\beta,k}=1+3k+
+\begin{cases}
+\min\{1,\lfloor\beta/2\rfloor\}, & k=1,\\[2pt]
+\max\{\min(k,\lfloor\beta/2\rfloor),\lfloor(\beta-3)/2\rfloor\}, & k\geq2 .
+\end{cases}
+$$
+The upper bound applies to arbitrary graphs with total cycle rank $\beta$. The connected examples attaining it are $k$-fault-tolerant and have a minimum killing support of size $k+1$.
 
-Consider an extra distinguished vertex $y$ outside the triples. It is a child of its subtree root $z$ and arrives at least two rounds before or after $z$. If its intact source $p$ is retained, $p$ has unique initially white neighbor $y$. Unless some other lost seed $z'\ne z$ is still white when the earlier of $y,z$ arrives, $p$ would force the later within one round. The edge $pz'$ is outside $F$. It cannot be on the trail either, because $p$ is blue by time one and the distinguished occurrence of $z'$ uses only edges of $F$. This contradicts $p,z'\in H$.
+#### Counting extra arrivals
 
-If $z$ is the intact source of $y$ and $y$ arrives later than $z$, a different neighbor $z'$ must still be white when $z$ returns. That neighbor is a lost seed because $y$ is the unique initially white neighbor of $z$. The edge $zz'$ is outside $F$, and neither endpoint can use it at its distinguished occurrence, so it is outside the trail. Again both endpoints are in $H$. Thus every extra vertex is a direct child that arrives before its root. There is at most one such child per subtree, so its subtree has only the extra visit and the triple visit.
+Assume the delay runs past round one. Use the discrepancy forest $F$ and the trail ending at round two from the preceding proof. For a round-one discrepancy with a retained intact source, choose as parent the lost neighbor that returns last, breaking ties arbitrarily. Every marked nonroot is a leaf of a subtree of $F$. Write $\tau(v)$ for the delayed arrival of a vertex $v$.
 
-For this early direct child $y$, some neighbor $g\ne z$ is white when $y$ arrives, or $y$ would restore $z$ one round later. Then $g$ belongs to $F$, and $yg$ is outside $F$ because $y$ is a leaf of its subtree. It cannot be used with $y$ distinguished. The later-arriving $g$ cannot be an intermediate source on that step, and $y$ cannot force $g$ while $z$ is white. Nor can the trail use $y$ as an intermediate source. If $y$ forces $z$, it must occur between the preceding distinguished child and $z$ within the triple visit, whose subtree path cannot contain the leaf $y$. If it forces another vertex, $z$ must already be blue. The intermediate occurrence of $y$ would then be after its own extra visit and could only lie in the triple visit. That visit already passes through $z$ between two other children, so its simple path cannot include the leaf $y$. Consequently $yg$ is outside $H$ despite having both endpoints in $H$. This rules out equality and proves the bound.
+A visit distinguishing its root $z$ can distinguish at most one child on each side of $z$, and any such child arrives at $\tau(z)-1$ or $\tau(z)+1$. Give this root a deficit of two minus the number of those children. Each root not distinguished has deficit three. Let $D$ be the total deficit, and $m$ the number of roots not distinguished. An extra is a distinguished child outside its root's distinguished visit, or any distinguished child of a root not distinguished. Each extra occupies a visit with exactly one distinguished vertex. If there are $e$ extras, then
+$$
+T-1=3k-D+e.
+$$
 
-For the construction, take a blue seed with a white neighbor that fills in round one. Starting at this white endpoint, join $k$ successive blocks by a single edge from the incoming endpoint $P$ to the entry $a$ of each block. In a path block use the path $P,a,z,p,b$. Initially $z,p$ are blue and $a,b$ are white. In a block of cycle rank two, use vertices $a,b,c,z,p,q,u$ and edges $Pa,az,ab,au,bu,zp,bp,zq,cq$. Its initial blue vertices are $z,p,q,u$. The exit is $b$ in a path block and $c$ in a block of rank two. All blocks finish in round one in the intact run. After losing every $z$, a block waits until its incoming endpoint is blue. Its subsequent additions are $a,z,b$ for a path block, or $a,b,z,c$ for a rank-two block. In the latter, $u$ forces $b$ after $a$ turns blue, $p$ can then restore $z$, and $q$ forces $c$.
+Call an extra near if its arrival differs from its root's by at most one. A distinguished root has the two adjacent arrival slots, less the ones used in its own visit. A root not distinguished has at most three such slots including its own round. Thus the number $N$ of near extras is at most $D$. Also, a distinguished root has at most its deficit in free sides, the sides of its visit with no distinguished child. Across distinguished roots there are $D-3m$ free sides.
 
-With $s$ blocks of rank two the designated delay is $1+3k+s$ and the graph has cycle rank $2s$. Attach an all-blue triangle to the shared seed by a bridge if one more cycle is desired. The [seed protection](#protection-and-a-minimum-killing-support) with $J$ a path adds a minimum killing support of size $k+1$ and gives recovery from every loss of at most $k$ seeds without changing the cycle rank or the designated delay. Taking $s=0$ and adding the triangle attains the unicyclic maximum. Taking $s=1$ without the triangle attains the bicyclic maximum.
+Each far extra $y$ with parent $z$ needs a blocking edge outside $F$.
+
+- If its intact source $p$ is retained, $p$ would force the later of $y,z$ by one round after the earlier unless another lost seed $z'$ were still white. Choose the edge $pz'$.
+- If $y$ is a direct child that arrives after $z$, choose an edge $zz'$ to a different lost seed white when $z$ returns. Such a seed must exist because $y$ is the only initially white neighbor of $z$.
+- If $y$ is a direct child that arrives before $z$, choose an edge $yg$ to a neighbor $g\ne z$ still white when $y$ arrives. Otherwise $y$ would force $z$ at the next round.
+
+These edges are distinct within and across the three cases. An edge of the first type identifies its retained source, which is chosen for only one child. An edge of the second type identifies the earlier of two lost seeds, which has only one direct child. An edge of the third type identifies its owner as the earlier endpoint, the initially white direct child. The first type joins a retained source and a lost seed, the second joins two lost seeds, and the third joins an initially white vertex to a vertex still white after round one. Every chosen edge has both endpoints in $F$.
+
+#### Charging blocking edges
+
+Let $R$ count repeated vertex occurrences in the contracted trail, $v_0$ count visits to subtrees without a distinguished vertex, and $u$ count subtrees never visited. The number of visits to subtrees is $k-m+e+v_0$, so
+$$
+R\geq e+v_0-m+u .
+$$
+If $U$ chosen blocking edges are unused by the trail, add them to the union of $F$ and the trail. That union has cycle rank $R$ and $u+1$ components. At most $u$ added edges can join components. Consequently $\beta\geq R+U-u$.
+
+A chosen edge on the trail can be assigned to a free side of a distinguished root or to a visit counted in $v_0$. An edge $pz'$ is used at the distinguished occurrence of $z'$ because $p$ was never white in the delayed run. An edge $zz'$ is used at the distinguished occurrence of at least one of its endpoints. In either case the edge immediately leaves that root's visit on the corresponding side. For an edge $yg$ of an early direct child, the trail cannot use it with $y$ distinguished. The later-arriving $g$ cannot be an intermediate source adjacent to that distinguished occurrence, and $y$ cannot force $g$ while $z$ is white. Hence $y$ is an intermediate source on that step, between two distinguished vertices. If the other edge of the step is its sole forest edge $yz$, charge the side of the distinguished $z$ ending at $y$. There is no distinguished child on that side because $y$ is a leaf. Otherwise both edges of the step are outside $F$, and this occurrence of $y$ gives a visit with no distinguished vertex.
+
+The assigned free sides are distinct because each is identified by its boundary edge on the trail. The assigned visits with no distinguished vertex are distinct because each is a single intermediate occurrence with both incident edges outside $F$. Let $C$ count the free-side charges. Then $C\leq D-3m$ and $e\leq N+C+v_0+U$. Write $A=D-N$ and $B=D-3m-C$ for the two unused allowances. Combining the counts, with $S=T-1-3k=e-D$, gives
+$$
+\beta\geq 2S+2m+A+B .
+$$
+
+#### The extra cost beyond one far arrival per seed
+
+The preceding inequality gives $S\leq\lfloor\beta/2\rfloor$. If $S>k$, there are more than $k$ far extras because $N\leq D$. At most $k$ can be direct children, so some far extra has a retained intact source $p$. This is impossible with only one lost seed. In general, with the latest lost neighbor chosen as its root, this extra cannot be late. Once all lost neighbors are blue, $p$ can force it in the next round. It must therefore be blue at least two rounds before the last lost neighbor of $p$. The two latest lost neighbors of $p$ have arrival times equal or one apart. Otherwise $p$ would force the last one before its recorded arrival.
+
+If $m\geq2$, the inequality already gives $\beta\geq2S+4$. If $m=1$, at least one of these two neighbors is distinguished. When exactly one is distinguished, its arrival takes one of the three slots for near extras of the other, giving $A\geq1$. When both are distinguished their times are consecutive, and each occupies a near slot of the other, giving $A\geq2$. Thus $\beta\geq2S+3$ in this case.
+
+If $m=0$, both lost neighbors are distinguished and arrive in consecutive rounds. They occupy each other's near slots, so $A\geq2$. Their two chronological sides facing each other are free. At most one selected blocking edge can be charged to these two sides. A direct trail step between the roots uses only one edge. For a step through an intermediate vertex, both sides can use only the edges of that step. If the intermediate vertex is a retained seed, at most one of the two edges was selected for its single intact target. If it is an initially white vertex, at most one was selected for it as an early direct child. If it is a lost seed, it is earlier than both distinguished roots. Any selected blocking edge there would have to be owned by that intermediate seed as the parent of a late direct child, so again at most one is selected. Consequently $B\geq1$ and $\beta\geq2S+3$.
+
+Thus $S>k$ requires $k\geq2$ and $S\leq\lfloor(\beta-3)/2\rfloor$. Together with the restriction $S\leq\lfloor\beta/2\rfloor$ for all $S$, this proves the stated upper bound.
+
+#### Attainment at every cycle rank
+
+Begin with a blue seed and its white neighbor, which fills in round one. Join successive blocks by an edge or a blue relay from the previous exit. A path block with previous exit $P$ is the path $P,a,z,p,b$. Initially $z,p$ are blue and $a,b$ are white. Its delayed additions after $P$ are $a,z,b$ when $z$ is lost. A rank-two block uses vertices $a,b,c,z,p,q,u$ and edges $Pa,az,ab,au,bu,zp,bp,zq,cq$. Its initial blue vertices are $z,p,q,u$. After $P$, losing $z$ gives successive additions $a,b,z,c$. In particular $u$ forces $b$ after $a$, $p$ can then restore $z$, and $q$ forces $c$. In the intact run both types finish in the first round.
+
+With $s$ rank-two blocks and $k-s$ path blocks, the designated time is $1+3k+s$ and the graph has cycle rank $2s$. Taking $s=\min(k,\lfloor\beta/2\rfloor)$ attains the first term. Extra rank can be added without changing any arrival in the two runs, by attaching a chain of all-blue triangles to the shared seed using bridges.
+
+For $k\geq2$ and $s=\lfloor(\beta-3)/2\rfloor>k$, use $k-2$ rank-two blocks and one [two-seed block from the degree-bounded construction](#constructions-attaining-the-bounds) with $q=s-k+2$ shared-source targets. After its incoming endpoint, it fills $q$ pair targets, two direct children, an entry target, the two lost seeds and the exit target, in that order and one per round. It contributes $q+6$ rounds. Including the incoming relays but excluding the incoming endpoint, the block contributes $3q+11$ vertices and $5q+14$ edges, hence $2q+3$ to cycle rank. The assembled graph has cycle rank $2s+3$, to which one all-blue triangle can be added for even $\beta$. The designated time is $1+3k+s$.
+
+Use [seed protection](#protection-and-a-minimum-killing-support) with a path for $J$ in both constructions. Its added graph is a tree attached by a bridge, preserving cycle rank and the designated delay. It gives recovery from every loss of at most $k$ seeds and a minimum killing support of size $k+1$.
 
 ## Degree two
 
@@ -269,7 +321,7 @@ The outgoing relay sees two white endpoints until either its exit or the next en
 
 ## Protection and a minimum killing support
 
-For the constructions using this protection at $d\geq4$, add a support $H$ of $k+1$ blue vertices. Take a connected simple graph $J$ on $H$. For every edge of $J$, add a blue vertex adjacent to its two endpoints. Connect one of these new blue vertices to the prefix seed $s$. The sparse-cycle construction uses a path for $J$. The other protected constructions use $J=K_{k+1}$ if $k\leq d$, and a path otherwise.
+For the constructions using this protection at $d\geq4$, add a support $H$ of $k+1$ blue vertices. Take a connected simple graph $J$ on $H$. For every edge of $J$, add a blue vertex adjacent to its two endpoints. Connect one of these new blue vertices to the prefix seed $s$. The constructions at a prescribed cycle rank use a path for $J$. The other protected constructions use $J=K_{k+1}$ if $k\leq d$, and a path otherwise.
 
 Protect every original blue vertex and every added edge source, except the $k$ designated slow-loss seeds. For each protected vertex attach a private all-blue path of $2k+2$ vertices by one endpoint. Each protected vertex has degree at most three before the attachment. The extra blue vertices leave the intact and designated slow runs unchanged, and the resulting graph is connected with maximum degree at most $d$.
 
@@ -285,4 +337,4 @@ Run the following from the repository root.
 python -B research-twins/check_multiple_loss_bounds.py
 ~~~
 
-The script replays the contracted trails on five branched trees that attain the forest bound, on the one-round sparse-cycle constructions and on the cyclic degree-three construction with up to 32 designated lost seeds. It exhausts losses through the budget on the degree-two examples, on the sparse-cycle constructions with one or two losses, and on the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It also checks the exact local arrival rounds of the degree-three construction and seven higher-degree concatenated examples. On the larger protected graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
+The script replays the contracted trails on five branched trees that attain the forest bound, on the one-round constructions with cycle rank up to 47 and on the cyclic degree-three construction with up to 32 designated lost seeds. It exhausts losses through the budget on the degree-two examples, on the small cycle-rank constructions with one or two losses, and on the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It also checks the exact local arrival rounds of the degree-three construction and seven higher-degree concatenated examples. On the larger protected graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
