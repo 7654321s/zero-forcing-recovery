@@ -754,10 +754,12 @@ def check_arrival_waves(graph, remaining_blue, additions):
 def main():
     exhaustive = sampled = 0
     check_branched_forest_extremizers()
+    two_loss_times = {}
     low_rank_cases = ((2, 1, 0, 4), (2, 1, 1, 4), (2, 1, 2, 4),
                       (2, 1, 3, 4), (2, 1, 4, 4), (2, 1, 6, 5), (2, 1, 7, 6),
                       (2, 1, 15, 10), (2, 1, 16, 10), (2, 1, 35, 20), (2, 1, 100, 52),
-                      (2, 2, 1, 4), (2, 4, 3, 4), (2, 4, 4, 4),
+                      (2, 2, 0, 4), (2, 2, 1, 4), (2, 2, 2, 4), (2, 2, 3, 4), (2, 2, 4, 4),
+                      (2, 4, 3, 4), (2, 4, 4, 4),
                       (3, 3, 2, 4), (3, 2, 7, 5), (4, 2, 2, 4),
                       (7, 5, 3, 4), (9, 3, 5, 4), (8, 3, 16, 7))
     for t, k, rank, cap in low_rank_cases:
@@ -777,6 +779,8 @@ def main():
         if (intact, delayed, actual_rank) != (t, expected, rank):
             raise AssertionError(('low-rank recovery', t, k, rank, delayed, actual_rank))
         check_arrival_waves(graph, blue ^ slow, additions)
+        if (t, k) == (2, 2):
+            two_loss_times[rank] = delayed
         if (t, k, rank) in ((2, 1, 2), (2, 2, 1)):
             exhaustive += check_all_losses(graph, blue, k)
         print('Low-rank recovery:', t, k, rank, len(graph), delayed)
@@ -803,7 +807,8 @@ def main():
             exhaustive += check_all_losses(graph, blue, k)
         print('Deep-detour recovery:', t, k, rank, cap, len(graph), delayed)
 
-    shared_cases = ((2, 2, 1, 0), (2, 2, 2, 1), (2, 2, 7, 2), (2, 2, 8, 2),
+    shared_cases = ((2, 2, 1, 0), (2, 2, 2, 1), (2, 2, 5, 2), (2, 2, 6, 2),
+                    (2, 2, 7, 2), (2, 2, 8, 2),
                     (2, 2, 100, 2), (2, 2, 101, 2), (2, 5, 35, 5),
                     (3, 3, 23, 0), (7, 4, 46, 0))
     for t, k, rank, detours in shared_cases:
@@ -819,9 +824,16 @@ def main():
         if (intact, delayed, actual_rank) != (t, expected, rank):
             raise AssertionError(('shared-center recovery', t, k, rank, delayed, actual_rank))
         check_arrival_waves(graph, blue ^ slow, additions)
+        if (t, k) == (2, 2):
+            two_loss_times[rank] = max(two_loss_times.get(rank, 0), delayed)
         if (t, k, rank) == (2, 2, 1):
             exhaustive += check_all_losses(graph, blue, k)
         print('Shared-center recovery:', t, k, rank, detours, len(graph), delayed)
+
+    expected_two_loss = dict(enumerate((12, 15, 18, 18, 19, 20, 20, 23, 23)))
+    expected_two_loss.update({100: 161, 101: 164})
+    if two_loss_times != expected_two_loss:
+        raise AssertionError(('two-loss rank extrema', two_loss_times, expected_two_loss))
 
     for t in (1, 2, 4, 7):
         for k in (1, 2, 3, 4, 6):

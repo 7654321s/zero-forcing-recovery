@@ -6,7 +6,7 @@ Use the synchronous rule and initial-color loss model of the [single-loss bounds
 - **Forests and cycle rank.** The exact value on forests of unrestricted degree is $t+k(2t+1)$. At cycle rank $\beta$ and $t\geq1$, an upper bound is $t+k(2t+1)+(2t-1)\beta$. The bound is exact for $t\geq2$ when $\beta\leq k$, even at degree cap four. The exact rank classification also holds at every rank for $t\geq3$ without a degree cap. For one intact round the exact worst-case time is determined at every cycle rank.
 - **One intact round.** The exact value is $1$ for $d=1$ and $1+3k$ for $d=2,3$. For $d\geq4$ one loss gives $5$. For $d\geq4$ and $k\geq2$, put $U=1+\lfloor kd/2\rfloor+2k$. The exact value is $U$ for even $k$ and for $d=4,5$. For odd $k$ it is $U-1$ at $d=6$, and $U-2+(d\bmod2)$ at $d\geq7$.
 - **Joint degree and cycle rank.** For one intact round the exact maximum is determined jointly for every degree cap at least three, cycle rank, and loss budget.
-- **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$. For one loss, the exact maximum at positive cycle rank is $\lfloor(\beta+19)/2\rfloor$. For two losses and odd rank $\beta\geq7$, it is $(3\beta+25)/2$. For even rank $\beta\geq8$, the two bounds differ by one round. For fixed $k\geq2$, the unrestricted leading term in cycle rank is $3\beta/2$.
+- **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$. The unrestricted maximum is known at every cycle rank for [one lost seed](#two-intact-rounds-and-one-lost-seed-at-every-cycle-rank) and for [two lost seeds](#exact-values-for-two-lost-seeds-at-every-cycle-rank). For fixed $k\geq2$, its leading term in cycle rank is $3\beta/2$.
 - **At least two intact rounds allowed.** Put $P=d(d-1)^{t-1}$. For $d\geq6$, $t\geq2$ and $k\geq1$,
   $$
   M_{d,t,k}=\frac{kP}{2}+\frac{kP}{2(d-1)}+O\!\left(\frac{kP}{d^2}\right),
@@ -153,11 +153,7 @@ $$
 \ \leq\ M_{\beta,k}^{(2)}\
 \leq\ 2+\left\lfloor\frac{3\beta+13k}{2}\right\rfloor.
 $$
-Here $b=\min(k,\beta-1)$. When $\beta\geq k+1$, the bounds differ by two rounds if $\beta-k$ is odd and four if it is even. For two lost seeds there is a sharper upper bound for $\beta\geq7$,
-$$
-M_{\beta,2}^{(2)}\leq\left\lfloor\frac{3\beta+25}{2}\right\rfloor.
-$$
-Thus $M_{\beta,2}^{(2)}=(3\beta+25)/2$ for odd $\beta\geq7$, and $3\beta/2+11\leq M_{\beta,2}^{(2)}\leq3\beta/2+12$ for even $\beta\geq8$. The lower bounds come from a construction that tolerates every loss of at most $k$ seeds.
+Here $b=\min(k,\beta-1)$. When $\beta\geq k+1$, the bounds differ by two rounds if $\beta-k$ is odd and four if it is even. The lower bounds come from a construction that tolerates every loss of at most $k$ seeds. For two lost seeds the following count gives the exact maximum at every rank.
 
 #### Counting the visits with shared first-round sources
 
@@ -193,19 +189,64 @@ T-2\leq\tfrac32(V+B-Q)+\tfrac72 k+\tfrac32 k
 $$
 Taking the integer part gives the upper bound.
 
-#### The sharper count for two lost seeds
+### Exact values for two lost seeds at every cycle rank
 
-Let the two lost seeds return at rounds $r_1\leq r_2$. First suppose $r_2-r_1\leq1$. The two root groups in the preceding count use at most six marks in total, since their time windows have a union of at most six rounds. Let $n=n_{z_1}+n_{z_2}$ and $v=v_{z_1}+v_{z_2}$. We show $n-3v/2+3Q/2\leq9/2$.
+For two lost seeds, connected graphs of cycle rank $\beta$, and intact time at most two, the largest finite recovery time is
+$$
+M_{\beta,2}^{(2)}=
+\begin{cases}
+12+3\beta,&0\leq\beta\leq2,\\
+18+\lfloor(\beta-2)/2\rfloor,&\beta=3,4,\\
+14+3\lfloor(\beta-1)/2\rfloor,&\beta\geq5.
+\end{cases}
+$$
+The [low-rank constructions](#exact-values-when-the-cycle-rank-is-at-most-the-loss-budget) give the first line. The [extra-target construction](#a-lower-bound-beyond-the-low-rank-range) gives the second line. For the third line, use the [pair construction](#a-construction-from-a-pair-of-lost-seeds) with two detours. All of these examples recover from any two seed losses. They also give the same exact values under a degree cap $d\geq4$ whenever $\beta\leq2d-2$. We prove the upper bound for $\beta\geq3$ according to the restoration rounds $r_1\leq r_2$ of the two lost seeds.
+
+#### Extra edges for isolated second-round marks
+
+An old vertex is a discrepancy marked by intact round one. As in the [one-loss proof](#blocking-edges-for-far-targets), consider a distinguished second-round mark $y$ whose delayed arrival is outside both root windows $[r_i-2,r_i+2]$ and differs by at least two from that of its forest parent $w$. We will use this argument when both lost seeds have direct first-round children, so neither can be the intact source of a second-round target.
+
+- If $y$ has an indirect parent, the unmarked intact source $p$ is blue by delayed time one. If $p$ has no other old neighbor, its only possible whites after that round are $y$ and the old parent $w$. Their arrivals then differ by at most one, including when $w$ arrives in round one. Choose the edge from $p$ to a second old neighbor.
+- If $y$ has a direct parent and arrives first, choose an edge from $y$ to another vertex still white when $y$ arrives. Otherwise $y$ would return $w$ in the next round.
+- If $y$ has a direct parent and arrives later, $w$ has another old neighbor still white when $w$ arrives. All neighbors of $w$ besides $y$ were blue by intact time one, and $w$ returns at or after round two. Among these other neighbors, the only possible forest edge to an old vertex is the edge to a lost seed $z$ of which $w$ is the direct child. If $z$ were the sole other neighbor still white when $w$ returns, the arrivals of $y,z$ would differ by at most one. This would put $y$ in a root window. Choose an edge from $w$ to another old neighbor still white when $w$ returns.
+
+These edges lie outside $F$ and have both endpoints in $F$. They are distinct across the three types and among different targets. For the indirect case the edge identifies the intact source, and for the two direct cases the earlier endpoint identifies the target or its unique intact source. An edge of the indirect type also differs from every guard chosen for a shared first-round child, since each intact source forces only once.
+
+Each such edge on the trail uses either a free side of a distinguished old vertex or a visit with no marks. For an indirect edge or a late direct edge, at least one old endpoint is distinguished, and the edge is the boundary on its free side. For the early direct edge $yg$, with $g$ arriving after $y$, it cannot be used at the distinguished occurrence of $y$. The later vertex $g$ cannot be an intermediate source there, and $y$ cannot directly force $g$ immediately after it arrives because $w$ is still white. Thus the edge is used with $y$ as the intermediate source. Its other edge is either the only forest edge $yw$, in which case the guard is the boundary on the free side of $w$, or an edge outside $F$, in which case the visit at that occurrence of $y$ has no marks. These charges are distinct since every side has a single boundary edge and each visit without marks has just one intermediate source.
+
+#### Seeds restored in the same or consecutive rounds
+
+Suppose $r_2-r_1\leq1$. The two root groups in the preceding count use at most six marks in total, since their windows have a union of at most six rounds. Let $n=n_{z_1}+n_{z_2}$ and $v=v_{z_1}+v_{z_2}$. We have $A=n-3v/2+3Q/2\leq9/2$.
 
 - With neither root distinguished, $Q=0$. One visit has at most three marks, and at least two visits use at most six marks in total.
 - With one root distinguished, $Q\leq2$. For $v\geq3$ the six-mark bound gives the claim. For $v=1$ the preceding per-root bound applies. For $v=2$, the root visit has one mark if neither side has further marks, at most three if one side does, and at most five if both sides do. The corresponding bounds on $Q$ are two, one and zero. The other visit has at most three marks and the six-mark bound still applies. These bounds give at most $9/2$ in all three cases.
 - With both roots distinguished, their rounds are consecutive. The step joining the two marks crosses between their visits. It uses at most one chosen guard edge, since a two-edge step has a single intermediate source and there is at most one chosen edge per source. Let $a$ be the number of root visits with marks on the side away from that step. Then $Q\leq3-a$. For $v=2$ we have $n\leq2+2a$, which gives $n-3v/2+3Q/2\leq7/2+a/2\leq9/2$. For $v=3$ and $a\geq1$ the six-mark bound suffices. For $v=3$ and $a=0$ the third visit has at most two marks, since a three-mark regular child visit would occupy its already used root round. Hence $n\leq4$. For $v\geq4$, use $n\leq6$ and $Q\leq3$.
 
-The direct-child visits can add at most three marks above their allowance in total. The rank inequality then gives $T-2\leq3(\beta+2)/2+9/2+3$.
+The direct-child visits can add at most three marks above their allowance in total. The rank inequality gives $T-2\leq3(\beta+2)/2+9/2+3$. For odd $\beta$ this is the desired bound $T\leq14+3\lfloor(\beta-1)/2\rfloor$.
 
-Now suppose $r_2-r_1\geq2$. Every shared first-round child returns in $[r_2-1,r_2+1]$. Its retained source has only the two lost roots and the child as possible white neighbors in the delayed run. A child returning by $r_2-2$ would allow that source to return the later root by $r_2-1$. After round $r_2$, the source can return the child in the next round. Therefore every shared rootless visit with at least two marks lies in $[r_2-2,r_2+2]$. Include these visits with the later root's group and make no extra guard claims. Give every visit one mark of allowance. Each group has at most five marks and contributes at most four above its allowance. Each of the at most two direct-child visits contributes at most two above its allowance. All other visits have at most one mark. With $V\leq\beta+2$, this gives $T-2\leq\beta+14$. For $\beta\geq7$, both cases give the stated upper bound.
+For even $\beta$, suppose $T=3\beta/2+12$, the integer upper bound just obtained. In this case the allowances can lose at most half a mark. There must be two direct-child visits of size three, every shared visit counted by $B$ must have size three, and no visit can be empty. A chosen guard on the trail uses a retained source with just three possible white neighbors, the two roots and its shared center. The step cannot lead to the shared center, since the center has both sides inside its own visit. Therefore the guard lies on the step between the two lost seeds, so $Q\leq1$.
 
-#### A construction from a pair of lost seeds
+We need $A\geq4$. With $Q=0$, a single visit contributes at most $7/2$ and two or more contribute at most $6-3=3$. Hence $Q=1$ and both roots are distinguished. This gives $v\geq2$. For $v\geq3$ we again get $A\leq3$, so $v=2$ and $n=6$. Each root visit has three marks, including the root at the end facing the other root. All six root-window times are now used. The only free old sides are on the step between the roots, which uses the chosen guard and the other forest edge incident to its retained source. The sole possible deficit of half a mark is a singleton visit. There must be exactly one, since otherwise $T-2=3B+12$ could not equal $3\beta/2+10$ for even $\beta$. Also $V+B-Q=\beta+2$, as any slack there costs at least $3/2$. The connected union of $F$, the trail and the chosen shared guards therefore already has rank $\beta$.
+
+Let $y$ be the singleton mark. Its time lies outside both root windows and outside the three-round intervals of every direct or shared center counted by the three-mark visits. If $y$ is old it must be a shared child outside those visits. Its retained source has a spare guard to the other lost seed, distinct from the selected guards. This edge cannot be on the trail because the only free old sides were used by the root step. It adds a cycle to the connected union. If $y$ is a second-round mark and its parent's time differs by at most one, that parent must also be a shared child outside those visits. The same spare edge adds a cycle. In the remaining case, the preceding argument supplies an extra edge for $y$, distinct from the shared guards and unusable on the trail because there is no empty visit or unused free old side. Every case contradicts the saturated rank. Thus $T\leq3\beta/2+11$ for even $\beta$ in this restoration regime.
+
+#### Seeds restored at least two rounds apart
+
+Suppose $r_2-r_1\geq2$. Every shared first-round child returns in $[r_2-1,r_2+1]$. Its retained source has only the two lost seeds and the child as possible white neighbors in the delayed run. A child returning by $r_2-2$ would allow that source to return the later root by $r_2-1$. After round $r_2$ the source can return the child in the next round. Consequently every shared rootless visit of size at least two lies in $[r_2-2,r_2+2]$. Group those visits with the later root, and set aside the extra guard count for shared children.
+
+Give every visit one mark of allowance. Each root group contributes $n_i-v_i\leq4$ above its allowance. Each rootless direct-child visit of size at least two contributes at most two above its allowance, and there is at most one per seed. Every other nonempty visit is a singleton. Let $h=\beta+2-V\geq0$, and let $E$ be the number of empty visits. The upper bound is $T\leq\beta+16$. Its deficit is exactly the sum of $h$, $E$, the two root-group deficits $4-(n_i-v_i)$, and the two direct-child deficits from a surplus of two each. A missing direct-child visit has deficit two. We show that this sum is at least one for $\beta\geq3$ and at least two for $\beta\geq6$.
+
+If the deficit is zero, each root group has one five-mark visit distinguishing its root and using its full window. Both direct-child visits have three marks using their centers' three-round intervals. All distinguished old vertices are internal to these visits. There are $\beta-2$ singleton visits. Their marks are outside the four intervals and hence are second-round targets at distance at least two in arrival time from every old vertex. The extra-edge argument applies. Since both roots are visited, the union of $F$ and the trail is connected and has rank at least $V-2=\beta-h$. There are no free old sides or empty visits and $h=0$, so even one singleton is impossible.
+
+Now let $\beta\geq6$ and suppose the deficit is one. If $h=1$, the two roots are both distinguished. Otherwise $V=\beta+2$ and the trail must meet both subtrees, since meeting just one would give rank at least $V-1>\beta$. The connected union of $F$ and the trail therefore admits at most $h$ more edges between its vertices. In each case below there are at least $\beta-3$ singleton marks outside the two root windows and both direct centers' three-round intervals. They are second-round marks whose times differ from every old arrival by at least two. Their distinct extra edges can use the remaining rank or charge the available free old sides or empty visits.
+
+- If $h=1$ or $E=1$, the root and direct-child visits are as in the zero-deficit case. There are $\beta-3$ singleton marks, and no free old side. At most one extra edge can be accommodated.
+- If one direct-child deficit is one, that visit has two marks and leaves one time uncovered in its three-round interval. The other direct-child visit and both root visits have their full sizes. There are $\beta-2$ singleton marks, of which at most one can use the uncovered time. Both direct children are already distinguished, and the root windows are full, so the singleton cannot be old. There is at most one free old side, at the two-mark direct-child visit.
+- If one root-group deficit is one, the group has either one four-mark visit or two visits with five marks. With one visit there are $\beta-2$ singleton marks and just one uncovered time in the root window. The four-mark visit has an internal root, so the gap is at $r_i-2$ or $r_i+2$, outside the old arrivals associated with this group. The other window is full and both direct children are already distinguished, so all singleton marks are second-round marks. The visit has at most one old endpoint. With two visits there are $\beta-3$ singleton marks and the window is full. If neither visit distinguishes the root, their sizes are two and three and they have at most one free old side together. If the rootless visit has three marks it has no free old side, and the two-mark root visit has at most two. In the remaining case the root visit has three marks. The root must be an endpoint, since a middle root would use $r_i-1,r_i,r_i+1$ and leave two nonconsecutive times for the two-mark rootless visit. A three-mark root visit with its root at an endpoint has at most one free old side, as does the two-mark rootless visit. There are therefore at most two free old sides in all cases.
+
+In all cases the $\beta-3\geq3$ extra edges exceed the available rank, sides and empty visits. This proves $T\leq\beta+15$ for $\beta\geq3$ and $T\leq\beta+14$ for $\beta\geq6$ when the seeds return at least two rounds apart. Combining these bounds with the close-restoration bounds proves the formula.
+
+### A construction from a pair of lost seeds
 
 The construction works for every intact deadline $t\geq2$. Start with two blue seeds $z_1,z_2$ and $q\geq1$ initially white centers $w_i$. Each center has a separate blue source adjacent to $z_1,z_2,w_i$. Give each center two relay arms of length $t-1$. Join the exit of each center's right arm to the far left endpoint of the next, starting from a prefix path of $t$ edges with just its first vertex blue.
 
