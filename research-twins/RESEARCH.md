@@ -22,6 +22,8 @@ An isolated vertex makes the full property automatic. Every forcing set contains
 
 The gap can still grow without bound in graphs that contain twins. In the [shared-edge family $\Theta(1,2,r)$](../research-bicyclic/NEARBY_FAMILIES.md#two-cycles-sharing-an-edge), the endpoint $x$ is blue and belongs to neither the killing pair nor the slow loss for $r\geq5$. Add a nonadjacent twin of $x$ and color it blue. All compared runs, including the double loss, keep $x$ as a blue representative, so their times are unchanged by the projection. Old singleton losses still finish by monotonicity, and losing the new twin is equivalent to losing $x$ in the enlarged graph. The same certificate therefore exhibits a gap of $\lfloor(r+1)/4\rfloor$ on graphs with a twin pair.
 
+[Sharp single-loss time bounds](ONE_LOSS_TIMING.md) distinguish intact time one, with a universal bound of five, from intact time two, which already allows arbitrary finite delay.
+
 ## Exactly one vertex without a twin
 
 Suppose $G$ has no isolated vertex and exactly one vertex $x$ without a twin. For each $v\ne x$, compare the neighborhoods of $x$ and $v$ after excluding both $x$ and $v$. Then `EveryMinimumSupport` holds exactly when all these pairs are comparable by inclusion, or all are incomparable.
