@@ -46,6 +46,10 @@ jobs:
           $elanBin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Build, audit and reproduce examples
         run: python scripts/run_checks.py
+      - name: Check the bicyclic positive case in Lean
+        run: lake env lean -DwarningAsError=true research-bicyclic/Bowtie.lean
+      - name: Replay the bicyclic certificates
+        run: python -B research-bicyclic/check_two_cycles.py --max-cycle 40 --max-path 12
       - name: Compile and reproduce unicyclic results
         run: python -B research-unicyclic/run_checks.py
       - name: Check finite unicyclic certificates in Lean
