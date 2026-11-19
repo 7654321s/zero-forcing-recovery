@@ -1,0 +1,87 @@
+"""Check the finite fort inequalities for the four-sheet prism chains."""
+
+import argparse
+from concurrent.futures import ProcessPoolExecutor
+from pathlib import Path
+import runpy
+
+from pysat.card import CardEnc, EncType
+from pysat.solvers import Solver
+
+
+MODEL = runpy.run_path(str(Path(__file__).with_name('check_multiple_loss_bounds.py')))
+members = MODEL['members']
+adjacency = MODEL['adjacency']
+completion_time = MODEL['completion_time']
+MAX_LOSSES = 7
+
+
+def find_stalled_set(graph, seeds, required, active_order):
+    """Leave vertices outside the active range fixed and allow no forces there."""
+    limit = CardEnc.atmost(lits=[v + 1 for v in seeds], bound=MAX_LOSSES,
+                         top_id=len(graph), encoding=EncType.totalizer)
+    clauses = limit.clauses + [[v + 1 for v in required]]
+    for v in range(active_order):
+        neighbors = tuple(members(graph[v]))
+        for u in neighbors:
+            if u < active_order:
+                clauses.append([v + 1, -(u + 1), *(w + 1 for w in neighbors if w != u)])
+    with Solver(name='glucose4', bootstrap_with=clauses) as solver:
+        if solver.solve():
+            white = set(solver.get_model())
+            return tuple(v for v in seeds if v + 1 in white)
+    return None
+
+
+def verify_case(case):
+    blocks, columns = case
+    rank = 32 * blocks + 5 + 4 * columns
+    graph, blue, lost, waves = MODEL['four_sheet_cubic_chain_certificate'](blocks, rank)
+    if (len(graph) // 2 + 1 != rank or completion_time(graph, blue) != 2
+            or lost.bit_count() != 4 * blocks or len(waves) != 6 * blocks + 2
+            or completion_time(graph, blue ^ 255) <= len(graph)
+            or any(row.bit_count() != 3 or any((v-w) % 2 == 0 for w in members(row))
+                   for v, row in enumerate(graph))):
+        raise AssertionError(('four-sheet chain metadata or eight-loss obstruction', case))
+    MODEL['check_arrival_waves'](graph, blue ^ lost, waves)
+
+    seeds = tuple(members(blue))
+    first_padding = 4 * (16 * blocks + 2)
+    # Rotate a required deleted seed to sheet zero.
+    required = [v for v in seeds if v % 4 == 0 and (columns == 1 or v >= first_padding)]
+    witness = find_stalled_set(graph, seeds, required, len(graph))
+    if witness is not None:
+        raise AssertionError(('small fort', case, witness))
+    return case
+
+
+def verify_long_ladders():
+    for width in range(10, 14):
+        order = 2 * width
+        rungs = [(u, u + 1) for u in range(0, order, 2)]
+        rails = [(u, u + 2) for u in range(order - 2)]
+        attachments = list(zip((0, 1, order - 2, order - 1), range(order, order + 4)))
+        graph = adjacency(order + 4, rungs + rails + attachments)
+        witness = find_stalled_set(graph, range(len(graph)), range(order), order)
+        if witness is not None:
+            raise AssertionError(('unrepaired ladder', width, witness))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--jobs', type=int, default=1)
+    args = parser.parse_args()
+    if args.jobs < 1:
+        parser.error('--jobs must be positive')
+    verify_long_ladders()
+    print('Ladder widths 10 through 13 verified', flush=True)
+    with ProcessPoolExecutor(max_workers=args.jobs) as pool:
+        for columns in range(1, 10):
+            cases = [(blocks, columns) for blocks in range(2, 35)]
+            for count, _ in enumerate(pool.map(verify_case, cases), 1):
+                if count % 10 == 0 or count == len(cases):
+                    print(f'Padding columns {columns}: {count}/{len(cases)} graphs', flush=True)
+
+
+if __name__ == '__main__':
+    main()

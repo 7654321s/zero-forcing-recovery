@@ -1814,6 +1814,18 @@ def bipartite_cubic_chain_certificate(blocks, cycle_rank=None):
     return adjacency(order, lifted_edges), seeds, deleted, lifted_waves
 
 
+def cyclic_cubic_chain_lift(certificate, sheets):
+    graph, blue, lost, waves = certificate
+
+    def copies(vertices):
+        return (sheets * v + sheet for v in vertices for sheet in range(sheets))
+
+    lifted = adjacency(sheets * len(graph), ((sheets * v + sheet, sheets * w + (sheet + 1) % sheets)
+                                            for v, row in enumerate(graph) for w in members(row) if v < w
+                                            for sheet in range(sheets)))
+    return lifted, mask(copies(members(blue))), mask(copies(members(lost))), [tuple(copies(wave)) for wave in waves]
+
+
 def three_sheet_cubic_chain_certificate(blocks, cycle_rank=None):
     """Lift each increasing base edge by the shift of one modulo three."""
     if cycle_rank is not None and cycle_rank % 3 != 1:
@@ -1823,15 +1835,20 @@ def three_sheet_cubic_chain_certificate(blocks, cycle_rank=None):
         base_rank = 11 if base_rank is None else base_rank
         if base_rank < 11:
             raise ValueError('The one-block three-sheet cover needs two padding columns')
-    graph, blue, lost, waves = compact_cubic_two_round_chain_certificate(blocks, base_rank)
+    return cyclic_cubic_chain_lift(compact_cubic_two_round_chain_certificate(blocks, base_rank), 3)
 
-    def copies(vertices):
-        return (3 * v + sheet for v in vertices for sheet in range(3))
 
-    lifted = adjacency(3 * len(graph), ((3 * v + sheet, 3 * w + (sheet + 1) % 3)
-                                       for v, row in enumerate(graph) for w in members(row) if v < w
-                                       for sheet in range(3)))
-    return lifted, mask(copies(members(blue))), mask(copies(members(lost))), [tuple(copies(wave)) for wave in waves]
+def four_sheet_cubic_chain_certificate(blocks, cycle_rank=None):
+    """Lift the padded prism chain by the shift of one modulo four."""
+    if blocks < 2:
+        raise ValueError('The four-sheet construction needs at least two blocks')
+    minimum_base_rank = 8 * blocks + 3
+    if cycle_rank is not None and cycle_rank % 4 != 1:
+        raise ValueError('The four-sheet cover has cycle rank one modulo four')
+    base_rank = minimum_base_rank if cycle_rank is None else (cycle_rank + 3) // 4
+    if base_rank < minimum_base_rank:
+        raise ValueError('The four-sheet construction needs at least one padding column')
+    return cyclic_cubic_chain_lift(cubic_two_round_chain_certificate(blocks, base_rank), 4)
 
 
 def cubic_loss_deadlines(graph, blue, budget):
