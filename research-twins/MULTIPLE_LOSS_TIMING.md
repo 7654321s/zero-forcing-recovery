@@ -535,6 +535,59 @@ The ratio $(1+z)z^4/((1-z-z^2)(1-z^2))$ has nonnegative power-series coefficient
 
 With all sites filled, the constructed time is $\Theta(kr^t)$. Each detour at depth $t-3$ contributes three rounds without shortening, and the other detours all have positive net contribution. The sum of the contributions is bounded above by a constant times $kr^t$ by summing the geometric series weighted by $2(t-i)-3$. For the construction with splices at depth two, the positive site capacities follow the tribonacci recurrence beyond the affected depths, with growth rate $r_0\approx1.839287$. At $r_0$ the new characteristic polynomial equals $(r_0-2)(r_0+1)<0$, so $r>r_0$. These rates describe the explicit constructions.
 
+#### Combining layered and recursive detours
+
+At degree three, a binary layer construction can be inserted into the same serial paths as the recursive detours. It tolerates every loss of at most $k$ seeds. In particular, for $t\geq3$ and
+$$
+\beta\geq 2k(3\cdot2^{t-2}-3)
+$$
+there are examples with intact time $t$, cycle rank $\beta$, and recovery time
+$$
+t+k(2t-1+3\cdot2^{t-2}).
+$$
+One can also mix layered and ordinary detours at a prescribed rank, using the site counts below.
+
+**A layered detour at a main-path vertex.** Choose a main-path vertex $x$ of intact depth $d\leq t-3$, using the same spare incidence as an ordinary detour. Attach a white vertex $w$ directly to $x$ and add a complete binary tree below $w$ through intact depth $t-1$, with a blue relay on each tree edge below $w$. The $2^{t-d-2}$ vertices in the final layer have an incoming relay and room for two additional edges each. Put them in cyclic order. For any $1\leq m\leq 2^{t-d-2}$, use the first $m$ consecutive pairs, including a pair across the end of the order if needed. A pair gives one white terminal vertex and a blue source adjacent to that terminal and both members of the pair. With two final-layer vertices the two cyclic pairs use distinct sources. The $m$ terminals form the new serial path. Use blue relays between consecutive terminals and at both junctions with neighboring serial paths. Each terminal and each of its sources has degree three, and all of the new serial and tree relays have degree two before protection.
+
+Each pair source and its terminal add one unit of rank, since the source joins two vertices of the same tree. The $m$ terminals are already joined to the tree before the serial path is installed. Replacing a single serial junction by the $m+1$ links through these terminals adds another $m$ units. Subdividing a link by a blue relay preserves rank. The layered detour therefore spends $2m$ units of rank for $m$ extra serial rounds.
+
+**Intact and delayed arrivals.** In the intact run, $x$ forces $w$ at round $d+1$ and the tree relays fill one level per round. The final pair sources fill the terminals at round $t$. Every boundary of a serial path, including the end of the prefix, arrives at round $t$ in the specified intact schedule, so the serial junctions cannot start any path early. In the designated delayed run, place the layered detour with attachment depth $d$ before the serial main path containing $x$. Its tree is white until $x$ returns. Every pair source sees both its tree neighbors white as the terminals travel along the serial relay path. When $x$ returns it forces $w$ and the tree fills level by level. These releases take $t-d-1$ rounds, and there are at least $t-d$ rounds left on the main path from $x$. Consequently the added layers finish within the serial time. Ordinary detours and repeated center attachments follow their previous schedule on the sites that remain.
+
+**Protection of the ternary sources.** Give private blue paths to the retained seed vertices as before, except for the degree-three pair sources. All protected seeds are restored even if up to $k$ initial seeds are lost. With those blue relays available, the serial path never needs a pair source to force. Once a terminal is blue, its two serial relays are blue, so the terminal can restore its own pair source if it was lost. The tree releases also use only the protected relays. Thus the initial set recovers from every loss through $k$, including mixtures of pair sources and lost roots. The same minimum killing support of size $k+1$ applies because its private component and its attachment to the prefix are unchanged.
+
+**Allocate a prescribed rank.** Choose any main-path sites for layered detours within the depth limit, with $m$ terminals at each chosen site. Write $M$ for the sum of these numbers and $s_i$ for the number of chosen sites at depth $i$. For $\beta\geq2M$, use the [repeated-attachment recurrence](#repeated-attachments-at-detour-centers) with rank budget $\beta-2M$, base counts $c_0=k-s_0$ and $c_i=2k-s_i$ for $i>0$. If this gives counts $b_i$ and $q_i$, the time is
+$$
+t+k(2t+1)+M+\sum_{i=0}^{t-2}(2t-2i-3)b_i-\sum_i q_i .
+$$
+As before, unused rank can be supplied with all-blue cycles. For instance, with $t=13$, $k=1$ and $\beta=5424$, put the full 2048-terminal layered detour at the lost root and use the remaining 1328 rank units for repeated attachments. This gives 6694 rounds, compared with 6654 from repeated attachments alone at the same rank.
+
+If all main-path sites through depth $t-3$ receive full layered detours, then $M=k(3\cdot2^{t-2}-4)$. The only ordinary sites that remain are the $2k$ main-arm sites at depth $t-2$, each of which adds one serial round and costs one unit of rank. This proves the first formula and gives a leading term $(3/4)k2^t$ at the stated rank threshold.
+
+**The best choice when the rank can fill all selected sites.** The fully filled recurrence is linear in the base site counts. Thus the contribution of each main-path site can be compared separately. For a site at depth $d$ with $s=t-d$ rounds available, a full layered detour gives $2^{s-2}$ rounds when $s\geq3$. To compute the alternative, let $f_i$ be the full site capacities generated by a single ordinary base site, with all subsequent center attachments selected and no depth cutoff. For negative indices set $f_i=0$. Write $P(z)=1-z-2z^2+z^3-z^5$. The site recurrence gives
+$$
+\sum_{i\geq0}f_i z^i=\frac{1-z}{P(z)} .
+$$
+At deadline $s$, the final capacity loses $f_{s-4}$ sites, and shorter paths cost one round per center attachment at depths through $s-3$. For $n=s-2\geq0$, the ordinary contribution is therefore
+$$
+U_n=\sum_{i=0}^n (2n-2i+1)f_i-\sum_{i=0}^{n-2}f_i,\qquad
+\sum_{n\geq0}U_n z^n=\frac{1+z-z^2+z^3}{(1-z)P(z)}.
+$$
+It uses $R_s=\sum_{i=0}^{s-2} f_i-f_{s-4}$ units of rank.
+
+For $3\leq s\leq12$, the ordinary contribution exceeds $2^{s-2}$, as given by the recurrence. For $s\geq13$, the layered contribution is larger. To verify the latter inequality for all $s$, use
+$$
+(1+z+z^2)P(z)=1-2z^2-2z^3-z^4-z^6-z^7 .
+$$
+This gives $U_n=2U_{n-2}+2U_{n-3}+U_{n-4}+U_{n-6}+U_{n-7}+6$ for $n\geq7$. The values at $n=11,\ldots,17$ are $2008,3747,6998,13062,24387,45523,84984$, all below $2^n$. Induction uses $U_n\leq (107/128)2^n+6<2^n$ for $n\geq18$.
+
+Consequently for $t\geq13$, fill a layered detour at every main-path site with at least 13 rounds available and use repeated ordinary attachments at the remaining sites. Each block has one site with $s=t$ and two for each $2\leq s<t$. The layered sites contribute $3\cdot2^{t-2}-4096$ rounds per block. The ordinary ones contribute $2\sum_{s=2}^{12} U_{s-2}=4606$ rounds and cost $2\sum_{s=2}^{12} R_s=1328$ units of rank per block. This proves the sharper high-rank guarantee
+$$
+T\geq t+k(2t+511+3\cdot2^{t-2})
+\qquad\text{for}\qquad
+\beta\geq k(6\cdot 2^{t-2}-6864),\quad t\geq13 .
+$$
+This optimizes the choices of main-path sites in the fully filled combined construction.
+
 <a id="the-first-rank-above-six-per-lost-seed"></a>
 
 #### Counting visits down to the fourth round

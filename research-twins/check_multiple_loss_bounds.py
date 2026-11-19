@@ -242,7 +242,7 @@ def check_small_subcubic_one_round():
 
 
 def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique_support=True,
-                  neutral_rank=0):
+                  neutral_rank=0, unprotected_blue=()):
     """Add private blue paths and a connected minimum killing support."""
     losses = len(deliberately_lost)
     support = range(order, order + losses + 1)
@@ -258,7 +258,7 @@ def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique
         edges.append((seed, attachment))
 
     paths = []
-    unprotected = set(deliberately_lost)
+    unprotected = set(deliberately_lost).union(unprotected_blue)
     for vertex in blue[:]:
         if vertex not in unprotected:
             path = range(order, order + 2 * losses + 2)
@@ -739,11 +739,12 @@ def subcubic_low_rank_certificate(losses, cycle_rank, *, rounds=2):
     return graph, initial, mask(lost), support, paths, additions
 
 
-def subcubic_center_splice_plan(rounds, losses, cycle_rank, depth_limit):
+def subcubic_center_splice_plan(rounds, losses, cycle_rank, depth_limit, *, main_sites=None):
+    if main_sites is None:
+        main_sites = [losses, *([2 * losses] * max(0, rounds - 2))]
     capacities, splices = [], []
     shallower_sites = arm_sites = 0
-    for depth in range(rounds - 1):
-        sites = losses if depth == 0 else 2 * losses
+    for depth, sites in enumerate(main_sites):
         if depth >= 2:
             sites += capacities[depth - 2] - splices[depth - 1] - splices[depth - 2]
         if depth >= 3:
@@ -759,12 +760,64 @@ def subcubic_center_splice_plan(rounds, losses, cycle_rank, depth_limit):
 
 
 def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_centers=False,
-                                        splice_depth_limit=2):
+                                        splice_depth_limit=2, layered_detours=None):
     edges, blue, lost = list(pairwise(range(rounds + 1))), [0], []
     main_paths = []
     detours = [[] for _ in range(losses)]
     hosts, releases = [], []
+    layered_releases, layered_sources, terminal_ends = [], [], set()
+    layered_detours = dict(layered_detours or ())
+    layered_rank = 2 * sum(layered_detours.values())
+    if layered_rank > cycle_rank:
+        raise ValueError('Layered detours exceed the cycle rank')
+    main_sites = [0] * max(1, rounds - 1)
     order = rounds + 1
+
+    def link_through_relay(left, right):
+        nonlocal order
+        edges.extend(((order, left), (order, right)))
+        blue.append(order)
+        order += 1
+
+    def place_main_site(block, depth, side, host):
+        nonlocal order
+        targets = layered_detours.pop((block, depth, side), 0)
+        if not targets:
+            heappush(hosts, (depth, host, block))
+            main_sites[depth] += 1
+            return
+        if not (depth <= rounds - 3 and 1 <= targets <= 2 ** (rounds - depth - 2)):
+            raise ValueError('Invalid number of targets for a layered detour')
+
+        frontier = [order]
+        edges.append((host, order))
+        order += 1
+        levels = [frontier]
+        for _ in range(rounds - depth - 2):
+            children = []
+            for vertex in frontier:
+                for _ in range(2):
+                    order, arm = relay_arm(edges, blue, vertex, order, 1)
+                    children.extend(arm)
+            frontier = children
+            levels.append(frontier)
+
+        path = []
+        for index in range(targets):
+            source, terminal = order, order + 1
+            order += 2
+            edges.extend(((source, frontier[index]),
+                          (source, frontier[(index + 1) % len(frontier)]),
+                          (source, terminal)))
+            blue.append(source)
+            layered_sources.append(source)
+            path.append(terminal)
+        for left, right in pairwise(path):
+            link_through_relay(left, right)
+        terminal_ends.update((path[0], path[-1]))
+        detours[block].append((depth, path))
+        layered_releases.append((host, levels))
+
     for block in range(losses):
         root = order
         blue.append(root)
@@ -772,13 +825,17 @@ def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_ce
         order, left = relay_arm(edges, blue, root, order + 1, rounds)
         order, right = relay_arm(edges, blue, root, order, rounds)
         main_paths.append([*reversed(left), root, *right])
-        heappush(hosts, (0, root, block))
+        place_main_site(block, 0, 0, root)
         for depth, (a, b) in enumerate(zip(left[:-2], right[:-2]), 1):
-            heappush(hosts, (depth, a, block))
-            heappush(hosts, (depth, b, block))
+            place_main_site(block, depth, 0, a)
+            place_main_site(block, depth, 1, b)
+    if layered_detours:
+        raise ValueError('Unknown main-path site for a layered detour')
 
+    ordinary_rank = cycle_rank - layered_rank
     splices = (
-        subcubic_center_splice_plan(rounds, losses, cycle_rank, splice_depth_limit)
+        subcubic_center_splice_plan(rounds, losses, ordinary_rank, splice_depth_limit,
+                                   main_sites=main_sites)
         if splice_centers else {}
     )
 
@@ -811,7 +868,7 @@ def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_ce
             heappush(hosts, (arm_depth, b, block))
         return guard
 
-    for _ in range(cycle_rank - sum(splices.values())):
+    for _ in range(ordinary_rank - sum(splices.values())):
         if not hosts:
             break
         attach_detour(*heappop(hosts))
@@ -823,7 +880,10 @@ def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_ce
         ordered = sorted(detours[block], key=lambda item: item[0], reverse=True)
         paths = [path for _, path in ordered]
         for path in [*paths, main]:
-            edges.append((sequence[-1], path[0]))
+            if sequence[-1] in terminal_ends or path[0] in terminal_ends:
+                link_through_relay(sequence[-1], path[0])
+            else:
+                edges.append((sequence[-1], path[0]))
             sequence.extend(path)
 
     arrivals = {v: time for time, v in enumerate(sequence, 1)}
@@ -834,10 +894,13 @@ def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_ce
         if guard not in arrivals:
             arrivals[guard] = arrivals[host] + 1
             waves[arrivals[guard] - 1] += (guard,)
+    for host, levels in layered_releases:
+        for offset, vertices in enumerate(levels):
+            waves[arrivals[host] + offset] += tuple(vertices)
 
     graph, initial, support, paths = protect_seeds(
         3, edges, blue, order, lost, 0, clique_support=False,
-        neutral_rank=cycle_rank - len(releases)
+        neutral_rank=ordinary_rank - len(releases), unprotected_blue=layered_sources
     )
     return graph, initial, mask(lost), support, paths, waves
 
@@ -1176,6 +1239,40 @@ def main():
                                             clique_support=False)
         print('Subcubic repeated center splices:', t, k, rank, len(graph), delayed,
               'gain:', actual_gain)
+
+    full_layered_block = {(0, depth, side): 2 ** (3 - depth) for depth in range(3)
+                          for side in range(1 if depth == 0 else 2)}
+    for t, k, rank, expected, grafts in (
+        (3, 1, 2, 11, {(0, 0, 0): 1}),
+        (5, 1, 42, 38, full_layered_block),
+        (5, 2, 26, 68, {(0, 0, 0): 4, (0, 1, 0): 2, (1, 1, 1): 3}),
+        (6, 2, 49, 116, {(0, 0, 0): 10, (0, 1, 0): 2, (1, 0, 0): 4}),
+    ):
+        graph, blue, slow, support, paths, waves = subcubic_recursive_rank_certificate(
+            t, k, rank, splice_centers=True, splice_depth_limit=None, layered_detours=grafts
+        )
+        sampled += check_robust_samples(graph, blue, slow, support, paths, 3, t, k,
+                                        clique_support=False)
+        intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
+        actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
+        if (intact, delayed, actual_rank) != (t, expected, rank):
+            raise AssertionError(('subcubic layered detours', t, k, rank, intact,
+                                  delayed, actual_rank))
+        check_arrival_waves(graph, blue ^ slow, waves)
+        if k == 1 and t == 3:
+            exhaustive += check_all_losses(graph, blue, k)
+        if k == 2:
+            sources = [v for v in members(blue ^ slow)
+                       if graph[v].bit_count() == 3 and not graph[v] & blue]
+            if len(sources) != sum(grafts.values()):
+                raise AssertionError('Layered terminal sources were not identified')
+            failures = (mask(sources[:2]), mask(sources[-2:]),
+                        (1 << sources[0]) | (slow & -slow))
+            for deletion in failures:
+                if completion_time(graph, blue ^ deletion) > len(graph):
+                    raise AssertionError(('layered terminal source loss', deletion))
+            sampled += len(failures)
+        print('Subcubic layered detours:', t, k, rank, len(graph), delayed)
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()
