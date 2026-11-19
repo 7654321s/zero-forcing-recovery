@@ -1609,6 +1609,97 @@ def cubic_two_round_chain_certificate(losses, cycle_rank=None):
     return adjacency(order, edges), blue, lost, waves
 
 
+def compact_cubic_two_round_chain_certificate(losses, cycle_rank=None):
+    """Join the blue ports around a cycle while relays delimit the delayed waves."""
+    if losses < 1:
+        raise ValueError('The chain requires at least one designated loss')
+    order = 13 * losses + 3 + (losses % 2 == 0)
+    minimum_rank = order // 2 + 1
+    rank = minimum_rank if cycle_rank is None else cycle_rank
+    if rank < minimum_rank:
+        raise ValueError('The requested rank is below the rank of this construction')
+    if losses == 1:
+        return cubic_two_round_chain_certificate(losses, rank)
+
+    first, blue, _ = SINGLE['cubic_eight_round_certificate']()
+    original_edges = [(v, w) for v, row in enumerate(first) for w in members(row) if v < w]
+    block_edges = [(v, w) for v, w in original_edges if w < 12 and (v, w) != (5, 6)]
+    block_blue = blue & ((1 << 12) - 1)
+    edges = [(v, w) for v, w in original_edges if (v, w) not in ((5, 6), (8, 14), (10, 15))]
+    edges.extend(((5, 16), (6, 16)))
+    blue |= 1 << 16
+    lost = 1
+    waves = [(13,), (12,), (4,), (7,), (3,), (0,), (2,), (5, 6)]
+    starts = range(17, 17 + 13 * (losses - 1), 13)
+    relay, cycle_port = 16, 14
+    for start in starts:
+        edges.extend(((relay, start + 4), (cycle_port, start + 9)))
+        edges.extend((start + v, start + w) for v, w in block_edges)
+        blue |= block_blue << start
+        lost |= 1 << start
+        waves.extend(tuple(start + v for v in wave) for wave in ((4,), (7,), (3,), (0,), (2,), (5, 6)))
+        if start == starts[-1]:
+            edges.append((start + 5, start + 6))
+        else:
+            relay = start + 12
+            edges.extend(((start + 5, relay), (start + 6, relay)))
+            blue |= 1 << relay
+        cycle_port = start + 10
+    edges.append((10, cycle_port))
+
+    spare_ports = [start + 8 for start in starts]
+    if losses % 2:
+        first_contact = spare_ports[0]
+        edges.extend(((8, first_contact), (15, spare_ports[1])))
+        spare_ports = spare_ports[2:]
+    else:
+        first_contact = order - 1
+        edges.extend(((8, first_contact), (15, first_contact), (spare_ports[0], first_contact)))
+        blue |= 1 << first_contact
+        spare_ports = spare_ports[1:]
+    edges.extend(zip(spare_ports[::2], spare_ports[1::2]))
+
+    SINGLE['expand_cubic_edge_pair'](edges, order, (8, first_contact), (10, cycle_port), rank - minimum_rank)
+    final_order = 2 * (rank - 1)
+    blue |= mask(range(order, final_order))
+    return adjacency(final_order, edges), blue, lost, waves
+
+
+def check_compact_cubic_chain_contacts(original_edges, original_blue):
+    """Replay the affected blocks for each type of blue contact."""
+    opening = (16, [(v, w) for v, w in original_edges
+                    if (v, w) not in ((5, 6), (8, 14), (10, 15))], original_blue)
+    block_blue = original_blue & ((1 << 12) - 1)
+    later = [(12, [(v, w) for v, w in original_edges
+                   if w < 12 and (keep_tail or (v, w) != (5, 6))], block_blue)
+             for keep_tail in (False, True)]
+    for layout, seeds in ((opening, (1, 9, 11)), *((block, (1, 11)) for block in later)):
+        order, edges, blue = layout
+        graph = adjacency(order, edges)
+        for seed in seeds:
+            if completion_time(graph, blue ^ (1 << seed)) > order:
+                raise AssertionError(('compact chain internal loss', layout, seed))
+
+    contacts = [(opening, a, right, b) for right in later
+                for a, b in ((14, 9), (10, 10), (8, 8), (15, 8))]
+    contacts.extend((left, a, right, b) for left in later for right in later
+                    for a, b in ((10, 9), (8, 8)))
+    for (order, left_edges, left_blue), a, (size, right_edges, right_blue), b in contacts:
+        edges = [*left_edges, *((order + v, order + w) for v, w in right_edges), (a, order + b)]
+        graph = adjacency(order + size, edges)
+        blue = left_blue | (right_blue << order)
+        for seed in (a, order + b):
+            if completion_time(graph, blue ^ (1 << seed)) > len(graph):
+                raise AssertionError(('compact chain port loss', a, b, seed))
+
+    for size, edges, blue in later:
+        hub = 16 + size
+        graph = adjacency(hub + 1, [*opening[1], *((16 + v, 16 + w) for v, w in edges),
+                                    (8, hub), (15, hub), (24, hub)])
+        if completion_time(graph, original_blue | (blue << 16)) > len(graph):
+            raise AssertionError('compact chain hub loss')
+
+
 def cubic_two_fault_gap_certificate(cycle_rank=10):
     """Give a two-fault-tolerant cubic witness with unrestricted time nine."""
     if cycle_rank < 10 or cycle_rank == 11:
@@ -2172,6 +2263,18 @@ def main():
         check_arrival_waves(graph, blue ^ lost, waves)
         exhaustive += check_all_losses(graph, blue, 1)
         print('Cubic two-round chain:', losses, rank, len(waves))
+
+    check_compact_cubic_chain_contacts(block_edges, original_blue)
+    for losses, rank in ((1, 9), (2, 16), (3, 22), (4, 29), (5, 37), (12, 81), (24, 159)):
+        graph, blue, lost, waves = compact_cubic_two_round_chain_certificate(losses, rank)
+        if (any(row.bit_count() != 3 for row in graph) or len(graph) // 2 + 1 != rank
+                or completion_time(graph, blue) != 2 or lost.bit_count() != losses
+                or lost & blue != lost or len(waves) != 2 + 6 * losses):
+            raise AssertionError(('compact cubic chain metadata', losses, rank))
+        check_no_two_edge_cut(graph)
+        check_arrival_waves(graph, blue ^ lost, waves)
+        exhaustive += check_all_losses(graph, blue, 1)
+        print('Compact cubic two-round chain:', losses, rank, len(waves))
 
     for rank in (10, 12, 13, 22):
         graph, blue, lost, support = cubic_two_fault_gap_certificate(rank)
