@@ -61,7 +61,7 @@ def add_projection_bound(clauses, seed_vars, budget, period, quotient_cost, top,
     return bound.nv
 
 
-def strip_formula(graph, blue, budget, *, sheets=SHEETS):
+def strip_formula(graph, blue, budget, *, sheets=SHEETS, quotient_bounds=True):
     order = len(graph)
     _, arrival = MODEL['trace'](graph, blue)
     if None in arrival or max(arrival) != 2:
@@ -106,14 +106,17 @@ def strip_formula(graph, blue, budget, *, sheets=SHEETS):
             if active(u):
                 clauses.append([v + 1, -(u + 1), *(w + 1 for w in adjacent if w != u and active(w))])
     seed_vars = [v + 1 for v in members(blue) if active(v)]
-    top = add_projection_bound(clauses, seed_vars, budget, 10, 20, top, sheets=sheets)
-    if budget > 20:
-        top = add_projection_bound(clauses, seed_vars, budget, 9, 18, top, sheets=sheets)
+    if quotient_bounds:
+        top = add_projection_bound(clauses, seed_vars, budget, 10, 20, top, sheets=sheets)
+        if budget > 20:
+            top = add_projection_bound(clauses, seed_vars, budget, 9, 18, top, sheets=sheets)
     return clauses, seed_vars, top
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--blocks', type=int, choices=(*range(5, 11), BLOCKS), default=BLOCKS,
+                        help='choose the length of the base chain')
     parser.add_argument('--budget', type=int, choices=range(20, 24), default=CERTIFIED_BUDGET)
     parser.add_argument('--sheets', type=int, choices=(33, SHEETS), default=SHEETS,
                         help='choose the 33-sheet bound from the wider bands or the 37-sheet strip')
@@ -123,12 +126,13 @@ def main():
     if args.conflicts is not None and args.conflicts < 1:
         parser.error('--conflicts must be positive')
 
-    graph, blue, _, _ = CHECKS['signed_prism_cover'](BLOCKS, sheets)
+    graph, blue, _, _ = CHECKS['signed_prism_cover'](args.blocks, sheets)
     upper_witness = mask(v * sheets + sheet for v, sheet in CHECKS['FOUR_BLOCK_FORT'])
     if (CHECKS['fort_cost'](graph, blue, upper_witness) != 24
             or any(v % sheets in (0, sheets - 1) for v in members(upper_witness))):
         raise AssertionError('Missing the 24-seed upper witness')
-    clauses, seed_vars, top = strip_formula(graph, blue, args.budget, sheets=sheets)
+    clauses, seed_vars, top = strip_formula(graph, blue, args.budget, sheets=sheets,
+                                           quotient_bounds=args.blocks == BLOCKS)
     with ITotalizer(lits=seed_vars, ubound=args.budget, top_id=top) as counter:
         with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
             assumptions = [-counter.rhs[args.budget]]
