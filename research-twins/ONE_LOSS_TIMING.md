@@ -1,4 +1,4 @@
-# Sharp single-loss recovery bounds for one-round colorings
+# Single-loss recovery times for synchronous zero forcing
 
 Use synchronous zero forcing, with a loss turning an initially blue vertex back to white. Write $T(B)$ for the number of rounds to completion from $B$, with infinity for a stalled run. See the [model and deadline property](../README.md#模型与定理).
 
@@ -215,6 +215,79 @@ After losing $z$, the run traverses the prefix and then the relay list one verte
 
 All singleton losses recover. The relays and prefix can color their entire list on loss of any predecessor or any blue source for a pair, $L$, or $u$. If a predecessor is lost, $L$ then enables $w_0$ to return, after which $z$ restores the missing predecessor. For a lost pair source or the source of $u$, an old endpoint other than $w_0$ restores it once that endpoint and its direct target are blue. If the source of $L$ is lost, $L$ can restore it after the relay traversal. On loss of a relay, the intact two rounds fill all originally white vertices and the missing relay then returns. Loss of the prefix seed, helper or a support leaf still recovers as in the other constructions. This gives the same two-vertex minimum killing support with restricted time two.
 
+## More than two intact rounds
+
+Write $M_{d,t}$ for the largest finite single-loss recovery time over graphs of maximum degree at most $d$ whose intact coloring completes by round $t$. Thus $M_d=M_{d,2}$ above. For $d\geq3$ and $t\geq3$, put $P=d(d-1)^{t-1}$. The bounds below give
+
+$$
+M_{d,t}=\Theta(P),
+\qquad
+\frac{M_{d,t}}{P}=\frac12+O(1/d),
+$$
+
+with constants independent of $t$. In particular, for fixed $d\geq3$ the growth rate in $t$ has base $d-1$, and for each fixed $t\geq3$ the leading term in $d$ is $d^t/2$.
+
+### A tree of all discrepancies
+
+Let $A_i=\bigcup_{j=0}^i D_j$ be the vertices that have ever disagreed by round $i$. For $d\geq2$,
+
+$$
+|A_i|\leq 1+d\sum_{j=0}^{i-1}(d-1)^j .
+$$
+
+For each new discrepancy $x$, choose one intact source $v$ at the round when $x$ becomes blue in the intact run. If $v$ has ever been a discrepancy, make it the parent of $x$ in a tree, even if $v$ has already turned blue in the delayed run. Otherwise $v$ is blue in both runs, and it sees another white neighbor $w$ in the delayed run that is blue in the intact run. Make one such $w$ the parent of $x$. Each parent appears strictly earlier than its child, and $z$ is the only first discrepancy, so these links make a rooted tree.
+
+Each child of a vertex $w$ uses a distinct selected source from among $w$ itself and its neighbors. A selected source can force only one target in the intact process, since after making a force all its neighbors are blue. If $w$ is chosen as the source of one of its own children $x$, the neighbor $x$ cannot be counted as an outside source for another child of $w$. Before that force $x$ is white, and after it $x$ is a historical discrepancy, so a later choice of $x$ as a source would put its target below $x$ itself. If $w\ne z$, its own intact predecessor is also unavailable as an outside source because it has already used its force. Thus $z$ has at most $d$ children and every other discrepancy has at most $d-1$. By round $i$ the tree has depth at most $i$, giving the bound.
+
+At intact completion all whites of the delayed run belong to $D_t\subseteq A_t$. If it recovers, it adds at least one vertex per unfinished round. In particular,
+
+$$
+M_{d,t}\leq t+1+d\sum_{j=0}^{t-1}(d-1)^j.
+$$
+
+For $d=2$ this upper bound is attained for every $t\geq1$. On the path $0,\ldots,3t+2$, start with $0,2t+1,2t+2$ blue. The first two blue blocks fill the gap of $2t$ whites from both ends in $t$ rounds. The last block also fills the $t$ whites to its right. On loss of either of its two seeds only the left endpoint can start a force. The path advances one white per round, passing the remaining seed once its left neighbor turns blue. This takes $3t+1$ rounds. Loss of $0$ leaves the consecutive blue pair and also recovers. A separate blue edge gives restricted time $t$ with a two-vertex minimum killing support.
+
+### Counting the final round of discrepancies
+
+For fixed $d\geq2$ and $t\geq1$ consider a recoverable instance, and let $D=|D_{t-1}|$. We claim the more precise bound
+
+$$
+T(B\setminus\{z\})\leq t+\left\lfloor\frac{(d+4)D+1}{2}\right\rfloor.
+$$
+
+Choose an intact round-$t$ source for each $x\in D_t\setminus D_{t-1}$. A source in $D_{t-1}$ is direct and uses one incidence at that old vertex. A source outside $D_{t-1}$ is blue in both runs at $t-1$, and its only possible white neighbors from then on are $x$ and its neighbors in $D_{t-1}$. It must have at least one old neighbor. If it has two or more, count at least two old incidences for $x$. If it has just one, say $w$, call $x$ exceptional. Because the source sees only $x,w$ as possible whites, their arrival times differ by at most one. Thus the old vertices and the exceptional targets occupy at most $3D$ rounds after $t$.
+
+Let $E$ be the number of exceptional targets and $N$ the number of other new targets. The old vertices and exceptional targets can also occupy at most $D+E$ rounds. The chosen sources for distinct new targets are distinct. The old incidences counted at the sources avoid the intact predecessor of each non-$z$ old vertex, since it already used its force. The total capacity is at most $(d-1)D+1$. With at most $D$ direct sources, it follows that $2N+E\leq dD+1$. Each round after $t$ adds a vertex, so the number of further rounds is at most
+$$
+N+\min(3D,D+E)
+\leq \frac{dD+1}{2}+\min(3D-E/2,D+E/2)
+\leq \frac{(d+4)D+1}{2}.
+$$
+
+Taking the integer part proves the bound. By the tree estimate, for $d\geq3$ and $t\geq3$ we can use $D\leq(P-2)/(d-2)$.
+
+### Layered constructions
+
+Take $d\geq3$ and $t\geq3$. Use a blue $z$ and $d$ blue predecessors $p_i$, each adjacent to $z$ and to a white root $w_i$. These roots form layer one. For each vertex in layers one through $t-2$, introduce $d-1$ white children in the next layer. Each child has a distinct blue source adjacent to exactly that child and its parent. Give $w_1$ only $d-2$ children to leave one spare edge there.
+
+The vertices in layer $t-1$ are partitioned by their root. In a branch of size $L\geq2$, take all consecutive pairs in cyclic order, including the closing pair, $\lfloor(d-1)/2\rfloor$ times. If $d-1$ is odd, also take $\lfloor L/2\rfloor$ disjoint consecutive pairs. Each pair occurrence gives a distinct terminal white vertex and a blue source adjacent to it and to the two vertices of the pair. For $L=2$ the cycle counts the pair twice, using distinct sources. A branch of size one contributes no pairs. This happens only for the branch at $w_1$ when $(d,t)=(3,3)$.
+
+Join all $n$ terminal vertices into a white path in any order, with a blue seed $s$ adjacent to the first and with the last adjacent to $w_1$. Attach the same blue helper and its two blue leaf neighbors to $s$, forming the support $H$. All edges are specified by this construction. The graph is connected and simple, and its maximum degree is $d$. Every nonterminal white has one incoming source and at most $d-1$ outgoing incidences. At $w_1$ one of those incidences is used for the terminal path. The count of terminal vertices is
+$$
+n=
+\left\lfloor\frac{(d-2)(d-1)^{t-2}}{2}\right\rfloor
++(d-1)\left\lfloor\frac{(d-1)^{t-1}}{2}\right\rfloor
+-\mathbf 1_{(d,t)=(3,3)}.
+$$
+
+In the intact run each nonterminal layer $j$ fills in round $j$. Before then, a source for a next-layer child sees two white vertices while both parent and child are white. A terminal source also sees its two white parents, so it cannot start coloring the deepest nonterminal layer. The terminal path can progress from $s$ starting in round one and from $w_1$ starting in round two. By time $t-1$ these two fronts can have filled at most $2t-3$ vertices. Since $n\geq2^{t-1}>2t-3$, some terminal white remains. The terminal sources fill the remainder in round $t$. The same timing holds after a singleton loss in $H$.
+
+After losing $z$, all nonterminal layers stay white while the terminal path advances one vertex per round from $s$. The single-parent sources see two white neighbors and every terminal source still sees two white parents. At round $n+1$ the last path vertex restores $w_1$. Then $p_1$ restores $z$ and the other roots fill in round $n+3$. Until their own roots fill, none of the other branches can start, since each terminal source is confined to one branch. Within each such branch, the nonterminal layers then fill one per round. The last nonterminal layer fills at $n+t+1$, giving that delayed time.
+
+All singleton losses recover. If a predecessor is lost, $z$ restores it in round one. The seed, helper and support leaves also recover in round one. If a blue source is lost, its parent layer still fills, since each parent can be forced from the preceding layer. A parent then sees only the missing source white. If that parent is $w_1$, the terminal path also fills independently from the seed, since this missing single-parent source is outside the terminal path. This allows $w_1$ to restore the source. For a terminal source the two parents are in layer $t-1$, where neither has an additional path neighbor. These cases give finite recovery for every singleton. The two leaves cannot recover if both are lost, so $H$ is a minimum killing support with restricted time $t$.
+
+This gives $n+t+1\leq M_{d,t}$. The terminal count is at least $P/2-(d-1)^{t-2}/2-d/2-1$. Dividing by $P$ and using the upper bound from the final-round count gives $M_{d,t}/P=1/2+O(1/d)$ uniformly for $t\geq3$. The same estimates give the stated growth in $t$ at each fixed $d\geq3$.
+
 ## Reproduction
 
 ```sh
@@ -223,4 +296,4 @@ python -B research-twins/check_saturated_subcubic.py
 lake env lean -DwarningAsError=true research-twins/SingleLossBound.lean
 ```
 
-The replay verifies both sharp examples and 147 instances of the unbounded family, using 49 path lengths and three variants of the lost vertex. The largest path has 100 vertices before $g$. It also checks 25,392 recoverable singleton cases with intact time at most one across all labeled simple graphs through order five. In 7,914 of those cases a blue twin of the lost vertex remains. On the same small graph range, the replay checks the degree-weighted inequality on 78,122 transitions and the refined round-two count on 51,658 singleton losses, including stalled runs. Separate subcubic certificates attain eight rounds with ten white vertices and nine rounds with eight white vertices after round two. The replay also verifies the degree-dependent lower bounds for every maximum degree from 4 through 22, including all singleton losses and the minimum killing support. The Lean proof establishes the one-round upper bounds without a graph-order restriction.
+The replay verifies both sharp examples and 147 instances of the unbounded family, using 49 path lengths and three variants of the lost vertex. The largest path has 100 vertices before $g$. It also checks 25,392 recoverable singleton cases with intact time at most one across all labeled simple graphs through order five. In 7,914 of those cases a blue twin of the lost vertex remains. On the same small graph range, the replay checks the degree-weighted inequality on 78,122 transitions and the refined round-two count on 51,658 singleton losses, including stalled runs. Separate subcubic certificates attain eight rounds with ten white vertices and nine rounds with eight white vertices after round two. The replay also verifies the degree-dependent lower bounds for every maximum degree from 4 through 22, including all singleton losses and the minimum killing support. The same script checks the cumulative discrepancy and final-round bounds on the small graphs, the degree-two extremal paths for intact times 1 through 25, and 12 layered certificates with intact times three through six. The Lean proof establishes the one-round upper bounds without a graph-order restriction.
