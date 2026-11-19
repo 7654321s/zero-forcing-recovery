@@ -244,12 +244,14 @@ def check_small_subcubic_one_round():
 
 
 def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique_support=True,
-                  neutral_rank=0, unprotected_blue=()):
+                  neutral_rank=0, unprotected_blue=(), fault_budget=None):
     """Add private blue paths and a connected minimum killing support."""
-    losses = len(deliberately_lost)
-    support = range(order, order + losses + 1)
+    budget = len(deliberately_lost) if fault_budget is None else fault_budget
+    if budget < len(deliberately_lost):
+        raise ValueError('The protection budget must cover the designated loss')
+    support = range(order, order + budget + 1)
     order = support.stop
-    support_pairs = (combinations(support, 2) if clique_support and losses <= degree
+    support_pairs = (combinations(support, 2) if clique_support and budget <= degree
                      else pairwise(support))
     attachment = order
     for left, right in support_pairs:
@@ -263,7 +265,7 @@ def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique
     unprotected = set(deliberately_lost).union(unprotected_blue)
     for vertex in blue[:]:
         if vertex not in unprotected:
-            path = range(order, order + 2 * losses + 2)
+            path = range(order, order + 2 * budget + 2)
             edges.append((vertex, path[0]))
             edges.extend(pairwise(path))
             if degree == 3 and vertex == attachment:
@@ -273,7 +275,7 @@ def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique
             order = path.stop
     if neutral_rank:
         start = order
-        order = append_subcubic_blue_cycles(edges, paths[0][-1], order, neutral_rank, losses)
+        order = append_subcubic_blue_cycles(edges, paths[0][-1], order, neutral_rank, budget)
         blue.extend(range(start, order))
     return adjacency(order, edges), mask([*blue, *support]), mask(support), paths
 
@@ -1077,7 +1079,7 @@ def subcubic_rank_allocation(rounds, losses, cycle_rank):
 
 def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_centers=False,
                                         splice_depth_limit=2, layered_detours=None,
-                                        ordinary_detours=None):
+                                        ordinary_detours=None, fault_budget=None):
     edges, blue, lost = list(pairwise(range(rounds + 1))), [0], []
     main_paths = []
     detours = [[] for _ in range(losses)]
@@ -1228,7 +1230,8 @@ def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_ce
 
     graph, initial, support, paths = protect_seeds(
         3, edges, blue, order, lost, 0, clique_support=False,
-        neutral_rank=ordinary_rank - len(releases), unprotected_blue=layered_sources
+        neutral_rank=ordinary_rank - len(releases), unprotected_blue=layered_sources,
+        fault_budget=fault_budget
     )
     return graph, initial, mask(lost), support, paths, waves
 
@@ -1241,6 +1244,163 @@ def subcubic_optimized_rank_certificate(rounds, losses, cycle_rank):
     if len(certificate[-1]) != expected:
         raise AssertionError('The optimized graph and rank allocation give different times')
     return certificate
+
+
+def graph_bridges(graph):
+    """Return the bridges of a connected, nonempty graph as pairs of vertices."""
+    n = len(graph)
+    if not n:
+        raise ValueError('A connected nonempty graph is required')
+    discovery, low, parents = [-1] * n, [-1] * n, [-1] * n
+    discovery[0] = low[0] = 0
+    time = 1
+    stack = [(0, graph[0])]
+    bridges = []
+    while stack:
+        vertex, pending = stack[-1]
+        if not pending:
+            stack.pop()
+            parent = parents[vertex]
+            if parent != -1:
+                if low[vertex] > discovery[parent]:
+                    bridges.append((parent, vertex))
+                low[parent] = min(low[parent], low[vertex])
+            continue
+        bit = pending & -pending
+        other = bit.bit_length() - 1
+        stack[-1] = (vertex, pending ^ bit)
+        if other == parents[vertex]:
+            continue
+        if discovery[other] == -1:
+            parents[other] = vertex
+            discovery[other] = low[other] = time
+            time += 1
+            stack.append((other, graph[other]))
+        else:
+            low[vertex] = min(low[vertex], discovery[other])
+    if time != n:
+        raise ValueError('A connected graph is required')
+    return bridges
+
+
+def subcubic_bridge_contacts(graph, bridges):
+    """Choose the least number of matching sites for a bridgeless double."""
+    if not bridges:
+        contacts = tuple(vertex for vertex, row in enumerate(graph) if row.bit_count() < 3)[:2]
+        if len(contacts) < 2:
+            raise ValueError('A bridgeless double needs two sites of degree at most two')
+        return contacts
+
+    cut = [0] * len(graph)
+    for a, b in bridges:
+        cut[a] |= 1 << b
+        cut[b] |= 1 << a
+    block_index = [-1] * len(graph)
+    candidates = []
+    for root in range(len(graph)):
+        if block_index[root] != -1:
+            continue
+        index = len(candidates)
+        candidates.append(None)
+        block_index[root] = index
+        todo = [root]
+        while todo:
+            vertex = todo.pop()
+            if graph[vertex].bit_count() < 3 and candidates[index] is None:
+                candidates[index] = vertex
+            for other in members(graph[vertex] & ~cut[vertex]):
+                if block_index[other] == -1:
+                    block_index[other] = index
+                    todo.append(other)
+
+    block_degrees = [0] * len(candidates)
+    for a, b in bridges:
+        block_degrees[block_index[a]] += 1
+        block_degrees[block_index[b]] += 1
+    contacts = tuple(candidate for candidate, degree in zip(candidates, block_degrees)
+                     if degree == 1)
+    if None in contacts:
+        raise ValueError('A leaf bridge block has no vertex of degree at most two')
+    return contacts
+
+
+def subcubic_synchronous_lift(graph, *, cubic=False, extra_contact=False):
+    """Return a bridgeless lift, its copy count, and the matching sites."""
+    degrees = [row.bit_count() for row in graph]
+    if max(degrees, default=0) > 3:
+        raise ValueError('The base graph must have maximum degree at most three')
+    if cubic and extra_contact:
+        raise ValueError('An extra matching contact is used only in the subcubic double')
+    bridges = graph_bridges(graph)
+    if cubic and all(degree == 3 for degree in degrees):
+        if bridges:
+            raise ValueError('A cubic base with bridges has no vacant degree for matching')
+        return graph, 1, ()
+    if cubic and len(graph) == 1:
+        return adjacency(4, combinations(range(4), 2)), 4, (0,)
+
+    contacts = subcubic_bridge_contacts(graph, bridges)
+    copies = 4 if cubic and 1 in degrees else 2
+    if cubic:
+        contacts = tuple(v for v, degree in enumerate(degrees) if degree < 3)
+    elif extra_contact:
+        used = set(contacts)
+        extra = next((v for v, degree in enumerate(degrees) if degree < 3 and v not in used), None)
+        if extra is None:
+            raise ValueError('No unused matching contact is available')
+        contacts = (*contacts, extra)
+    order = len(graph)
+    lifted = [row << (copy * order) for copy in range(copies) for row in graph]
+    for vertex in contacts:
+        links = ((0, 1),) if copies == 2 else ((0, 1), (2, 3))
+        if copies == 4 and degrees[vertex] == 1:
+            links = (*links, (1, 2), (3, 0))
+        for left, right in links:
+            a, b = left * order + vertex, right * order + vertex
+            lifted[a] |= 1 << b
+            lifted[b] |= 1 << a
+    return tuple(lifted), copies, contacts
+
+
+def copy_mask(seeds, order, copies):
+    return sum(seeds << (copy * order) for copy in range(copies))
+
+
+def subcubic_layered_lift_rank(rounds, losses, *, cubic=False):
+    size = 2 ** (rounds - 2)
+    if not cubic:
+        return losses * (21 * size - 2 * rounds - 7) + 2
+    budget = 4 * losses
+    core_order = rounds + 1 + losses * (21 * size - 2 * rounds - 3)
+    protected_core = 1 + losses * (9 * size - 2 * rounds + 1)
+    order = core_order + 2 * budget + 1 + (protected_core + budget) * (2 * budget + 2)
+    return 2 * order + 1
+
+
+def subcubic_bridgeless_layered_certificate(rounds, losses, *, cubic=False, cycle_rank=None):
+    """Use full layers and lift a designated loss of size two or four times losses."""
+    if rounds < 3 or losses < 1:
+        raise ValueError('Use at least three intact rounds and one designated loss per copy')
+    grafts = {(block, depth, side): 2 ** (rounds - depth - 2)
+              for block in range(losses) for depth in range(rounds - 2)
+              for side in range(1 if depth == 0 else 2)}
+    rank = 2 * sum(grafts.values()) + 2 * losses
+    budget = (4 if cubic else 2) * losses
+    minimum = subcubic_layered_lift_rank(rounds, losses, cubic=cubic)
+    surplus = 0 if cycle_rank is None else cycle_rank - minimum
+    if surplus < 0:
+        raise ValueError('The requested rank is below the rank of the unpadded lift')
+    padding, remainder = divmod(surplus, 4 * budget + 8 if cubic else 2)
+    if cubic and remainder:
+        raise ValueError('Cubic padding requires whole rank steps of four times the budget plus eight')
+    base, blue, slow, _, _, waves = subcubic_recursive_rank_certificate(
+        rounds, losses, rank + padding, layered_detours=grafts, fault_budget=budget
+    )
+    graph, copies, _ = subcubic_synchronous_lift(base, cubic=cubic, extra_contact=bool(remainder))
+    order = len(base)
+    lifted_waves = [tuple(copy * order + v for copy in range(copies) for v in wave)
+                    for wave in waves]
+    return graph, copy_mask(blue, order, copies), copy_mask(slow, order, copies), lifted_waves
 
 
 def subcubic_nine_round_chain(losses):
@@ -1722,6 +1882,30 @@ def main():
                 elif gap[1] >= expected[0]:
                     raise AssertionError(('subcubic packing gap near peak', k, cell, shift))
         print('Subcubic maximum packing gap:', k, float(expected[0]), float(expected[1]))
+
+    for t, h, cubic, padding in ((3, 1, False, 0), (3, 1, False, 1), (4, 1, False, 5),
+                                  (3, 1, True, 0), (4, 1, True, 24)):
+        rank = subcubic_layered_lift_rank(t, h, cubic=cubic) + padding
+        graph, blue, slow, waves = subcubic_bridgeless_layered_certificate(
+            t, h, cubic=cubic, cycle_rank=rank
+        )
+        copies = 4 if cubic else 2
+        losses = copies * h
+        expected = t + h * (2 * t - 1 + 3 * 2 ** (t - 2))
+        degrees = [row.bit_count() for row in graph]
+        if (graph_bridges(graph) or min(degrees) < (3 if cubic else 2) or max(degrees) > 3
+                or sum(degrees) // 2 - len(graph) + 1 != rank
+                or slow.bit_count() != losses or completion_time(graph, blue) != t
+                or len(waves) != expected):
+            raise AssertionError(('bridgeless layered lift', t, h, cubic, rank))
+        check_arrival_waves(graph, blue ^ slow, waves)
+        seeds = list(members(blue))
+        concentrated = mask([v for v in seeds if v < len(graph) // copies][:losses])
+        scattered = mask(Random(273).sample(seeds, losses))
+        for deletion in (concentrated, scattered):
+            if completion_time(graph, blue ^ deletion) > len(graph):
+                raise AssertionError(('arbitrary lift fault', t, h, cubic, deletion))
+        print('Subcubic bridgeless lift:', t, losses, rank, expected, 'cubic:', cubic)
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()
