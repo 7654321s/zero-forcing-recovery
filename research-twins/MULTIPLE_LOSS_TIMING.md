@@ -320,6 +320,10 @@ This is the exact maximum for $0\leq\beta\leq k$. For $\beta=k+j$ with $j>0$, th
 $$
 t+k(2t+1)+(2t-3)k+(2t-5)j.
 $$
+For $3k<\beta\leq6k$ and $t\geq4(\beta-2k)+4$, the [next exact range](#counting-visits-down-to-the-third-round) has maximum
+$$
+t+k(2t+1)+(2t-3)k+2k(2t-5)+(\beta-3k)(2t-7).
+$$
 The sharp examples recover from every loss of at most $k$ seeds and have a minimum killing support of size $k+1$.
 
 #### Counting long visits at degree three
@@ -403,6 +407,42 @@ In the remaining case, one root visit has a side with just one mark. Its size is
 
 The only possible free old side belongs to the nonfull root visit's short-end mark. Edges required by the same blocking argument either pay for a gap using that side, or they come from a direct center near its early parent. In the latter case, the extra edge to a white guard could not be used through that parent: the lost root is internal and the center uses both sides in its visit. Each remaining gap needs its own blocking edge, distinct because the intact source or the earlier old endpoint determines its target. At most one visit can use the short-end old side. All others require the usual indirect center attached to an early direct parent, of which there are at most $k$. This gives $\beta\leq k+1$, contrary to the assumed excess of at least two. Together the cases prove the bound.
 
+#### Counting visits down to the third round
+
+For $t\geq7$ and $\beta\geq3k$, every finite recovery under the degree cap three satisfies
+$$
+D\geq\min\{t-4,\ 2(\beta-k)+2(\beta-3k)\}.
+$$
+The two terms in the sum come from counting rootless visits at two sizes. Write $a=2t-3$. Assume $D\leq t-5$, since otherwise the first term of the minimum already gives the claim. The preceding proof gives $V=k+\beta$, and the union of the trail and $F$ is connected of rank $\beta$. It also gives at most $k+u$ rootless visits of size at least $a-1$, where $u$ is the number of undistinguished roots. We show that at most $3k+u$ rootless visits have size at least $a-3$.
+
+**Distinguished vertices born by round two have no free side.** Each distinguished root uses both branches and has no charged units. Its visit has at least $2t+1-D$ marks, with at least $t-D\geq5$ on either side. The birth round strictly increases along either branch away from the root, so a distinguished vertex born by round two cannot be an end mark there. A rootless visit has at least $a-D\geq t+2$ marks, since any shortfall from $a$ is part of the nonnegative deficit count. The marks of such a visit stay in one branch of its root. If a distinguished vertex born by round two were an end mark, there could be at most one earlier-born mark in that branch, born in round one, and at most $t-1$ further marks in the downward direction. Including the end mark would give at most $t+1$ marks. Thus every distinguished vertex born by round two has both sides inside its visit. An edge outside $F$ between two vertices born by round two, or from one such vertex to a relay of $F$, is therefore impossible. Within the connected rank-saturated union it would have to be a trail edge. Its distinguished endpoint would need a free side, and relays are never distinguished.
+
+**Arrival gaps for births in rounds two and three.** Let $y$ be born in round $s\in\{2,3\}$ and have forest parent $w$. Write $r_x$ for the delayed arrival of $x$.
+
+- If the forest incidence uses a relay, the relay is blue by delayed time $s-1$. At that time its only possible white neighbors are $w$ and $y$. Any other still-white neighbor was blue by intact time $s-1$ and would require an extra edge from the relay to a vertex born by round two. Thus $|r_y-r_w|\leq1$.
+- If $w$ is the direct intact source and $r_y\geq r_w+2$, consider delayed time $\max(r_w,s-1)$. The discrepancy $y$ is still at least two rounds from arrival, since $r_y\geq s+1$. The blue $w$ must see another white neighbor. Such a neighbor was blue by intact round $s-1$ and is therefore a vertex born by round two in $F$. Its edge to $w$ must be in $F$. The only possibility is the direct predecessor $v$ of $w$, if it exists. The other forest incidences are relays or the one direct child $y$. Once either $v$ or $y$ arrives, $w$ can force the other in one round, so $|r_y-r_v|\leq1$.
+- If $y$ is distinguished and its parent $w$ is direct, $r_y\leq r_w-2$ is impossible. At its arrival $y$ would need another white neighbor to avoid returning $w$ early, whereas a nonfinal distinguished mark has at most one white neighbor.
+
+**Locate the larger visits.** A rootless visit with at least $a-3=2t-6$ marks distinguishes a center born at some round $s\leq3$. To see this, follow its branch down until the earliest distinguished vertex. An undistinguished branch point cannot connect two marked descendant branches: it would have to be an intermediate source on a trail step using two downward direct intact edges. The path therefore stays in a single descendant branch until it reaches a distinguished vertex. If the earliest distinguished birth were at least four, each side of that vertex would have at most $t-4$ marks. For a center born in round $s$, the visit uses times within $t-s$ rounds of the center.
+
+If the center is within $s$ rounds of any lost seed, the whole visit lies in that seed's window. Its center's time is already occupied whenever that seed is distinguished, since its visit uses at least five marks on each side of the seed. We can therefore count these visits in the $u$ undistinguished windows. Each window accommodates at most one, since $2(2t-6)>2t+1$. A first-round center is always within one round of its seed by the preceding proof.
+
+Each remaining visit can be assigned to the branch of its center's root $z$ in $F$. We show that, within each particular branch, all such visits fit in a single interval of at most $2t-1$ times. A center born in round two or three is within one round of its parent or of its parent's direct predecessor, by the arrival rules. Call that older vertex its anchor.
+
+- **The branch begins with a round-one vertex $w_1$.** A relayed $w_1$ arrives within one round of $z$. A direct $w_1$ arrives no later than $r_z+1$, since $z$ has no other lost neighbors and $w_1$ was its only intact white neighbor. Thus $w_1$ is within one round of $z$ or is direct and early, with $r_{w_1}\leq r_z-2$. For a center born in round two, the only possible anchor outside distance one of $z$ is this early $w_1$. The visit then lies within $t-1$ rounds of $r_{w_1}$. A third-round center with anchor $z$ or $w_1$ likewise either fits in the root window or, for early $w_1$, in the interval of radius $t-1$ about $r_{w_1}$.
+
+  The remaining possible anchor is a second-round child $w_2$ of $w_1$. A relayed $w_2$ is within one round of $w_1$. A direct $w_2$ is within one round of $w_1$, is late and within one round of $z$ by the direct-predecessor rule, or satisfies $r_{w_2}\leq r_{w_1}-2$. The last possibility can occur only when $w_1$ is within one round of $z$. For early $w_1$, at its return $z$ would still be white and $w_2$ already blue. Any other neighbor was blue by intact round one because $w_1$ made the intact force to $w_2$. Such a neighbor could be white at the return of $w_1$ only via an extra edge between vertices born by round two. With $z$ as its sole white neighbor, $w_1$ would return $z$ too early.
+
+  Hence when $w_1$ is early, the remaining visits have centers within two rounds of $w_1$ if born in round three and within one round if born in round two. All fit in the stated interval of radius $t-1$. When $w_1$ is within one round of $z$, the only anchor that can give a third-round center more than three rounds from $z$ is an early direct $w_2$. There is at most one direct child. Those visits lie within $t-2$ rounds of $r_{w_2}$.
+- **The branch begins with a round-two vertex $w_2$.** A distinguished $w_2$ would be within one round of $z$ by the arrival rules, since $z$ has no predecessor. For any remaining visit the center must be born in round three and anchored at $w_2$. Its times lie within $t-2$ rounds of $r_{w_2}$.
+- **The branch begins in round three or later.** The only eligible center is a round-three child of $z$. Its anchor is $z$, so its visit lies in the root window.
+
+There is room for at most one of these remaining visits per branch, since $2(2t-6)>2t-1$. With at most three branches per root and the $u$ visits assigned to seed windows, the count at size $a-3$ is at most $3k+u$.
+
+There are $V-(k-u)=\beta+u$ rootless visits. At least $\beta-k$ of them fall short of $a$ by at least two marks, and at least $\beta-3k$ fall short by at least four. These shortfalls contribute to $D$ even when a long visit charges excess marks to a root allowance. This yields $D\geq2(\beta-k)+2(\beta-3k)$ under the assumed small deficit, proving the bound.
+
+For $3k<\beta\leq6k$, the recursive construction uses $k$, $2k$ and $\beta-3k$ attachments at depths zero, one and two, respectively. It loses exactly $2(\beta-k)+2(\beta-3k)$ rounds from the linear bound. Hence its time is maximal whenever $t\geq4(\beta-2k)+4$, including in the class that tolerates every loss of at most $k$ seeds.
+
 #### Construction through a second-round center
 
 Use the common $t$-edge prefix and ordinary two-arm blocks. To place one unit of rank in a block, add a white vertex $w$ adjacent to its lost root $z$, a white leaf $g$ at $w$, and a blue relay linking $w$ to a white center $u$. Give $u$ two arms of length $t-2$. Replace the edge entering the main left arm at $z$ by an edge into this detour and an edge from the detour exit into the main arm. Only $z,w,u$ have degree three in the modification. In the intact run $w$ fills in round one and $u,g$ in round two. The detour arm ends fill by $t$, as do the main arm ends and the prefix.
@@ -425,6 +465,8 @@ $$
 t+k(2t+1)+\sum_{i=0}^{t-2}(2t-2i-3)b_i.
 $$
 Any unused rank is supplied by all-blue cycles. At $\beta=k+j$ with $1\leq j\leq2k$, each of the $j$ detours beyond rank $k$ attaches at depth one and contributes $2t-5$ rounds. This attains the upper bound whenever $2j\leq t$.
+
+For $3k<\beta\leq6k$, each of the $\beta-3k$ further detours attaches at depth two, contributing $2t-7$ rounds apiece. This attains the [third-round visit bound](#counting-visits-down-to-the-third-round) for $t\geq4(\beta-2k)+4$.
 
 <a id="one-intact-round-at-small-cycle-rank"></a>
 
