@@ -22,6 +22,33 @@ def path_certificate(rounds, losses):
     return adjacency(order, pairwise(range(order))), blue, mask(pairs), mask([0, *pairs])
 
 
+def cycle_certificate(rounds, losses):
+    order = (losses + 1) * (2 * rounds + 2)
+    pairs = range(0, order, 2 * rounds + 2)
+    blue = mask([*pairs, *(v + 1 for v in pairs)])
+    return adjacency(order, pairwise([*range(order), 0])), blue, mask(pairs[1:]), mask(pairs)
+
+
+def check_small_cycles():
+    checked = 0
+    for order in range(3, 12):
+        graph = adjacency(order, pairwise([*range(order), 0]))
+        times = [completion_time(graph, blue) for blue in range(1 << order)]
+        for blue, intact in enumerate(times):
+            if intact > order:
+                continue
+            seeds = tuple(members(blue))
+            for size in range(1, min(3, len(seeds)) + 1):
+                cap = intact * (size + 1) + (size + 1) // 2
+                for deleted in combinations(seeds, size):
+                    delayed = times[blue ^ mask(deleted)]
+                    if delayed <= order:
+                        if delayed > cap:
+                            raise AssertionError(('cycle upper bound', order, blue, deleted))
+                        checked += 1
+    return checked
+
+
 def protect_seeds(degree, edges, blue, order, deliberately_lost, seed):
     """Add private blue paths and a connected minimum killing support."""
     losses = len(deliberately_lost)
@@ -162,6 +189,16 @@ def main():
                 raise AssertionError(('path support survives', t, k))
             exhaustive += check_all_losses(graph, blue, k)
 
+    for t, k in ((0, 1), (0, 3), (1, 1), (1, 2), (2, 3), (4, 4), (5, 6)):
+        graph, blue, slow, support = cycle_certificate(t, k)
+        check_connected(graph, 2)
+        observed = (completion_time(graph, blue), completion_time(graph, blue ^ slow))
+        if observed != (t, t * (k + 1) + (k + 1) // 2):
+            raise AssertionError(('cycle delay', t, k, observed))
+        if completion_time(graph, blue ^ support) <= len(graph):
+            raise AssertionError(('cycle support survives', t, k))
+        exhaustive += check_all_losses(graph, blue, k)
+
     for d, k in ((4, 2), (5, 3), (7, 4), (4, 6)):
         graph, blue, slow, support, paths, n = one_round_certificate(d, k)
         sampled += check_robust_samples(graph, blue, slow, support, paths, d, 1, k)
@@ -185,6 +222,7 @@ def main():
         print('Layered family:', d, t, k, len(graph), late)
 
     print('Exhaustive losses on the degree-two and small one-round examples:', exhaustive)
+    print('Recoverable losses checked against the cycle upper bound:', check_small_cycles())
     print('Sampled losses on the protected examples:', sampled)
 
 
