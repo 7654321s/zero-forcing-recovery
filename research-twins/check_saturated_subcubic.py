@@ -1,5 +1,6 @@
 """Exhaust the subcubic round-two residuals with seven to ten whites."""
 
+from argparse import ArgumentParser
 from itertools import combinations, combinations_with_replacement
 
 
@@ -87,7 +88,7 @@ def completion_time(neighbors, rules, white, minimum):
     return elapsed
 
 
-def enumerate_features(neighbors, rules, remaining, white, minimum, rank_budget):
+def enumerate_features(neighbors, rules, remaining, white, minimum, rank_budget, *, cubic=False):
     free = [v for v, capacity in enumerate(remaining) if capacity]
     free_white = [v for v in free if white & (1 << v)]
     features = {v: [] for v in free}
@@ -116,9 +117,9 @@ def enumerate_features(neighbors, rules, remaining, white, minimum, rank_budget)
             return
 
         # Every feature is picked at its least end with a growing index.
-        # This also avoids repeated blue rules with the same neighbor set.
-        visit(index + 1, 0, possible_start, budget)
         vertex = free[index]
+        if not cubic or not white & (1 << vertex) or not remaining[vertex]:
+            visit(index + 1, 0, possible_start, budget)
         if not remaining[vertex]:
             return
         for choice, (direct, ends, mask) in enumerate(features[vertex][first:], first):
@@ -131,7 +132,10 @@ def enumerate_features(neighbors, rules, remaining, white, minimum, rank_budget)
                 toggle_edge(neighbors, *ends)
             else:
                 rules.append(mask)
-            visit(index, choice + 1, possible_start or (mask & white).bit_count() == 1,
+            # Distinct blue vertices with the same white neighbors occupy
+            # distinct degree slots, even though they force in the same round.
+            next_choice = choice if cubic and not direct else choice + 1
+            visit(index, next_choice, possible_start or (mask & white).bit_count() == 1,
                   budget - cost)
             if direct:
                 toggle_edge(neighbors, *ends)
@@ -144,7 +148,7 @@ def enumerate_features(neighbors, rules, remaining, white, minimum, rank_budget)
     return configurations, finishing, longest
 
 
-def enumerate_residuals(white_count, minimum, rank_budget=float('inf')):
+def enumerate_residuals(white_count, minimum, rank_budget=float('inf'), *, cubic=False):
     skeletons = configurations = finishing = longest = 0
     for neighbors, rules, outside_sources, remaining, white, old in templates(white_count):
         skeletons += 1
@@ -153,7 +157,7 @@ def enumerate_residuals(white_count, minimum, rank_budget=float('inf')):
             nonlocal configurations, finishing, longest
             if index == len(outside_sources):
                 count, success, elapsed = enumerate_features(
-                    neighbors, rules, remaining, white, minimum, budget
+                    neighbors, rules, remaining, white, minimum, budget, cubic=cubic
                 )
                 configurations += count
                 finishing += success
@@ -176,7 +180,7 @@ def enumerate_residuals(white_count, minimum, rank_budget=float('inf')):
     return skeletons, configurations, finishing, longest
 
 
-if __name__ == '__main__':
+def check_subcubic_residuals():
     for whites, minimum, expected in (
         (10, 1, (10, 6176870, 5921708, 6)),
         (9, 7, (20, 5390980, 0, 0)),
@@ -195,3 +199,14 @@ if __name__ == '__main__':
         if observed != expected:
             raise AssertionError((rank, observed, expected))
         print(f'Eight whites, rank at most {rank}: {observed}', flush=True)
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument('--cubic-only', action='store_true', help='Check the eight-round cubic bound')
+    if not parser.parse_args().cubic_only:
+        check_subcubic_residuals()
+    observed = enumerate_residuals(8, 7, cubic=True)
+    if observed != (57, 770681, 0, 0):
+        raise AssertionError(('eight degree-three whites', observed))
+    print(f'Eight degree-three whites, at least seven additional rounds: {observed}', flush=True)

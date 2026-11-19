@@ -156,6 +156,28 @@ The [rank-filtered enumeration](check_saturated_subcubic.py) checks the same eig
 
 The [rank-one construction](MULTIPLE_LOSS_TIMING.md#cycle-rank-one-at-degree-three) attains eight rounds. The 17-vertex nine-round witness above has rank four. Both can be raised to any larger prescribed rank by adding all-blue cycles linked by bridges. Attach the cycles to the far endpoint of a private blue path in the rank-one example, or to prefix seed $13$ in the nine-round example. In each added cycle the two attachment ports are adjacent and the other route has at least four interior vertices. Any singleton loss preserves a consecutive blue pair among these interior vertices, so the cycle repairs independently. The added cycles preserve the designated recovery times, the degree cap and the original minimum killing support.
 
+### Sharp eight-round bound for cubic graphs
+
+In a cubic graph whose intact propagation finishes within two rounds, every recoverable single seed loss finishes within **eight rounds**. The bound is attained in 3-vertex-connected cubic graphs that recover from every singleton loss, at every cycle rank at least nine.
+
+**Upper bound.** The subcubic enumeration above leaves only the case of eight whites after round two for a nine-round counterexample. In a cubic graph all eight of those whites must use all three incident degree slots. Impose this condition on the same 57 templates. A branch can advance past a white vertex only once all of its slots are occupied. An optional rule for an outside blue vertex may be repeated because distinct blue vertices may have the same white neighborhood and still use separate slots. Internal edges remain simple. Every cubic graph with this residual is represented: each remaining white incidence is either an internal edge, an extra incidence of a prescribed blue source, or part of the rule for another blue source. Incidences entirely outside the eight whites affect neither these slots nor subsequent forces.
+
+Of the 770,681 degree-saturated configurations with a possible first force, none finishes in seven or more further rounds. The [finite replay](check_saturated_subcubic.py) runs this check with `python -B research-twins/check_saturated_subcubic.py --cubic-only`.
+
+**A witness and every larger rank.** The [16-vertex certificate](check_single_loss_bounds.py) starts with blue vertices $\{0,1,8,9,10,11,14,15\}$. The intact additions are $\{2,3,13\}$ and $\{4,5,6,7,12\}$. Losing vertex $0$ gives the waves
+$$
+\{13\},\ \{12\},\ \{4\},\ \{7\},\ \{3\},\ \{0\},\ \{2\},\ \{5,6\}.
+$$
+Every single loss recovers, and deleting any two graph vertices leaves the graph connected. The pair $\{1,14\}$ is a minimum killing support with restricted singleton time five.
+
+To increase the order by any positive even number, replace vertex $15$ by a tetrahedron or a prism with one vertex removed. Join its three remaining ports by separate edges to the old neighbors $9,10,13$. There is a tetrahedron or prism of every even order from four onward. Joining these fragments preserves 3-vertex-connectivity. If one vertex is removed in each fragment, each fragment remains connected and at least one joining edge survives. If both removals are in one fragment, each resulting component in that fragment retains a port, by connectivity of its original graph with the two vertices removed. The other fragment remains connected and receives a joining edge from every such component.
+
+All inserted vertices are blue. In the intact and designated runs, the only initially white neighbor of $15$ is $13$. Its replacement port forces $13$ in the same round, and all old waves are unchanged. This also preserves the runs for losses inside $\{1,14\}$. For any other old singleton loss, every force available from $15$ remains available at its corresponding port, so recovery is preserved. After a singleton loss inside the inserted fragment, the missing vertex has at least two internal neighbors. At most one of them is the port facing an old white vertex. An unblocked internal neighbor restores the missing vertex in round one.
+
+**Maximum gap at a minimum killing support.** Use the first insertion even when no additional rank is needed, and then replace the port facing old vertex $9$ by $K_{3,3}$ with one vertex removed. The replaced port has only blue neighbors. The two remaining vertices on the deleted vertex's side are nonadjacent twins. Coloring the whole fragment initially blue preserves intact time two, eight rounds after losing $0$, and singleton tolerance by the same argument. Losing both twins stalls because every neighbor sees both white. Losing just one restores it in round one, while the old intact waves remain unchanged. This gives a size-two minimum killing support with restricted time **two**, compared with **eight** over all singleton losses. The construction works at every cycle rank at least twelve, beginning with 22 vertices.
+
+The gap of six is sharp among cubic graphs with intact time at most two and recovery from every singleton loss. Monotonicity gives restricted time at least the intact time. The new upper bound gives a gap of at most six at intact time two, the one-round upper bound gives at most four at intact time one, and at intact time zero every singleton loss takes one round. In particular the witnesses disprove EveryMinimumSupport in the 3-vertex-connected cubic class.
+
 ## Quadratic growth with the maximum degree
 
 Let $M_d$ be the largest finite recovery time after one initial blue vertex is lost, over graphs of maximum degree at most $d$ whose intact coloring takes at most two rounds. Put $F=\lfloor d^2/2\rfloor$. Then

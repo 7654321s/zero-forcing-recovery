@@ -252,6 +252,78 @@ def check_nine_round_example():
     MODEL['certify'](adj, blue, support, 1, 2, 9)
 
 
+def replace_cubic_vertex(graph, vertex, auxiliary):
+    """Join the three neighbors of vertex to the neighbors of auxiliary vertex zero."""
+    order = len(graph) + len(auxiliary) - 2
+    labels = (None, vertex, *range(len(graph), order))
+    edges = [(a, b) for a, row in enumerate(graph) for b in members(row)
+             if a < b and vertex not in (a, b)]
+    edges.extend((labels[a], labels[b]) for a in range(1, len(auxiliary))
+                 for b in members(auxiliary[a]) if a < b)
+    edges.extend(zip(members(graph[vertex]), (labels[b] for b in members(auxiliary[0]))))
+    return adjacency(order, edges), labels
+
+
+def cubic_padding_graph(order):
+    """Build a tetrahedron at order four or a prism at a larger even order."""
+    if order == 4:
+        return adjacency(4, combinations(range(4), 2))
+    width = order // 2
+    edges = [(offset + v, offset + (v + 1) % width) for offset in (0, width)
+             for v in range(width)]
+    edges.extend((v, v + width) for v in range(width))
+    return adjacency(order, edges)
+
+
+def cubic_eight_round_certificate(cycle_rank=9, *, twin_support=False):
+    """Return a three-connected cubic witness with a size-two killing support."""
+    minimum = 12 if twin_support else 9
+    if cycle_rank < minimum:
+        raise ValueError('The requested rank is below the threshold for this construction')
+    edges = [(0, 1), (0, 2), (0, 8), (1, 3), (1, 4), (2, 5), (2, 9), (3, 8),
+             (3, 10), (4, 7), (4, 12), (5, 6), (5, 11), (6, 9), (6, 11), (7, 10),
+             (7, 11), (8, 14), (9, 15), (10, 15), (12, 13), (12, 14), (13, 14), (13, 15)]
+    graph = adjacency(16, edges)
+    blue = mask((0, 1, 8, 9, 10, 11, 14, 15))
+    support = mask((1, 14))
+    if twin_support or cycle_rank > minimum:
+        auxiliary = cubic_padding_graph(2 * (cycle_rank - minimum) + (4 if twin_support else 2))
+        graph, labels = replace_cubic_vertex(graph, 15, auxiliary)
+        blue |= mask(labels[1:])
+    if twin_support:
+        # The first port is attached to old vertex 9 and has only blue neighbors.
+        vertex = labels[next(members(auxiliary[0]))]
+        bipartite = adjacency(6, product(range(3), range(3, 6)))
+        graph, labels = replace_cubic_vertex(graph, vertex, bipartite)
+        blue |= mask(labels[1:])
+        support = mask(labels[1:3])
+    return graph, blue, support
+
+
+def check_cubic_eight_round_examples():
+    for rank, twin_support in ((9, False), (10, False), (11, False), (16, False),
+                               (12, True), (13, True), (17, True)):
+        graph, blue, support = cubic_eight_round_certificate(rank, twin_support=twin_support)
+        if (any(row.bit_count() != 3 for row in graph) or len(graph) // 2 + 1 != rank
+                or completion_time(graph, blue) != 2):
+            raise AssertionError(('incorrect cubic graph, rank or intact time', rank))
+        MODEL['certify'](graph, blue, support, 1, 2 if twin_support else 5, 8)
+
+        order = len(graph)
+        for a, b in combinations(range(order), 2):
+            remaining = ((1 << order) - 1) ^ (1 << a) ^ (1 << b)
+            reached = pending = remaining & -remaining
+            while pending:
+                vertex = pending & -pending
+                pending ^= vertex
+                fresh = graph[vertex.bit_length() - 1] & remaining & ~reached
+                reached |= fresh
+                pending |= fresh
+            if reached != remaining:
+                raise AssertionError(('cubic vertex cut', rank, a, b))
+        print('Cubic eight-round witness:', rank, order, 'twin support:', twin_support)
+
+
 def check_low_degree_examples():
     edge = adjacency(2, [(0, 1)])
     if completion_time(edge, 1) != 1:
@@ -544,6 +616,7 @@ def main():
     print('Saturated subcubic example: exact restricted time 2 and delayed time 8')
     check_nine_round_example()
     print('Sharp subcubic example: exact restricted time 2 and delayed time 9')
+    check_cubic_eight_round_examples()
     check_low_degree_examples()
     print('Sharp maximum-degree-one example and degree-two examples for deadlines 1..25')
     print('Quadratic-degree examples with exact restricted time 2:', check_quadratic_degree_family())
