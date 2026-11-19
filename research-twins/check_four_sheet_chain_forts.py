@@ -63,9 +63,11 @@ def verify_prism_rank_case(case, sheets, certificate):
     first_padding = sheets * (16 * blocks + 2)
     also_required = None
     if extra:
-        a, b = MODEL['PRISM_RANK_EDGE']
         start = len(graph) - 2 * extra
-        required = [sheets * a, sheets * a + 2, sheets * b + 1, sheets * b + 3, *range(start, len(graph))]
+        required = list(range(start, len(graph)))
+        if extra == 1:
+            a, b = MODEL['PRISM_RANK_EDGE']
+            required.extend((sheets * a, sheets * a + 2, sheets * b + 1, sheets * b + 3))
         if columns > 1:
             also_required = range(first_padding, start)
     else:

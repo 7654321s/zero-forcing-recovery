@@ -1901,6 +1901,20 @@ def five_sheet_cubic_chain_certificate(blocks, cycle_rank=None):
     return adjacency(final_order, edges), blue | mask(range(order, final_order)), lost, waves
 
 
+def six_sheet_cubic_chain_certificate(blocks, cycle_rank=None):
+    """Lift the signed prism chain and extend its bipartite opening ladder."""
+    if blocks < 2:
+        raise ValueError('The six-sheet construction needs at least two blocks')
+    minimum_rank = 48 * blocks + 7
+    rank = minimum_rank if cycle_rank is None else cycle_rank
+    extra = rank - minimum_rank
+    if extra < 0:
+        raise ValueError('The six-sheet construction requires cycle rank at least 48 * blocks + 7')
+    base = cubic_two_round_chain_certificate(blocks)
+    cover = cyclic_cubic_chain_lift(base, 6, reversed_edge=(0, 1))
+    return bipartite_prism_rank_ladder(cover, 6, extra)
+
+
 def cubic_loss_deadlines(graph, blue, budget):
     """Compute maximum parallel times for each loss budget, with None for a stall."""
     def minimal(terms):
