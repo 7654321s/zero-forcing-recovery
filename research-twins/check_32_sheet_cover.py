@@ -1,4 +1,4 @@
-"""Certify the wrapped-fort bounds at 29 through 32 sheets."""
+"""Certify the wrapped-fort bounds at 28 through 32 sheets."""
 
 import argparse
 from itertools import product
@@ -16,6 +16,7 @@ SHEETS = 32
 BUDGET = 23
 SHEET_CAP = 4
 CASES = {
+    28: ((20, 2), (21, 3), (22, 4), (23, 5)),
     29: ((21, 3), (22, 4), (23, 5)),
     30: ((21, 3), (22, 4), (23, 5)),
     31: ((22, 4), (23, 5)),

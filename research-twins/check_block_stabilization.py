@@ -137,12 +137,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--certify-sheets', type=int, nargs='+', choices=(7, 8, 9, 10), default=(),
                         help='replay the selected small-sheet thresholds at 26 blocks')
+    parser.add_argument('--band-through', type=int, choices=range(13, 17), default=13,
+                        help='replay the sheet-band bounds through this width')
     args = parser.parse_args()
     print(f'{check_contractions()} stage contractions checked', flush=True)
     check_band(26)
     check_band(27)
     print('Every 25-stage prefix band with at most 23 losses fills an adjacent pair', flush=True)
-    for width in range(10, 14):
+    for width in range(10, args.band_through + 1):
         check_sheet_band(width, width - 5, pin_ends=width > 10)
         print(f'A {width}-sheet band fills a pair after up to {width - 5} losses', flush=True)
     for sheets in args.certify_sheets:
