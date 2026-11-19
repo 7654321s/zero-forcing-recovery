@@ -82,7 +82,34 @@ $$
 T(B\setminus\{z\})\leq t+\sum_{j=0}^{t}\Delta^j.
 $$
 
-For maximum degree three and intact time at most two, this gives **15 rounds**. The [17-vertex certificate in the replay](check_single_loss_bounds.py) has maximum degree three, restricted time two, and delayed time seven. Its initial blue set is $\{0,1,2,6,7,9,11,12,14\}$, its killing pair is $\{0,11\}$, and its slow loss is $9$. The two bounds leave the best possible maximum-degree-three time open.
+For maximum degree three and intact time at most two, this gives 15 rounds. The next argument lowers this bound by counting which round-one sources can still act in round two.
+
+## Two-round colorings at bounded degree
+
+**Theorem.** Let the maximum degree be $\Delta\geq1$ and let the intact coloring finish by round two. If the delayed run finishes, it does so within $\Delta^2+3$ rounds. For maximum degree at most three it finishes within **11 rounds**.
+
+Write $m=|D_1\setminus\{z\}|$. For each of these $m$ missed targets, choose an intact round-one source. If $z$ forced a missed target, choose $z$ as its source and call that target $w_0$. Every other chosen source is an initially blue neighbor of $z$. The chosen sources are distinct and have no white neighbors in the intact run after round one. Counting these neighbors of $z$, together with $w_0$ if present, gives $m\leq\Delta$.
+
+If $z\notin D_1$, the delayed coloring after round one contains the entire intact initial blue set. By monotonicity, the delayed coloring after round two contains the intact coloring after round one, so every discrepancy in $D_2$ is new. Each of the $m$ vertices of $D_1$ accounts for at most $\Delta-1$ new discrepancies by the preceding attribution argument. Thus $|D_2|\leq m(\Delta-1)$.
+
+If $z\in D_1$, at most $\Delta-m$ new discrepancies can be attributed to $z$. When $z$ was not chosen as a round-one source, the $m$ chosen neighbors are unavailable in round two. If $z$ itself acts in round two, its still-white target is an additional neighbor unavailable as a source, accounting for $z$'s own attribution. When $z$ was chosen in round one, it can no longer act, and the $m-1$ chosen neighbors are again unavailable. The neighbor $w_0$ is in $D_1$, so any force from $w_0$ is attributed to $w_0$ itself. In either case, counting retained and new discrepancies gives
+
+$$
+|D_2|\leq 1+m+(\Delta-m)+m(\Delta-1)
+       =1+\Delta+m(\Delta-1)
+       \leq 1+\Delta^2.
+$$
+
+At round two the intact coloring is full. Every subsequent round of a finite delayed run colors at least one of the remaining whites, so it finishes by round $\Delta^2+3$.
+
+For maximum degree at most three, it suffices to consider equality $|D_2|=10$. The inequalities force $\Delta=m=3$, with $z\in D_1$ and all four discrepancies of $D_1$ still white after round two. Each of the three missed targets accounts for exactly two new discrepancies in round two. A delayed time of 12 would require exactly one new blue vertex in each round from three to twelve. We exclude that schedule in both cases.
+
+- If $z$ was not a chosen source, write $p_i$ for the chosen source of $w_i$, for $1\leq i\leq3$. Each $p_i$ has only $z$ and $w_i$ as possible white neighbors. If $z$ fills first among these four vertices, all three $w_i$ fill together in the next round. If some $w_i$ fills first, the next round fills $z$ from $p_i$, or already has more than one addition. In the former case both remaining $w_i$ fill together in the following round.
+- If $z$ was chosen, its neighbors are $p_1,p_2,w_0$, where $p_i$ is the chosen source of $w_i$. If $z$ fills before both $w_1,w_2$, they fill together in the next round. Under the one-addition assumption, we may therefore take $w_1$ to fill in round $r$, then $z$ in round $r+1$ and $w_2$ in round $r+2$. The vertex $w_0$ must fill before round $r$, since otherwise $z$ would force it along with the force into $w_2$. Now consider the two new discrepancies attributed to $w_0$ in intact round two. Beyond its neighbor $z$, either both neighbors of $w_0$ are sources blue in both runs at round one, or one is such a source and the other is a new discrepancy $x$ forced by $w_0$. In the first case $w_0$ forces $z$ by round $r$. In the second case, if $x$ is blue before round $r$, the same contradiction follows. Nor can $x$ fill in rounds $r,r+1$, which add $w_1,z$. So $w_0$ forces $x$ in round $r+2$, alongside the force into $w_2$.
+
+Thus even with ten whites after round two, at least two of them fill in the same round, giving the bound of eleven. A graph of maximum degree zero has no successful singleton recovery.
+
+The [17-vertex certificate in the replay](check_single_loss_bounds.py) has maximum degree three, restricted time two, and delayed time seven. Its initial blue set is $\{0,1,2,6,7,9,11,12,14\}$, its killing pair is $\{0,11\}$, and its slow loss is $9$. The maximum possible delay for this class lies between seven and eleven.
 
 ## Reproduction
 
@@ -91,4 +118,4 @@ python -B research-twins/check_single_loss_bounds.py
 lake env lean -DwarningAsError=true research-twins/SingleLossBound.lean
 ```
 
-The replay verifies both sharp examples and 147 instances of the unbounded family, using 49 path lengths and three variants of the lost vertex. The largest path has 100 vertices before $g$. It also checks 25,392 recoverable singleton cases with intact time at most one across all labeled simple graphs through order five. In 7,914 of those cases a blue twin of the lost vertex remains. The replay checks the degree-weighted inequality on 78,122 round transitions through intact completion on the same small graph range, including stalled delayed runs. The Lean proof establishes the one-round upper bounds without a graph-order restriction.
+The replay verifies both sharp examples and 147 instances of the unbounded family, using 49 path lengths and three variants of the lost vertex. The largest path has 100 vertices before $g$. It also checks 25,392 recoverable singleton cases with intact time at most one across all labeled simple graphs through order five. In 7,914 of those cases a blue twin of the lost vertex remains. On the same small graph range, the replay checks the degree-weighted inequality on 78,122 transitions and the refined round-two count on 51,658 singleton losses, including stalled runs. Two additional subcubic examples attain ten white vertices after round two, one for each possible role of the lost vertex as a round-one source. The Lean proof establishes the one-round upper bounds without a graph-order restriction.

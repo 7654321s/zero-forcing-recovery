@@ -90,19 +90,41 @@ def check_small_graphs():
     return cases, paired_cases
 
 
+def check_two_round_bound(degree, lost, full_arrivals, delayed_arrivals):
+    missed_first = {v for v, arrival in enumerate(full_arrivals)
+                    if arrival <= 1 and (delayed_arrivals[v] is None or delayed_arrivals[v] > 1)}
+    missed_second = {v for v, arrival in enumerate(delayed_arrivals)
+                     if arrival is None or arrival > 2}
+    if lost in missed_first:
+        bound = 1 + degree + (degree - 1) * (len(missed_first) - 1)
+    else:
+        bound = (degree - 1) * len(missed_first)
+    if len(missed_second) > bound:
+        raise AssertionError((degree, lost, missed_first, missed_second, bound))
+    if None not in delayed_arrivals:
+        cap = 11 if degree == 3 else degree**2 + 3
+        if max(delayed_arrivals) > cap:
+            raise AssertionError((degree, lost, delayed_arrivals, cap))
+    return len(missed_second)
+
+
 def check_discrepancy_growth():
-    transitions = 0
+    transitions = two_round_cases = 0
     for n in range(1, 6):
         possible = list(combinations(range(n), 2))
         for edge_mask in range(1 << len(possible)):
             adj = adjacency(n, (possible[i] for i in members(edge_mask)))
             degrees = [row.bit_count() for row in adj]
+            degree = max(degrees)
             traces = [trace(adj, blue) for blue in range(1 << n)]
             for blue, (intact, full_arrivals) in enumerate(traces):
                 if intact > n:
                     continue
                 for lost in members(blue):
                     _, delayed_arrivals = traces[blue ^ (1 << lost)]
+                    if degree and intact <= 2:
+                        check_two_round_bound(degree, lost, full_arrivals, delayed_arrivals)
+                        two_round_cases += 1
                     differences = {lost}
                     for round_number in range(1, intact + 1):
                         next_differences = {v for v in range(n) if full_arrivals[v] <= round_number
@@ -113,7 +135,27 @@ def check_discrepancy_growth():
                             raise AssertionError((adj, blue, lost, round_number, bound))
                         differences = next_differences
                         transitions += 1
-    return transitions
+    return transitions, two_round_cases
+
+
+def check_saturated_subcubic():
+    # Vertices 4..6 are round-one targets. Each blocks two round-two targets
+    # after loss of vertex 0. The separate branch through 19..22 starts repair.
+    for lost_is_source in (False, True):
+        edges = [(0, 1), (0, 2), (1, 4), (2, 5)]
+        edges += [(0, 6), (3, 22)] if lost_is_source else [(0, 3), (3, 6)]
+        for offset in range(6):
+            edges.extend(((4 + offset // 2, 7 + offset), (7 + offset, 13 + offset)))
+        edges.extend(((13, 19), (19, 20), (20, 21), (21, 22)))
+        adj = adjacency(23, edges)
+        blue = mask([0, 1, 2, 3, *range(7, 13), 20, 22])
+        intact, full_arrivals = trace(adj, blue)
+        delayed, delayed_arrivals = trace(adj, blue ^ 1)
+        degree = max(row.bit_count() for row in adj)
+        if degree != 3 or intact != 2 or delayed > len(adj):
+            raise AssertionError((lost_is_source, degree, intact, delayed))
+        if check_two_round_bound(degree, 0, full_arrivals, delayed_arrivals) != 10:
+            raise AssertionError((lost_is_source, delayed_arrivals))
 
 
 def check_subcubic_example():
@@ -135,7 +177,11 @@ def main():
     cases, paired_cases = check_small_graphs()
     print('Recoverable singleton cases through graph order five:', cases)
     print('Cases with a retained twin:', paired_cases)
-    print('Discrepancy growth transitions:', check_discrepancy_growth())
+    transitions, two_round_cases = check_discrepancy_growth()
+    print('Discrepancy growth transitions:', transitions)
+    print('Refined round-two discrepancy cases:', two_round_cases)
+    check_saturated_subcubic()
+    print('Saturated subcubic cases with ten whites after round two: 2')
     check_subcubic_example()
     print('Subcubic example: exact restricted time 2 and delayed time 7')
 
