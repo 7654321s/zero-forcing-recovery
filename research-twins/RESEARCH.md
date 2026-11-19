@@ -24,7 +24,7 @@ The gap can still grow without bound in graphs that contain twins. In the [share
 
 [Sharp single-loss time bounds](ONE_LOSS_TIMING.md) give five rounds when the intact time is one, and nine rounds for subcubic graphs when the intact time is at most two. For intact time at most two, the sharp worst-case recovery times are 15 at maximum degree four, 19 at degree five, and $\lfloor d^2/2\rfloor+6$ for every $d\geq6$. Without a degree bound, intact time two allows arbitrarily large finite recovery times.
 
-[Longer intact runs](ONE_LOSS_TIMING.md#more-than-two-intact-rounds) have sharp exponential base $d-1$ for fixed maximum degree $d\geq3$. Their worst finite recovery time divided by $d(d-1)^{t-1}$ approaches $1/2$ as $d$ grows, uniformly over intact deadlines $t\geq3$. At maximum degree two the exact time is $3t+1$.
+[Longer intact runs](ONE_LOSS_TIMING.md#more-than-two-intact-rounds) have sharp exponential base $d-1$ for fixed maximum degree $d\geq3$. Their worst finite recovery time divided by $d(d-1)^{t-1}$ approaches $1/2$ as $d$ grows, uniformly over intact deadlines $t\geq3$. At maximum degree two the exact time is $3t+1$. [The two-term expansion](ONE_LOSS_TIMING.md#the-first-two-asymptotic-terms) gives $d^t/2-(t-2)d^{t-1}/2+O_t(d^{t-2})$ for each fixed $t\geq3$.
 
 ## Exactly one vertex without a twin
 

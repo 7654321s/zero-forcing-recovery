@@ -288,6 +288,64 @@ All singleton losses recover. If a predecessor is lost, $z$ restores it in round
 
 This gives $n+t+1\leq M_{d,t}$. The terminal count is at least $P/2-(d-1)^{t-2}/2-d/2-1$. Dividing by $P$ and using the upper bound from the final-round count gives $M_{d,t}/P=1/2+O(1/d)$ uniformly for $t\geq3$. The same estimates give the stated growth in $t$ at each fixed $d\geq3$.
 
+### The first two asymptotic terms
+
+The error term can be sharpened uniformly in the intact deadline. With $P=d(d-1)^{t-1}$, for $d\geq6$ and $t\geq3$,
+$$
+M_{d,t}=\frac P2+\frac{P}{2(d-1)}+O\!\left(\frac{P}{d^2}\right),
+$$
+with an absolute constant. Equivalently, for fixed $t\geq3$,
+$$
+M_{d,t}=\frac{d^t}{2}-\frac{t-2}{2}d^{t-1}+O_t(d^{t-2}).
+$$
+
+#### Upper bound
+
+Let $\alpha_j=1+d\sum_{\ell=0}^{j-1}(d-1)^\ell$ be the capacity of the discrepancy tree through round $j$. At any cutoff $j$ put $A=|A_j|$, $D=|D_j|$ and $h=A-D$. Each link of the tree with both endpoints still discrepant reserves an incidence at its parent. If the link used an outside source, that source already made its intact force and cannot be selected again. If it used the parent itself as a historical direct source, its child is still discrepant. The edge to that child cannot be used for a direct force into a new discrepancy or for an outside source blue in both runs. These incidences are distinct by the tree argument. They also avoid the earlier intact predecessor at every non-root vertex, which is already excluded.
+
+At most $(d-1)h+\mathbf{1}_{z\notin D_j}$ links have a restored parent, and exactly $h-\mathbf{1}_{z\notin D_j}$ have a restored child. Hence the number $Q_j$ of links with both endpoints still discrepant satisfies
+$$
+Q_j\geq A-1-dh.
+$$
+The capacity for incidences used in new forces at round $j+1$ is therefore at most $(d-1)D+1-Q_j$.
+
+Set $i=t-1$, $X=\alpha_i$ and $Y=\alpha_{i-1}$. For each new discrepancy born in round $i$, select one intact source. Let $B$ count those for which the selected source is outside $D_{i-1}$ and has at least two neighbors in $D_{i-1}$. A direct source or an outside source with one old neighbor uses one incidence, while an outside source counted for $B$ uses at least two. Thus the number born plus $B$ is at most $(d-1)|D_{i-1}|+1-Q_{i-1}$. Adding the number retained and using the bound for $Q_{i-1}$ gives
+$$
+|D_i|+B\leq (d-1)|A_{i-1}|+2\leq (d-1)Y+2=X.
+$$
+
+Consider the additions after the intact deadline $t$. Use the final-round classification above, with $N$ counting the nonexceptional new targets and $E$ the exceptional targets. Let $R$ count the rounds after $t$ that add an old vertex or an exceptional target. Among the old vertices in $D_i$, those already present in $D_{i-1}$ and those born from a direct source in round $i$ number at most $2Y$ in total. At most $B$ further old vertices were born from outside sources with multiple old neighbors. These vertices and their own exceptional targets occupy at most $3(2Y+B)$ rounds.
+
+Every other old vertex $v$ is a round-$i$ birth with a selected outside source that had exactly one neighbor $w$ in $D_{i-1}$. From time $i-1$ onward, this source has only $w,v$ as possible whites. Their delayed arrival times differ by at most one. Each final-round exceptional target associated with $v$ also arrives within one round of $v$. All these arrivals are within two rounds of the arrival of some $w\in D_{i-1}$, and therefore occupy at most $5Y$ rounds. We conclude that $R\leq11Y+3B$.
+
+For the final-round incidence count, use $Q_i$ to get
+$$
+2N+E\leq d|D_i|+1-Q_i.
+$$
+The right-hand side is at most $(d-1)X+2$ by the bound on $Q_i$. It is also at most $d(X-B)+1$ by the penultimate count. The run finishes by $t+N+R$. In bounding $N$ by half the smaller of these two upper bounds, use their weighted average with weight $6/d$ on the second. This cancels the $3B$ in the bound for $R$ and gives
+$$
+M_{d,t}\leq t+11Y+\frac{(d-1)X+2}{2}+\frac{3(X-1)}{d}.
+$$
+Here $X=(P-2)/(d-2)$ and $Y=(X-2)/(d-1)$. The terms $t$, $Y$ and $X/d$ are all $O(P/d^2)$ uniformly in $t\geq3$. The middle term is $P/2+P/(2(d-2))+O(1)$, which gives the claimed upper bound.
+
+#### Lower bound
+
+Use the nonterminal layers of the previous construction with $d-1$ children at every vertex, including $w_1$. There is no edge from the terminal path back to $w_1$. The deepest nonterminal layer has $L=d(d-1)^{t-2}=P/(d-1)$ white vertices. Give every one of these vertices a direct terminal white child. On the same $L$ parents use the cyclic pair construction with at most $d-2$ incidences per parent, by repeating the cycle $\lfloor(d-2)/2\rfloor$ times and adding one matching of disjoint consecutive pairs when $d-2$ is odd. Each pair occurrence has a distinct outside blue source and a terminal white target, for $\lfloor(d-2)L/2\rfloor$ such targets.
+
+Partition the $L$ direct children into $\lceil L/(d-2)\rceil$ groups of size at most $d-2$. In each group choose one child and join it to the other children of that group. Call the chosen child its guard. Use the prefix $s,a,b$ and the same helper and two support leaves. Add a blue relay between consecutive vertices in the list consisting of $b$, the pair targets, all direct children other than the guards, then all guards. Each guard has its old parent, at most $d-3$ guarded neighbors and at most two blue relay neighbors. Each other direct child has at most four neighbors, and every old parent has at most $d$ neighbors. The graph is connected and has maximum degree $d$.
+
+In the intact run all nonterminal layers fill on their assigned rounds. Before the deepest nonterminal layer fills, the pair sources are blocked. The relay list starts from $b$ in round two, and the guards are beyond all the nonguard targets, too far to arrive by the relay before the intact deadline. Thus a direct child reached early by the relay cannot restore its old parent while its guard is white. In round $t$ the old parents fill their direct children and the pair sources fill their targets. There are more nonguard targets than the $t-2$ that the relay could supply by then, so intact and support-restricted completion take exactly $t$ rounds.
+
+When $z$ is lost, all nonterminal layers stay white until the first guard is reached. The pair sources see two white parents, and each blue nonguard direct child sees both its parent and its guard white. Thus the two prefix vertices, all nonguard terminal targets, and the first guard fill one at a time. This gives a lower bound of
+$$
+\left\lfloor\frac{dL}{2}\right\rfloor-\left\lceil\frac{L}{d-2}\right\rceil+3
+$$
+rounds. The relays eventually fill all terminal vertices. Then the direct children can force their old parents, the single-parent sources let this repair reach the roots, and a predecessor restores $z$.
+
+The other singleton losses also recover. A lost predecessor, prefix seed, helper or leaf is restored in round one. A lost single-parent source is restored by its old parent, because the parent's earlier layer still fills. A lost pair source is repaired by one of its parents after the relay list is blue. A lost relay can return after the intact sources color all originally white vertices. The leaf pair remains a minimum killing support.
+
+Since $dL=P+P/(d-1)$, the lower bound is $P/2+P/(2(d-1))-O(P/d^2)$ with an absolute constant, as required.
+
 ## Reproduction
 
 ```sh
@@ -296,4 +354,4 @@ python -B research-twins/check_saturated_subcubic.py
 lake env lean -DwarningAsError=true research-twins/SingleLossBound.lean
 ```
 
-The replay verifies both sharp examples and 147 instances of the unbounded family, using 49 path lengths and three variants of the lost vertex. The largest path has 100 vertices before $g$. It also checks 25,392 recoverable singleton cases with intact time at most one across all labeled simple graphs through order five. In 7,914 of those cases a blue twin of the lost vertex remains. On the same small graph range, the replay checks the degree-weighted inequality on 78,122 transitions and the refined round-two count on 51,658 singleton losses, including stalled runs. Separate subcubic certificates attain eight rounds with ten white vertices and nine rounds with eight white vertices after round two. The replay also verifies the degree-dependent lower bounds for every maximum degree from 4 through 22, including all singleton losses and the minimum killing support. The same script checks the cumulative discrepancy and final-round bounds on the small graphs, the degree-two extremal paths for intact times 1 through 25, and 12 layered certificates with intact times three through six. The Lean proof establishes the one-round upper bounds without a graph-order restriction.
+The replay verifies both sharp examples and 147 instances of the unbounded family, using 49 path lengths and three variants of the lost vertex. The largest path has 100 vertices before $g$. It also checks 25,392 recoverable singleton cases with intact time at most one across all labeled simple graphs through order five. In 7,914 of those cases a blue twin of the lost vertex remains. On the same small graph range, the replay checks the degree-weighted inequality on 78,122 transitions and the refined round-two count on 51,658 singleton losses, including stalled runs. Separate subcubic certificates attain eight rounds with ten white vertices and nine rounds with eight white vertices after round two. The replay also verifies the degree-dependent lower bounds for every maximum degree from 4 through 22, including all singleton losses and the minimum killing support. The same script checks the cumulative discrepancy and final-round bounds on the small graphs, the degree-two extremal paths for intact times 1 through 25, 12 layered certificates with intact times three through six, and six guarded layered certificates. It also checks the penultimate-round incidence bound on the small graphs. The Lean proof establishes the one-round upper bounds without a graph-order restriction.

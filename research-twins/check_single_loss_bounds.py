@@ -144,6 +144,19 @@ def check_discrepancy_growth():
                         next_layer *= degree - 1
                         if len(ever_affected) > capacity:
                             raise AssertionError((adj, blue, lost, round_number, capacity))
+                        if round_number >= 2:
+                            full_blue = mask(v for v in range(n)
+                                             if full_arrivals[v] < round_number)
+                            old = mask(differences)
+                            multiple_blockers = 0
+                            for target in next_differences - differences:
+                                source = next(v for v in members(adj[target] & full_blue)
+                                              if (adj[v] & ~full_blue) == (1 << target))
+                                blockers = (adj[source] & old).bit_count()
+                                if source not in differences and blockers > 1:
+                                    multiple_blockers += 1
+                            if len(next_differences) + multiple_blockers > capacity:
+                                raise AssertionError((adj, lost, round_number, multiple_blockers))
                         if round_number == intact and delayed <= n:
                             extra = ((degree + 4) * len(differences) + 1) // 2
                             if delayed > intact + extra:
@@ -372,7 +385,7 @@ def check_quadratic_degree_family():
     return len(degrees)
 
 
-def layered_degree_certificate(degree, rounds):
+def nonterminal_layers(degree, rounds, reserve_path_edge):
     lost = 0
     predecessors = range(1, degree + 1)
     roots = range(degree + 1, 2 * degree + 1)
@@ -386,7 +399,7 @@ def layered_degree_certificate(degree, rounds):
         for branch in branches:
             children = []
             for parent in branch:
-                count = degree - 1 - (parent == roots[0])
+                count = degree - 1 - (reserve_path_edge and parent == roots[0])
                 for _ in range(count):
                     source, child = order, order + 1
                     order += 2
@@ -396,6 +409,11 @@ def layered_degree_certificate(degree, rounds):
             next_branches.append(children)
         branches = next_branches
 
+    return edges, blue, order, roots[0], branches
+
+
+def layered_degree_certificate(degree, rounds):
+    edges, blue, order, first_root, branches = nonterminal_layers(degree, rounds, True)
     terminal = []
     for branch in branches:
         if len(branch) < 2:
@@ -412,7 +430,7 @@ def layered_degree_certificate(degree, rounds):
 
     seed, helper, leaf_a, leaf_b = range(order, order + 4)
     blue.extend((seed, helper, leaf_a, leaf_b))
-    edges.extend(pairwise([seed, *terminal, roots[0]]))
+    edges.extend(pairwise([seed, *terminal, first_root]))
     edges.extend(((seed, helper), (helper, leaf_a), (helper, leaf_b)))
     return adjacency(leaf_b + 1, edges), mask(blue), mask([leaf_a, leaf_b]), len(terminal)
 
@@ -433,6 +451,54 @@ def check_layered_degree_family():
     return len(cases)
 
 
+def guarded_layered_certificate(degree, rounds):
+    edges, blue, order, _, branches = nonterminal_layers(degree, rounds, False)
+    parents = [v for branch in branches for v in branch]
+    pairs = list(pairwise([*parents, parents[0]])) * ((degree - 2) // 2)
+    if degree % 2:
+        pairs.extend(zip(parents[::2], parents[1::2]))
+    outside = []
+    for left, right in pairs:
+        source, child = order, order + 1
+        order += 2
+        edges.extend(((source, left), (source, right), (source, child)))
+        blue.append(source)
+        outside.append(child)
+
+    direct = range(order, order + len(parents))
+    edges.extend(zip(parents, direct))
+    guards, guarded = [], []
+    for index in range(0, len(direct), degree - 2):
+        group = direct[index:index + degree - 2]
+        guards.append(group[0])
+        guarded.extend(group[1:])
+        edges.extend((group[0], child) for child in group[1:])
+    graph, seeds, support = complete_quadratic_certificate(
+        edges, blue, direct.stop, [*outside, *guarded, *guards]
+    )
+    return graph, seeds, support, len(outside) + len(guarded)
+
+
+def check_guarded_layered_family():
+    cases = ((4, 3), (5, 3), (6, 3), (8, 3), (5, 4), (6, 4))
+    for degree, rounds in cases:
+        adj, blue, support, early_targets = guarded_layered_certificate(degree, rounds)
+        last_layer = degree * (degree - 1)**(rounds - 2)
+        guard_count = (last_layer + degree - 3) // (degree - 2)
+        if early_targets != degree * last_layer // 2 - guard_count:
+            raise AssertionError((degree, rounds, early_targets))
+        if max(row.bit_count() for row in adj) != degree or completion_time(adj, blue) != rounds:
+            raise AssertionError(('guarded layered deadline or degree', degree, rounds))
+        delayed, arrivals = trace(adj, blue ^ 1)
+        if delayed < early_targets + 3 or delayed > len(adj):
+            raise AssertionError((degree, rounds, delayed))
+        early_rounds = sorted(time for time in arrivals if 1 <= time <= early_targets + 3)
+        if early_rounds != list(range(1, early_targets + 4)):
+            raise AssertionError(('guarded serial prefix', degree, rounds))
+        MODEL['certify'](adj, blue, support, 1, rounds, delayed)
+    return len(cases)
+
+
 def main():
     extremal_examples()
     print('Sharp one-round examples: two certificates at times 1/5 and 1/4')
@@ -441,7 +507,7 @@ def main():
     print('Recoverable singleton cases through graph order five:', cases)
     print('Cases with a retained twin:', paired_cases)
     transitions, two_round_cases = check_discrepancy_growth()
-    print('Discrepancy growth and cumulative bound transitions:', transitions)
+    print('Discrepancy growth, cumulative bound and incidence transitions:', transitions)
     print('Refined round-two discrepancy cases:', two_round_cases)
     check_saturated_subcubic()
     print('Saturated subcubic cases with ten whites after round two: 2')
@@ -455,6 +521,7 @@ def main():
     print('Sharp maximum-degree-one example and degree-two examples for deadlines 1..25')
     print('Quadratic-degree examples with exact restricted time 2:', check_quadratic_degree_family())
     print('Layered examples with exact restricted time 3..6:', check_layered_degree_family())
+    print('Guarded layered examples with the stronger lower bound:', check_guarded_layered_family())
 
 
 if __name__ == '__main__':
