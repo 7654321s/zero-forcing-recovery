@@ -133,15 +133,14 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
             upper = min(upper, 2 + (3 * cycle_rank + 13 * len(roots)) // 2)
         if all(row.bit_count() <= 3 for row in graph):
             linear_bound = 2 + 5 * len(roots) + cycle_rank
-            upper = min(upper, linear_bound - (cycle_rank > len(roots)))
+            excess_rank = max(0, cycle_rank - len(roots))
+            upper = min(upper, linear_bound - min(2, excess_rank))
             full_roots = (len(root_visits) == len(roots)
                           and all(visit_sizes[index] == 5 for index in root_visits))
             if full_roots:
                 singletons = delayed - 2 - 5 * len(roots)
                 if cycle_rank < singletons + max(0, singletons - len(roots)):
                     raise AssertionError(('subcubic full-root visit rank', cycle_rank, singletons))
-                if cycle_rank == len(roots) + 2:
-                    upper = min(upper, 2 + 6 * len(roots))
             if delayed == linear_bound:
                 if not full_roots or any(
                     size != 1
@@ -930,8 +929,8 @@ def main():
         raise AssertionError(('two-round rank extrema', observed_extremizers, rank_extremizers))
 
     for k, rank in ((1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (2, 4), (3, 1),
-                    (3, 2), (3, 3), (3, 4), (3, 5), (4, 3), (4, 4), (4, 5), (5, 1), (5, 3), (5, 5),
-                    (7, 7), (7, 8)):
+                    (3, 2), (3, 3), (3, 4), (3, 5), (4, 3), (4, 4), (4, 5), (4, 6),
+                    (5, 1), (5, 3), (5, 5), (7, 7), (7, 8), (7, 9)):
         graph, blue, slow, support, paths, waves = subcubic_low_rank_certificate(k, rank)
         sampled += check_robust_samples(graph, blue, slow, support, paths, 3, 2, k,
                                         clique_support=False)
@@ -944,8 +943,8 @@ def main():
             exhaustive += check_all_losses(graph, blue, k)
         print('Subcubic low-rank recovery:', k, rank, len(graph), delayed)
 
-    for k, rank, expected in ((2, 5, 15), (2, 7, 15), (2, 8, 16), (3, 6, 21),
-                              (3, 9, 22), (3, 12, 23), (4, 7, 27), (4, 25, 30)):
+    for k, rank, expected in ((1, 4, 9), (2, 5, 15), (2, 7, 15), (2, 8, 16), (3, 6, 21),
+                              (3, 9, 22), (3, 12, 23), (4, 7, 27), (4, 25, 30), (7, 10, 45)):
         graph, blue, slow = subcubic_mixed_rank_certificate(k, rank)
         check_connected(graph, 3)
         intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
