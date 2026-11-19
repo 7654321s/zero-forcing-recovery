@@ -4,7 +4,7 @@ Let $\kappa_{k,m}$ be the minimum number of seeds whose loss blocks recovery in 
 $$
 \kappa_{k,m}=\kappa_{26,m} \qquad (k\geq26).
 $$
-The [sheet stabilization theorem](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers) gives a single constant when $k\geq26$ and $m\geq34$, by the sheet-band refinement below. The constant is at most 24 by the common finite fort, and at least 20 by projection to the ten-sheet cover. The exact value of the constant remains open here.
+The [sheet stabilization theorem](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers) gives a single constant when $k\geq26$ and $m\geq34$, by the sheet-band refinement below. The constant is at most 24 by the common finite fort, and at least 23 by the finite-fort exclusion below.
 
 ## The prism stage labels
 
@@ -42,19 +42,36 @@ If a fort of cost $b$ has no two consecutive empty sheets, each cyclic thirteen-
 
 The twelve-sheet band also shortens the search for a finite integer-sheet fort of cost at most 23. After splitting at any internal gap of two empty sheets, a nonempty piece occupies a span of at most 35 sheets. A span of at least 36 would contain three disjoint twelve-sheet bands. Each would need eight seeds, giving cost at least 24. The bounded search can therefore use 37 sheets, with two outer guard sheets.
 
+More generally, at a budget $b\in\{20,21,22,23\}$ choose three band widths from ten through thirteen that sum to $b+13$. Their seed requirements sum to $b+1$, since a width-$w$ band needs $w-4$ seeds to avoid an empty pair. A piece with no such pair therefore spans at most $b+12$ sheets. The verifier uses the same 37-sheet domain at all four budgets.
+
 ## The seven- through ten-sheet cases
 
 The verifier checks the signed 26-block covers with seven, eight, nine and ten sheets. Their blocking numbers are 14, 16, 18 and 20. The SAT clauses require a fort and impose respective budgets of 13, 15, 17 and 19 fort seeds. Rotate a seed belonging to the fort to sheet zero. The additional distance-four clauses follow from the intact two-round process. The instances are unsatisfiable. The full lifted opening obstruction supplies the corresponding upper bounds. Block stabilization gives the same values at these sheet counts for every $k\geq26$.
 
-Take $m=40$ in the stable regime. Reduction to ten sheets is a graph covering because ten divides 40. The image of a fort is a fort at no greater seed cost, so the common stabilized value lies in $[20,24]$.
+Take $m=40$ in the stable regime. Reduction to ten sheets is a graph covering because ten divides 40. The image of a fort is a fort at no greater seed cost, so the common stabilized value is at least 20 before the finite-strip check.
+
+## Finite forts and repeated projected seeds
+
+For a budget $b\leq23$, any finite fort of cost at most $b$ contains a nonempty inclusion-minimal fort of cost at most $b$. It cannot straddle an internal pair of empty sheets, since the two sides would separately be forts. By the twelve-sheet band bound, it occupies at most 35 consecutive sheets. Translate it to start on sheet one and place it in the 37-sheet strip with empty guards. Edges span one sheet, so no neighbor count relevant to the fort changes when the two guards are joined cyclically.
+
+Use a Boolean variable for membership of each vertex. The ordinary fort clauses forbid a vertex outside the selected set from having exactly one selected neighbor. The sheet variables require the guards to be empty, the first interior sheet to be occupied, and no pair of empty sheets before the last occupied sheet. For each selected vertex $v$, we can also demand a local reason why removing it alone would break the fort condition. A singleton cannot be a fort in a cubic graph. If removing $v$ breaks the condition, either $v$ has exactly one selected neighbor, or a neighbor outside the original selected set has exactly two selected neighbors before the removal. Inclusion-minimal forts satisfy this necessary condition. For other fort optimization encodings, see [Cameron and Pulaj](https://arxiv.org/abs/2508.07293).
+
+For a selected nonseed, follow a chosen force from its intact arrival round. If the source belongs to the fort, use that earlier vertex. Otherwise the source must have another neighbor in the fort, since it already sees the selected nonseed. This other neighbor belongs to an earlier round as well. Repeating the argument reaches a selected seed through vertices in the interior. The verifier builds these possible seed sets recursively and requires such a seed for each selected nonseed. This is the guarded version of the [seed ancestry condition](LOSS_COMPONENTS.md).
+
+Projection to the ten-sheet cover identifies selected seeds with the same base label and sheet residue modulo ten. The seed cost of the image fort is exactly the number of occupied projected seed labels. It is at least 20, so at budget $b$ the number of selections beyond the first in each projected fiber, summed over fibers, is at most $b-20$. In particular at budget 20 no fiber can contain two selected seeds. For larger budgets, a Boolean variable counts a selected seed when any earlier seed in its fiber is also selected. The same argument gives a repetition bound of $b-18$ using the nine-sheet cover.
+
+The [finite-strip verifier](check_finite_fort_strip.py) finds the budget-20, budget-21 and budget-22 formulas unsatisfiable and checks the 24-seed witness on the same strip. The guarded strip contains every possible inclusion-minimal finite fort at the excluded budgets, so the common stabilized value is either 23 or 24. Moreover, for any $k\geq26$ and $m\geq32$, a cyclic fort of cost at most 22 must have two consecutive empty sheets, since $9m>13\cdot22$. It would then unroll to an excluded finite fort. Thus these covers recover after any loss of at most 22 seeds.
 
 ## Reproduction
 
 ```sh
 python -B research-twins/check_block_stabilization.py
 python -B research-twins/check_block_stabilization.py --certify-sheets 7 8 9 10
+python -B research-twins/check_finite_fort_strip.py
 ```
 
 The script checks both stage band types and the sheet bands with PySAT and the normalized seed and edge identifications in 120 interior contractions, including splices next to the first or terminal stage.
 
 The optional run also checks the four exact small-sheet thresholds.
+
+The finite-strip command replays the certified budget-22 exclusion. Other budgets can be selected with the budget argument. A capped run reports an inconclusive search if the cap is exhausted. [PySAT cardinality encodings](https://pysathq.github.io/docs/html/api/card.html)
