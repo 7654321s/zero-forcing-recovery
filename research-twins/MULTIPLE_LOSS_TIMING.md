@@ -588,6 +588,40 @@ T\geq t+k(2t+511+3\cdot2^{t-2})
 $$
 This optimizes the choices of main-path sites in the fully filled combined construction.
 
+#### Optimizing detours at a prescribed cycle rank
+
+The combined construction admits an exact finite-budget optimization. It allows independent choices at all ordinary sites, including whether to attach a detour to its center, and permits a layered detour at each main-path site. The optimum here is within these constructions and gives a lower bound for the maximum over subcubic graphs.
+
+Let $s$ be the number of intact rounds remaining at a site. An ordinary site can be left empty or take a detour of rank one with base contribution $2s-3$. The detour creates one guard site with $s-2$ rounds left and two arm sites for each remaining deadline from 2 through $s-3$. If its center is spliced, its contribution decreases by one, the center must take an ordinary detour with $s-2$ rounds left, and the first two sites on the outgoing arm are omitted. The first mark is removed, and the second is identified with the new detour's guard and already counted there. This option is offered for $s\geq5$, as in the [repeated-attachment construction](#repeated-attachments-at-detour-centers).
+
+For each $s$, store the best ordinary contribution at every exact rank up to $\beta$. Include zero at rank zero for an optional site, and exclude rank zero when a center splice requires a detour. Each of the two detour shapes combines the tables of its child sites by max-convolution. For tables $A,B$, the entry at rank $r$ is $\max_{i+j=r}(A(i)+B(j))$ over reachable entries. The child's remaining deadline is strictly smaller, so the tables are evaluated in order of increasing $s$. The distinct child sites use independent spare incidences. In the spliced shape the shared guard is assigned only to the new detour. The serial schedule of the construction works for every allocation to these sites, so the recurrence is both necessary and sufficient for the ordinary choices in this family.
+
+At a main-path site with $s\geq3$, also allow rank $2m$ for a layered detour of size $m$, where $1\leq m\leq2^{s-2}$. Convolve the resulting tables for the $k$ sites with $s=t$ and the $2k$ sites at each $2\leq s<t$. Take the best entry at rank at most $\beta$, since unused rank can be supplied by all-blue cycles. The prefix and main paths add $t+k(2t+1)$ rounds. Recorded rank splits reconstruct the layered sizes and all ordinary choices, including the compulsory center detours. The algorithm uses $O((t^2+kt)\beta^2)$ time and $O((t^2+kt)\beta)$ table space for $t\geq2$ and $\beta\geq1$. The tables can stop at each configuration's capacity when it is less than $\beta$.
+
+**Removing dominated layered choices.** Let $U_{s-2}$ and $R_s$ be the contribution and rank of the fully filled ordinary site computed above. A layered option with $m\leq U_{s-2}$ can be replaced by an ordinary choice of rank at most $2m$. If $R_s<m$, use the fully filled ordinary site. If $R_s\geq m$, retain exactly $m$ detours from that site by removing leaves of the detour tree. Removing a leaf at a center also restores the parent's ordinary outgoing arm, with its two newly available sites left unused. The resulting shape is still allowed. Each retained detour contributes at least one net serial round, so the ordinary plan contributes at least $m$ rounds for rank $m$. In particular, no layered choice is needed for $t\leq12$. The implementation also prunes any layered option already matched by the ordinary table at equal or smaller rank.
+
+For one lost seed and $t=13$, rank $5345$ gives 6654 rounds in this family. At rank $5346$ a 2009-terminal layered detour at the lost root gives 6655 rounds with the remaining rank spent on ordinary detours. For $t=14$, the corresponding values are 12412 rounds at rank $6997$ and 12413 rounds at rank $6998$. The latter choice places its 2009-terminal detour on a first-round arm vertex, with ordinary detours at the other active sites. These are the first improvements over the fully filled ordinary times, since the optimized time is nondecreasing under all-blue rank padding. The dominance rule rules out a useful layered option below the rank that fills the ordinary sites in these two examples.
+
+The replay script provides `subcubic_rank_allocation` for the numerical optimum and its plan, and `subcubic_optimized_rank_certificate` to build the graph and its delayed arrival waves.
+
+**Marginal gains for ordinary sites.** The ordinary part of the optimization has an explicit multiset rule. Let $M_s$ be the multiset of marginal gains for an ordinary site with $s$ rounds left, so the optimal contribution for rank $b$ is the sum of its $b$ largest entries, up to the size of the multiset. Set $M_0=M_1=\varnothing$, $M_2=\{1\}$, $M_3=\{3\}$ and $M_4=\{5,1\}$. Write $\widetilde M_s$ for $M_s$ with its largest entry reduced by one. For $s\geq5$ the rule is
+$$
+M_s=\{2s-3\}\uplus M_{s-2}\uplus\widetilde M_{s-2}
+   \uplus\biguplus_{j=2}^{s-3} M_j \uplus\biguplus_{j=2}^{s-5} M_j .
+$$
+Here $\uplus$ denotes union with multiplicities. Thus for ordinary detours at the main sites, the optimum takes the largest gains from $k$ copies of $M_t$ and $2k$ copies of each $M_s$ for $2\leq s<t$.
+
+For the proof, the key claim is that $\widetilde M_n$ dominates $M_{n-1}\uplus M_{n-2}$ in decreasing order for $n\geq3$. This means that it has at least as many entries at or above each positive integer threshold. For a detour with $s=n+2$ rounds available, the two displaced outgoing sites have gains $M_{n-1},M_{n-2}$. Spending positive rank on a center splice gives the gains of $M_n$ minus one round for shortening the parent, which reduces the first marginal gain by one. That first gain remains the largest, since the other gains come from sites with at most $n-2$ rounds available. The dominance claim therefore lets the modified center multiset replace the two outgoing sites whenever rank is allocated to them. At rank zero it represents leaving the parent unspliced. The guard and remaining arms are independent, so choosing their best total gains amounts to taking the largest entries of their multiset union. The parent itself costs one rank and has the largest entry $2s-3$. This yields the displayed rule from dominance at $n=s-2$.
+
+To prove dominance, let $c_n(w)$ count entries of $M_n$ at least $w$, and put $e_n(w)=\mathbf 1_{w=2n-3}$ for $n\geq2$. The base cases $n=3,4,5$ follow from their multisets, with $M_5=\{7,3,2,1\}$ obtained using dominance at $n=3$. For $n\geq6$, the rule for $M_n$ uses dominance at the smaller index $n-2$. Subtract the counts for $M_{n-1}$ and $M_{n-2}$ from the modified count for $M_n$. For each positive integer $w$ the difference is
+$$
+c_n(w)-e_n(w)-c_{n-1}(w)-c_{n-2}(w)
+=\mathbf 1_{w=2n-4}
+ +c_{n-2}(w)-e_{n-2}(w)-c_{n-3}(w)
+ +c_{n-5}(w)+e_{n-3}(w).
+$$
+The middle difference is nonnegative by dominance at $n-2$, so the induction closes. This proves the multiset rule at every deadline, including the nonincreasing order of the optimal marginal gains.
+
 <a id="the-first-rank-above-six-per-lost-seed"></a>
 
 #### Counting visits down to the fourth round

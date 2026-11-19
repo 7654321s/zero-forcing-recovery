@@ -1,7 +1,8 @@
 """Replay extremal recovery examples for several lost initial blue vertices."""
 
+from collections import namedtuple
 from heapq import heappop, heappush
-from itertools import combinations, pairwise
+from itertools import accumulate, combinations, pairwise
 from pathlib import Path
 from random import Random
 import runpy
@@ -759,12 +760,121 @@ def subcubic_center_splice_plan(rounds, losses, cycle_rank, depth_limit, *, main
     return {depth: count for depth, count in enumerate(splices) if count}
 
 
+DetourPlan = namedtuple('DetourPlan', ('guard', 'incoming', 'outgoing', 'center'))
+
+
+def combine_rank_tables(tables, budget):
+    """Maximize the added time for each exact rank and record the splits."""
+    totals, splits = [0], []
+    for options in tables:
+        size = min(budget + 1, len(totals) + len(options) - 1)
+        scores, choices = [-1] * size, [-1] * size
+        for spent, before in enumerate(totals):
+            if before < 0:
+                continue
+            for extra in range(min(len(options), size - spent)):
+                after = options[extra]
+                rank = spent + extra
+                if after >= 0 and before + after > scores[rank]:
+                    scores[rank] = before + after
+                    choices[rank] = extra
+        totals = scores
+        splits.append(choices)
+    return totals, splits
+
+
+def rank_split(splits, rank):
+    allocation = []
+    for choices in reversed(splits):
+        extra = choices[rank]
+        assert extra >= 0
+        allocation.append(extra)
+        rank -= extra
+    assert rank == 0
+    return list(reversed(allocation))
+
+
+def subcubic_rank_allocation(rounds, losses, cycle_rank):
+    """Optimize the combined detour construction and recover its allocation."""
+    ordinary = [[0], [0]]
+    variants = [None, None]
+    main_options = [None, None]
+    layered_choices = [set(), set()]
+    for remaining in range(2, rounds + 1):
+        arm_rounds = tuple(range(remaining - 3, 1, -1))
+        arm_tables = [ordinary[s] for s in arm_rounds]
+        shapes = []
+        best, chosen = [0], [0]
+        if cycle_rank:
+            for splice in range(2 if remaining >= 5 else 1):
+                outgoing = arm_rounds[2:] if splice else arm_rounds
+                options = [ordinary[remaining - 2], *arm_tables,
+                           *(ordinary[s] for s in outgoing)]
+                if splice:
+                    options.append([-1, *ordinary[remaining - 2][1:]])
+                values, splits = combine_rank_tables(options, cycle_rank - 1)
+                shapes.append((outgoing, splits))
+                extension = max(0, len(values) + 1 - len(best))
+                best.extend([-1] * extension)
+                chosen.extend([0] * extension)
+                for extra, gain in enumerate(values, 1):
+                    score = gain + 2 * remaining - 3 - splice
+                    if gain >= 0 and score > best[extra]:
+                        best[extra], chosen[extra] = score, splice
+        ordinary.append(best)
+        variants.append((arm_rounds, shapes, chosen))
+        layered = set()
+        options = best[:]
+        if remaining >= 3:
+            at_most = list(accumulate(best, max))
+            targets = min(cycle_rank // 2, 2 ** (remaining - 2))
+            for count in range(1, targets + 1):
+                rank = 2 * count
+                if count <= at_most[min(rank, len(at_most) - 1)]:
+                    continue
+                options.extend([-1] * max(0, rank + 1 - len(options)))
+                options[rank] = count
+                layered.add(rank)
+        main_options.append(options)
+        layered_choices.append(layered)
+
+    sites = [(block, depth, side) for block in range(losses)
+             for depth in range(rounds - 1) for side in range(1 if depth == 0 else 2)]
+    totals, splits = combine_rank_tables((main_options[rounds - d] for _, d, _ in sites),
+                                        cycle_rank)
+    rank = max(range(len(totals)), key=totals.__getitem__)
+
+    def detour(remaining, budget):
+        if budget == 0:
+            return None
+        incoming, shapes, chosen = variants[remaining]
+        splice = chosen[budget]
+        outgoing, splits = shapes[splice]
+        budgets = iter(rank_split(splits, budget - 1))
+        guard = detour(remaining - 2, next(budgets))
+        incoming_plans = tuple(detour(s, next(budgets)) for s in incoming)
+        outgoing_plans = tuple(detour(s, next(budgets)) for s in outgoing)
+        center = detour(remaining - 2, next(budgets)) if splice else None
+        return DetourPlan(guard, incoming_plans, outgoing_plans, center)
+
+    detours, layered = {}, {}
+    for site, spent in zip(sites, rank_split(splits, rank)):
+        remaining = rounds - site[1]
+        if spent in layered_choices[remaining]:
+            layered[site] = spent // 2
+        elif spent:
+            detours[site] = detour(remaining, spent)
+    return rounds + losses * (2 * rounds + 1) + totals[rank], detours, layered
+
+
 def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_centers=False,
-                                        splice_depth_limit=2, layered_detours=None):
+                                        splice_depth_limit=2, layered_detours=None,
+                                        ordinary_detours=None):
     edges, blue, lost = list(pairwise(range(rounds + 1))), [0], []
     main_paths = []
     detours = [[] for _ in range(losses)]
     hosts, releases = [], []
+    planned_hosts = {}
     layered_releases, layered_sources, terminal_ends = [], [], set()
     layered_detours = dict(layered_detours or ())
     layered_rank = 2 * sum(layered_detours.values())
@@ -779,11 +889,19 @@ def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_ce
         blue.append(order)
         order += 1
 
+    def queue_host(depth, host, block, plan=None):
+        if ordinary_detours is not None:
+            if plan is None:
+                return
+            planned_hosts[host] = plan
+        heappush(hosts, (depth, host, block))
+
     def place_main_site(block, depth, side, host):
         nonlocal order
         targets = layered_detours.pop((block, depth, side), 0)
         if not targets:
-            heappush(hosts, (depth, host, block))
+            plan = ordinary_detours.get((block, depth, side)) if ordinary_detours is not None else None
+            queue_host(depth, host, block, plan)
             main_sites[depth] += 1
             return
         if not (depth <= rounds - 3 and 1 <= targets <= 2 ** (rounds - depth - 2)):
@@ -836,18 +954,19 @@ def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_ce
     splices = (
         subcubic_center_splice_plan(rounds, losses, ordinary_rank, splice_depth_limit,
                                    main_sites=main_sites)
-        if splice_centers else {}
+        if splice_centers and ordinary_detours is None else {}
     )
 
-    def attach_detour(depth, host, block):
+    def attach_detour(depth, host, block, plan=None):
         nonlocal order
         center_depth = depth + 2
         order, parent, guard, center = subcubic_detour_center(edges, blue, host, order)
         order, incoming = relay_arm(edges, blue, center, order, rounds - center_depth)
-        splice = splices.get(center_depth, 0) > 0
+        splice = plan.center is not None if plan else splices.get(center_depth, 0) > 0
         if splice:
-            splices[center_depth] -= 1
-            child_guard = attach_detour(center_depth, center, block)
+            if plan is None:
+                splices[center_depth] -= 1
+            child_guard = attach_detour(center_depth, center, block, plan.center if plan else None)
             order, tail = relay_arm(edges, blue, child_guard, order, rounds - center_depth - 2)
             outgoing = [child_guard, *tail]
         else:
@@ -856,22 +975,23 @@ def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_ce
         detours[block].append((depth, [*reversed(incoming), center, *outgoing]))
         releases.append((host, parent, guard, center))
         if center_depth <= rounds - 2:
-            heappush(hosts, (center_depth, guard, block))
-        for arm_depth, a in enumerate(incoming[:-2], center_depth + 1):
-            heappush(hosts, (arm_depth, a, block))
+            queue_host(center_depth, guard, block, plan.guard if plan else None)
+        for index, a in enumerate(incoming[:-2]):
+            queue_host(center_depth + 1 + index, a, block, plan.incoming[index] if plan else None)
         outgoing_start = center_depth + 1
         if splice:
             # The child detour already registered the shared guard at center_depth + 2.
             outgoing = outgoing[1:]
             outgoing_start += 2
-        for arm_depth, b in enumerate(outgoing[:-2], outgoing_start):
-            heappush(hosts, (arm_depth, b, block))
+        for index, b in enumerate(outgoing[:-2]):
+            queue_host(outgoing_start + index, b, block, plan.outgoing[index] if plan else None)
         return guard
 
     for _ in range(ordinary_rank - sum(splices.values())):
         if not hosts:
             break
-        attach_detour(*heappop(hosts))
+        depth, host, block = heappop(hosts)
+        attach_detour(depth, host, block, planned_hosts.pop(host, None))
     if any(splices.values()):
         raise AssertionError('The detours did not use the planned center attachments')
 
@@ -903,6 +1023,16 @@ def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_ce
         neutral_rank=ordinary_rank - len(releases), unprotected_blue=layered_sources
     )
     return graph, initial, mask(lost), support, paths, waves
+
+
+def subcubic_optimized_rank_certificate(rounds, losses, cycle_rank):
+    expected, ordinary, layered = subcubic_rank_allocation(rounds, losses, cycle_rank)
+    certificate = subcubic_recursive_rank_certificate(
+        rounds, losses, cycle_rank, ordinary_detours=ordinary, layered_detours=layered
+    )
+    if len(certificate[-1]) != expected:
+        raise AssertionError('The optimized graph and rank allocation give different times')
+    return certificate
 
 
 def subcubic_nine_round_chain(losses):
@@ -1273,6 +1403,25 @@ def main():
                     raise AssertionError(('layered terminal source loss', deletion))
             sampled += len(failures)
         print('Subcubic layered detours:', t, k, rank, len(graph), delayed)
+
+    for t, k, rank, expected in ((2, 1, 0, 7), (3, 2, 4, 25), (6, 1, 23, 89),
+                                 (7, 2, 25, 203), (9, 1, 100, 499)):
+        graph, blue, slow, _, _, waves = subcubic_optimized_rank_certificate(t, k, rank)
+        check_connected(graph, 3)
+        intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
+        actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
+        if (intact, delayed, actual_rank) != (t, expected, rank):
+            raise AssertionError(('subcubic optimized detours', t, k, rank, intact,
+                                  delayed, actual_rank))
+        check_arrival_waves(graph, blue ^ slow, waves)
+        print('Subcubic optimized detours:', t, k, rank, delayed)
+
+    for t, rank, expected, layered_count in ((13, 5345, 6654, 0), (13, 5346, 6655, 2009),
+                                              (14, 6997, 12412, 0), (14, 6998, 12413, 2009)):
+        time, _, layered = subcubic_rank_allocation(t, 1, rank)
+        if (time, sum(layered.values())) != (expected, layered_count):
+            raise AssertionError(('subcubic rank allocation', t, rank, time, layered))
+        print('Subcubic rank allocation:', t, rank, time, 'layered targets:', layered_count)
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()
