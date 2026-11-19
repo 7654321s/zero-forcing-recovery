@@ -4,7 +4,7 @@ Let $\kappa_{k,m}$ be the minimum number of seeds whose loss blocks recovery in 
 $$
 \kappa_{k,m}=\kappa_{26,m} \qquad (k\geq26).
 $$
-The [sheet stabilization theorem](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers) gives a single constant when $k\geq26$ and $m\geq34$, by the sheet-band refinement below. The constant is at most 24 by the common finite fort, and at least 18 by projection to the nine-sheet cover. The exact value of the constant remains open here.
+The [sheet stabilization theorem](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers) gives a single constant when $k\geq26$ and $m\geq34$, by the sheet-band refinement below. The constant is at most 24 by the common finite fort, and at least 20 by projection to the ten-sheet cover. The exact value of the constant remains open here.
 
 ## The prism stage labels
 
@@ -42,19 +42,19 @@ If a fort of cost $b$ has no two consecutive empty sheets, each cyclic thirteen-
 
 The twelve-sheet band also shortens the search for a finite integer-sheet fort of cost at most 23. After splitting at any internal gap of two empty sheets, a nonempty piece occupies a span of at most 35 sheets. A span of at least 36 would contain three disjoint twelve-sheet bands. Each would need eight seeds, giving cost at least 24. The bounded search can therefore use 37 sheets, with two outer guard sheets.
 
-## The seven-, eight- and nine-sheet cases
+## The seven- through ten-sheet cases
 
-The verifier checks the signed 26-block covers with seven, eight and nine sheets. Their blocking numbers are 14, 16 and 18. The SAT clauses require a fort and impose respective budgets of 13, 15 and 17 fort seeds. Rotate a seed belonging to the fort to sheet zero. The additional distance-four clauses follow from the intact two-round process. The instances are unsatisfiable. The full lifted opening obstruction supplies the corresponding upper bounds. Block stabilization gives the same values at these sheet counts for every $k\geq26$.
+The verifier checks the signed 26-block covers with seven, eight, nine and ten sheets. Their blocking numbers are 14, 16, 18 and 20. The SAT clauses require a fort and impose respective budgets of 13, 15, 17 and 19 fort seeds. Rotate a seed belonging to the fort to sheet zero. The additional distance-four clauses follow from the intact two-round process. The instances are unsatisfiable. The full lifted opening obstruction supplies the corresponding upper bounds. Block stabilization gives the same values at these sheet counts for every $k\geq26$.
 
-Take $m=36$ in the stable regime. Reduction to nine sheets is a graph covering because nine divides 36. The image of a fort is a fort at no greater seed cost, so the common stabilized value lies in $[18,24]$.
+Take $m=40$ in the stable regime. Reduction to ten sheets is a graph covering because ten divides 40. The image of a fort is a fort at no greater seed cost, so the common stabilized value lies in $[20,24]$.
 
 ## Reproduction
 
 ```sh
 python -B research-twins/check_block_stabilization.py
-python -B research-twins/check_block_stabilization.py --certify-sheets 7 8 9
+python -B research-twins/check_block_stabilization.py --certify-sheets 7 8 9 10
 ```
 
 The script checks both stage band types and the sheet bands with PySAT and the normalized seed and edge identifications in 120 interior contractions, including splices next to the first or terminal stage.
 
-The optional run also checks the three exact small-sheet thresholds.
+The optional run also checks the four exact small-sheet thresholds.

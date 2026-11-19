@@ -135,7 +135,7 @@ def check_small_cover(sheets):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--certify-sheets', type=int, nargs='+', choices=(7, 8, 9), default=(),
+    parser.add_argument('--certify-sheets', type=int, nargs='+', choices=(7, 8, 9, 10), default=(),
                         help='replay the selected small-sheet thresholds at 26 blocks')
     args = parser.parse_args()
     print(f'{check_contractions()} stage contractions checked', flush=True)
