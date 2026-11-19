@@ -4,7 +4,7 @@ Let $\kappa_{k,m}$ be the minimum number of seeds whose loss blocks recovery in 
 $$
 \kappa_{k,m}=\kappa_{26,m} \qquad (k\geq26).
 $$
-The common value is exactly 24 when $k\geq26$ and $m\geq33$. The sheet-band refinement below reduces the lower bound to a finite strip for at least 34 sheets. At 33 sheets the remaining cyclic seed profiles can also be excluded. The common 24-seed fort gives the upper bound.
+The common value is exactly 24 when $k\geq24$ and $m\geq32$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 32 and 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
 
 ## The prism stage labels
 
@@ -31,6 +31,14 @@ Insert a new empty stage between two consecutive empty appended stages, using th
 To contract a pair, delete one ordinary stage and retain the other. Keep the first appended stage if the pair meets it, and keep the terminal stage if the pair meets that end. For the retained stage, the count of fort neighbors at a given vertex consists of contributions from its two sides. Each contribution is the full old count of the corresponding vertex in one of the empty stages, since its old neighbors on the other side and in its own stage were outside the fort. Each old count is zero or at least two. The port rules preserve the contributions under the splice, so their sum cannot be one. Every other surviving vertex keeps the same count of fort neighbors. All links between appended stages have the same increasing-label sheet shift, so the argument applies at each sheet, including modulo $m$. Seed memberships of all surviving labeled vertices are inherited.
 
 In both directions the cost is unchanged. For $k\geq26$, the two adjacent lengths $k$ and $k+1$ both admit a blocking set of size at most 24 by the published witness. If either minimum is at most 23, the corresponding fort admits insertion or contraction, giving the same upper bound in the other length. Applying this to the smaller of the two minima proves equality. If both are 24, they already agree. This proves stabilization across block counts, uniformly over sheet counts.
+
+## Opening insertion at 24 and 25 blocks
+
+Starting with the opening seeds alone fills the opening by round two for each of these two bases. The process lifts to a cyclic or integer-sheet cover. A fort containing no opening seed is consequently disjoint from the opening. Each opening vertex in $\{5,6,14,17\}$ has a single neighbor outside the opening. The fort condition at every lift of these vertices then excludes offsets $0,1,2$ of the first appended stage from the fort, on every sheet.
+
+Insert an empty first appended stage and relabel every old appended vertex by adding 16. The four opening links now go to the empty new stage. The new stage connects to the old first stage at offsets $0,1,2$, which are also outside the fort. All changed edges therefore join vertices outside the fort. Old terminal links and the signed shifts on retained edges are preserved. This insertion preserves the fort and its seed cost.
+
+For each of 24 and 25 blocks, the [opening verifier](check_prism_opening_insertion.py) excludes any base fort of cost at most 23 that contains an opening seed and meets every consecutive pair of appended stages. A projected fort has no greater cost and retains membership in the opening and in each occupied stage. Thus a lifted fort of cost at most 23 can extend by opening insertion if it omits the opening seeds, or by the empty adjacent pair if it contains one. Iterating gives a fort of the same cost at 26 blocks with the same sheet count. Consequently, wherever the 26-block value is 24, the 24- and 25-block values are also 24.
 
 ## A smaller sheet threshold for long chains
 
@@ -70,6 +78,14 @@ Up to cyclic rotation the two excess units are on the same band, or in two bands
 
 The [profile verifier](check_33_sheet_profiles.py) excludes a fort for each of the twelve profiles. It enforces the ordinary fort clauses, the local minimality and seed-ancestry conditions, at least one occupied sheet in every consecutive sheet pair, and an empty adjacent stage pair from the 25-stage band. Boolean sheet flags fix the occupied seed sheets in each case. It also checks the 24-seed witness. Together with block stabilization, this proves $\kappa_{k,33}=24$ for every $k\geq26$.
 
+## The 32-sheet case
+
+A candidate with cost below 24 at 32 sheets must have cost exactly 23 and meet every adjacent sheet pair, by the finite-strip exclusion and the thirteen-sheet bound at budget 22. The other 31 sheets around any given sheet can be partitioned into bands of widths 10, 10 and 11. They require at least $6+6+7=19$ selected seeds. Thus at most four seeds are selected on the given sheet.
+
+The [32-sheet verifier](check_32_sheet_cover.py) encodes four exact count flags on each sheet. Flag $j$ means that at least $j$ of that sheet's seeds are selected. As a new seed is scanned, a successful threshold comes from either the previous prefix at the same threshold or the previous prefix one below the threshold together with that seed. The fifth threshold is fixed false. The sum of all final flags is the total seed cost. For each cyclic band of width $w$ from ten to thirteen the flags in the band sum to at least $w-4$. The total is fixed at 23, and rotation places one selected seed on sheet zero.
+
+Along with the fort, ancestry, local minimality, occupied sheet-pair and empty stage-pair clauses, these requirements are unsatisfiable. The verifier also checks the cost-24 witness. Hence $\kappa_{26,32}=24$. Block stabilization and the opening insertion give the stated range of at least 24 blocks and 32 sheets.
+
 ## Reproduction
 
 ```sh
@@ -77,6 +93,8 @@ python -B research-twins/check_block_stabilization.py
 python -B research-twins/check_block_stabilization.py --certify-sheets 7 8 9 10
 python -B research-twins/check_finite_fort_strip.py
 python -B research-twins/check_33_sheet_profiles.py
+python -B research-twins/check_32_sheet_cover.py
+python -B research-twins/check_prism_opening_insertion.py
 ```
 
 The script checks both stage band types and the sheet bands with PySAT and the normalized seed and edge identifications in 120 interior contractions, including splices next to the first or terminal stage.
