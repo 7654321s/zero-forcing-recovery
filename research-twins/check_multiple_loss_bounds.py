@@ -96,30 +96,62 @@ def one_round_certificate(degree, losses):
     return graph, initial, mask(deliberately_lost), support, paths, len(terminal)
 
 
-def exact_two_loss_certificate(degree):
-    first, second = 0, 1
-    edges, blue, targets = [], [first, second], []
-    order = 2
-    for _ in range(degree - 2):
+def one_round_block(degree, roots, edges, blue, order):
+    targets = []
+    if len(roots) == 2:
+        pairs = [tuple(roots)] * (degree - 2)
+    elif len(roots) == 3:
+        count, parity = divmod(degree - 2, 2)
+        a, b, c = roots
+        pairs = [(a, b)] * count + [(a, c), (b, c)] * (count + parity)
+    else:
+        pairs = []
+
+    for left, right in pairs:
         source, target = order, order + 1
         order += 2
-        edges.extend(((source, first), (source, second), (source, target)))
+        edges.extend(((source, left), (source, right), (source, target)))
         blue.append(source)
         targets.append(target)
-    direct_a, direct_b, guard_a, guard_b, source_a, source_b, seed, prefix = range(order, order + 8)
-    order += 8
-    edges.extend(((first, direct_a), (second, direct_b),
-                  (direct_a, guard_a), (direct_b, guard_b),
-                  (source_a, first), (source_a, guard_a),
-                  (source_b, second), (source_b, guard_b), (seed, prefix)))
-    blue.extend((source_a, source_b, seed))
-    for left, right in pairwise([prefix, *targets, direct_a, direct_b, guard_a]):
-        edges.extend(((order, left), (order, right)))
-        blue.append(order)
-        order += 1
-    lost = [first, second]
-    graph, initial, support, paths = protect_seeds(degree, edges, blue, order, lost, seed)
-    return graph, initial, mask(lost), support, paths
+
+    direct = range(order, order + len(roots))
+    enter, tail, enter_source, tail_source = range(direct.stop, direct.stop + 4)
+    edges.extend(zip(roots, direct))
+    edges.extend((tail, child) for child in direct[1:])
+    edges.extend(((enter, direct[0]), (enter_source, roots[0]), (enter_source, enter),
+                  (tail_source, roots[min(1, len(roots) - 1)]), (tail_source, tail)))
+    blue.extend((enter_source, tail_source))
+    return tail_source + 1, [*targets, *direct, enter], tail
+
+
+def sharp_one_round_certificate(degree, losses):
+    """Build a sharp connected example for degree at least four and at least two losses."""
+    roots = list(range(losses))
+    tail_size = 0 if losses % 2 == 0 else (1 if degree <= 6 else 3)
+    split = losses - tail_size
+    groups = [roots[i:i + 2] for i in range(0, split, 2)]
+    if tail_size:
+        groups.append(roots[split:])
+
+    seed, prefix = losses, losses + 1
+    edges, blue = [(seed, prefix)], [*roots, seed]
+    order = prefix + 1
+    for group in groups:
+        order, targets, tail = one_round_block(degree, group, edges, blue, order)
+        for left, right in pairwise([prefix, *targets]):
+            edges.extend(((order, left), (order, right)))
+            blue.append(order)
+            order += 1
+        prefix = tail
+    graph, initial, support, paths = protect_seeds(degree, edges, blue, order, roots, seed)
+    return graph, initial, mask(roots), support, paths
+
+
+def sharp_one_round_time(degree, losses):
+    cap = 1 + degree * losses // 2 + 2 * losses
+    if losses % 2 and degree >= 6:
+        cap -= 1 if degree == 6 else 2 - degree % 2
+    return cap
 
 
 def layered_certificate(degree, rounds, losses):
@@ -234,14 +266,17 @@ def main():
             exhaustive += check_all_losses(graph, blue, k)
         print('One-round family:', d, k, len(graph), n + 1 + k // 2)
 
-    for d in (4, 5, 7, 12):
-        graph, blue, slow, support, paths = exact_two_loss_certificate(d)
-        sampled += check_robust_samples(graph, blue, slow, support, paths, d, 1, 2)
-        if completion_time(graph, blue ^ slow) != d + 5:
-            raise AssertionError(('sharp two-loss deadline', d))
-        if d == 4:
+    sharp_cases = ((4, 2), (4, 3), (4, 6), (5, 3), (6, 3), (6, 7),
+                   (7, 2), (7, 3), (8, 3), (8, 4), (9, 5), (12, 2))
+    for d, k in sharp_cases:
+        graph, blue, slow, support, paths = sharp_one_round_certificate(d, k)
+        sampled += check_robust_samples(graph, blue, slow, support, paths, d, 1, k)
+        expected = sharp_one_round_time(d, k)
+        if completion_time(graph, blue ^ slow) != expected:
+            raise AssertionError(('sharp one-round deadline', d, k, expected))
+        if (d, k) == (4, 2):
             exhaustive += check_all_losses(graph, blue, 2)
-        print('Sharp two-loss one-round family:', d, len(graph), d + 5)
+        print('Sharp one-round family:', d, k, len(graph), expected)
 
     for d, t, k in ((4, 2, 2), (5, 2, 3), (4, 3, 2), (5, 3, 3), (4, 2, 5)):
         graph, blue, slow, support, paths, early = layered_certificate(d, t, k)
