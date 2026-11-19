@@ -95,6 +95,7 @@ def check_sharpness():
     for depth in range(1, 5):
         graph, seeds, fort = sharp_cubic_fort(depth)
         check_cubic_bipartite(graph)
+        MODEL['check_no_two_edge_cut'](graph)
         check_charge(graph, seeds, fort, depth)
         if fort.bit_count() != 3 * 2**depth - 2 or (seeds & fort).bit_count() != 1:
             raise AssertionError(('sharpness', depth))
