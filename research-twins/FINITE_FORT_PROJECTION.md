@@ -58,6 +58,25 @@ In the remaining case the projection meets the opening seeds and every adjacent 
 
 For each of the thirteen lengths from 11 through 23 blocks, the verifier checks the sheet bands of widths 10 through 23. The ten-sheet test permits five lost seeds and forces a consecutive pair of sheets in the core. The larger widths use the two overlapping shorter bands and the complement bounds from the [26-block proof](BLOCK_STABILIZATION.md#a-smaller-sheet-threshold-for-long-chains). Each 23-sheet band of a wrapped fort contains at least 19 seeds. Counting cyclic translates gives $19m\leq23b$ for a wrapped fort of cost $b$. At $m\geq28$ and $b\leq23$ that inequality is impossible. Two empty sheets then turn the cyclic fort into a finite fort of the same cost, excluded by the projected-support argument above. The inherited cost-24 fort supplies the matching upper bound.
 
+## Exact minimum spans in signed prism chains
+
+The span of a finite fort is its largest occupied sheet minus its smallest occupied sheet plus one. A fort of span at most $w$ can be translated into the middle $w$ sheets of a cyclic cover with $w+2R$ sheets, where $R\geq1$ bounds the absolute edge shifts. Keep $R$ empty guard sheets on each side. An edge meeting the fort stays inside this strip, and all outside neighbor counts next to the fort agree with those in the integer lift. A fort within the proposed span exists exactly when the guards, colored blue initially, fail to force the whole cyclic cover. In that case the vertices left white are the largest fort in the interior strip.
+
+For the signed prism chain, $R=1$. The two guards force the six interior sheets at each chain length from 6 through 11. At lengths of at least 12, a 51-round timetable works uniformly. At 12 blocks, the timetable consists of the opening and first appended stage, five copies of one ordinary stage timetable, and a suffix of five fixed stages. For a longer chain, insert more copies of the repeated timetable.
+
+Every edge joins vertices within one stage or in consecutive stages in the cyclic order from the opening through the last appended stage and back to the opening. The [normalized stage description](BLOCK_STABILIZATION.md#the-prism-stage-labels) preserves the edges and shifts when an ordinary interior stage is repeated. A proposed force and all its prerequisites lie within the five consecutive stages centered at the target stage. The opening, first stage and terminal stage retain their types. Every five-stage window of types and timetables in the longer chain already occurs at length 12, where five repeated copies suffice for the window consisting solely of repetitions. The verifier checks that each noninitial vertex in the timetable has a source and other prerequisites with strictly earlier times. Induction on the assigned time therefore forces all six interior sheets in every longer chain.
+
+The common cost-24 witness occupies seven sheets. Consequently the minimum span is seven for every chain with at least six blocks, and for at least eleven blocks that witness attains both the minimum seed cost and the minimum span. Each numerical entry below is the minimum seed cost among forts of span at most the column value.
+
+| Blocks | Minimum span | 4 sheets | 5 sheets | 6 sheets | 7 sheets | 8 sheets |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2 | 4 | 22 | 18 | 16 | — | — |
+| 3 | 5 | no fort | 27 | 23 | 22 | 21 |
+| 4 | 5 | no fort | 41 | 34 | 24 | — |
+| 5 | 6 | no fort | no fort | 42 | 24 | — |
+
+For each displayed numerical cost, the guarded fort formula is satisfiable at that cost and unsatisfiable one seed below it. Dashes mark spans omitted from the table.
+
 ## Reproduction
 
 ```sh
@@ -76,4 +95,10 @@ The sheet-band checks for the shorter chains can be replayed with the same verif
 
 ```sh
 python -B research-twins/check_block_stabilization.py --subbands-from 17 --band-through 23 --band-blocks 11 12 13 14 15 16 17 18 19 20 21 22 23
+```
+
+The following command reproduces the minimum spans and the cost table.
+
+```sh
+python -B research-twins/check_finite_fort_span.py
 ```
