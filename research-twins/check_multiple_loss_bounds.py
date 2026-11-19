@@ -341,11 +341,11 @@ def main():
             raise AssertionError(('serial prefix', d, t, k))
         print('Layered family:', d, t, k, len(graph), late)
 
-    for d, k in ((4, 2), (5, 3), (6, 2), (7, 3), (8, 2), (6, 7)):
+    for d, k in ((4, 2), (4, 5), (5, 3), (6, 2), (7, 3), (8, 2), (6, 7)):
         graph, blue, slow, support, paths = two_round_certificate(d, k)
         sampled += check_robust_samples(graph, blue, slow, support, paths, d, 2, k)
         expected = 2 + k * (SINGLE['quadratic_degree_time'](d) - 2)
-        upper = 2 + k * (d**2 + 12) // 2
+        upper = 2 + (13 * k if d == 4 else k * (d**2 + 11) // 2)
         if completion_time(graph, blue ^ slow) != expected or expected > upper:
             raise AssertionError(('concatenated two-round delay', d, k, expected, upper))
         print('Concatenated two-round family:', d, k, len(graph), expected, upper)

@@ -131,10 +131,11 @@ After the relay list fills, the direct children force their old parents, the sin
 
 For every $d\geq4$ and $k\geq1$, let $m_d=M_{d,2,1}$ be the [exact single-loss value](ONE_LOSS_TIMING.md#quadratic-growth-with-the-maximum-degree), namely $15$ at $d=4$, $19$ at $d=5$ and $\lfloor d^2/2\rfloor+6$ at $d\geq6$. Then
 $$
+M_{4,2,k}=2+13k,\qquad
 2+k(m_d-2)\ \leq\ M_{d,2,k}\ \leq\
-2+\left\lfloor\frac{kd^2}{2}\right\rfloor+6k.
+2+\left\lfloor\frac{k(d^2+11)}{2}\right\rfloor\quad(d\geq5).
 $$
-The bounds differ by at most $5k/2$ rounds. The lower bound holds on connected $k$-fault-tolerant graphs.
+The bounds differ by at most $2k$ rounds. The lower bound holds on connected $k$-fault-tolerant graphs.
 
 #### Upper bound
 
@@ -159,7 +160,27 @@ There are $a+B_*$ other old discrepancies. Each of those and its exceptional tar
 $$
 2+\frac{k(d^2+1)}2+4k+\frac{3a}{2}+2B_*-\frac d2(\nu+h).
 $$
-Since $a\leq k$, $B_*\leq\nu$ and $d\geq4$, taking the integer part gives the claimed upper bound.
+Since $a\leq k$, $B_*\leq\nu$ and $d\geq4$, this gives a preliminary upper bound of $2+\lfloor kd^2/2\rfloor+6k$.
+
+#### Saving for each lost seed
+
+Keep the slack in both counts. Put $\lambda=kd-J-h$. Let $u$ count physically unused old incidences in the final-round count, excluding the unavailable first-round incidences and the predecessors already subtracted. Let $v$ count initially white members of $D_1$ that are not chosen as direct final-round sources. The incidence inequality can then subtract an additional $(d-1)\lambda+u+v$ on the right of $2N+E\leq k(d^2+1)-d(\nu+h)-a$: substitute $b=kd-\nu-h-\lambda$, subtract the unused incidences from the capacity, and subtract $v$ from the direct-source allowance.
+
+Write $R_z$ for the set of rounds after time two occupied by the regular group of a lost seed $z$, and $W_w$ for the corresponding set of an irregular old vertex $w$. Their exceptional-target counts are $E_z$ and $E_w$, respectively. These groups have nonnegative slacks
+$$
+4-|R_z|+E_z/2,\qquad 2-|W_w|+E_w/2.
+$$
+We may also subtract the sum of the group sizes minus the size of their union, and the number of nonexceptional targets arriving in that union. The preliminary bound counted these rounds more than once.
+
+Call a lost seed good if it uses all $d$ first-round incidences and is chosen as a direct source. For each other seed we already save at least one round: the number of such seeds is at most $(k-a)+h+\lambda$, while the preceding bound saves $3(k-a)/2+dh/2+(d-1)\lambda/2$. For every good seed we will find at least one further round of slack at $d=4$ and at least half a round at $d\geq5$.
+
+Let $z$ be good, let $w$ be its first-round target, and let $r$ be the delayed restoration time of $z$. The other $d-1$ neighbors of $z$ are retained sources already blue. If $R_z$ lacks any of $r-1,r,r+1$, then $|R_z|\leq\min(4,2+E_z)$ and its slack is at least one. If all three rounds occur and $w$ is still white at $r-2$, then $w$ returns in one of those rounds: $z$ can force it by $r+1$. The sets $R_z,W_w$ therefore overlap, saving one round.
+
+It remains that $w$ is blue by $r-2$ and all three central rounds occur. At round $r-2$ the vertex $w$ has another white neighbor besides $z$, since otherwise it would force $z$ by $r-1$. If $w$ was not selected as a direct final-round source, it contributes one unit to $v$. Its white neighbor supplies an unused incidence at $w$ in $u$, because it is white at time one in the delayed run and so cannot be a retained source in that count. This gives a whole round of slack.
+
+If $w$ has a selected direct final-round target $y$, consider its other white neighbors at $r-2$. If there are none besides $z,y$, then $y$ is still white at $r-2$ and fills by $r+1$, since $z$ returns at $r$. Thus $y$ arrives in $R_z$. It is counted in $N$ and saves a round by arriving in the union of the group rounds. Otherwise an additional white neighbor supplies an unused incidence at $w$, saving half a round. For $d=4$, the predecessor $z$, the target $y$ and this extra neighbor leave room for at most one exceptional source at $w$. With $E_w\leq1$, the slack $2-|W_w|+E_w/2$ is at least another half round.
+
+The local contributions can be added. Distinct good seeds have distinct target vertices $w$, so their unused incidences, direct-source allowances and irregular group slacks are distinct. Their selected final-round targets $y$ are also distinct. The overlaps used here are between disjoint pairs of group identities $(R_z,W_w)$, so even when several pairs overlap at one time, the excess multiplicity counts every such pair. We have saved at least $k$ rounds in degree four and $k/2$ rounds in the other degrees. Applying these savings to the preliminary upper bound before taking the integer part gives the stated bounds. The concatenated construction gives equality at degree four.
 
 #### Concatenated lower construction
 
@@ -187,4 +208,4 @@ Run the following from the repository root.
 python -B research-twins/check_multiple_loss_bounds.py
 ~~~
 
-The script exhausts losses through the budget on the degree-two examples and the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It also replays six concatenated two-round examples, including budgets larger than the degree cap. On the larger graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
+The script exhausts losses through the budget on the degree-two examples and the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It also replays seven concatenated two-round examples, including budgets larger than the degree cap. On the larger graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
