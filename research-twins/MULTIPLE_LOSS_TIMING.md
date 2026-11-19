@@ -690,6 +690,55 @@ E=\min\{B/2,(3/4)k2^t\}+O(kr^t+1).
 $$
 The upper bound uses the total capacity and the two-unit cost per round. The lower bound takes all useful sites and pays their total activation rank when the budget permits, with the same error bound at smaller budgets. Hence if $B/(k2^t)\to\lambda\geq0$, the extra rounds divided by $k2^t$ tend to $\min(\lambda/2,3/4)$.
 
+#### Several layers and the saturation window
+
+Keep $B,E,D$ from the preceding section, and put $L=t-2$. Suppose $t\to\infty$ and $x_t=B/(k2^{L+1})\to x$ with $0<x<3$. For fixed $k$, define $C_k(x)$ as the minimum of $k^{-1}\sum_{j\geq0}a_j r^{-j}$ subject to
+$$
+\sum_{j\geq0}a_j2^{-j}\geq kx,\qquad
+a_0\in\{0,\ldots,k\},\qquad a_j\in\{0,\ldots,2k\}\quad(j\geq1).
+$$
+The normalized deficit then satisfies
+$$
+\frac{D}{kr^L}\longrightarrow \frac w2 C_k(x).
+$$
+If instead $k\to\infty$, the same limit uses $C_\infty(x)$, the fractional relaxation with bounds $0\leq a_0/k\leq1$ and $0\leq a_j/k\leq2$ for $j\geq1$. Its value is $x$ for $0\leq x\leq1$ and $(r+1)/(r-1)$ at $x=3$. For $m\geq1$, put $X_m=3-2^{1-m}$ and $X_0=1$. On $[X_{m-1},X_m]$ its value is
+$$
+C_\infty(x)=1+2\sum_{j=1}^{m-1}r^{-j}+(x-X_{m-1})(2/r)^m.
+$$
+
+**Proof of the interior limit.** A type at deadline $s=t-j$ has $k$ copies at $j=0$ and $2k$ copies at each $j>0$ until the usefulness cutoff $s=13$. Across every selection, the actual total capacity divided by $k2^L$ differs from $k^{-1}\sum_j a_j2^{-j}$ by $O((r/2)^L)$, since $P_s=2^{s-2}-O(r^{s-2})$. Similarly the total activation rank divided by $wkr^L$ differs from $k^{-1}\sum_j a_jr^{-j}$ by $o(1)$ uniformly in the selection. At each fixed $j$ this follows from $W_s\sim wr^{s-2}$, and the omitted tail is bounded by a geometric series.
+
+For fixed $k$, a minimizing count sequence exists by diagonal subsequences and the uniform geometric tails. The resulting $C_k$ is left continuous because a limit of minimizing sequences for smaller demands covers the limiting demand. For right continuity at $x<3$, consider a minimizing sequence of counts for the demand $kx$. If its covered size is exactly $kx$, it must leave space at arbitrarily deep types. Otherwise all sufficiently deep types would be full. If a type has at least two copies selected, moving two to one spare position in the preceding type preserves size and lowers cost. Thus a full tail would force every preceding type to be full, for a covered size of $3k$. Adding one copy at a deep unfilled type yields a strict surplus at arbitrarily small additional cost. A strict surplus can be retained under finite truncation. This proves right continuity and supplies finite covers with strict surplus and cost arbitrarily close to the minimum.
+
+For the fractional cover, the cost per unit size of type $j$ is $(2/r)^j$, which increases with $j$. Filling types in order gives the displayed formula. Rounding up its last partially filled type gives an integer cover and adds cost at most $1/k$. Consequently $0\leq C_k(x)-C_\infty(x)\leq1/k$ for $0\leq x\leq3$.
+
+The [leading-order formula](#how-extra-cycle-rank-converts-into-recovery-time) gives $E/(k2^L)\to x$. An optimal layered selection $S$ therefore covers raw normalized demand $x-o(1)$ and pays activation rank $W(S)\leq2D$. The uniform cost comparison and continuity give the claimed lower limit, using the fractional lower bound if $k$ grows. For the upper limit at fixed $k$, use a finite cover of $x$ with strict surplus and cost arbitrarily close to $C_k(x)$. For growing $k$, take the fractional cover of a fixed demand slightly above $x$ and round up. The strict surplus ensures that the actual capacity exceeds $B/2$ for large $t$. Thus $D$ is at most half the chosen activation rank plus the loss of less than one round from rounding. This proves both limits. For $kx\leq1$ the fixed-$k$ formula agrees with the [single-site scale](#how-extra-cycle-rank-converts-into-recovery-time), since $C_k(x)=C(kx)/k$ after merging repeated dyadic sizes.
+
+**Full layered capacity.** Write $P_{\rm all}$ and $W_{\rm all}$ for the sums of $P_s$ and $W_s$ over all useful sites. At $t\geq13$ the first rank budget above ordinary saturation that attains $E=P_{\rm all}$ is
+$$
+B_{\rm sat}=W_{\rm all}+2P_{\rm all}.
+$$
+Reaching full capacity requires every useful site because each has positive capacity. Conversely this budget pays for all of them and all their extra rounds. In terms of total rank this is exactly $\beta_{\rm sat}=k(6\cdot2^{t-2}-6864)$ by the [fully filled calculation](#combining-layered-and-recursive-detours).
+
+For a budget $B=B_{\rm sat}-\Delta$ with $0\leq\Delta\leq3519$, the optimum is exactly
+$$
+E=P_{\rm all}-\min\{\lceil\Delta/2\rceil,40\}.
+$$
+The smallest useful site has capacity $P_{13}=40$ and activation rank $W_{13}=3439$. To verify that all later capacities are larger, let $V_n=2U_{n-1}-U_n$. The [ordinary recurrence](#combining-layered-and-recursive-detours) gives the same positive-coefficient recurrence with constant term 6 for $V_n$ when $n\geq8$. The values at $n=11,\ldots,17$ are $140,269,496,934,1737,3251,6062$, all positive. Hence $V_n>0$ for every $n\geq11$, so $P_{s+1}=2P_s+V_{s-1}>2P_s$ for $s\geq13$. Keeping every site loses $\lceil\Delta/2\rceil$ rounds when that option is feasible. Omitting one site of deadline 13 loses 40 rounds of capacity and saves $3439+80=3519$ units of rank at full use. No nonempty omission can leave more than $P_{\rm all}-40$ rounds of capacity. These two choices therefore give the exact formula, including the 40-round plateau.
+
+**Critical scale near saturation.** Let
+$$
+u=-\frac{1+\rho-\rho^2+\rho^3}{(1-\rho)\rho Q'(\rho)},\qquad
+u_*=u\frac{r+1}{r-1},\qquad w_*=w\frac{r+1}{r-1}.
+$$
+Then $P_{\rm all}=3k2^L-u_*kr^L+o(kr^L)$ and $W_{\rm all}=w_*kr^L+o(kr^L)$, by the coefficient formula for $U_n$ and the geometric cost sum. If $(B-6k2^L)/(kr^L)\to b$ for a finite real $b$, with $k\geq1$ fixed or varying, then
+$$
+\frac{3k2^L-E}{kr^L}\longrightarrow \max\{u_*,(w_*-b)/2\}.
+$$
+Choosing all sites gives $E_{\rm all}=\min(P_{\rm all},\lfloor(B-W_{\rm all})/2\rfloor)$ and loses $O(kr^L)$ rounds of capacity on this scale. If a better choice omits capacity $a$, then $a\leq P_{\rm all}-E_{\rm all}$. The activation rank it saves is $O(k^{1-\alpha}a^\alpha)$. For the latter bound, split omitted sites by whether their raw size $d=2^{s-2}$ is at most $a/k$. Small types save $O(k(a/k)^\alpha)$ by the geometric sum. At the larger types the ratio of activation rank to capacity is $O(d^{\alpha-1})$, so they save $O(a(a/k)^{\alpha-1})$. When $a=0$ there are no omissions. Thus the improvement over $E_{\rm all}$ is $O(kr^{\alpha L}+1)=o(kr^L)$, which gives the claimed limit.
+
+The numerical optimizer can search for omissions instead of activations near saturation. Any omission that improves $E_{\rm all}$ must lose strictly less than $P_{\rm all}-E_{\rm all}$ capacity. The same dominance search now minimizes omitted capacity and maximizes saved activation rank. This gives a small exact search for budgets just below saturation.
+
 <a id="the-first-rank-above-six-per-lost-seed"></a>
 
 #### Counting visits down to the fourth round

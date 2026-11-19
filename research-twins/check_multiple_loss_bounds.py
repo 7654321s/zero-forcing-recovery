@@ -815,39 +815,67 @@ def subcubic_first_layered_rank(rounds, losses):
     return sum(ordinary.values()) + min(layer.activation_rank for layer in layers) + 2
 
 
-def subcubic_layer_selection(layers, budget):
-    """Choose layers by activation rank and their capacity for extra rounds."""
-    if not layers or budget < min(layer.activation_rank for layer in layers) + 2:
-        return 0, ()
-    full_capacity = sum(layer.copies * layer.extra_capacity for layer in layers)
-    full_activation = sum(layer.copies * layer.activation_rank for layer in layers)
-    if budget >= full_activation + 2 * full_capacity:
-        return full_capacity, tuple((layer.remaining, layer.copies) for layer in layers)
-
+def subcubic_layer_frontier(groups, limit):
+    """Find undominated cost, benefit, and plan triples."""
     frontier = [(0, 0, ())]
-    for layer in layers:
-        remaining = min(layer.copies, (budget - 2) // layer.activation_rank)
+    for deadline, copies, unit_cost, unit_benefit in groups:
+        remaining = min(copies, limit // unit_cost)
         chunk = 1
         while remaining:
             count = min(chunk, remaining)
-            extra_rank = count * layer.activation_rank
-            extra_capacity = count * layer.extra_capacity
-            candidates = {rank: (capacity, plan) for rank, capacity, plan in frontier}
-            for rank, capacity, plan in frontier:
-                rank += extra_rank
-                capacity += extra_capacity
-                if rank <= budget - 2 and capacity > candidates.get(rank, (-1, ()))[0]:
-                    candidates[rank] = (capacity, (*plan, (layer.remaining, count)))
+            extra_cost = count * unit_cost
+            extra_benefit = count * unit_benefit
+            candidates = {cost: (benefit, plan) for cost, benefit, plan in frontier}
+            for cost, benefit, plan in frontier:
+                cost += extra_cost
+                benefit += extra_benefit
+                if cost <= limit and benefit > candidates.get(cost, (-1, ()))[0]:
+                    candidates[cost] = (benefit, (*plan, (deadline, count)))
 
             frontier = []
             largest = -1
-            for rank, (capacity, plan) in sorted(candidates.items()):
-                if capacity > largest:
-                    frontier.append((rank, capacity, plan))
-                    largest = capacity
+            for cost, (benefit, plan) in sorted(candidates.items()):
+                if benefit > largest:
+                    frontier.append((cost, benefit, plan))
+                    largest = benefit
             remaining -= count
             chunk *= 2
+    return frontier
 
+
+def subcubic_layer_totals(layers):
+    activation = sum(layer.copies * layer.activation_rank for layer in layers)
+    capacity = sum(layer.copies * layer.extra_capacity for layer in layers)
+    return activation, capacity
+
+
+def subcubic_layer_selection(layers, budget):
+    """Choose layers by activation rank, or choose omissions near saturation."""
+    if not layers or budget < min(layer.activation_rank for layer in layers) + 2:
+        return 0, ()
+    full_activation, full_capacity = subcubic_layer_totals(layers)
+    full_plan = tuple((layer.remaining, layer.copies) for layer in layers)
+    if budget >= full_activation + 2 * full_capacity:
+        return full_capacity, full_plan
+
+    deficit = full_capacity - (budget - full_activation) // 2
+    if budget >= full_activation and deficit - 1 < budget - 2:
+        groups = ((layer.remaining, layer.copies, layer.extra_capacity, layer.activation_rank)
+                  for layer in layers)
+        frontier = subcubic_layer_frontier(groups, deficit - 1)
+        loss, saved, excluded = max(
+            frontier, key=lambda item: min(full_capacity - item[0],
+                                           (budget - full_activation + item[1]) // 2)
+        )
+        kept = dict(full_plan)
+        for remaining, count in excluded:
+            kept[remaining] -= count
+        gain = min(full_capacity - loss, (budget - full_activation + saved) // 2)
+        return gain, tuple((remaining, count) for remaining, count in kept.items() if count)
+
+    groups = ((layer.remaining, layer.copies, layer.activation_rank, layer.extra_capacity)
+              for layer in layers)
+    frontier = subcubic_layer_frontier(groups, budget - 2)
     rank, capacity, plan = max(frontier, key=lambda item: min(item[1], (budget - item[0]) // 2))
     return min(capacity, (budget - rank) // 2), plan
 
@@ -1522,6 +1550,19 @@ def main():
             if deficit != expected:
                 raise AssertionError(('subcubic layered deficit', n, excess, deficit))
             print('Subcubic layered deficit:', n, excess, deficit)
+
+    for t, k in ((13, 1), (14, 2), (28, 1), (60, 3)):
+        _, _, ordinary, layers = subcubic_rank_model(t, k)
+        activation, capacity = subcubic_layer_totals(layers)
+        saturated_rank = k * (6 * 2 ** (t - 2) - 6864)
+        if sum(ordinary.values()) + activation + 2 * capacity != saturated_rank:
+            raise AssertionError(('subcubic saturation rank', t, k, saturated_rank))
+        saturated = subcubic_rank_value(t, k, saturated_rank)
+        for shortfall, expected in ((1, 1), (79, 40), (81, 40), (3519, 40)):
+            actual = saturated - subcubic_rank_value(t, k, saturated_rank - shortfall)
+            if actual != expected:
+                raise AssertionError(('subcubic saturation plateau', t, k, shortfall, actual))
+        print('Subcubic saturation plateau:', t, k, saturated_rank, saturated)
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()
