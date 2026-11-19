@@ -4,6 +4,8 @@
 
 This statement uses the [initial-color loss model](../README.md#模型与定理). The fort criterion for zero forcing and the role of twin vertices in fault tolerance appear in [Vertex Fault Tolerant Zero Forcing](https://arxiv.org/html/2509.07854v4#S2).
 
+The [general twin truncation theorem](../research-twins/RESEARCH.md) extends the timing argument to adjacent and nonadjacent twin classes anywhere in the graph.
+
 ## Why the reduction works
 
 Write $G_2$ for the graph with truncated multiplicities and $G_m$ for the full graph. We view $G_2$ as an induced subgraph of $G_m$ by keeping two designated leaves in every group of at least two. A pair in any group with the same parent is a fort. If a forcing blue set omits one leaf of such a group, then removing another blue leaf from it kills. Omitting two would already make the original coloring fail. Hence every blue set that survives all singleton losses contains every leaf in each group with at least two. If there is no such group, the two graphs are identical.
