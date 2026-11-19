@@ -26,6 +26,8 @@ The gap can still grow without bound in graphs that contain twins. In the [share
 
 [Longer intact runs](ONE_LOSS_TIMING.md#more-than-two-intact-rounds) have sharp exponential base $d-1$ for fixed maximum degree $d\geq3$. Their worst finite recovery time divided by $d(d-1)^{t-1}$ approaches $1/2$ as $d$ grows, uniformly over intact deadlines $t\geq3$. At maximum degree two the exact time is $3t+1$. [The two-term expansion](ONE_LOSS_TIMING.md#the-first-two-asymptotic-terms) gives $d^t/2-(t-2)d^{t-1}/2+O_t(d^{t-2})$ for each fixed $t\geq3$.
 
+[Several lost seeds](MULTIPLE_LOSS_TIMING.md) have exact worst-case time $t+k(2t+1)$ in degree two. For $t\geq2$, the first two asymptotic terms scale with the loss budget $k$, even for connected graphs that recover from every loss of at most $k$ seeds.
+
 ## Exactly one vertex without a twin
 
 Suppose $G$ has no isolated vertex and exactly one vertex $x$ without a twin. For each $v\ne x$, compare the neighborhoods of $x$ and $v$ after excluding both $x$ and $v$. Then `EveryMinimumSupport` holds exactly when all these pairs are comparable by inclusion, or all are incomparable.

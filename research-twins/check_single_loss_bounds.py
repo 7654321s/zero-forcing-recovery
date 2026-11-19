@@ -451,14 +451,16 @@ def check_layered_degree_family():
     return len(cases)
 
 
-def guarded_layered_certificate(degree, rounds):
-    edges, blue, order, _, branches = nonterminal_layers(degree, rounds, False)
-    parents = [v for branch in branches for v in branch]
-    pairs = list(pairwise([*parents, parents[0]])) * ((degree - 2) // 2)
-    if degree % 2:
-        pairs.extend(zip(parents[::2], parents[1::2]))
+def cyclic_pairs(vertices, capacity):
+    pairs = list(pairwise([*vertices, vertices[0]])) * (capacity // 2)
+    if capacity % 2:
+        pairs.extend(zip(vertices[::2], vertices[1::2]))
+    return pairs
+
+
+def guarded_terminal_layer(degree, edges, blue, order, parents):
     outside = []
-    for left, right in pairs:
+    for left, right in cyclic_pairs(parents, degree - 2):
         source, child = order, order + 1
         order += 2
         edges.extend(((source, left), (source, right), (source, child)))
@@ -473,10 +475,17 @@ def guarded_layered_certificate(degree, rounds):
         guards.append(group[0])
         guarded.extend(group[1:])
         edges.extend((group[0], child) for child in group[1:])
+    return direct.stop, [*outside, *guarded, *guards], len(outside) + len(guarded)
+
+
+def guarded_layered_certificate(degree, rounds):
+    edges, blue, order, _, branches = nonterminal_layers(degree, rounds, False)
+    parents = [v for branch in branches for v in branch]
+    order, targets, early = guarded_terminal_layer(degree, edges, blue, order, parents)
     graph, seeds, support = complete_quadratic_certificate(
-        edges, blue, direct.stop, [*outside, *guarded, *guards]
+        edges, blue, order, targets
     )
-    return graph, seeds, support, len(outside) + len(guarded)
+    return graph, seeds, support, early
 
 
 def check_guarded_layered_family():
