@@ -3,7 +3,7 @@
 from collections import Counter, defaultdict, namedtuple
 from fractions import Fraction
 from heapq import heappop, heappush
-from itertools import combinations, pairwise
+from itertools import combinations, groupby, pairwise
 from pathlib import Path
 from random import Random
 import runpy
@@ -1700,6 +1700,25 @@ def check_compact_cubic_chain_contacts(original_edges, original_blue):
             raise AssertionError('compact chain hub loss')
 
 
+def check_cubic_chain_loss_patterns(certificate, losses, rank=None):
+    graph, blue, designated, _ = certificate(losses, rank)
+    seeds = tuple(members(designated))
+    for count in range(losses + 1):
+        times = []
+        for subset in combinations(seeds, count):
+            omitted = mask(subset)
+            longest = max((sum(1 for _ in run) for failed, run in
+                           groupby(bool(omitted & (1 << seed)) for seed in seeds) if failed), default=0)
+            actual = completion_time(graph, blue ^ omitted)
+            if actual != 2 + 6 * longest:
+                raise AssertionError(('cubic chain loss pattern', losses, subset, actual))
+            times.append(actual)
+        gaps = losses - count + 1
+        balanced = (count + gaps - 1) // gaps
+        if min(times) != 2 + 6 * balanced or max(times) != 2 + 6 * count:
+            raise AssertionError(('cubic chain pattern extremes', losses, count))
+
+
 def cubic_two_fault_gap_certificate(cycle_rank=10):
     """Give a two-fault-tolerant cubic witness with unrestricted time nine."""
     if cycle_rank < 10 or cycle_rank == 11:
@@ -2275,6 +2294,13 @@ def main():
         check_arrival_waves(graph, blue ^ lost, waves)
         exhaustive += check_all_losses(graph, blue, 1)
         print('Compact cubic two-round chain:', losses, rank, len(waves))
+
+    for certificate, padded_rank in ((cubic_two_round_chain_certificate, 81),
+                                     (compact_cubic_two_round_chain_certificate, 67)):
+        for losses in range(1, 10):
+            check_cubic_chain_loss_patterns(certificate, losses)
+        check_cubic_chain_loss_patterns(certificate, 9, padded_rank)
+    print('Cubic chain designated loss patterns: 3068 subsets')
 
     for rank in (10, 12, 13, 22):
         graph, blue, lost, support = cubic_two_fault_gap_certificate(rank)

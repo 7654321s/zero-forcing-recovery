@@ -1426,6 +1426,14 @@ For a singleton loss of a designated seed, use monotonicity as before. Losing a 
 
 To reach a larger cycle rank, use the disjoint edge expansion on the blue edge from first-block vertex $8$ and the blue edge returning to first-block vertex $10$. This preserves the two schedules and singleton tolerance by the preceding padding argument.
 
+#### Exact timing for every subset of designated losses
+
+Number the designated seeds in block order. For either chain and any subset of these seeds, let $m$ be the length of the longest consecutive run of lost seeds, with $m=0$ for no losses. Recovery takes exactly $2+6m$ rounds, including after cycle-rank padding.
+
+A block whose designated seed is retained still follows its two intact waves. Its blue attachments stay blue, and its internal forces in those two waves are independent of the incoming relay. A later block whose designated seed is lost waits for the preceding tail pair, then takes six rounds beginning with the round in which the relay forces its entry. The relay cannot send a force back into a waiting tail pair because both of its vertices are white until their common arrival. These rules also hold when the succeeding block has already completed. A run of lost seeds after a retained seed therefore takes six additional rounds per block beyond round two. A run starting at the first block follows the same formula because its first block takes eight rounds. All runs start from their own two-round baseline, so the longest one determines completion.
+
+For a fixed number $\ell$ of losses among the $k$ designated seeds, the largest time is $2+6\ell$, attained by consecutive losses. The smallest time is $2+6\lceil\ell/(k-\ell+1)\rceil$. There are $k-\ell+1$ gaps before, between and after the retained seeds. Some gap contains at least $\lceil\ell/(k-\ell+1)\rceil$ losses, and distributing the losses as evenly as possible across these gaps attains that count.
+
 <a id="cycle-rank-one-at-degree-three"></a>
 <a id="cycle-rank-two-at-degree-three"></a>
 
