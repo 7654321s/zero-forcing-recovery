@@ -16,9 +16,9 @@ completion_time = MODEL['completion_time']
 MAX_LOSSES = 7
 
 
-def find_stalled_set(graph, seeds, required, active_order, *, also_required=None):
+def find_stalled_set(graph, seeds, required, active_order, *, also_required=None, budget=MAX_LOSSES):
     """Leave vertices outside the active range fixed and allow no forces there."""
-    limit = CardEnc.atmost(lits=[v + 1 for v in seeds], bound=MAX_LOSSES,
+    limit = CardEnc.atmost(lits=[v + 1 for v in seeds], bound=budget,
                          top_id=len(graph), encoding=EncType.totalizer)
     clauses = limit.clauses + [[v + 1 for v in required]]
     if also_required is not None:
@@ -42,43 +42,49 @@ def verify_case(case):
 
 
 def verify_rank_case(case):
+    return verify_prism_rank_case(case, 4, MODEL['four_sheet_cubic_chain_certificate'])
+
+
+def verify_prism_rank_case(case, sheets, certificate):
     blocks, columns, extra = case
-    rank = 32 * blocks + 5 + 4 * columns + extra
-    graph, blue, lost, waves = MODEL['four_sheet_cubic_chain_certificate'](blocks, rank)
+    rank = sheets * (8 * blocks + 1 + columns) + 1 + extra
+    graph, blue, lost, waves = certificate(blocks, rank)
+    even = sheets % 2 == 0
+    obstruction = (1 << (2 * sheets)) - 1
     if (len(graph) // 2 + 1 != rank or completion_time(graph, blue) != 2
-            or lost.bit_count() != 4 * blocks or len(waves) != 6 * blocks + 2
-            or completion_time(graph, blue ^ 255) <= len(graph)
-            or any(row.bit_count() != 3 or any((v-w) % 2 == 0 for w in members(row))
+            or lost.bit_count() != sheets * blocks or len(waves) != 6 * blocks + 2
+            or completion_time(graph, blue ^ obstruction) <= len(graph)
+            or any(row.bit_count() != 3 or (even and any((v-w) % 2 == 0 for w in members(row)))
                    for v, row in enumerate(graph))):
-        raise AssertionError(('four-sheet chain metadata or eight-loss obstruction', case))
+        raise AssertionError(('prism chain metadata or full-fiber obstruction', sheets, case))
     MODEL['check_arrival_waves'](graph, blue ^ lost, waves)
 
     seeds = tuple(members(blue))
-    first_padding = 4 * (16 * blocks + 2)
+    first_padding = sheets * (16 * blocks + 2)
     also_required = None
     if extra:
-        a, b = MODEL['FOUR_SHEET_RANK_EDGE']
+        a, b = MODEL['PRISM_RANK_EDGE']
         start = len(graph) - 2 * extra
-        required = [4 * a, 4 * a + 2, 4 * b + 1, 4 * b + 3, *range(start, len(graph))]
+        required = [sheets * a, sheets * a + 2, sheets * b + 1, sheets * b + 3, *range(start, len(graph))]
         if columns > 1:
             also_required = range(first_padding, start)
     else:
         # Rotate a required deleted seed to sheet zero in the symmetric cover.
-        required = [v for v in seeds if v % 4 == 0 and (columns <= 1 or v >= first_padding)]
-    witness = find_stalled_set(graph, seeds, required, len(graph), also_required=also_required)
+        required = [v for v in seeds if v % sheets == 0 and (columns <= 1 or v >= first_padding)]
+    witness = find_stalled_set(graph, seeds, required, len(graph), also_required=also_required, budget=2 * sheets - 1)
     if witness is not None:
-        raise AssertionError(('small fort', case, witness))
+        raise AssertionError(('small fort', sheets, case, witness))
     return case
 
 
-def verify_long_ladders():
-    for width in range(10, 14):
+def verify_long_ladders(widths=range(10, 14), budget=MAX_LOSSES):
+    for width in widths:
         order = 2 * width
         rungs = [(u, u + 1) for u in range(0, order, 2)]
         rails = [(u, u + 2) for u in range(order - 2)]
         attachments = list(zip((0, 1, order - 2, order - 1), range(order, order + 4)))
         graph = adjacency(order + 4, rungs + rails + attachments)
-        witness = find_stalled_set(graph, range(len(graph)), range(order), order)
+        witness = find_stalled_set(graph, range(len(graph)), range(order), order, budget=budget)
         if witness is not None:
             raise AssertionError(('unrepaired ladder', width, witness))
 
