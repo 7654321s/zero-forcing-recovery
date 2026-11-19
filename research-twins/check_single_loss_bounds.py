@@ -257,15 +257,16 @@ def check_low_degree_examples():
                          1 << lost, rounds, 3 * rounds + 1)
 
 
+def quadratic_relay_links(prefix, targets, splice=None):
+    if splice is None:
+        return list(pairwise([prefix, *targets]))
+    enter, resume = splice
+    return [(prefix, enter), *pairwise([resume, *targets])]
+
+
 def complete_quadratic_certificate(edges, blue, next_vertex, targets, splice=None):
     first, second, seed, helper, leaf_a, leaf_b = range(next_vertex, next_vertex + 6)
-    if splice is None:
-        path = [second, *targets]
-        pairs = list(zip(path, path[1:]))
-    else:
-        enter, resume = splice
-        path = [resume, *targets]
-        pairs = [(second, enter), *zip(path, path[1:])]
+    pairs = quadratic_relay_links(second, targets, splice)
     relays = range(leaf_b + 1, leaf_b + 1 + len(pairs))
     for source, (left, right) in zip(relays, pairs):
         edges.extend(((source, left), (source, right)))
@@ -276,7 +277,7 @@ def complete_quadratic_certificate(edges, blue, next_vertex, targets, splice=Non
     return adj, initial, mask([leaf_a, leaf_b])
 
 
-def even_quadratic_degree_certificate(degree):
+def even_quadratic_degree_block(degree, continue_at_tail):
     lost = 0
     missed = range(1, degree + 1)
     predecessors = range(missed.stop, missed.stop + degree - 1)
@@ -297,16 +298,17 @@ def even_quadratic_degree_certificate(degree):
     for source, pair, target in zip(outside_sources, pairs, outside_targets):
         edges.extend((source, v) for v in (*pair, target))
     edges.extend(zip(missed[1:], direct_targets))
-    edges.extend((x, y) for x in direct_targets for y in (guard, tail))
+    edges.extend((x, guard) for x in direct_targets)
+    tail_child = direct_targets[tail_parent - missed[1]]
+    tail_children = (tail_child,) if continue_at_tail else direct_targets
+    edges.extend((x, tail) for x in tail_children)
     edges.extend(((missed[0], guard), (missed[0], last_source), (last_source, last),
                   (tail_parent, tail_source), (tail_source, tail)))
     blue = [lost, *predecessors, *outside_sources, tail_source, last_source]
-    return complete_quadratic_certificate(
-        edges, blue, last_source + 1, [*outside_targets, *direct_targets, last]
-    )
+    return edges, blue, last_source + 1, [*outside_targets, *direct_targets, last], tail, None
 
 
-def small_quadratic_degree_certificate(degree):
+def small_quadratic_degree_block(degree):
     lost = 0
     missed = range(1, degree + 1)
     ordinary = missed[1:]
@@ -333,13 +335,11 @@ def small_quadratic_degree_certificate(degree):
                   (missed[0], resume_source), (resume_source, resume)))
     blue = [lost, *predecessors, *outside_sources, finish_source, tail_source,
             enter_source, resume_source]
-    return complete_quadratic_certificate(
-        edges, blue, resume_source + 1, [*outside_targets, *direct_targets, finish],
-        splice=(enter, resume)
-    )
+    targets = [*outside_targets, *direct_targets, finish]
+    return edges, blue, resume_source + 1, targets, tail, (enter, resume)
 
 
-def odd_quadratic_degree_certificate(degree):
+def odd_quadratic_degree_block(degree):
     lost = 0
     predecessors = range(1, degree + 1)
     missed = range(degree + 1, 2 * degree + 1)
@@ -362,17 +362,24 @@ def odd_quadratic_degree_certificate(degree):
     edges.extend(((missed[0], guard_source), (guard_source, guard),
                   (missed[1], tail_source), (tail_source, tail)))
     blue = [lost, *predecessors, *outside_sources, guard_source, tail_source]
-    return complete_quadratic_certificate(
-        edges, blue, tail + 1, [*outside_targets, *direct_targets, guard]
-    )
+    return edges, blue, tail + 1, [*outside_targets, *direct_targets, guard], tail, None
+
+
+def quadratic_degree_block(degree, continue_at_tail=False):
+    if degree <= 5:
+        return small_quadratic_degree_block(degree)
+    if degree % 2:
+        return odd_quadratic_degree_block(degree)
+    return even_quadratic_degree_block(degree, continue_at_tail)
 
 
 def quadratic_degree_certificate(degree):
-    if degree <= 5:
-        return small_quadratic_degree_certificate(degree)
-    if degree % 2:
-        return odd_quadratic_degree_certificate(degree)
-    return even_quadratic_degree_certificate(degree)
+    edges, blue, order, targets, _, splice = quadratic_degree_block(degree)
+    return complete_quadratic_certificate(edges, blue, order, targets, splice)
+
+
+def quadratic_degree_time(degree):
+    return degree**2 // 2 + (7 if degree <= 5 else 6)
 
 
 def check_quadratic_degree_family():
@@ -381,7 +388,7 @@ def check_quadratic_degree_family():
         adj, blue, support = quadratic_degree_certificate(degree)
         if max(row.bit_count() for row in adj) != degree or completion_time(adj, blue) != 2:
             raise AssertionError((degree, len(adj)))
-        MODEL['certify'](adj, blue, support, 1, 2, degree**2 // 2 + (7 if degree <= 5 else 6))
+        MODEL['certify'](adj, blue, support, 1, 2, quadratic_degree_time(degree))
     return len(degrees)
 
 

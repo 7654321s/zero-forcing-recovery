@@ -206,6 +206,31 @@ def layered_certificate(degree, rounds, losses):
     return graph, initial, mask(deliberately_lost), support, paths, early
 
 
+def two_round_certificate(degree, losses):
+    block, block_blue, size, targets, tail, splice = SINGLE['quadratic_degree_block'](
+        degree, continue_at_tail=True
+    )
+    seed, first, prefix = range(losses * size, losses * size + 3)
+    edges, blue, deliberately_lost = [(seed, first), (first, prefix)], [seed], []
+    order = prefix + 1
+    for copy in range(losses):
+        start = copy * size
+        deliberately_lost.append(start)
+        edges.extend((start + a, start + b) for a, b in block)
+        blue.extend(start + v for v in block_blue)
+        chain = [start + v for v in targets]
+        junction = None if splice is None else tuple(start + v for v in splice)
+        for left, right in SINGLE['quadratic_relay_links'](prefix, chain, junction):
+            edges.extend(((order, left), (order, right)))
+            blue.append(order)
+            order += 1
+        prefix = start + tail
+    graph, initial, support, paths = protect_seeds(
+        degree, edges, blue, order, deliberately_lost, seed
+    )
+    return graph, initial, mask(deliberately_lost), support, paths
+
+
 def check_connected(graph, degree):
     reached, frontier = 0, 1
     while frontier:
@@ -315,6 +340,15 @@ def main():
         if observed != list(range(1, early + 4)):
             raise AssertionError(('serial prefix', d, t, k))
         print('Layered family:', d, t, k, len(graph), late)
+
+    for d, k in ((4, 2), (5, 3), (6, 2), (7, 3), (8, 2), (6, 7)):
+        graph, blue, slow, support, paths = two_round_certificate(d, k)
+        sampled += check_robust_samples(graph, blue, slow, support, paths, d, 2, k)
+        expected = 2 + k * (SINGLE['quadratic_degree_time'](d) - 2)
+        upper = 2 + k * (d**2 + 12) // 2
+        if completion_time(graph, blue ^ slow) != expected or expected > upper:
+            raise AssertionError(('concatenated two-round delay', d, k, expected, upper))
+        print('Concatenated two-round family:', d, k, len(graph), expected, upper)
 
     print('Exhaustive losses on the degree-two and small one-round examples:', exhaustive)
     print('Recoverable losses checked against the cycle upper bound:', check_small_cycles())

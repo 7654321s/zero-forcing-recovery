@@ -127,6 +127,48 @@ M_{d,t,k}\geq\left\lfloor\frac{dL}{2}\right\rfloor
 $$
 After the relay list fills, the direct children force their old parents, the single-parent sources carry the repair upward, and every missing designated seed returns. Substituting $L=kP/(d-1)$ gives the matching first two terms.
 
+### Finite bounds for two intact rounds
+
+For every $d\geq4$ and $k\geq1$, let $m_d=M_{d,2,1}$ be the [exact single-loss value](ONE_LOSS_TIMING.md#quadratic-growth-with-the-maximum-degree), namely $15$ at $d=4$, $19$ at $d=5$ and $\lfloor d^2/2\rfloor+6$ at $d\geq6$. Then
+$$
+2+k(m_d-2)\ \leq\ M_{d,2,k}\ \leq\
+2+\left\lfloor\frac{kd^2}{2}\right\rfloor+6k.
+$$
+The bounds differ by at most $5k/2$ rounds. The lower bound holds on connected $k$-fault-tolerant graphs.
+
+#### Upper bound
+
+Let $h$ of the $k$ lost seeds return in delayed round one, and let $b$ new discrepancies be born in that round. Choose one intact source for each birth. There are $a$ direct births from lost seeds, and $B_*$ births from retained sources with at least two lost neighbors. Count one incidence at the source for a direct birth, and one incidence at every lost neighbor of the source for any other birth. The total is $J=b+\nu$, with $\nu\geq B_*$. These incidences are distinct since sources force at most once. A seed restored in delayed round one must have an additional neighbor that had no white neighbors before the loss. The additional edge is outside this count, so $J+h\leq kd$.
+
+At time one there are $D=k-h+b$ old discrepancies. First-round incidences at seeds still white are unavailable for the second-round count. A retained source used in round one has already used its intact force. A direct incidence leads to a first-round target that is already blue in the intact run and still white in the delayed run. It cannot give an intact second-round target or a source blue in both runs. The $h$ restored seeds accounted for at most $(d-1)h$ of the $J$ incidences. Thus at least $Q=J-(d-1)h$ are unavailable at the unreturned seeds. Separately, every old discrepancy that was initially white has an intact predecessor already used in round one. The remaining old incidence capacity is at most $(d-1)D+k-h-Q$.
+
+In the final-round classification above, let $N$ count nonexceptional targets and $E$ count exceptional targets. At most $D-a_{\rm live}$ sources can act directly in intact round two, where $a_{\rm live}$ counts the unreturned seeds that were chosen as direct sources in round one. These sources have already used their force. The final-round cost satisfies
+$$
+\begin{aligned}
+2N+E
+&\leq dD+k-h-Q-a_{\rm live}\\
+&\leq (d+1)k+(d-1)b-\nu-2h-a_{\rm live}\\
+&\leq k(d^2+1)-d(\nu+h)-a.
+\end{aligned}
+$$
+The last step uses $b+\nu+h\leq kd$ and $a\leq a_{\rm live}+h$.
+
+For the delayed rounds after time two, group each old discrepancy with its exceptional targets. The initially lost seeds and the old vertices born from retained sources with one lost neighbor occupy at most three rounds per initial lost seed. The old vertices in that group arrive within one round of the seed. Its exceptional targets arrive within two rounds of the seed. If these groups contain $E_0$ exceptional targets, they occupy at most $\min(5k,3k+E_0)$ rounds after time two. Their contribution to the round count minus $E_0/2$ is at most $4k$.
+
+There are $a+B_*$ other old discrepancies. Each of those and its exceptional targets occupy at most three rounds. With $E_1$ exceptional targets in these groups, the analogous count minus $E_1/2$ is at most $2(a+B_*)$, using $\min(3(a+B_*),a+B_*+E_1)$. Thus the full time is at most
+$$
+2+\frac{k(d^2+1)}2+4k+\frac{3a}{2}+2B_*-\frac d2(\nu+h).
+$$
+Since $a\leq k$, $B_*\leq\nu$ and $d\geq4$, taking the integer part gives the claimed upper bound.
+
+#### Concatenated lower construction
+
+Use $k$ copies of the [sharp single-loss constructions](ONE_LOSS_TIMING.md#quadratic-growth-with-the-maximum-degree), keeping the substantive vertices and omitting the individual prefixes and supports. Add one common two-round prefix. Use the last white vertex of each copy as the prefix endpoint for the relay list of the next. For $d=4,5$, retain the internal splice through the old vertex $w_0$. The only link into that copy from its predecessor is the relay into the first target of its list.
+
+In the even-degree construction at $d\geq6$, reserve room for the outgoing relay at the last white vertex $u$. Keep only the edge from $u$ to the direct child of its late parent $w_3$, and its edge to its blue source. The other direct children keep their guard $G$. Until the final old-seed repairs begin, each is blocked by its own old parent and by $G$. In the final sequence $G$ may now fill in the same round as $z$. The vertex $u$ still waits for $w_3$, which returns in the round after $z$, so the time of $u$ is unchanged. The odd and small-degree constructions already have space for the outgoing relay.
+
+The intact sources of each copy still finish in two rounds. After the $k$ designated seeds are lost, no copy starts before its prefix endpoint is blue: its old vertices are white, its retained sources are blocked, and its relays see two white endpoints. When the prefix endpoint becomes blue, it starts exactly the single-copy delayed sequence after the prefix. The last target of that copy then activates the successor. Thus the shared first two rounds are followed by $k$ further intervals of length $m_d-2$. The protection below preserves the degree cap and gives recovery from every loss of at most $k$ seeds.
+
 ## Protection and a minimum killing support
 
 For either construction with $d\geq4$, add a support $H$ of $k+1$ blue vertices. Take a connected simple graph $J$ on $H$. For every edge of $J$, add a blue vertex adjacent to its two endpoints. Connect one of these new blue vertices to $s$. Use $J=K_{k+1}$ if $k\leq d$, and a path otherwise.
@@ -145,4 +187,4 @@ Run the following from the repository root.
 python -B research-twins/check_multiple_loss_bounds.py
 ~~~
 
-The script exhausts losses through the budget on the degree-two examples and the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. On the larger graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
+The script exhausts losses through the budget on the degree-two examples and the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It also replays six concatenated two-round examples, including budgets larger than the degree cap. On the larger graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
