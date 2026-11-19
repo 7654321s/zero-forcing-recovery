@@ -132,10 +132,9 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
         elif len(roots) >= 2:
             upper = min(upper, 2 + (3 * cycle_rank + 13 * len(roots)) // 2)
         if all(row.bit_count() <= 3 for row in graph):
+            upper = min(upper, 2 + 5 * len(roots) + cycle_rank)
             if len(roots) == 1:
                 upper = min(upper, 8 if cycle_rank <= 3 else 9)
-            elif 1 <= cycle_rank <= 2:
-                upper = min(upper, 2 + 5 * len(roots) + cycle_rank)
     if intact >= 3:
         upper = min(upper, intact + (2 * intact + 3) * len(roots) + (2 * intact - 3) * cycle_rank)
     if revisits > cycle_rank or delayed > upper:
@@ -891,8 +890,8 @@ def main():
     if observed_extremizers != rank_extremizers:
         raise AssertionError(('two-round rank extrema', observed_extremizers, rank_extremizers))
 
-    for k, rank in ((1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (3, 1), (3, 2),
-                    (5, 1), (5, 3), (7, 7)):
+    for k, rank in ((1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (3, 1), (3, 2), (3, 3),
+                    (4, 3), (4, 4), (5, 1), (5, 3), (5, 5), (7, 7)):
         graph, blue, slow, support, paths, waves = subcubic_low_rank_certificate(k, rank)
         sampled += check_robust_samples(graph, blue, slow, support, paths, 3, 2, k,
                                         clique_support=False)
