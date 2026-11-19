@@ -826,6 +826,44 @@ For $\theta\leq1/2$, the inequality $\widehat C(1-\theta)<1$ reduces to $C(1/2-\
 
 The replay script's `subcubic_omission_profile_bounds` encloses $A_k(x)$ with rational arithmetic at any rational $x\in[1/2,1]$. It rounds the cover demand down and up on a dyadic grid, evaluates the binary covers from those endpoints, and bisects the positive root of $r^4-2r^3+r-1$ in $[9/5,2]$. Cover costs decrease with $r$ and increase with demand, so choosing the corresponding endpoints gives lower and upper bounds. Both enclosures converge as the grid is refined.
 
+#### The maximum gap from fractional packing
+
+Let $A_\infty$ be the fractional packing profile. The integer profile satisfies
+$$
+A_\infty(x)-A_k(x)=\frac{C(1-\theta)-(1-\theta)}{kr^2},
+\qquad \theta=4k(x-1/2)-\lfloor4k(x-1/2)\rfloor.
+$$
+Indeed, the unrestricted cover can use size one at cost one. Among covers without that size the minimum cost is $\widehat C$, giving $C(y)=\min\{1,\widehat C(y)\}$. Thus $\Phi(\theta)=1-C(1-\theta)$ in the [exact integer formula](#exact-packing-formula-for-a-fixed-number-of-losses).
+
+The maximum gap on $1/2\leq x\leq1$ is exactly
+$$
+\frac{5/36-r^{-6}}{kr^2}\approx \frac{0.0330747283}{k}.
+$$
+It is attained precisely at $x=1/2+(\ell+5/36)/(4k)$ for $\ell=0,\ldots,2k-1$. The proof below reduces the continuum maximization to two strict grids certified with rational arithmetic, and gives the exact maximizer between the grid points.
+
+**Rational inequalities.** Put $\rho=1/r$, $q=(r/2)^3$, and $M=5/36-\rho^6$. Use the rational root bracket $r_- =18667/10000 < r <18668/10000=r_+$. Its signs follow by substitution in the quartic $r^4-2r^3+r-1$, which has a unique root in this interval by the [growth calculation](#repeated-attachments-at-detour-centers). Let $C_-(b)$ denote the dyadic binary-cover evaluation at $r_-$, so $C(b)\leq C_-(b)$. The two grid checks are
+$$
+\begin{aligned}
+ C_-(b)-a &< 5/36-r_-^{-6}
+ &&\bigl([a,b]\subset[0,3/4]\cup[7/8,1],\quad b-a=2^{-8}\bigr),\\
+ C_-(b)&<1-(r_+/2)^3(8/9-a)
+ &&\bigl([a,b]\subset[0,7/8],\quad b-a=2^{-10}\bigr),
+\end{aligned}
+$$
+where $a,b$ are consecutive points of the indicated grid. The replay function `check_subcubic_cover_peak` evaluates $C_-$ by minimum over the terminating bits, size one, and each single round-up of the binary prefix. It checks 224 intervals in the first row and 896 in the second, with minimum slacks exceeding $19/10000$ and $3/10000$, respectively. By monotonicity, the first row implies $C(u)-u<M$ outside the middle interval $[3/4,7/8]$. The second implies $C(v)<1-q(8/9-v)$ for $0\leq v\leq7/8$.
+
+**Extend the second inequality to the exact contact.** The strict-budget pattern $111000$ gives $C(v)<1$ exactly for $v<8/9$ and $C(v)=1$ above and at $8/9$. For $7/8<v<8/9$, any cover of cost below one can be merged to use distinct binary sizes. It must take the first three sizes, since omitting even the third would leave total size at most $7/8$. Those sizes cost $1-\rho^6$. Bits four and five exceed the remaining budget, and bit six costs all of it. The tail scales to the unrestricted cover, so
+$$
+1-C(v)=\rho^6\left[1-C\bigl(64(v-7/8)\bigr)\right].
+$$
+This equality also holds at the endpoints by continuity. The map $v\mapsto64(v-7/8)$ fixes $8/9$ and multiplies its distance by 64. Thus the ratio $(1-C(v))/(8/9-v)$ is $(2\rho)^6>1$ times the ratio at the image. Starting at any $v<8/9$ above $7/8$, repeated use eventually reaches $[0,7/8]$, where the second grid proves the ratio is strictly above $q$. For $v>8/9$ the cost stays one. Consequently $C(v)-qv$ has its unique maximum at $v=8/9$.
+
+**Locate the peak.** For $3/4<u<7/8$, an optimal cover can achieve cost strictly below one by taking sizes $1/2,1/4,1/8$. Any cover of cost below one must include sizes $1/2$ and $1/4$ after merging, since distinct smaller sizes alone cannot supply a demand above $3/4$ with either of those sizes absent. Its remaining cover has sizes at most $1/8$. Scaling gives
+$$
+C(u)=\rho+\rho^2+\rho^3 C\bigl(8(u-3/4)\bigr).
+$$
+The formula extends to the endpoints by continuity. Maximizing $C(u)-u$ here is equivalent to maximizing $C(v)-qv$ at $v=8(u-3/4)$, because $q=1/(8\rho^3)$. Hence the only maximizer is $u=3/4+(8/9)/8=31/36$, with $C(u)=\rho+\rho^2+\rho^3=1-\rho^6$. The first grid excludes any other maximum. Returning to the packing profile gives $\theta=5/36$ and the stated gap. The replay function `subcubic_max_omission_gap_bounds` gives rational enclosures for its height.
+
 <a id="the-first-rank-above-six-per-lost-seed"></a>
 
 #### Counting visits down to the fourth round

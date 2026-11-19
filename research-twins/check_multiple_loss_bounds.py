@@ -865,12 +865,16 @@ def subcubic_saturation_shortfall_limit(layers, lost_rounds):
     return 2 * lost_rounds + saved
 
 
+def subcubic_growth_polynomial(value):
+    return value ** 4 - 2 * value ** 3 + value - 1
+
+
 def subcubic_growth_factor_bounds(bits):
     """Enclose the ordinary growth factor by rational bisection."""
     low, high = Fraction(9, 5), Fraction(2)
     for _ in range(bits):
         mid = (low + high) / 2
-        if mid ** 4 - 2 * mid ** 3 + mid - 1 < 0:
+        if subcubic_growth_polynomial(mid) < 0:
             low = mid
         else:
             high = mid
@@ -891,6 +895,44 @@ def subcubic_dyadic_cover_cost(numerator, bits, growth):
     return min(best, prefix)
 
 
+def check_subcubic_cover_peak():
+    """Verify the strict grid inequalities used in the global peak proof."""
+    low_r, high_r = Fraction(18667, 10000), Fraction(18668, 10000)
+    if not subcubic_growth_polynomial(low_r) < 0 < subcubic_growth_polynomial(high_r):
+        raise AssertionError('The cover-peak certificate must bracket the growth factor')
+
+    peak_lower = Fraction(5, 36) - low_r ** -6
+    outer_bits = 8
+    outer_grid = 1 << outer_bits
+    outer_slack = min(
+        peak_lower + Fraction(i, outer_grid) - subcubic_dyadic_cover_cost(i + 1, outer_bits, low_r)
+        for i in range(outer_grid)
+        if 4 * i < 3 * outer_grid or 8 * i >= 7 * outer_grid
+    )
+
+    slope_upper = (high_r / 2) ** 3
+    inner_bits = 10
+    inner_grid = 1 << inner_bits
+    inner_slack = min(
+        1 - slope_upper * (Fraction(8, 9) - Fraction(i, inner_grid))
+        - subcubic_dyadic_cover_cost(i + 1, inner_bits, low_r)
+        for i in range(7 * inner_grid // 8)
+    )
+    if outer_slack <= Fraction(19, 10000) or inner_slack <= Fraction(3, 10000):
+        raise AssertionError(('cover peak certificate slack', outer_slack, inner_slack))
+    return outer_slack, inner_slack
+
+
+def subcubic_max_omission_gap_bounds(losses, bits=24):
+    """Enclose the maximum gap between fractional and integer packing."""
+    if not isinstance(losses, int) or losses < 1 or not isinstance(bits, int) or bits < 1:
+        raise ValueError('The loss count and precision must be positive integers')
+    low_r, high_r = subcubic_growth_factor_bounds(bits + 8)
+    lower = (Fraction(5, 36) - low_r ** -6) / (losses * high_r ** 2)
+    upper = (Fraction(5, 36) - high_r ** -6) / (losses * low_r ** 2)
+    return lower, upper
+
+
 def subcubic_omission_profile_bounds(losses, normalized_shortfall, bits=24):
     """Enclose the fixed-loss dyadic packing coefficient A_k(x)."""
     x = Fraction(normalized_shortfall)
@@ -902,23 +944,17 @@ def subcubic_omission_profile_bounds(losses, normalized_shortfall, bits=24):
     cells = 4 * losses * (x - Fraction(1, 2))
     whole = int(cells)
     demand = 1 - (cells - whole)
-    needs_half = demand > Fraction(1, 2)
-    if needs_half:
-        demand -= Fraction(1, 2)
 
     grid = demand * (1 << bits)
     low_digit = grid.numerator // grid.denominator
     high_digit = -(-grid.numerator // grid.denominator)
     low_cost = subcubic_dyadic_cover_cost(low_digit, bits, high_r)
     high_cost = subcubic_dyadic_cover_cost(high_digit, bits, low_r)
-    if needs_half:
-        low_cost += 1 / high_r
-        high_cost += 1 / low_r
 
     lower = 2 / (high_r ** 2 * (high_r - 1))
     upper = 2 / (low_r ** 2 * (low_r - 1))
-    lower += (whole + max(0, 1 - high_cost)) / (losses * high_r ** 2)
-    upper += (whole + max(0, 1 - low_cost)) / (losses * low_r ** 2)
+    lower += (whole + 1 - high_cost) / (losses * high_r ** 2)
+    upper += (whole + 1 - low_cost) / (losses * low_r ** 2)
     return lower, upper
 
 
@@ -1666,6 +1702,26 @@ def main():
                     and flat[1] < above[0] and coarse[0] <= above[0] <= above[1] <= coarse[1]):
                 raise AssertionError(('subcubic packing profile', k, cell))
         print('Subcubic packing profile:', k, 'first and last cell thresholds verified')
+
+    outer, inner = check_subcubic_cover_peak()
+    print('Subcubic cover peak certificate slacks:', float(outer), float(inner))
+    low_r, high_r = subcubic_growth_factor_bounds(56)
+    for k in (1, 3, 8):
+        expected = subcubic_max_omission_gap_bounds(k, bits=48)
+        for cell in (0, 2 * k - 1):
+            for shift in (-1, 0, 1):
+                theta = Fraction(5, 36) + Fraction(shift, 512)
+                x = Fraction(1, 2) + (cell + theta) / (4 * k)
+                low, high = subcubic_omission_profile_bounds(k, x, bits=48)
+                lower = 2 / (high_r ** 2 * (high_r - 1)) + 4 * (x - Fraction(1, 2)) / high_r ** 2
+                upper = 2 / (low_r ** 2 * (low_r - 1)) + 4 * (x - Fraction(1, 2)) / low_r ** 2
+                gap = (lower - high, upper - low)
+                if shift == 0:
+                    if max(expected[0], gap[0]) > min(expected[1], gap[1]):
+                        raise AssertionError(('subcubic maximum packing gap', k, cell, gap))
+                elif gap[1] >= expected[0]:
+                    raise AssertionError(('subcubic packing gap near peak', k, cell, shift))
+        print('Subcubic maximum packing gap:', k, float(expected[0]), float(expected[1]))
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()
