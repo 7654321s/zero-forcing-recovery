@@ -243,13 +243,28 @@ def check_small_subcubic_one_round():
     return checked
 
 
+def compact_private_path_lengths(budget, protected_count):
+    """Choose the smaller of the layouts with one or two long paths at each end."""
+    def length(losses):
+        return (3 * losses - 1) // 2
+
+    longest = length(budget)
+    layouts = ((1, 1),) if budget <= 2 else (
+        (length(budget // 2 + 1), 1),
+        (length(budget // 3 + 1), 2),
+    )
+    return min((tuple(longest if index < ends or index >= protected_count - ends else inner
+                      for index in range(protected_count))
+                for inner, ends in layouts), key=sum)
+
+
 def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique_support=True,
-                  neutral_rank=0, unprotected_blue=(), fault_budget=None):
-    """Add private blue paths and a connected minimum killing support."""
+                  neutral_rank=0, unprotected_blue=(), fault_budget=None, compact=False):
+    """Add private blue paths and, for the original construction, a killing support."""
     budget = len(deliberately_lost) if fault_budget is None else fault_budget
     if budget < len(deliberately_lost):
         raise ValueError('The protection budget must cover the designated loss')
-    support = range(order, order + budget + 1)
+    support = range(order, order + (0 if compact else budget + 1))
     order = support.stop
     support_pairs = (combinations(support, 2) if clique_support and budget <= degree
                      else pairwise(support))
@@ -258,21 +273,23 @@ def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique
         edges.extend(((order, left), (order, right)))
         blue.append(order)
         order += 1
-    if degree != 3:
+    if support and degree != 3:
         edges.append((seed, attachment))
 
     paths = []
     unprotected = set(deliberately_lost).union(unprotected_blue)
-    for vertex in blue[:]:
-        if vertex not in unprotected:
-            path = range(order, order + 2 * budget + 2)
-            edges.append((vertex, path[0]))
-            edges.extend(pairwise(path))
-            if degree == 3 and vertex == attachment:
-                edges.append((seed, path[-1]))
-            blue.extend(path)
-            paths.append(tuple(path))
-            order = path.stop
+    protected = [vertex for vertex in blue if vertex not in unprotected]
+    lengths = (compact_private_path_lengths(budget, len(protected))
+               if compact else (2 * budget + 2,) * len(protected))
+    for vertex, length in zip(protected, lengths):
+        path = range(order, order + length)
+        edges.append((vertex, path[0]))
+        edges.extend(pairwise(path))
+        if support and degree == 3 and vertex == attachment:
+            edges.append((seed, path[-1]))
+        blue.extend(path)
+        paths.append(tuple(path))
+        order = path.stop
     if neutral_rank:
         start = order
         order = append_subcubic_blue_cycles(edges, paths[0][-1], order, neutral_rank, budget)
@@ -1079,7 +1096,7 @@ def subcubic_rank_allocation(rounds, losses, cycle_rank):
 
 def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_centers=False,
                                         splice_depth_limit=2, layered_detours=None,
-                                        ordinary_detours=None, fault_budget=None):
+                                        ordinary_detours=None, fault_budget=None, compact=False):
     edges, blue, lost = list(pairwise(range(rounds + 1))), [0], []
     main_paths = []
     detours = [[] for _ in range(losses)]
@@ -1231,7 +1248,7 @@ def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_ce
     graph, initial, support, paths = protect_seeds(
         3, edges, blue, order, lost, 0, clique_support=False,
         neutral_rank=ordinary_rank - len(releases), unprotected_blue=layered_sources,
-        fault_budget=fault_budget
+        fault_budget=fault_budget, compact=compact
     )
     return graph, initial, mask(lost), support, paths, waves
 
@@ -1457,7 +1474,7 @@ def cubic_leaf_cycle_lift(base, blue, padding):
     return adjacency(2 * order, edges), blue, white_caps
 
 
-def cubic_single_loss_lift_rank(rounds, *, three_connected=False, fault_budget=2):
+def cubic_single_loss_lift_rank(rounds, *, three_connected=False, fault_budget=2, compact=False):
     """The smallest rank in this construction, indexed by the base intact time."""
     if rounds < 3 or fault_budget < 1:
         raise ValueError('Use at least three base rounds and a positive fault budget')
@@ -1465,10 +1482,13 @@ def cubic_single_loss_lift_rank(rounds, *, three_connected=False, fault_budget=2
     if three_connected:
         core_order = 14 * size - rounds + 1 - (rounds == 3)
         protected_core = 6 * size - 2 * rounds + 4 - (rounds == 3)
+        if compact:
+            lengths = compact_private_path_lengths(fault_budget, protected_core)
+            return core_order + sum(lengths) + 10
         order = (core_order + 2 * fault_budget + 1
                  + (protected_core + fault_budget) * (2 * fault_budget + 2))
         return order + 10
-    if fault_budget != 2:
+    if compact or fault_budget != 2:
         raise ValueError('Adjustable protection is available for the leaf cycle lift')
     if rounds == 3:
         return 142
@@ -1476,10 +1496,10 @@ def cubic_single_loss_lift_rank(rounds, *, three_connected=False, fault_budget=2
 
 
 def cubic_single_loss_lift_certificate(rounds, *, cycle_rank=None, three_connected=False,
-                                       fault_budget=2):
+                                       fault_budget=2, compact=False):
     """Build a cubic double with one retained root and adjustable leaf-cycle protection."""
     minimum = cubic_single_loss_lift_rank(
-        rounds, three_connected=three_connected, fault_budget=fault_budget
+        rounds, three_connected=three_connected, fault_budget=fault_budget, compact=compact
     )
     surplus = 0 if cycle_rank is None else cycle_rank - minimum
     if surplus < 0:
@@ -1489,7 +1509,7 @@ def cubic_single_loss_lift_certificate(rounds, *, cycle_rank=None, three_connect
     ordinary = {(0, rounds - 2, side): DetourPlan(None, (), (), None) for side in range(2)}
     base, blue, root, _, _, waves = subcubic_recursive_rank_certificate(
         rounds, 1, 2 * sum(grafts.values()) + 2, layered_detours=grafts,
-        ordinary_detours=ordinary, fault_budget=fault_budget
+        ordinary_detours=ordinary, fault_budget=fault_budget, compact=compact
     )
     if three_connected:
         graph, blue, white_caps = cubic_leaf_cycle_lift(base, blue, surplus)
@@ -1586,6 +1606,19 @@ def check_all_losses(graph, blue, limit):
                 raise AssertionError(('loss failed', deleted))
             checked += 1
     return checked
+
+
+def check_no_two_edge_cut(graph):
+    without_edge = list(graph)
+    for u, row in enumerate(graph):
+        for offset in members(row >> (u + 1)):
+            v = u + 1 + offset
+            without_edge[u] ^= 1 << v
+            without_edge[v] ^= 1 << u
+            if graph_bridges(without_edge):
+                raise AssertionError(('two-edge cut', u, v))
+            without_edge[u] = graph[u]
+            without_edge[v] = graph[v]
 
 
 def check_robust_samples(graph, blue, slow, support, paths, degree, rounds, losses, *,
@@ -2028,24 +2061,17 @@ def main():
                 limit = 2 if three_connected and t == 3 and padding == 0 else 1
                 exhaustive += check_all_losses(graph, blue, limit)
             if three_connected and t <= 5:
-                without_edge = list(graph)
-                for u, row in enumerate(graph):
-                    for offset in members(row >> (u + 1)):
-                        v = u + 1 + offset
-                        without_edge[u] ^= 1 << v
-                        without_edge[v] ^= 1 << u
-                        if graph_bridges(without_edge):
-                            raise AssertionError(('two-edge cut in cubic lift', t, rank, u, v))
-                        without_edge[u] = graph[u]
-                        without_edge[v] = graph[v]
+                check_no_two_edge_cut(graph)
             print('Cubic single-loss lift:', t + 2, rank, expected, '3-connected:', three_connected)
 
     rng = Random(421)
-    for t, budget, padding in ((3, 1, 0), (3, 4, 1), (4, 7, 0), (5, 12, 3)):
-        rank = cubic_single_loss_lift_rank(t, three_connected=True, fault_budget=budget) + padding
-        graph, blue, slow, waves = cubic_single_loss_lift_certificate(
-            t, cycle_rank=rank, three_connected=True, fault_budget=budget
-        )
+    for t, budget, padding, compact in (
+        (3, 1, 0, False), (3, 4, 1, False), (4, 7, 0, False), (5, 12, 3, False),
+        (3, 1, 0, True), (3, 2, 0, True), (3, 3, 2, True), (4, 4, 1, True), (6, 20, 0, True),
+    ):
+        options = dict(three_connected=True, fault_budget=budget, compact=compact)
+        rank = cubic_single_loss_lift_rank(t, **options) + padding
+        graph, blue, slow, waves = cubic_single_loss_lift_certificate(t, cycle_rank=rank, **options)
         if (graph_bridges(graph) or any(row.bit_count() != 3 for row in graph)
                 or len(graph) // 2 + 1 != rank or completion_time(graph, blue) != t + 2
                 or len(waves) != 3 * t + 2 ** (t - 1)):
@@ -2055,7 +2081,11 @@ def main():
         for lost_seeds in (seeds[:budget], seeds[-budget:], rng.sample(seeds, budget)):
             if completion_time(graph, blue ^ mask(lost_seeds)) > len(graph):
                 raise AssertionError(('cubic leaf cycle fault budget', t, budget, lost_seeds))
-        print('Cubic leaf cycle protection:', t + 2, rank, budget, len(waves))
+        if compact and t == 3:
+            check_no_two_edge_cut(graph)
+            if budget <= 2:
+                exhaustive += check_all_losses(graph, blue, budget)
+        print('Cubic leaf cycle protection:', t + 2, rank, budget, len(waves), 'compact:', compact)
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()

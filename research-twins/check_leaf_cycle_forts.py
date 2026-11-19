@@ -41,11 +41,15 @@ def main():
     parser.add_argument('--solver', default='glucose42', help='Solver name in python-sat')
     args = parser.parse_args()
     model = runpy.run_path(str(Path(__file__).with_name('check_multiple_loss_bounds.py')))
-    for t, padding, expected in ((3, 0, 12), (3, 2, 12), (4, 0, 11),
-                                 (4, 1, 12), (5, 0, 11), (6, 0, 11)):
-        rank = model['cubic_single_loss_lift_rank'](t, three_connected=True) + padding
+    for t, budget, padding, expected, compact in (
+        (3, 2, 0, 12, False), (3, 2, 2, 12, False), (4, 2, 0, 11, False),
+        (4, 2, 1, 12, False), (5, 2, 0, 11, False), (6, 2, 0, 11, False),
+        (3, 1, 0, 3, True), (3, 2, 0, 4, True), (3, 3, 0, 5, True), (3, 4, 0, 6, True),
+    ):
+        options = dict(three_connected=True, fault_budget=budget, compact=compact)
+        rank = model['cubic_single_loss_lift_rank'](t, **options) + padding
         graph, blue, _, _ = model['cubic_single_loss_lift_certificate'](
-            t, cycle_rank=rank, three_connected=True
+            t, cycle_rank=rank, **options
         )
         loss = check_minimum(graph, blue, expected, model, args.solver)
         print(f'intact {t + 2}, rank {rank}, minimum killing size {expected}, seeds {loss}')
