@@ -739,7 +739,27 @@ def subcubic_low_rank_certificate(losses, cycle_rank, *, rounds=2):
     return graph, initial, mask(lost), support, paths, additions
 
 
-def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_centers=False):
+def subcubic_center_splice_plan(rounds, losses, cycle_rank, depth_limit):
+    capacities, splices = [], []
+    shallower_sites = arm_sites = 0
+    for depth in range(rounds - 1):
+        sites = losses if depth == 0 else 2 * losses
+        if depth >= 2:
+            sites += capacities[depth - 2] - splices[depth - 1] - splices[depth - 2]
+        if depth >= 3:
+            arm_sites += 2 * capacities[depth - 3]
+        sites += arm_sites
+        splice = 0
+        if 2 <= depth <= rounds - 3 and (depth_limit is None or depth <= depth_limit):
+            splice = min(capacities[depth - 2], max(0, cycle_rank - shallower_sites - sites))
+        splices.append(splice)
+        capacities.append(sites + splice)
+        shallower_sites += capacities[-1]
+    return {depth: count for depth, count in enumerate(splices) if count}
+
+
+def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_centers=False,
+                                        splice_depth_limit=2):
     edges, blue, lost = list(pairwise(range(rounds + 1))), [0], []
     main_paths = []
     detours = [[] for _ in range(losses)]
@@ -757,43 +777,46 @@ def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_ce
             heappush(hosts, (depth, a, block))
             heappush(hosts, (depth, b, block))
 
-    def record_detour(block, depth, host, parent, guard, center, incoming, outgoing,
-                      *, shortened_outgoing=False):
+    splices = (
+        subcubic_center_splice_plan(rounds, losses, cycle_rank, splice_depth_limit)
+        if splice_centers else {}
+    )
+
+    def attach_detour(depth, host, block):
+        nonlocal order
+        center_depth = depth + 2
+        order, parent, guard, center = subcubic_detour_center(edges, blue, host, order)
+        order, incoming = relay_arm(edges, blue, center, order, rounds - center_depth)
+        splice = splices.get(center_depth, 0) > 0
+        if splice:
+            splices[center_depth] -= 1
+            child_guard = attach_detour(center_depth, center, block)
+            order, tail = relay_arm(edges, blue, child_guard, order, rounds - center_depth - 2)
+            outgoing = [child_guard, *tail]
+        else:
+            order, outgoing = relay_arm(edges, blue, center, order, rounds - center_depth)
+
         detours[block].append((depth, [*reversed(incoming), center, *outgoing]))
         releases.append((host, parent, guard, center))
-        center_depth = depth + 2
         if center_depth <= rounds - 2:
             heappush(hosts, (center_depth, guard, block))
         for arm_depth, a in enumerate(incoming[:-2], center_depth + 1):
             heappush(hosts, (arm_depth, a, block))
         outgoing_start = center_depth + 1
-        if shortened_outgoing:
-            # The other detour already registered its guard at depth four.
+        if splice:
+            # The child detour already registered the shared guard at center_depth + 2.
             outgoing = outgoing[1:]
             outgoing_start += 2
         for arm_depth, b in enumerate(outgoing[:-2], outgoing_start):
             heappush(hosts, (arm_depth, b, block))
+        return guard
 
-    splices = min(losses, max(0, cycle_rank - 6 * losses)) if splice_centers and rounds >= 5 else 0
-    for _ in range(cycle_rank - splices):
+    for _ in range(cycle_rank - sum(splices.values())):
         if not hosts:
             break
-        depth, host, block = heappop(hosts)
-        center_depth = depth + 2
-        order, parent, guard, center = subcubic_detour_center(edges, blue, host, order)
-        order, incoming = relay_arm(edges, blue, center, order, rounds - center_depth)
-        splice = depth == 0 and block < splices
-        if splice:
-            order, child_parent, child_guard, child_center, left, right = subcubic_detour(
-                edges, blue, center, order, rounds - 4
-            )
-            record_detour(block, 2, center, child_parent, child_guard, child_center, left, right)
-            order, tail = relay_arm(edges, blue, child_guard, order, rounds - 4)
-            outgoing = [child_guard, *tail]
-        else:
-            order, outgoing = relay_arm(edges, blue, center, order, rounds - center_depth)
-        record_detour(block, depth, host, parent, guard, center, incoming, outgoing,
-                      shortened_outgoing=splice)
+        attach_detour(*heappop(hosts))
+    if any(splices.values()):
+        raise AssertionError('The detours did not use the planned center attachments')
 
     sequence = list(range(1, rounds + 1))
     for block, main in enumerate(main_paths):
@@ -1130,6 +1153,29 @@ def main():
         if (t, k, rank) == (5, 1, 7):
             exhaustive += check_all_losses(graph, blue, k)
         print('Subcubic center splice:', t, k, rank, len(graph), delayed, 'gain:', actual_gain)
+
+    for t, k, rank, expected, gain in ((5, 1, 13, 49, 0), (6, 1, 13, 78, 1),
+                                       (6, 1, 23, 89, 2), (7, 2, 25, 203, 1),
+                                       (8, 1, 46, 258, 8), (9, 1, 100, 499, 30)):
+        _, _, _, _, _, previous_waves = subcubic_recursive_rank_certificate(
+            t, k, rank, splice_centers=True
+        )
+        graph, blue, slow, support, paths, waves = subcubic_recursive_rank_certificate(
+            t, k, rank, splice_centers=True, splice_depth_limit=None
+        )
+        check_connected(graph, 3)
+        intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
+        actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
+        actual_gain = delayed - len(previous_waves)
+        if (intact, delayed, actual_rank, actual_gain) != (t, expected, rank, gain):
+            raise AssertionError(('subcubic repeated center splices', t, k, rank, intact,
+                                  delayed, actual_rank, actual_gain))
+        check_arrival_waves(graph, blue ^ slow, waves)
+        if (t, k, rank) == (7, 2, 25):
+            sampled += check_robust_samples(graph, blue, slow, support, paths, 3, t, k,
+                                            clique_support=False)
+        print('Subcubic repeated center splices:', t, k, rank, len(graph), delayed,
+              'gain:', actual_gain)
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()

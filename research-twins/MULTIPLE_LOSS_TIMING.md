@@ -498,6 +498,43 @@ As before, all-blue cycles supply any unused rank.
 
 For $6k<\beta\leq12k$, this is exactly $q$ rounds longer than the unmodified recursive construction. The site counts through depth three change from $(k,2k,3k,6k)$ to $(k,2k,3k+q,6k-q)$. Moving $q$ detours from depth three to depth two gains $2q$ rounds, and the $q$ shortened paths cost $q$ rounds. At larger ranks the improvement is at least $q$. In fact, if $\Delta_i=H_i^{(q)}-H_i^{(0)}$, then $\Delta_2=q,\Delta_3=-q,\Delta_4=0,\Delta_5=q$ whenever those depths are eligible. For $i\geq6$, the contributions of $\Delta_2,\Delta_3$ to the sum cancel, leaving $\Delta_i=\Delta_{i-2}+2\sum_{j=4}^{i-3}\Delta_j\geq0$. For example, at $t=8$, $k=1$ and $\beta=44$, the construction gives 248 rounds, compared with 245 for unmodified detours at the same parameters. These are constructive lower bounds for the worst-case time.
 
+#### Repeated attachments at detour centers
+
+The same replacement works at a center $x$ born in any round $d$ with $2\leq d\leq t-3$. The new parent is born at $d+1$, and its guard and center are born at $d+2$. The new detour attaches at depth $d$ and its guard replaces the first two outgoing marks of the old path by one mark at depth $d+2$. The remaining outgoing arm retains its original depths. The new detour can itself have a shortened outgoing arm by the same operation at its own center. Every retained blue relay still has degree two before seed protection.
+
+Order serial paths by decreasing attachment depth, as in the original construction. At a shortened path the relay at the added center restores its parent before the older path reaches $x$. The parent waits with $x$ and its guard white. After the return of $x$ it restores its guard in the next round, continuing the serial path. This argument applies to the added detour even when its own outgoing arm is shortened. Detours attached to a guard are processed earlier than the path that releases that guard. Their parents wait in the same way and cannot release it prematurely. For the guards off the serial paths, a chain of releases starting at a serial vertex of intact depth $i$ adds at most $\lfloor(t-i)/2\rfloor$ parallel rounds, since each release increases the intact depth by two. Even in a shortened path there are at least $t-i-1$ remaining serial rounds for $i\leq t-2$. Parents themselves return one round after their centers and each detour precedes its host's serial path or the path that releases its host. Thus the parallel releases do not extend the serial schedule. The degree cap, one unit of rank per detour, and the private-path proof of seed-loss tolerance are unchanged.
+
+Let $q_i$ count the center attachments at depth $i$, and let $H_i$ be the capacity at that depth if all shallower sites are used. Put $H_i=q_i=0$ for $i<0$, and set $c_0=k$ and $c_i=2k$ for $i>0$. For $0\leq i\leq t-2$, compute
+$$
+\begin{aligned}
+\widehat H_i &= c_i+H_{i-2}+2\sum_{h=0}^{i-3}H_h-q_{i-1}-q_{i-2},\\
+q_i &= \min\left\{H_{i-2},\ \max\left(0,\beta-\sum_{h<i}H_h-\widehat H_i\right)\right\}
+       \qquad(2\leq i\leq t-3),\\
+H_i &= \widehat H_i+q_i ,
+\end{aligned}
+$$
+with $q_i=0$ outside the displayed range. A splice at $i$ creates a center site at $i$, removes an outgoing site at $i+1$, and merges an outgoing site with a guard at $i+2$. There are $H_{i-2}$ centers available when the rank reaches the threshold for $q_i>0$. Every selected center site is used, and the remaining rank takes the shallowest available ordinary sites. Indeed if $q_i>0$, the rank is enough to use all $H_i$ sites and all shallower sites. With $b_i=\min\{H_i,\max(0,\beta-\sum_{h<i}H_h)\}$, this constructs a recovery of length
+$$
+t+k(2t+1)+\sum_{i=0}^{t-2}(2t-2i-3)b_i-\sum_i q_i.
+$$
+Again, all-blue cycles supply any rank beyond the available sites.
+
+Selecting the depth-$i$ splices increases the time by at least $q_i$ compared with the plan that stops choosing splices at depth $i-1$. At depth $i$ the capacity increases by $q_i$, at $i+1$ it decreases by $q_i$, and at $i+2$ it is unchanged. Thus $q_i$ detours formerly placed at depth $i+1$ or later can move to depth $i$. Each gains at least two rounds, and each shortened path costs one. No capacity is lost beyond $i+1$: the difference at $i+3$ is $q_i$, and at higher depths the differences at $i,i+1$ cancel in the sum, leaving only nonnegative differences in the recurrence.
+
+In particular, if $t\geq6$ and $\beta>12k$, the depth-three splices improve the [depth-two construction](#joining-a-detour-to-an-existing-center) by at least $\min(2k,\beta-12k)$ rounds. For $12k<\beta\leq23k$, the improvement is exactly this amount for the construction. The capacity through depth three before the new splices is $12k$, and the capacity through depth four is $23k$. The new depth-three sites replace the same number of depth-four sites, so no later splices are selected in this range. At $t=9$, $k=1$, and $\beta=100$, repeated attachments give 499 rounds, 30 more than when center attachments are used only at depth two.
+
+**Growth when all sites are used.** Let $h_i$ be the per-seed site counts with all centers selected and with the depth cutoff removed. For $t\geq5$, the capacities through $t-3$ are $kh_i$, and the capacity at $t-2$ is $k(h_{t-2}-h_{t-4})$ because the final depth has no center attachments. All sites are used once $\beta\geq k(\sum_{i=0}^{t-2}h_i-h_{t-4})$. The generating function is
+$$
+\sum_{i\geq0}h_i z^i=\frac{1+z}{1-z-2z^2+z^3-z^5}.
+$$
+To see this, substitute $q_i=H_{i-2}$ in the site recurrence and sum. The denominator factors as
+$$
+(1-z-z^2)(1-z^2)-(1+z)z^4 .
+$$
+The ratio $(1+z)z^4/((1-z-z^2)(1-z^2))$ has nonnegative power-series coefficients, including positive coefficients at consecutive powers $4$ and $5$. It increases from zero to infinity on the positive interval before the first zero of $1-z-z^2$. Hence it reaches one at a simple positive root $\rho$ in that interval. On $|z|<\rho$ its modulus is less than one, and on $|z|=\rho$ equality to one requires $z=\rho$ by the consecutive positive coefficients. Therefore the generating function has a simple pole at $\rho$ and no other pole of that modulus. It follows that $h_i=\Theta(r^i)$ for $r=1/\rho\approx1.866760$, the largest positive root of $r^5-r^4-2r^3+r^2-1=0$.
+
+With all sites filled, the constructed time is $\Theta(kr^t)$. Each detour at depth $t-3$ contributes three rounds without shortening, and the other detours all have positive net contribution. The sum of the contributions is bounded above by a constant times $kr^t$ by summing the geometric series weighted by $2(t-i)-3$. For the construction with splices at depth two, the positive site capacities follow the tribonacci recurrence beyond the affected depths, with growth rate $r_0\approx1.839287$. At $r_0$ the new characteristic polynomial equals $(r_0-2)(r_0+1)<0$, so $r>r_0$. These rates describe the explicit constructions.
+
 <a id="the-first-rank-above-six-per-lost-seed"></a>
 
 #### Counting visits down to the fourth round
