@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 import runpy
 
-from pysat.card import ITotalizer
+from pysat.card import CardEnc, EncType, ITotalizer
 from pysat.solvers import Solver
 
 
@@ -77,7 +77,7 @@ def check_band(blocks):
                 raise AssertionError(('23 seed labels block the band', blocks))
 
 
-def check_sheet_band(width, budget, pin_ends=False, *, blocks=26):
+def check_sheet_band(width, budget, pin_ends=False, *, blocks=26, subband_constraints=False):
     margin = 2
     sheets = width + 2 * (margin + 1)
     graph, blue, _, _ = MODEL['cyclic_cubic_chain_lift'](chain(blocks), sheets, reversed_edge=(0, 1))
@@ -97,7 +97,19 @@ def check_sheet_band(width, budget, pin_ends=False, *, blocks=26):
                 clauses.append([-(v + 1)])
             else:
                 seeds.append(v + 1)
-    with ITotalizer(lits=seeds, ubound=budget, top_id=order) as counter:
+    top = order
+    if subband_constraints:
+        # A certified subband must contain at least subwidth - 4 lost seeds.
+        for subwidth in range(max(10, width - 5), width - 1):
+            for start in range(first, last - subwidth + 2):
+                outside = [v for v in seeds if not start <= (v - 1) % sheets < start + subwidth]
+                cap = budget - (subwidth - 4)
+                if len(outside) > cap:
+                    bound = CardEnc.atmost(lits=outside, bound=cap, top_id=top,
+                                           encoding=EncType.seqcounter)
+                    clauses.extend(bound.clauses)
+                    top = max(top, bound.nv)
+    with ITotalizer(lits=seeds, ubound=budget, top_id=top) as counter:
         with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
             if solver.solve(assumptions=[-counter.rhs[budget]]):
                 raise AssertionError(('sheet band can be blocked', width, budget))
@@ -137,11 +149,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--certify-sheets', type=int, nargs='+', choices=(7, 8, 9, 10), default=(),
                         help='replay the selected small-sheet thresholds at 26 blocks')
-    parser.add_argument('--band-through', type=int, choices=range(13, 19), default=13,
+    parser.add_argument('--band-through', type=int, choices=range(13, 25), default=13,
                         help='replay the sheet-band bounds through this width')
     parser.add_argument('--band-blocks', type=int, nargs='+', default=[26], metavar='BLOCKS',
                         help='check the sheet-band bounds on these base chain lengths')
+    parser.add_argument('--subbands-from', type=int, default=19, metavar='WIDTH',
+                        help='use constraints from certified subbands from this width onward')
     args = parser.parse_args()
+    if args.subbands_from < 12:
+        parser.error('--subbands-from requires a width of at least twelve')
+
     if any(blocks < 2 for blocks in args.band_blocks):
         parser.error('--band-blocks requires lengths of at least two blocks')
 
@@ -151,7 +168,8 @@ if __name__ == '__main__':
     print('Every 25-stage prefix band with at most 23 losses fills an adjacent pair', flush=True)
     for blocks in args.band_blocks:
         for width in range(10, args.band_through + 1):
-            check_sheet_band(width, width - 5, pin_ends=width > 10, blocks=blocks)
+            check_sheet_band(width, width - 5, pin_ends=width > 10, blocks=blocks,
+                             subband_constraints=width >= args.subbands_from)
             print(f'{blocks} blocks: a {width}-sheet band fills a pair after up to {width - 5} losses',
                   flush=True)
     for sheets in args.certify_sheets:

@@ -54,6 +54,10 @@ More generally, at a budget $b\in\{20,21,22,23\}$ choose three band widths from 
 
 The extended verifier gives the same loss bound $w-5$ at widths fourteen through eighteen. For a wrapped fort and $m\geq16$, counting the sixteen-sheet bands gives $12m\leq16b$. In particular, a cost-at-most-23 fort must unroll when $m\geq31$, so the finite exclusion alone now settles every $m\geq31$. At widths seventeen and eighteen the inequalities are $13m\leq17b$ and $14m\leq18b$. The latter rules out wrapping at budget 23 for $m\geq30$. The explicit wrapped cases below use the smaller bands in their formulas.
 
+The width bounds continue through 24 using extra inequalities from certified shorter bands. For a width-$w$ core under a budget $b=w-5$, take any contained band of a verified width $j$ from $\max(10,w-5)$ through $w-2$. If the core has no empty pair, that subband contains at least $j-4$ lost seeds. Its margin lies within the active strip of the wider test. At most $b-(j-4)$ losses therefore lie in the rest of the core. The verifier adds these bounds on the complements of the subbands, along with the pinned end sheets and the original total loss bound. Every added restriction follows from an earlier width.
+
+For a wrapped fort in the cyclic cover, apply these local tests to the periodic lift to the integer sheets. A window of width $w$ may pass the same residue more than once, with each occurrence counted on its own integer sheet. Summing over one period counts each lost seed exactly $w$ times, giving $(w-4)m\leq wb$. Width 23 needs at least 19 losses per band and excludes wrapping below cost 24 already at $m\geq28$. Width 21 also rules out any wrapped fort of cost at most 21 at $m=26$, since $17\cdot26>21\cdot21$. Width 24 requires 20 losses and independently rules out wrapping at budget 22 for $m=27$.
+
 Two disjoint sixteen-sheet bands would cost at least 24, so an inclusion-minimal finite fort of cost at most 23 occupies at most 31 consecutive sheets. At a budget $b\in\{20,21,22,23\}$, choose two widths between thirteen and sixteen summing to $b+9$. These need $b+1$ seeds in total, so a piece without an internal empty pair spans at most $b+8$ sheets. The resulting 33-sheet domain with two guard sheets is sufficient for all four budgets. The verifier also excludes the budget-23 formula on this smaller domain and checks the same 24-seed witness there.
 
 ## The seven- through ten-sheet cases
@@ -114,7 +118,7 @@ For costs at most 20, the sixteen-sheet bound rules out wrapping, since $12\cdot
 
 ```sh
 python -B research-twins/check_block_stabilization.py
-python -B research-twins/check_block_stabilization.py --band-through 18
+python -B research-twins/check_block_stabilization.py --band-through 24
 python -B research-twins/check_block_stabilization.py --certify-sheets 7 8 9 10
 python -B research-twins/check_finite_fort_strip.py
 python -B research-twins/check_finite_fort_strip.py --sheets 33
