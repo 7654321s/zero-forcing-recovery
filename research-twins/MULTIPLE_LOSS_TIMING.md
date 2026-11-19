@@ -5,6 +5,7 @@ Use the synchronous rule and initial-color loss model of the [single-loss bounds
 - **Degree two.** For $t\geq1$ and $k\geq1$, the exact value is $M_{2,t,k}=t+k(2t+1)$. On cycles the exact value is $t(k+1)+\lceil k/2\rceil$.
 - **Forests and cycle rank.** The exact value on forests of unrestricted degree is $t+k(2t+1)$. At cycle rank $\beta$ and $t\geq1$, an upper bound is $t+k(2t+1)+(2t-1)\beta$. For one intact round the exact worst-case time is determined at every cycle rank.
 - **One intact round.** The exact value is $1$ for $d=1$ and $1+3k$ for $d=2,3$. For $d\geq4$ one loss gives $5$. For $d\geq4$ and $k\geq2$, put $U=1+\lfloor kd/2\rfloor+2k$. The exact value is $U$ for even $k$ and for $d=4,5$. For odd $k$ it is $U-1$ at $d=6$, and $U-2+(d\bmod2)$ at $d\geq7$.
+- **Joint degree and cycle rank.** For one intact round the exact maximum is determined with both constraints for degree caps three through five, and for two losses at any cap at least four.
 - **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$.
 - **At least two intact rounds allowed.** Put $P=d(d-1)^{t-1}$. For $d\geq6$, $t\geq2$ and $k\geq1$,
   $$
@@ -186,6 +187,64 @@ If the chosen direct target arrives within one round of its source, use the boun
 
 Thus each group of $p$ seeds can spend up to two boundary slots at one incidence each, and every other assigned target costs two incidences in the group. The group has at most $3p$ incidences. It can account for at most $\lfloor3p/2\rfloor+1\leq2p$ targets if $p\geq2$, or at most two if $p=1$. There are at most $2k$ selected target rounds and at most $k$ seed-restoration rounds, giving $M_{3,1,k}\leq1+3k$. The degree-two path construction attains equality at both caps.
 
+## One intact round with both degree and cycle rank fixed
+
+Let $M(d,\beta,k)$ be the maximum finite recovery time on connected graphs of maximum degree at most $d$ and cycle rank exactly $\beta$, with intact time at most one and exactly $k$ losses. For $k\geq1$ and $\beta\geq0$,
+$$
+\begin{aligned}
+M(3,\beta,k)&=1+3k,\\
+M(4,\beta,k)&=1+3k+\min(k,\lfloor\beta/2\rfloor),\\
+M(5,\beta,k)&=1+3k+
+\begin{cases}
+\lfloor\beta/2\rfloor, & 0\leq\beta<2k,\\
+k+\min\!\left(\lfloor k/2\rfloor,\lfloor(\beta-2k)/5\rfloor\right),&\beta\geq2k.
+\end{cases}
+\end{aligned}
+$$
+For two losses and every $d\geq4$, the two separate upper bounds are simultaneously sharp:
+$$
+M(d,\beta,2)=\min(\mathcal{M}_{\beta,2},d+5).
+$$
+All these maxima have connected $k$-fault-tolerant witnesses with a minimum killing support of size $k+1$.
+
+### Rank spent by groups of lost seeds
+
+Let $T$ be a finite delayed time, $S=T-1-3k$, and assume $T>1$. Group all lost seeds by consecutive restoration rounds, as in the degree proof. Write $h$ for the number of distinct restoration rounds, $s$ for the number of groups consisting of a single seed, and $g$ for the number of other groups. The trail argument gives $\beta\geq2S+2m+A+B$, where $m$ counts undistinguished roots and $A,B$ count unused near slots and free sides. Every group containing at least two seeds supplies at least three units of $2m+A+B$.
+
+- If all roots of the group are distinguished, choose two of them restored in consecutive rounds. These occupy each other's near slots, contributing two to $A$. The two free trail sides facing each other can receive at most one blocking-edge charge, by the step count in the [cycle-rank proof](#the-extra-cost-beyond-one-far-arrival-per-seed). This supplies a unit of $B$.
+- If exactly one root of the group is undistinguished, some distinguished root returns within one round of it, including a possible tie. That time consumes one of the undistinguished root's near slots. This gives one unit of $A$ and two from the undistinguished root.
+- If at least two roots of the group are undistinguished, their contribution from $2m$ is at least four.
+
+The charges use root slots, sides and undistinguished roots from disjoint groups. Thus for any degree cap,
+$$
+\beta\geq 2S+3g.
+$$
+Group sizes give a finer inequality. In one group of $p$ lost seeds and $r$ distinct restoration times, choose one representative seed per time, taking the distinguished seed whenever there is one. Each pair of consecutive times with two distinguished representatives supplies three units as above. A pair with exactly one distinguished representative supplies one unit through the other representative's unused near slot. Allocate one of the two units in $2m$ for each incident pair at an undistinguished representative, which has at most two incident pairs. Each pair now supplies at least two units, including pairs with two undistinguished representatives. The $p-r$ seeds not chosen as representatives are undistinguished and supply another $2(p-r)$ units. This gives at least $2(p-1)$ per group. Taking the better bound in each nonsingleton group yields
+$$
+\beta\geq 2S+\sum_{\text{groups of size }p\geq2}\max\{3,2(p-1)\}.
+$$
+
+For $d\geq5$, retaining $h$ and $c=s+g$ in the [degree count](#upper-bound) also gives
+$$
+S\leq h+g+\frac{d-5}{2}(k-s).
+$$
+
+At degree five this yields $S\leq k+g$, so $S>k$ requires $\beta\geq5S-3k$. The separate degree bound gives $S\leq k+\lfloor k/2\rfloor$, and the trail gives $S\leq\lfloor\beta/2\rfloor$. This proves the degree-five formula. The degree-three and degree-four upper bounds follow directly from their separate degree bounds and the general cycle-rank bound.
+
+### Sharp constructions
+
+For degree three, start with the extremal path for intact time one. Attach cycles using bridges in a chain at a retained seed of the last blue pair. The port towards the previous block and the port towards the next block are adjacent on each cycle. The other route between the two ports has $2k+2$ interior vertices. Color every cycle vertex blue. The path's designated loss and killing support leave the attachment seed blue, so their outcomes are preserved. After any loss of at most $k$ seeds, the interior of each long route retains a consecutive blue pair. It restores the entire route and both ports independently of the other blocks. Once the cycles are blue, the remaining path seeds suffice to recover the path. Each cycle adds one to $\beta$ and every vertex has degree at most three.
+
+At degree four, use $\min(k,\lfloor\beta/2\rfloor)$ rank-two blocks from the [cycle-rank construction](#attainment-at-every-cycle-rank), with path blocks for the remaining seeds. At degree five and $\beta<2k$, use the same rule. For $\beta\geq2k$, start with $k$ rank-two blocks, of total rank $2k$. Replace two such blocks by a two-seed block with three shared-source targets whenever another five units of rank are available. Each replacement increases the time by one and raises the rank from four to nine. The two-seed block has maximum degree five, including after seed protection. Use at most $\lfloor k/2\rfloor$ replacements.
+
+For $k=2$ and $d\geq4$, the degree-four blocks attain the formula whenever the desired surplus is at most two. A larger surplus $S$ is realized by one two-seed block with $S$ shared-source targets. The simultaneous upper bounds give $S\leq d-2$ and $2S+3\leq\beta$, so the block fits both budgets. In all these degree-four and higher constructions, a chain of all-blue triangles uses the unused rank, and seed protection with a path for $J$ preserves the rank and the two propagation times.
+
+### Least rank attaining the degree-only bound
+
+For every even $k\geq2$ and $d\geq5$, the minimum rank attaining the degree-only maximum is $(2d-1)k/2$. Indeed, that maximum requires $S=(d-2)k/2$. In the joint degree count, $h\leq k$, $g\leq k/2$ and $k-s\leq k$. Equality requires $g=k/2$, so the rank is at least $2S+3k/2$. Using $k/2$ two-seed blocks with $d-2$ shared-source targets attains the threshold.
+
+At degree six and odd $k$, the minimum rank is $(11k-7)/2$. Here the degree-only maximum requires $S=2k-1$, including $S=1$ for $k=1$. Since $S\leq k+g+k/2$, integrality gives $g\geq(k-1)/2$. The rank is at least $2S+3(k-1)/2$. Using $(k-1)/2$ two-seed blocks with four shared-source targets and one rank-two block attains it.
+
 ## Two or more intact rounds
 
 ### Upper bound
@@ -337,4 +396,4 @@ Run the following from the repository root.
 python -B research-twins/check_multiple_loss_bounds.py
 ~~~
 
-The script replays the contracted trails on five branched trees that attain the forest bound, on the one-round constructions with cycle rank up to 47 and on the cyclic degree-three construction with up to 32 designated lost seeds. It exhausts losses through the budget on the degree-two examples, on the small cycle-rank constructions with one or two losses, and on the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It also checks the exact local arrival rounds of the degree-three construction and seven higher-degree concatenated examples. On the larger protected graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
+The script replays the contracted trails on five branched trees attaining the forest bound, on the cyclic degree-three construction with up to 32 designated lost seeds, and on the one-round constructions at prescribed cycle rank and degree cap. It exhausts losses through the budget on the degree-two examples, on the small cycle-rank constructions with one or two losses, and on the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It also checks the exact local arrival rounds of the degree-three construction and seven higher-degree concatenated examples. On the larger protected graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.

@@ -115,6 +115,17 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
     upper = intact + (2 * intact + 1) * len(roots) + surcharge * revisits
     if intact == 1:
         upper = min(upper, one_round_cycle_rank_time(len(roots), cycle_rank))
+        sizes = []
+        previous_arrival = -2
+        for arrival in sorted(late[z] for z in roots):
+            if arrival > previous_arrival + 1:
+                sizes.append(0)
+            sizes[-1] += 1
+            previous_arrival = arrival
+        group_cost = sum(max(3, 2 * (size - 1)) for size in sizes if size >= 2)
+        excess = delayed - 1 - 3 * len(roots)
+        if cycle_rank < 2 * excess + group_cost:
+            raise AssertionError(('rank cost of restoration groups', cycle_rank, excess, sizes))
     if revisits > cycle_rank or delayed > upper:
         raise AssertionError(('cycle rank bound', intact, delayed, cycle_rank, revisits))
     return intact, delayed, revisits
@@ -209,21 +220,23 @@ def sparse_one_round_certificate(losses, cycle_rank):
     extra_from_pair = (cycle_rank - 3) // 2
     if losses >= 2 and extra_from_pair > losses:
         cyclic_blocks = losses - 2
-        pair_targets = extra_from_pair - cyclic_blocks
-        spare_cycles = cycle_rank - (2 * extra_from_pair + 3)
+        pair_targets = (extra_from_pair - cyclic_blocks,)
     else:
         cyclic_blocks = min(losses, cycle_rank // 2)
-        pair_targets = 0
-        spare_cycles = cycle_rank - 2 * cyclic_blocks
+        pair_targets = ()
+    return assemble_one_round_certificate(losses, cycle_rank, cyclic_blocks, pair_targets)
 
+
+def assemble_one_round_certificate(losses, cycle_rank, cyclic_blocks, pair_targets):
+    spare_cycles = cycle_rank - 2 * cyclic_blocks - sum(2 * q + 3 for q in pair_targets)
     seed, endpoint = 0, 1
     edges, blue, deliberately_lost = [(seed, endpoint)], [seed], []
     order = 2
-    if pair_targets:
+    for count in pair_targets:
         roots = (order, order + 1)
         blue.extend(roots)
         deliberately_lost.extend(roots)
-        order, targets, tail = one_round_block(pair_targets + 2, roots, edges, blue, order + 2)
+        order, targets, tail = one_round_block(count + 2, roots, edges, blue, order + 2)
         for left, right in pairwise([endpoint, *targets]):
             edges.extend(((order, left), (order, right)))
             blue.append(order)
@@ -253,11 +266,36 @@ def sparse_one_round_certificate(losses, cycle_rank):
         blue.extend((x, y, z))
         anchor = y
         order += 3
-    degree = max(4, pair_targets + 2)
+    degree = max(4, max(pair_targets, default=0) + 2)
     graph, initial, support, paths = protect_seeds(
         degree, edges, blue, order, deliberately_lost, seed, clique_support=False
     )
     return graph, initial, mask(deliberately_lost), support, paths, degree
+
+
+def subcubic_rank_certificate(losses, cycle_rank):
+    path, blue, lost, support = path_certificate(1, losses)
+    edges = list(pairwise(range(len(path))))
+    anchor = len(path) - 2
+    order = len(path)
+    for _ in range(cycle_rank):
+        cycle = range(order, order + 2 * losses + 4)
+        edges.append((anchor, cycle.start))
+        edges.extend(pairwise([*cycle, cycle.start]))
+        anchor = cycle[-1]
+        order = cycle.stop
+    return adjacency(order, edges), blue | mask(range(len(path), order)), lost, support
+
+
+def bounded_rank_certificate(degree, losses, cycle_rank):
+    if degree == 5 and cycle_rank >= 2 * losses:
+        pairs = min(losses // 2, (cycle_rank - 2 * losses) // 5)
+        return assemble_one_round_certificate(losses, cycle_rank, losses - 2 * pairs, (3,) * pairs)
+    if losses == 2 and degree >= 6:
+        count = min(degree - 2, (cycle_rank - 3) // 2)
+        if count > 2:
+            return assemble_one_round_certificate(losses, cycle_rank, 0, (count,))
+    return assemble_one_round_certificate(losses, cycle_rank, min(losses, cycle_rank // 2), ())
 
 
 def one_round_certificate(degree, losses):
@@ -464,6 +502,14 @@ def check_robust_samples(graph, blue, slow, support, paths, degree, rounds, loss
     return len(checks)
 
 
+def check_ranked_one_round_example(graph, blue, slow, rank, expected):
+    actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
+    intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
+    if (intact, delayed, actual_rank) != (1, expected, rank):
+        raise AssertionError(('ranked one-round delay', slow.bit_count(), rank,
+                              delayed, expected, actual_rank))
+
+
 def main():
     exhaustive = sampled = 0
     check_branched_forest_extremizers()
@@ -495,13 +541,58 @@ def main():
         graph, blue, slow, support, paths, degree = sparse_one_round_certificate(k, rank)
         sampled += check_robust_samples(graph, blue, slow, support, paths, degree, 1, k,
                                         clique_support=False)
-        actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
-        intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
-        if (intact, delayed, actual_rank) != (1, one_round_cycle_rank_time(k, rank), rank):
-            raise AssertionError(('sparse one-round delay', k, rank, delayed, actual_rank))
+        expected = one_round_cycle_rank_time(k, rank)
+        check_ranked_one_round_example(graph, blue, slow, rank, expected)
         if k <= 2 and rank <= 4:
             exhaustive += check_all_losses(graph, blue, k)
-        print('Sparse one-round family:', rank, k, len(graph), delayed)
+        print('Sparse one-round family:', rank, k, len(graph), expected)
+
+    rng = Random(247)
+    for k, rank in ((1, 1), (2, 2), (8, 6)):
+        graph, blue, slow, support = subcubic_rank_certificate(k, rank)
+        check_connected(graph, 3)
+        check_ranked_one_round_example(graph, blue, slow, rank, 1 + 3 * k)
+        if completion_time(graph, blue ^ support) <= len(graph):
+            raise AssertionError(('subcubic ranked killing loss', k, rank))
+        if k <= 2:
+            exhaustive += check_all_losses(graph, blue, k)
+        seeds = tuple(members(blue))
+        for _ in range(12):
+            lost = mask(rng.sample(seeds, k))
+            if completion_time(graph, blue ^ lost) > len(graph):
+                raise AssertionError(('subcubic ranked sample', k, rank, lost))
+            sampled += 1
+        print('Subcubic one-round rank:', rank, k, len(graph), 1 + 3 * k)
+
+    joint_cases = (
+        (4, 1, 0, 4), (4, 1, 17, 5), (4, 4, 3, 14), (4, 4, 8, 17), (4, 4, 23, 17),
+        (5, 4, 7, 16), (5, 4, 8, 17), (5, 4, 12, 17), (5, 4, 13, 18),
+        (5, 4, 15, 18), (5, 4, 17, 18), (5, 4, 18, 19), (5, 4, 25, 19),
+        (5, 5, 14, 21), (5, 5, 15, 22), (5, 5, 20, 23),
+        (6, 2, 8, 9), (6, 2, 9, 10), (6, 2, 11, 11), (6, 2, 20, 11),
+        (9, 2, 16, 13), (9, 2, 17, 14), (9, 2, 22, 14),
+    )
+    for cap, k, rank, expected in joint_cases:
+        graph, blue, slow, support, paths, degree = bounded_rank_certificate(cap, k, rank)
+        if degree > cap:
+            raise AssertionError(('joint degree cap', cap, degree, k, rank))
+        check_ranked_one_round_example(graph, blue, slow, rank, expected)
+        sampled += check_robust_samples(graph, blue, slow, support, paths, degree, 1, k,
+                                        clique_support=False)
+        print('Joint one-round family:', cap, rank, k, len(graph), expected)
+
+    for d, k in ((5, 4), (6, 3), (6, 4), (6, 7), (7, 4), (8, 6), (12, 8)):
+        rank = (2 * d - 1) * (k // 2) + 2 * (k % 2)
+        graph, blue, slow, support, paths, degree = assemble_one_round_certificate(
+            k, rank, k % 2, (d - 2,) * (k // 2)
+        )
+        if degree != d:
+            raise AssertionError(('one-round threshold degree', d, k, rank, degree))
+        expected = sharp_one_round_time(d, k)
+        check_ranked_one_round_example(graph, blue, slow, rank, expected)
+        sampled += check_robust_samples(graph, blue, slow, support, paths, degree, 1, k,
+                                        clique_support=False)
+        print('Rank threshold for degree-only maximum:', d, rank, k, expected)
 
     for d, k in ((4, 2), (5, 3), (7, 4), (4, 6)):
         graph, blue, slow, support, paths, n = one_round_certificate(d, k)
