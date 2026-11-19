@@ -1,8 +1,8 @@
 """Replay extremal recovery examples for several lost initial blue vertices."""
 
-from collections import namedtuple
+from collections import Counter, defaultdict, namedtuple
 from heapq import heappop, heappush
-from itertools import accumulate, combinations, pairwise
+from itertools import combinations, pairwise
 from pathlib import Path
 from random import Random
 import runpy
@@ -763,108 +763,181 @@ def subcubic_center_splice_plan(rounds, losses, cycle_rank, depth_limit, *, main
 DetourPlan = namedtuple('DetourPlan', ('guard', 'incoming', 'outgoing', 'center'))
 
 
-def combine_rank_tables(tables, budget):
-    """Maximize the added time for each exact rank and record the splits."""
-    totals, splits = [0], []
-    for options in tables:
-        size = min(budget + 1, len(totals) + len(options) - 1)
-        scores, choices = [-1] * size, [-1] * size
-        for spent, before in enumerate(totals):
-            if before < 0:
-                continue
-            for extra in range(min(len(options), size - spent)):
-                after = options[extra]
-                rank = spent + extra
-                if after >= 0 and before + after > scores[rank]:
-                    scores[rank] = before + after
-                    choices[rank] = extra
-        totals = scores
-        splits.append(choices)
-    return totals, splits
+LayerChoice = namedtuple('LayerChoice', ('remaining', 'copies', 'ordinary_gain',
+                                         'activation_rank', 'extra_capacity'))
 
 
-def rank_split(splits, rank):
-    allocation = []
-    for choices in reversed(splits):
-        extra = choices[rank]
-        assert extra >= 0
-        allocation.append(extra)
-        rank -= extra
-    assert rank == 0
-    return list(reversed(allocation))
+def subcubic_ordinary_margins(rounds):
+    """Count the ordinary marginal gains by deadline and gain."""
+    margins = [Counter(), Counter()]
+    shortened = [Counter(), Counter()]
+    prefixes = [Counter(), Counter()]
+    for remaining in range(2, rounds + 1):
+        first = 2 * remaining - 3
+        counts = Counter({first: 1})
+        if remaining == 4:
+            counts[1] = 1
+        if remaining >= 5:
+            for group in (margins[remaining - 2], shortened[remaining - 2],
+                          prefixes[remaining - 3], prefixes[remaining - 5]):
+                counts.update(group)
+        margins.append(counts)
+        shortened_counts = counts.copy()
+        del shortened_counts[first]
+        if first > 1:
+            shortened_counts[first - 1] += 1
+        shortened.append(shortened_counts)
+        prefixes.append(prefixes[-1] + counts)
+    return margins, shortened
+
+
+def subcubic_rank_model(rounds, losses):
+    margins, shortened = subcubic_ordinary_margins(rounds)
+    ordinary = Counter()
+    layers = []
+    for remaining in range(2, rounds + 1):
+        copies = losses if remaining == rounds else 2 * losses
+        gains = margins[remaining]
+        ordinary.update({value: copies * count for value, count in gains.items()})
+        full_gain = sum(value * count for value, count in gains.items())
+        extra = 2 ** (remaining - 2) - full_gain
+        if remaining >= 3 and extra > 0:
+            layers.append(LayerChoice(remaining, copies, full_gain,
+                                      2 * full_gain - sum(gains.values()), extra))
+    return margins, shortened, ordinary, layers
+
+
+def subcubic_first_layered_rank(rounds, losses):
+    """First rank with a strict benefit from the layered construction."""
+    _, _, ordinary, layers = subcubic_rank_model(rounds, losses)
+    if not layers:
+        return None
+    return sum(ordinary.values()) + min(layer.activation_rank for layer in layers) + 2
+
+
+def subcubic_layer_selection(layers, budget):
+    """Choose layers by activation rank and their capacity for extra rounds."""
+    if not layers or budget < min(layer.activation_rank for layer in layers) + 2:
+        return 0, ()
+    full_capacity = sum(layer.copies * layer.extra_capacity for layer in layers)
+    full_activation = sum(layer.copies * layer.activation_rank for layer in layers)
+    if budget >= full_activation + 2 * full_capacity:
+        return full_capacity, tuple((layer.remaining, layer.copies) for layer in layers)
+
+    frontier = [(0, 0, ())]
+    for layer in layers:
+        remaining = min(layer.copies, (budget - 2) // layer.activation_rank)
+        chunk = 1
+        while remaining:
+            count = min(chunk, remaining)
+            extra_rank = count * layer.activation_rank
+            extra_capacity = count * layer.extra_capacity
+            candidates = {rank: (capacity, plan) for rank, capacity, plan in frontier}
+            for rank, capacity, plan in frontier:
+                rank += extra_rank
+                capacity += extra_capacity
+                if rank <= budget - 2 and capacity > candidates.get(rank, (-1, ()))[0]:
+                    candidates[rank] = (capacity, (*plan, (layer.remaining, count)))
+
+            frontier = []
+            largest = -1
+            for rank, (capacity, plan) in sorted(candidates.items()):
+                if capacity > largest:
+                    frontier.append((rank, capacity, plan))
+                    largest = capacity
+            remaining -= count
+            chunk *= 2
+
+    rank, capacity, plan = max(frontier, key=lambda item: min(item[1], (budget - item[0]) // 2))
+    return min(capacity, (budget - rank) // 2), plan
+
+
+def take_rank_margins(groups, budget):
+    """Take the largest available margins, keeping their site labels."""
+    groups = list(groups)
+    counts_by_gain = defaultdict(list)
+    for index, margins in enumerate(groups):
+        for gain, count in margins.items():
+            counts_by_gain[gain].append((index, count))
+
+    spent, score = [0] * len(groups), 0
+    for gain in sorted(counts_by_gain, reverse=True):
+        for index, count in counts_by_gain[gain]:
+            selected = min(count, budget)
+            spent[index] += selected
+            score += gain * selected
+            budget -= selected
+            if budget == 0:
+                return score, spent
+    return score, spent
+
+
+def subcubic_rank_value(rounds, losses, cycle_rank):
+    """Return the optimum in the combined family without building a plan."""
+    _, _, ordinary, layers = subcubic_rank_model(rounds, losses)
+    ordinary_rank = sum(ordinary.values())
+    bonus, _ = subcubic_layer_selection(layers, cycle_rank - ordinary_rank)
+    if bonus:
+        gain = sum(value * count for value, count in ordinary.items()) + bonus
+    else:
+        gain, _ = take_rank_margins([ordinary], cycle_rank)
+    return rounds + losses * (2 * rounds + 1) + gain
 
 
 def subcubic_rank_allocation(rounds, losses, cycle_rank):
     """Optimize the combined detour construction and recover its allocation."""
-    ordinary = [[0], [0]]
-    variants = [None, None]
-    main_options = [None, None]
-    layered_choices = [set(), set()]
-    for remaining in range(2, rounds + 1):
-        arm_rounds = tuple(range(remaining - 3, 1, -1))
-        arm_tables = [ordinary[s] for s in arm_rounds]
-        shapes = []
-        best, chosen = [0], [0]
-        if cycle_rank:
-            for splice in range(2 if remaining >= 5 else 1):
-                outgoing = arm_rounds[2:] if splice else arm_rounds
-                options = [ordinary[remaining - 2], *arm_tables,
-                           *(ordinary[s] for s in outgoing)]
-                if splice:
-                    options.append([-1, *ordinary[remaining - 2][1:]])
-                values, splits = combine_rank_tables(options, cycle_rank - 1)
-                shapes.append((outgoing, splits))
-                extension = max(0, len(values) + 1 - len(best))
-                best.extend([-1] * extension)
-                chosen.extend([0] * extension)
-                for extra, gain in enumerate(values, 1):
-                    score = gain + 2 * remaining - 3 - splice
-                    if gain >= 0 and score > best[extra]:
-                        best[extra], chosen[extra] = score, splice
-        ordinary.append(best)
-        variants.append((arm_rounds, shapes, chosen))
-        layered = set()
-        options = best[:]
-        if remaining >= 3:
-            at_most = list(accumulate(best, max))
-            targets = min(cycle_rank // 2, 2 ** (remaining - 2))
-            for count in range(1, targets + 1):
-                rank = 2 * count
-                if count <= at_most[min(rank, len(at_most) - 1)]:
-                    continue
-                options.extend([-1] * max(0, rank + 1 - len(options)))
-                options[rank] = count
-                layered.add(rank)
-        main_options.append(options)
-        layered_choices.append(layered)
-
-    sites = [(block, depth, side) for block in range(losses)
-             for depth in range(rounds - 1) for side in range(1 if depth == 0 else 2)]
-    totals, splits = combine_rank_tables((main_options[rounds - d] for _, d, _ in sites),
-                                        cycle_rank)
-    rank = max(range(len(totals)), key=totals.__getitem__)
+    margins, shortened, ordinary, layers = subcubic_rank_model(rounds, losses)
+    bonus, chosen = subcubic_layer_selection(layers, cycle_rank - sum(ordinary.values()))
+    layer_types = {layer.remaining: layer for layer in layers}
+    chosen_by_rounds = Counter()
+    for remaining, count in chosen:
+        chosen_by_rounds[remaining] += count
+    layered, ordinary_sites = {}, []
+    unassigned_bonus = bonus
+    for block in range(losses):
+        for depth in range(rounds - 1):
+            for side in range(1 if depth == 0 else 2):
+                site = (block, depth, side)
+                remaining = rounds - depth
+                if unassigned_bonus and chosen_by_rounds[remaining]:
+                    layer = layer_types[remaining]
+                    extra = min(unassigned_bonus, layer.extra_capacity)
+                    layered[site] = layer.ordinary_gain + extra
+                    unassigned_bonus -= extra
+                    chosen_by_rounds[remaining] -= 1
+                else:
+                    ordinary_sites.append(site)
+    assert unassigned_bonus == 0
 
     def detour(remaining, budget):
         if budget == 0:
             return None
-        incoming, shapes, chosen = variants[remaining]
-        splice = chosen[budget]
-        outgoing, splits = shapes[splice]
-        budgets = iter(rank_split(splits, budget - 1))
+        incoming = tuple(range(remaining - 3, 1, -1))
+        center_allowed = remaining >= 5
+        outgoing = incoming[2:] if center_allowed else incoming
+        groups = [margins[remaining - 2], *(margins[s] for s in incoming),
+                  *(margins[s] for s in outgoing)]
+        if center_allowed:
+            groups.append(shortened[remaining - 2])
+        _, budgets = take_rank_margins(groups, budget - 1)
+        budgets = iter(budgets)
         guard = detour(remaining - 2, next(budgets))
         incoming_plans = tuple(detour(s, next(budgets)) for s in incoming)
         outgoing_plans = tuple(detour(s, next(budgets)) for s in outgoing)
-        center = detour(remaining - 2, next(budgets)) if splice else None
+        center = detour(remaining - 2, next(budgets)) if center_allowed else None
+        if center_allowed and center is None:
+            outgoing_plans = (None,) * min(2, len(incoming)) + outgoing_plans
         return DetourPlan(guard, incoming_plans, outgoing_plans, center)
 
-    detours, layered = {}, {}
-    for site, spent in zip(sites, rank_split(splits, rank)):
-        remaining = rounds - site[1]
-        if spent in layered_choices[remaining]:
-            layered[site] = spent // 2
-        elif spent:
-            detours[site] = detour(remaining, spent)
-    return rounds + losses * (2 * rounds + 1) + totals[rank], detours, layered
+    groups = [margins[rounds - site[1]] for site in ordinary_sites]
+    if bonus:
+        budgets = [sum(group.values()) for group in groups]
+        gain = sum(value * count for value, count in ordinary.items()) + bonus
+    else:
+        gain, budgets = take_rank_margins(groups, cycle_rank)
+    detours = {site: detour(rounds - site[1], spent)
+               for site, spent in zip(ordinary_sites, budgets) if spent}
+    return rounds + losses * (2 * rounds + 1) + gain, detours, layered
 
 
 def subcubic_recursive_rank_certificate(rounds, losses, cycle_rank, *, splice_centers=False,
@@ -1422,6 +1495,18 @@ def main():
         if (time, sum(layered.values())) != (expected, layered_count):
             raise AssertionError(('subcubic rank allocation', t, rank, time, layered))
         print('Subcubic rank allocation:', t, rank, time, 'layered targets:', layered_count)
+
+    if subcubic_first_layered_rank(12, 3) is not None:
+        raise AssertionError('Layering at deadline twelve cannot improve the ordinary optimum')
+    for t, k, rank, expected in ((13, 2, 7251, 13296), (14, 2, 10555, 24811),
+                                  (15, 1, 10082, 23161), (20, 3, 455151, 1574145),
+                                  (60, 1, 10502302759001520, 36598365714832758)):
+        threshold = subcubic_first_layered_rank(t, k)
+        before = subcubic_rank_value(t, k, rank - 1)
+        after = subcubic_rank_value(t, k, rank)
+        if (threshold, before, after) != (rank, expected - 1, expected):
+            raise AssertionError(('subcubic first layered rank', t, k, threshold, before, after))
+        print('Subcubic first layered rank:', t, k, threshold, after)
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()

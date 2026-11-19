@@ -596,9 +596,9 @@ Let $s$ be the number of intact rounds remaining at a site. An ordinary site can
 
 For each $s$, store the best ordinary contribution at every exact rank up to $\beta$. Include zero at rank zero for an optional site, and exclude rank zero when a center splice requires a detour. Each of the two detour shapes combines the tables of its child sites by max-convolution. For tables $A,B$, the entry at rank $r$ is $\max_{i+j=r}(A(i)+B(j))$ over reachable entries. The child's remaining deadline is strictly smaller, so the tables are evaluated in order of increasing $s$. The distinct child sites use independent spare incidences. In the spliced shape the shared guard is assigned only to the new detour. The serial schedule of the construction works for every allocation to these sites, so the recurrence is both necessary and sufficient for the ordinary choices in this family.
 
-At a main-path site with $s\geq3$, also allow rank $2m$ for a layered detour of size $m$, where $1\leq m\leq2^{s-2}$. Convolve the resulting tables for the $k$ sites with $s=t$ and the $2k$ sites at each $2\leq s<t$. Take the best entry at rank at most $\beta$, since unused rank can be supplied by all-blue cycles. The prefix and main paths add $t+k(2t+1)$ rounds. Recorded rank splits reconstruct the layered sizes and all ordinary choices, including the compulsory center detours. The algorithm uses $O((t^2+kt)\beta^2)$ time and $O((t^2+kt)\beta)$ table space for $t\geq2$ and $\beta\geq1$. The tables can stop at each configuration's capacity when it is less than $\beta$.
+At a main-path site with $s\geq3$, also allow rank $2m$ for a layered detour of size $m$, where $1\leq m\leq2^{s-2}$. Convolve the resulting tables for the $k$ sites with $s=t$ and the $2k$ sites at each $2\leq s<t$. Take the best entry at rank at most $\beta$, since unused rank can be supplied by all-blue cycles. The prefix and main paths add $t+k(2t+1)$ rounds. Recorded rank splits reconstruct the layered sizes and all ordinary choices, including the compulsory center detours. Direct tabulation uses $O((t^2+kt)\beta^2)$ time and $O((t^2+kt)\beta)$ table space for $t\geq2$ and $\beta\geq1$. The tables can stop at each configuration's capacity when it is less than $\beta$.
 
-**Removing dominated layered choices.** Let $U_{s-2}$ and $R_s$ be the contribution and rank of the fully filled ordinary site computed above. A layered option with $m\leq U_{s-2}$ can be replaced by an ordinary choice of rank at most $2m$. If $R_s<m$, use the fully filled ordinary site. If $R_s\geq m$, retain exactly $m$ detours from that site by removing leaves of the detour tree. Removing a leaf at a center also restores the parent's ordinary outgoing arm, with its two newly available sites left unused. The resulting shape is still allowed. Each retained detour contributes at least one net serial round, so the ordinary plan contributes at least $m$ rounds for rank $m$. In particular, no layered choice is needed for $t\leq12$. The implementation also prunes any layered option already matched by the ordinary table at equal or smaller rank.
+**Removing dominated layered choices.** Let $U_{s-2}$ and $R_s$ be the contribution and rank of the fully filled ordinary site computed above. A layered option with $m\leq U_{s-2}$ can be replaced by an ordinary choice of rank at most $2m$. If $R_s<m$, use the fully filled ordinary site. If $R_s\geq m$, retain exactly $m$ detours from that site by removing leaves of the detour tree. Removing a leaf at a center also restores the parent's ordinary outgoing arm, with its two newly available sites left unused. The resulting shape is still allowed. Each retained detour contributes at least one net serial round, so the ordinary plan contributes at least $m$ rounds for rank $m$. In particular, no layered choice is needed for $t\leq12$.
 
 For one lost seed and $t=13$, rank $5345$ gives 6654 rounds in this family. At rank $5346$ a 2009-terminal layered detour at the lost root gives 6655 rounds with the remaining rank spent on ordinary detours. For $t=14$, the corresponding values are 12412 rounds at rank $6997$ and 12413 rounds at rank $6998$. The latter choice places its 2009-terminal detour on a first-round arm vertex, with ordinary detours at the other active sites. These are the first improvements over the fully filled ordinary times, since the optimized time is nondecreasing under all-blue rank padding. The dominance rule rules out a useful layered option below the rank that fills the ordinary sites in these two examples.
 
@@ -621,6 +621,35 @@ c_n(w)-e_n(w)-c_{n-1}(w)-c_{n-2}(w)
  +c_{n-5}(w)+e_{n-3}(w).
 $$
 The middle difference is nonnegative by dominance at $n-2$, so the induction closes. This proves the multiset rule at every deadline, including the nonincreasing order of the optimal marginal gains.
+
+#### First useful rank for layered detours
+
+Write
+$$
+R_{\mathrm{ord}}(t,k)=kR_t+2k\sum_{s=2}^{t-1}R_s
+$$
+for the rank that fills all ordinary sites. Within the combined family, for every $t\geq13$ and $k\geq1$ the first rank at which layering gives a strict gain over the ordinary optimum is
+$$
+\beta_{\mathrm{first}}(t,k)=R_{\mathrm{ord}}(t,k)+3441 .
+$$
+At that rank the gain is exactly one round. A single site with 13 rounds available takes a layered detour with 2009 terminals, and every other site is ordinary and full. For $t\leq12$, the ordinary optimum remains optimal in the combined family at every rank. For example, with two losses the first useful ranks at $t=13$ and $t=14$ are 7251 and 10555.
+
+**Fill the remaining ordinary sites.** Among optimal allocations, minimize the number of layered sites and then maximize the number of ordinary detours. Each chosen layer must have $m>U_{s-2}$ by the dominance rule. If some ordinary site is unfilled, trim one terminal from a layer. Its size stays positive and the change frees two rank units at a cost of one round. One of those units buys the next ordinary marginal gain, which is at least one. This improves the optimum or preserves it with more ordinary detours. Both contradict the choice of allocation. Thus the optimum is attained by an all-ordinary allocation or by a layered set with all other sites filled by ordinary detours.
+
+**Pay for the replacement and extra rounds.** At a site of deadline $s$, define
+$$
+W_s=2U_{s-2}-R_s,\qquad P_s=2^{s-2}-U_{s-2}.
+$$
+A useful layered site has $P_s>0$. Replacing its full ordinary site and gaining $e$ extra rounds uses net rank $W_s+2e$, for any integer $1\leq e\leq P_s$. All $W_s$ are positive because all ordinary marginal gains are at least one. Thus a normalized layered optimum has rank strictly above $R_{\mathrm{ord}}(t,k)$, where the ordinary optimum is already constant. The maximum gain over that full ordinary time at such ranks can be computed from subsets $S$ of useful sites. Let $W(S)=\sum_{s\in S} W_s$ and $P(S)=\sum_{s\in S} P_s$, counting repetitions. The gain is
+$$
+\max\left\{0,\ \max_S\min\left(P(S),
+      \left\lfloor\frac{\beta-R_{\mathrm{ord}}(t,k)-W(S)}2\right\rfloor\right)\right\}.
+$$
+For a positive candidate gain, distribute those extra rounds over the chosen sites, up to each site's capacity. Any site assigned zero extra rounds can be restored to ordinary, which saves its activation rank $W_s$. This shows that the formula remains exact even when the candidate gain is smaller than the size of $S$. Below $R_{\mathrm{ord}}(t,k)$, take the ordinary marginal gains up to the available rank.
+
+The smallest activation rank among useful sites is $W_{13}=2\cdot2008-577=3439$. Indeed $P_s>0$ exactly for $s\geq13$. Also $W_s$ is strictly increasing: extend the full ordinary shape at deadline $s$ by one intact round, increasing both arms of every detour by one while retaining the same attachment choices. The shape has the same rank and contributes $2R_s$ more rounds. At deadline $s+1$, the maximum of twice the ordinary contribution minus its rank is attained at the full ordinary shape, since each extra ordinary marginal is at least one. Hence $W_{s+1}\geq W_s+4R_s$. Every $t\geq13$ has a main-path site with 13 rounds available. The minimum activation rank plus two units for the first extra round gives the formula, and the budget there permits exactly one extra round.
+
+The replay script counts ordinary gains by their values and keeps only undominated pairs of activation rank and extra-round capacity for the layered subset search. A pair with at least as much rank and no more capacity can be discarded. Identical sites are processed in binary-sized groups. This also supports the numerical queries `subcubic_rank_value` and `subcubic_first_layered_rank` without creating the detour plan or the graph. The threshold uses only the ordinary histograms and the available site types.
 
 <a id="the-first-rank-above-six-per-lost-seed"></a>
 
