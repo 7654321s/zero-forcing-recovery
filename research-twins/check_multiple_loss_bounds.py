@@ -29,6 +29,95 @@ def cycle_certificate(rounds, losses):
     return adjacency(order, pairwise([*range(order), 0])), blue, mask(pairs[1:]), mask(pairs)
 
 
+def force_source(graph, arrivals, vertex):
+    round_number = arrivals[vertex]
+    return next(source for source in members(graph[vertex])
+                if arrivals[source] < round_number
+                and all(arrivals[w] < round_number
+                        for w in members(graph[source] & ~(1 << vertex))))
+
+
+def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
+    intact, full = trace(graph, blue)
+    delayed, late = trace(graph, blue ^ lost)
+    if delayed > len(graph) or delayed <= intact:
+        raise AssertionError(('expected a finite, positive delay', intact, delayed))
+
+    roots = set(members(lost))
+    representative = {v: v for v in roots}
+    forest_edges = set()
+    discrepant = sorted((v for v in range(len(graph)) if 0 < full[v] < late[v]),
+                        key=full.__getitem__)
+    for vertex in discrepant:
+        source = force_source(graph, full, vertex)
+        if full[source] < late[source]:
+            parent = source
+        else:
+            parent = next(w for w in members(graph[source] & ~(1 << vertex))
+                          if late[w] >= full[vertex])
+            if source in representative:
+                raise AssertionError(('repeated intermediate vertex', source))
+            representative[source] = representative[parent]
+            forest_edges.add(frozenset((parent, source)))
+        representative[vertex] = representative[parent]
+        forest_edges.add(frozenset((source, vertex)))
+
+    vertex = late.index(delayed)
+    trail = [(vertex, True)]
+    for round_number in range(delayed, intact + 1, -1):
+        source = force_source(graph, late, vertex)
+        if late[source] == round_number - 1:
+            vertex = source
+        else:
+            trail.append((source, False))
+            vertex = next(w for w in members(graph[source]) if late[w] == round_number - 1)
+        trail.append((vertex, True))
+    distinguished = [v for v, selected in trail if selected]
+    if [late[v] for v in distinguished] != list(range(delayed, intact, -1)):
+        raise AssertionError(('incorrect sequence of arrival rounds', distinguished))
+
+    visits, edges, nonroots = [], set(), 0
+    previous = None
+    for vertex, selected in trail:
+        if previous is None:
+            visits.append(representative[vertex])
+        else:
+            edge = frozenset((previous, vertex))
+            if edge in edges:
+                raise AssertionError(('repeated trail edge', previous, vertex))
+            edges.add(edge)
+            if edge not in forest_edges:
+                visits.append(representative.get(vertex, vertex))
+                nonroots = 0
+        if selected:
+            if vertex not in representative:
+                raise AssertionError(('uncovered discrepancy', vertex))
+            nonroots += vertex not in roots
+            if nonroots > 2 * intact:
+                raise AssertionError(('too many nonroots in one visit', vertex, nonroots))
+        previous = vertex
+
+    revisits = len(visits) - len(set(visits))
+    if revisits > cycle_rank or delayed > intact + (2 * intact + 1) * len(roots) + 2 * intact * revisits:
+        raise AssertionError(('cycle rank bound', intact, delayed, cycle_rank, revisits))
+    return intact, delayed, revisits
+
+
+def check_branched_forest_extremizers():
+    for intact, losses in ((0, 3), (1, 3), (2, 4), (4, 2), (7, 6)):
+        path, blue, lost, _ = path_certificate(intact, losses)
+        order = len(path)
+        if intact == 0:
+            lost = mask(range(order - losses, order))
+        leaves = range(order, order + 12)
+        graph = adjacency(leaves.stop, [*pairwise(range(order)), *((0, v) for v in leaves)])
+        expected = (intact, intact + (2 * intact + 1) * losses, 0)
+        result = check_cycle_rank_trace(graph, blue | mask(leaves), lost, 0)
+        if result != expected:
+            raise AssertionError(('branched forest extremizer', losses, result, expected))
+        print('Branched tree attaining the forest bound:', intact, losses, len(graph), result[1])
+
+
 def check_small_cycles():
     checked = 0
     for order in range(3, 12):
@@ -303,6 +392,7 @@ def check_robust_samples(graph, blue, slow, support, paths, degree, rounds, loss
 
 def main():
     exhaustive = sampled = 0
+    check_branched_forest_extremizers()
     for t in (1, 2, 4, 7):
         for k in (1, 2, 3, 4, 6):
             graph, blue, slow, support = path_certificate(t, k)
@@ -371,7 +461,10 @@ def main():
             expected = tuple(2 + 7 * copy + r for r in local_rounds)
             if tuple(arrivals[start:start + 8]) != expected:
                 raise AssertionError(('subcubic block delays', k, copy, expected))
-        print('Subcubic two-round family:', k, len(graph), late)
+        _, _, revisits = check_cycle_rank_trace(graph, blue, slow, 4 * k)
+        if revisits == 0:
+            raise AssertionError(('subcubic trail should revisit a contracted subtree', k))
+        print('Subcubic two-round family:', k, len(graph), late, 'trail revisits:', revisits)
 
     for d, k in ((4, 2), (4, 5), (5, 3), (6, 2), (7, 3), (8, 2), (6, 7)):
         graph, blue, slow, support, paths = two_round_certificate(d, k)

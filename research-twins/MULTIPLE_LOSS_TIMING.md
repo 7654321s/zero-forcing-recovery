@@ -3,6 +3,7 @@
 Use the synchronous rule and initial-color loss model of the [single-loss bounds](ONE_LOSS_TIMING.md). Let $M_{d,t,k}$ be the largest finite recovery time over graphs of maximum degree at most $d$, initial blue sets with intact completion by round $t$, and losses of exactly $k$ initial blue vertices. A $k$-fault-tolerant set recovers from every loss of at most $k$ seeds, in the terminology of [Fault Tolerant Zero Forcing](https://arxiv.org/abs/2509.07854).
 
 - **Degree two.** For $t\geq1$ and $k\geq1$, the exact value is $M_{2,t,k}=t+k(2t+1)$. On cycles the exact value is $t(k+1)+\lceil k/2\rceil$.
+- **Forests and cycle rank.** The exact value on forests of unrestricted degree is $t+k(2t+1)$. On a graph of cycle rank $\beta$, every finite recovery finishes within $t+k(2t+1)+2t\beta$ rounds.
 - **One intact round.** The exact value is $1$ for $d=1$ and $1+3k$ for $d=2,3$. For $d\geq4$ one loss gives $5$. For $d\geq4$ and $k\geq2$, put $U=1+\lfloor kd/2\rfloor+2k$. The exact value is $U$ for even $k$ and for $d=4,5$. For odd $k$ it is $U-1$ at $d=6$, and $U-2+(d\bmod2)$ at $d\geq7$.
 - **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$.
 - **At least two intact rounds allowed.** Put $P=d(d-1)^{t-1}$. For $d\geq6$, $t\geq2$ and $k\geq1$,
@@ -20,6 +21,24 @@ $$
 |A_j|\leq\alpha_j^{(k)}:=k\left(1+d\sum_{\ell=0}^{j-1}(d-1)^\ell\right).
 $$
 At time $t$, every remaining white vertex belongs to $A_t$. A finite delayed run adds at least one blue vertex per unfinished round, so $M_{d,t,k}\leq t+\alpha_t^{(k)}$.
+
+## Sharp bound for forests and an extension by cycle rank
+
+Let $\beta(G)=|E(G)|-|V(G)|+c(G)$, where $c(G)$ is the number of connected components. If the intact run finishes by round $t\geq0$ and the run with $k\geq1$ deleted seeds finishes at round $T$, then
+$$
+T\leq t+k(2t+1)+2t\beta(G).
+$$
+At $\beta(G)=0$ the bound is attained for every $t,k$, already on paths with $k$-fault-tolerant initial sets. The maximum over connected trees therefore has the same value, with no degree restriction.
+
+**Realize the discrepancy forest inside $G$.** For each new discrepancy $v$, let $u$ be its chosen intact source. If $u$ has already been discrepant, add the edge $uv$ to the forest. Otherwise let $x$ be a discrepant neighbor blocking $u$ in the delayed run and add the path $x,u,v$. In this second case $u$ is blue in both runs at the start of the round and has never been discrepant. It stays out of $A_t$ and serves as an intermediate vertex at most once, since it uses its intact force at this step. Thus every attachment adds the new vertex $v$ and possibly a fresh intermediate vertex. The resulting subgraph $F$ consists of $k$ disjoint subtrees rooted at the lost seeds, with the vertices of $A_t$ marked. Along a path from a root there are at most $t$ marked nonroot vertices, since their discrepancy birth rounds strictly increase. Every simple path in one subtree therefore has at most $2t$ marked nonroot vertices, by splitting it at the common ancestor of its endpoints.
+
+**Trace the late rounds backwards.** Use the propagation trail of [Hogben et al., Lemma 4.1](https://arxiv.org/pdf/1410.4191), stopped at round $t+1$. If $T>t$, start from a vertex colored at round $T$. From a vertex $v$ colored at round $r>t+1$, choose a delayed source $u$ that forces $v$ in round $r$. If $u$ became blue at $r-1$, follow $vu$. Otherwise $u$ was already blue at $r-2$. Some other neighbor $x$ must have blocked it at time $r-2$ and become blue by time $r-1$, since $v$ did not fill in round $r-1$. Follow $v,u,x$. This chooses a distinguished vertex of arrival time $r-1$ and ultimately yields one distinguished vertex for every round $t+1,\ldots,T$. All of them are in $A_t$ because they were white at time $t$.
+
+The resulting walk has no repeated edge. Edges from a target to its chosen source run from later to earlier arrival times, and those from a source through a last blocker run from earlier to later arrival times. An edge can appear at most once in either role, because its later endpoint is distinguished and each arrival time has exactly one distinguished vertex. If it occurred in both roles, the later endpoint would have to be the same distinguished occurrence in consecutive steps. The earlier endpoint would then be the chosen source for two forces, which is impossible.
+
+**Count visits after contraction.** Contract each subtree of $F$, retaining loops and parallel edges for the edges outside $F$. The projected walk still uses each edge at most once. A trail using $e$ edges and visiting $v$ distinct vertices has $e+1$ vertex occurrences, so its number of repeated occurrences is $e-v+1$. This is the cycle rank of its connected trace and is at most $\beta(G)$ because contracting the forest preserves cycle rank. There are at most $k+\beta(G)$ visits to the contracted subtrees. Within each visit the original trail follows a simple path of one subtree, so it contributes at most $2t$ distinguished nonroot vertices. Each of the $k$ lost roots can be distinguished at most once in the whole trail. This bounds the $T-t$ distinguished vertices by $2t(k+\beta(G))+k$. The argument also gives the same bound with the cycle rank of the subgraph formed by $F$ and the edges incident to at least one vertex white at time $t$, since each edge of the original trail is incident to a distinguished vertex.
+
+For equality when $t\geq1$, use the [degree-two path construction](#degree-two). At $t=0$, start with all $2k+1$ vertices of a path blue and delete its final $k$ vertices. They fill one per round. Any loss of at most $k$ leaves an endpoint or a consecutive blue pair, and keeping just the $k$ alternating internal vertices stalls. The minimum killing size is therefore $k+1$ here as well.
 
 ## Degree two
 
@@ -248,4 +267,4 @@ Run the following from the repository root.
 python -B research-twins/check_multiple_loss_bounds.py
 ~~~
 
-The script exhausts losses through the budget on the degree-two examples and the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It replays the exact local arrival rounds of the degree-three two-round construction with up to 32 lost seeds, and checks seven higher-degree concatenated examples. On the larger protected graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
+The script replays the contracted trails on five branched trees that attain the forest bound and on the cyclic degree-three construction with up to 32 designated lost seeds. It exhausts losses through the budget on the degree-two examples and the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It also checks the exact local arrival rounds of the degree-three construction and seven higher-degree concatenated examples. On the larger protected graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
