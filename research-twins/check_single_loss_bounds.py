@@ -220,12 +220,18 @@ def check_eight_round_example():
     MODEL['certify'](adj, blue, mask([22, 23]), 1, 2, 8)
 
 
-def check_nine_round_example():
+def subcubic_two_round_block():
     edges = [(0, 1), (0, 8), (0, 9), (1, 4), (1, 10), (2, 8), (2, 10),
              (2, 11), (3, 6), (3, 9), (3, 11), (4, 7), (5, 7), (5, 10),
-             (5, 12), (7, 11), (12, 13), (13, 14), (14, 15), (14, 16)]
+             (7, 11)]
+    return edges, [0, 8, 9, 10, 11], 12, 5, 6
+
+
+def check_nine_round_example():
+    block, seeds, size, entry, _ = subcubic_two_round_block()
+    edges = [*block, (entry, size), (12, 13), (13, 14), (14, 15), (14, 16)]
     adj = adjacency(17, edges)
-    blue = mask([0, 8, 9, 10, 11, 13, 15, 16])
+    blue = mask([*seeds, 13, 15, 16])
     intact, full_arrivals = trace(adj, blue)
     delayed, delayed_arrivals = trace(adj, blue ^ 1)
     degree = max(row.bit_count() for row in adj)

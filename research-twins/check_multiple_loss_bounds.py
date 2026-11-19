@@ -206,6 +206,23 @@ def layered_certificate(degree, rounds, losses):
     return graph, initial, mask(deliberately_lost), support, paths, early
 
 
+def subcubic_two_round_certificate(losses):
+    block, block_blue, size, entry, tail = SINGLE['subcubic_two_round_block']()
+    seed, first, prefix = range(losses * size, losses * size + 3)
+    edges, blue, deliberately_lost = [(seed, first), (first, prefix)], [seed], []
+    order = prefix + 1
+    for copy in range(losses):
+        start = copy * size
+        deliberately_lost.append(start)
+        edges.extend((start + a, start + b) for a, b in block)
+        blue.extend(start + v for v in block_blue)
+        edges.extend(((order, prefix), (order, start + entry)))
+        blue.append(order)
+        order += 1
+        prefix = start + tail
+    return adjacency(order, edges), mask(blue), mask(deliberately_lost)
+
+
 def two_round_certificate(degree, losses):
     block, block_blue, size, targets, tail, splice = SINGLE['quadratic_degree_block'](
         degree, continue_at_tail=True
@@ -340,6 +357,21 @@ def main():
         if observed != list(range(1, early + 4)):
             raise AssertionError(('serial prefix', d, t, k))
         print('Layered family:', d, t, k, len(graph), late)
+
+    for k in (1, 2, 3, 8, 32):
+        graph, blue, slow = subcubic_two_round_certificate(k)
+        check_connected(graph, 3)
+        intact = completion_time(graph, blue)
+        late, arrivals = trace(graph, blue ^ slow)
+        if (slow.bit_count(), intact, late) != (k, 2, 2 + 7 * k):
+            raise AssertionError(('subcubic two-round delay', k, intact, late))
+        local_rounds = (5, 4, 5, 6, 3, 1, 7, 2)
+        for copy in range(k):
+            start = 12 * copy
+            expected = tuple(2 + 7 * copy + r for r in local_rounds)
+            if tuple(arrivals[start:start + 8]) != expected:
+                raise AssertionError(('subcubic block delays', k, copy, expected))
+        print('Subcubic two-round family:', k, len(graph), late)
 
     for d, k in ((4, 2), (4, 5), (5, 3), (6, 2), (7, 3), (8, 2), (6, 7)):
         graph, blue, slow, support, paths = two_round_certificate(d, k)

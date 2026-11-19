@@ -4,13 +4,14 @@ Use the synchronous rule and initial-color loss model of the [single-loss bounds
 
 - **Degree two.** For $t\geq1$ and $k\geq1$, the exact value is $M_{2,t,k}=t+k(2t+1)$. On cycles the exact value is $t(k+1)+\lceil k/2\rceil$.
 - **One intact round.** The exact value is $1$ for $d=1$ and $1+3k$ for $d=2,3$. For $d\geq4$ one loss gives $5$. For $d\geq4$ and $k\geq2$, put $U=1+\lfloor kd/2\rfloor+2k$. The exact value is $U$ for even $k$ and for $d=4,5$. For odd $k$ it is $U-1$ at $d=6$, and $U-2+(d\bmod2)$ at $d\geq7$.
+- **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$.
 - **At least two intact rounds allowed.** Put $P=d(d-1)^{t-1}$. For $d\geq6$, $t\geq2$ and $k\geq1$,
   $$
   M_{d,t,k}=\frac{kP}{2}+\frac{kP}{2(d-1)}+O\!\left(\frac{kP}{d^2}\right),
   $$
   with one constant for all such $k,t$. For fixed $t$ the expansion is $kd^t/2-k(t-2)d^{t-1}/2+O_t(kd^{t-2})$.
 
-The upper bounds apply whenever the chosen loss recovers. For $d\geq2$ the lower constructions are connected and $k$-fault-tolerant, and have a minimum killing support of size $k+1$. For $d\geq4$ and $k\leq d$, the constructions also have worst restricted time $t$ over losses of at most $k$ from the support.
+The upper bounds apply whenever the chosen loss recovers. All lower constructions for $d\geq2$ are connected. The degree-three construction for two intact rounds gives recovery for the designated $k$-seed loss. The other lower constructions for $d\geq2$ are $k$-fault-tolerant and have a minimum killing support of size $k+1$. For $d\geq4$ and $k\leq d$, the constructions also have worst restricted time $t$ over losses of at most $k$ from the support.
 
 ## A discrepancy forest
 
@@ -190,6 +191,45 @@ In the even-degree construction at $d\geq6$, reserve room for the outgoing relay
 
 The intact sources of each copy still finish in two rounds. After the $k$ designated seeds are lost, no copy starts before its prefix endpoint is blue: its old vertices are white, its retained sources are blocked, and its relays see two white endpoints. When the prefix endpoint becomes blue, it starts exactly the single-copy delayed sequence after the prefix. The last target of that copy then activates the successor. Thus the shared first two rounds are followed by $k$ further intervals of length $m_d-2$. The protection below preserves the degree cap and gives recovery from every loss of at most $k$ seeds.
 
+### Two intact rounds at degree three
+
+For every $k\geq1$,
+$$
+2+7k\leq M_{3,2,k}\leq 2+9k.
+$$
+For $k=1$ the [exact value is nine](ONE_LOSS_TIMING.md#two-round-colorings-at-bounded-degree).
+
+#### Upper bound
+
+Use the two-round incidence and group counts above, which hold before imposing a degree restriction. At $d=3$ they give the preliminary upper bound
+$$
+2+\frac{21k}{2}-\frac{3(k-a)}2-\frac{3h}{2}-\lambda
+  +2B_*-\frac{3\nu}{2},
+$$
+before subtracting $u/2$, $v/2$ and group slacks. Since $\nu\geq B_*$, the last two terms together add at most $B_*/2$.
+
+Each of the $B_*$ first-round targets has already used one of its three incidences on its intact predecessor. If it is chosen as a direct final-round source, it can have at most one exceptional target, and the slack of its irregular group is at least $1/2$. Otherwise it contributes $1/2$ through $v$. These distinct contributions absorb $B_*/2$.
+
+We save at least another $3/2$ per lost seed. A seed that is not a chosen direct source already contributes $3/2$ through $k-a$. A chosen direct source with fewer than three counted first-round incidences contributes at least one through $3h/2+\lambda$, since $h+\lambda=3k-J$. Its regular group has at most one first-round target besides the seed. The old vertices therefore occupy at most two rounds, and at most one of the two outer rounds $r-2,r+2$ can occur, where $r$ is the seed's restoration round. With $E_z$ exceptional targets the group occupies at most $\min(4,2+E_z)$ rounds. Its slack is at least one.
+
+Now consider a good seed $z$, with all three first-round incidences used, direct first-round target $w$ and restoration round $r$. No exceptional target uses an incidence at $z$. Each outer round in $R_z$ requires an old regular child in the adjacent central round. If one of $r-1,r,r+1$ is absent, at most one outer round can occur. When $r$ itself is absent, $r\leq2$ and the earlier outer round is outside the count. Thus $|R_z|\leq\min(3,2+E_z)$ and the group saves at least $3/2$.
+
+If all three central rounds occur and $w$ is white at $r-2$, the overlap of $W_w$ with $R_z$ saves one round as above. There is another $1/2$ from the slack of $W_w$ if $w$ has a selected direct final-round target, and from $v$ otherwise. If $w$ is already blue at $r-2$ and has no selected direct final-round target, it supplies an unused incidence and contributes to $v$. The unused incidence and the predecessor leave at most one exceptional target, giving another $1/2$ from the slack of $W_w$.
+
+If $w$ is blue at $r-2$ and has a chosen direct target $y$, there are two possibilities. With a further white neighbor besides $z,y$, the unused incidence, $z$ and $y$ fill all three slots at $w$. Its group has no exceptional targets and has slack at least one in addition to the unused incidence. With no such neighbor, $y$ arrives in $R_z$ as above, saving one round. The direct target and predecessor leave at most one exceptional target, again giving at least $1/2$ from the slack of $W_w$.
+
+The charges for direct first-round targets use groups and incidences distinct from those used for the $B_*$ targets. The good-seed overlaps and direct-target arrivals can be charged together by the same disjointness argument as in the higher-degree bound. Subtracting $3k/2$ from $2+21k/2$ proves the upper bound.
+
+#### Concatenated lower construction
+
+Use $k$ copies of the twelve-vertex block in the [nine-round certificate](check_single_loss_bounds.py). In each block the initial seeds are $0,8,9,10,11$, the entry is $5$, and the exit is $6$. Begin with a three-vertex path whose first vertex is blue. A blue degree-two relay links its last vertex to the first entry. Other blue degree-two relays link each exit to the following entry. The graph has $13k+3$ vertices and maximum degree three. In the intact run each copy fills $1,2,3$ in round one and $4,5,6,7$ in round two, independently of the relays.
+
+Delete seed $0$ in each copy. Before its incoming relay can force, every local blue source is blocked and all white vertices in the copy remain white. Once the preceding endpoint turns blue, the local newly blue sets in successive rounds are
+$$
+\{5\},\ \{7\},\ \{4\},\ \{1\},\ \{0,2\},\ \{3\},\ \{6\}.
+$$
+The outgoing relay sees two white endpoints until either its exit or the next entry turns blue. Inductively the next copy stays white at its entry until this relay fires. The shared prefix takes two rounds, and each copy adds seven rounds. This proves the lower bound for the designated losses.
+
 ## Protection and a minimum killing support
 
 For either construction with $d\geq4$, add a support $H$ of $k+1$ blue vertices. Take a connected simple graph $J$ on $H$. For every edge of $J$, add a blue vertex adjacent to its two endpoints. Connect one of these new blue vertices to $s$. Use $J=K_{k+1}$ if $k\leq d$, and a path otherwise.
@@ -208,4 +248,4 @@ Run the following from the repository root.
 python -B research-twins/check_multiple_loss_bounds.py
 ~~~
 
-The script exhausts losses through the budget on the degree-two examples and the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It also replays seven concatenated two-round examples, including budgets larger than the degree cap. On the larger graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
+The script exhausts losses through the budget on the degree-two examples and the smallest protected two-loss example. It checks the cycle upper bound through cycle order eleven for up to three losses, and the subcubic one-round upper bound on every labeled simple graph through order five. It replays the exact local arrival rounds of the degree-three two-round construction with up to 32 lost seeds, and checks seven higher-degree concatenated examples. On the larger protected graphs it checks designated losses, restricted deadlines, the killing loss and samples of clustered and mixed deletions. The proofs above give the guarantees for arbitrary budgets.
