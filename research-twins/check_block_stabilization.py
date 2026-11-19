@@ -77,6 +77,32 @@ def check_band(blocks):
                 raise AssertionError(('23 seed labels block the band', blocks))
 
 
+def check_sheet_band(width, budget, pin_ends=False):
+    margin = 2
+    sheets = width + 2 * (margin + 1)
+    graph, blue, _, _ = MODEL['cyclic_cubic_chain_lift'](chain(26), sheets, reversed_edge=(0, 1))
+    order = len(graph)
+    active = mask(v for v in range(order) if 0 < v % sheets < sheets - 1)
+    sources = [v for v in members(active) if not graph[v] & ~active]
+    clauses = [[-(v + 1)] for v in range(order) if not active & (1 << v)]
+    clauses.extend(fort_clauses(graph, sources))
+    first, last = margin + 1, margin + width
+    for start in range(first, last):
+        clauses.append([v + 1 for s in (start, start + 1) for v in range(s, order, sheets)])
+    seeds = []
+    for v in members(blue):
+        s = v % sheets
+        if first <= s <= last:
+            if pin_ends and s in (first, last):
+                clauses.append([-(v + 1)])
+            else:
+                seeds.append(v + 1)
+    with ITotalizer(lits=seeds, ubound=budget, top_id=order) as counter:
+        with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
+            if solver.solve(assumptions=[-counter.rhs[budget]]):
+                raise AssertionError(('sheet band can be blocked', width, budget))
+
+
 def check_small_cover(sheets):
     graph, blue, _, _ = MODEL['cyclic_cubic_chain_lift'](chain(26), sheets, reversed_edge=(0, 1))
     if MODEL['completion_time'](graph, blue) != 2:
@@ -109,13 +135,16 @@ def check_small_cover(sheets):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--certify-sheets', type=int, nargs='+', choices=(7, 8), default=(),
+    parser.add_argument('--certify-sheets', type=int, nargs='+', choices=(7, 8, 9), default=(),
                         help='replay the selected small-sheet thresholds at 26 blocks')
     args = parser.parse_args()
     print(f'{check_contractions()} stage contractions checked', flush=True)
     check_band(26)
     check_band(27)
     print('Every 25-stage prefix band with at most 23 losses fills an adjacent pair', flush=True)
+    for width in range(10, 14):
+        check_sheet_band(width, width - 5, pin_ends=width > 10)
+        print(f'A {width}-sheet band fills a pair after up to {width - 5} losses', flush=True)
     for sheets in args.certify_sheets:
         check_small_cover(sheets)
         print(f'The 26-block {sheets}-sheet cover has minimum blocking cost {2 * sheets}',

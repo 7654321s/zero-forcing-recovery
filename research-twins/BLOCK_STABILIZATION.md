@@ -4,7 +4,7 @@ Let $\kappa_{k,m}$ be the minimum number of seeds whose loss blocks recovery in 
 $$
 \kappa_{k,m}=\kappa_{26,m} \qquad (k\geq26).
 $$
-The [sheet stabilization theorem](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers) gives a single constant when $k\geq26$ and $m\geq162$. The constant is at most 24 by the common finite fort, and at least 16 by projection to the eight-sheet cover. The exact value of the constant remains open here.
+The [sheet stabilization theorem](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers) gives a single constant when $k\geq26$ and $m\geq34$, by the sheet-band refinement below. The constant is at most 24 by the common finite fort, and at least 18 by projection to the nine-sheet cover. The exact value of the constant remains open here.
 
 ## The prism stage labels
 
@@ -32,19 +32,29 @@ To contract a pair, delete one ordinary stage and retain the other. Keep the fir
 
 In both directions the cost is unchanged. For $k\geq26$, the two adjacent lengths $k$ and $k+1$ both admit a blocking set of size at most 24 by the published witness. If either minimum is at most 23, the corresponding fort admits insertion or contraction, giving the same upper bound in the other length. Applying this to the smaller of the two minima proves equality. If both are 24, they already agree. This proves stabilization across block counts, uniformly over sheet counts.
 
-## The seven- and eight-sheet cases
+## A smaller sheet threshold for long chains
 
-The verifier checks that the signed 26-block covers with seven and eight sheets have blocking numbers 14 and 16. Their SAT clauses require a fort and impose respective budgets of 13 and 15 fort seeds. Rotate a seed belonging to the fort to sheet zero. The additional distance-four clauses follow from the intact two-round process. Both instances are unsatisfiable. The full lifted opening obstruction supplies the corresponding upper bounds. Block stabilization gives the same values at these sheet counts for every $k\geq26$.
+Work at $k=26$, which suffices for all longer chains. In the integer-sheet lift, seed only the intact seed vertices of a band of ten consecutive sheets, with two unseeded sheets of margin at each end. Permit sources whose entire neighborhood is in the band plus its margins. If at most five of the band seeds are deleted, the resulting process fills two consecutive sheets of the band. The verifier uses a cyclic graph with two further guard sheets. The clauses enforce the fort inequalities at permitted sources, require every consecutive core-sheet pair to contain some white vertex, and bound the number of white seeds in the core. The formula is unsatisfiable. The allowed sources have the same neighborhoods in the integer lift.
 
-Take $m=168$ in the two-parameter stable regime. Reduction to eight sheets is a graph covering because eight divides 168. The image of a fort is a fort at no greater seed cost, so the common stabilized value lies in $[16,24]$.
+The band result extends to widths eleven, twelve and thirteen with respective loss budgets six, seven and eight. For width $w$, use the left and right $(w-1)$-sheet subbands with their own margins. If neither subband fills a pair, each contains at least $w-5$ lost seeds by the preceding width. With at most $w-5$ total losses all are in the overlap. The verifier excludes that case by fixing the first and last core sheets' seeds blue and using the restricted-source clauses. The margins of both subbands lie inside the permitted region of the wider test.
+
+If a fort of cost $b$ has no two consecutive empty sheets, each cyclic thirteen-sheet window must contain at least nine of its seeds, or the band certificate would fill a pair. Counting the seeds in all $m$ windows gives $9m\leq13b$. For $b\leq23$ this rules out the case without a gap at $m\geq34$. When two empty sheets occur, the fort unrolls to a finite fort of the same cost, by the [gap criterion](MULTIPLE_LOSS_TIMING.md#saturation-of-the-blocking-number-in-cyclic-covers). Conversely a finite fort projects at no larger cost. The eventual constant is at most 24, so these inequalities give equality to the constant for every $m\geq34$.
+
+The twelve-sheet band also shortens the search for a finite integer-sheet fort of cost at most 23. After splitting at any internal gap of two empty sheets, a nonempty piece occupies a span of at most 35 sheets. A span of at least 36 would contain three disjoint twelve-sheet bands. Each would need eight seeds, giving cost at least 24. The bounded search can therefore use 37 sheets, with two outer guard sheets.
+
+## The seven-, eight- and nine-sheet cases
+
+The verifier checks the signed 26-block covers with seven, eight and nine sheets. Their blocking numbers are 14, 16 and 18. The SAT clauses require a fort and impose respective budgets of 13, 15 and 17 fort seeds. Rotate a seed belonging to the fort to sheet zero. The additional distance-four clauses follow from the intact two-round process. The instances are unsatisfiable. The full lifted opening obstruction supplies the corresponding upper bounds. Block stabilization gives the same values at these sheet counts for every $k\geq26$.
+
+Take $m=36$ in the stable regime. Reduction to nine sheets is a graph covering because nine divides 36. The image of a fort is a fort at no greater seed cost, so the common stabilized value lies in $[18,24]$.
 
 ## Reproduction
 
 ```sh
 python -B research-twins/check_block_stabilization.py
-python -B research-twins/check_block_stabilization.py --certify-sheets 7 8
+python -B research-twins/check_block_stabilization.py --certify-sheets 7 8 9
 ```
 
-The script checks both band types with PySAT and the normalized seed and edge identifications in 120 interior contractions, including splices next to the first or terminal stage.
+The script checks both stage band types and the sheet bands with PySAT and the normalized seed and edge identifications in 120 interior contractions, including splices next to the first or terminal stage.
 
-The optional run also checks both exact small-sheet thresholds.
+The optional run also checks the three exact small-sheet thresholds.
