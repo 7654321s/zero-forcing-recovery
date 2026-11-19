@@ -10,23 +10,33 @@ R=\left\lfloor\frac{g-1}{4}\right\rfloor,
 \qquad
 Q=\left\lfloor\frac{g-3}{4}\right\rfloor,
 \qquad
-M(\Delta,2t)=1+\Delta\sum_{i=0}^{2t-1}(\Delta-1)^i.
+M(\Delta,t)=1+\Delta\sum_{i=0}^{t-1}(\Delta-1)^i.
 $$
 Then
 $$
 \kappa(G,S)\geq
 \left\lceil
 \frac{\max\{1+\delta\sum_{i=0}^{R-1}(\delta-1)^i,\ 2\sum_{i=0}^{Q}(\delta-1)^i\}}
-     {M(\Delta,2t)}
+     {M(\Delta,t)}
 \right\rceil.
 $$
-Empty sums are zero. For cubic graphs with $t=2$, the denominator is $46$ and the numerator is at least $3\cdot 2^R-2$. Thus the guaranteed fault budget grows exponentially in $g$ along the cover sequence.
+Empty sums are zero. For cubic graphs with $t=2$, the denominator is $10$ and the numerator is at least $3\cdot 2^R-2$. Thus the guaranteed fault budget grows exponentially in $g$ along the cover sequence.
 
 **Fort size.** A fort is a nonempty set $F$ such that each vertex outside $F$ has either zero or at least two neighbors in $F$. Form a subgraph with the edges that have at least one endpoint in $F$. A vertex in $F$ has at least $\delta$ incident edges in this subgraph. Every outside vertex reached by such an edge can continue to another vertex of $F$. Start at a vertex of $F$. Take each outgoing edge and, if it reaches an outside vertex, extend it by one edge back into $F$. This gives $\delta$ branches of length at most two. At each subsequent vertex in $F$, repeat while excluding the incoming edge. The resulting walks are nonbacktracking, and each vertex after the root gives at least $\delta-1$ branches. After $R$ branching steps each walk has length at most $2R$. Their endpoints are distinct, including across different depths, since two different such walks from the root that end at the same vertex would give a cycle of length at most $4R<g$. Counting the root and the endpoints proves the first fort-size bound.
 
 For the second bound, take two vertices of $F$ joined by a path of length at most two whose interior, if present, is outside $F$. Such a path comes from any edge leaving a fort vertex, extending once if needed. Grow branches from both endpoints, excluding the first edge toward the other endpoint at each root. Each root now has at least $\delta-1$ branches. Count both trees to depth $Q$. An endpoint coincidence across the two trees would give a cycle of length at most $4Q+2<g$, by using the original path between their roots. Within each tree the previous argument still applies. This proves the second bound. The branching argument is related to the tree bound for stopping sets of a Tanner graph. [Orlitsky, Urbanke, Viswanathan and Zhang](https://doi.org/10.1109/ISIT.2002.1023274)
 
-**Seed loss.** The final white set after a blocking deletion is a fort. More generally, for any fort $F$, the initial set $S\setminus F$ leaves every vertex of $F$ white. One parallel round depends on the previous colors at graph distance at most two, since a force inspects its source and all neighbors of the source. After $t$ rounds every vertex of $F$ therefore lies within distance $2t$ of some seed in $S\cap F$. Each such graph ball contains at most $M(\Delta,2t)$ vertices. Divide the fort-size bound by this maximum ball size and round up. This applies to every fort, and the minimum seed intersection of a fort equals $\kappa(G,S)$.
+**Seed loss.** The final white set after a blocking deletion is a fort. More generally, for any fort $F$, the initial set $S\setminus F$ leaves every vertex of $F$ white. Thus the minimum seed intersection of a fort equals $\kappa(G,S)$. The bound below limits the number of vertices in a fort per seed in it.
+
+## The fort charging bound
+
+In any finite simple graph of maximum degree $\Delta\geq2$, let $S$ complete in $t$ parallel rounds. Every fort $F$ satisfies $|F|\leq M(\Delta,t)|F\cap S|$. To prove this, choose one nominal source for each vertex colored after round zero. A source can contribute at most one force during the whole process, since all its neighbors are blue after it forces.
+
+For every nonseed $x\in F$, let $y$ be its chosen source. If $y\in F$, give $x$ parent $y$. If $y$ is outside $F$, take another neighbor $z$ of $y$ in $F$ as the parent. Such a neighbor exists by the fort property and was already blue before $y$ forced $x$. Parent times strictly decrease, so these links form a forest of depth at most $t$ rooted in $F\cap S$.
+
+For a vertex $z$ in this forest, its children have distinct chosen sources. A child's source is either $z$ itself or a neighbor of $z$ outside $F$. If $z$ has a child whose source is $z$, that child is a neighbor of $z$ in $F$. This gives at most $\Delta$ children for a root. For a nonroot $z$, its own chosen source is unavailable for its children. If that source lies outside $F$, this removes one possible outside neighbor. If it lies in $F$, it is a neighbor of $z$ in $F$ distinct from any child forced by $z$. In both cases at most $\Delta-1$ children remain. Summing the generation bound proves the claim, and dividing the fort-size bound by $M(\Delta,t)$ gives the stated blocking bound.
+
+The coefficient is attained in cubic bipartite graphs for every $t\geq1$. Start with a tree of depth $t$ with three children at the root and two at every nonleaf below it. Add a cycle through its leaves, then subdivide every edge of the resulting cubic graph. Partition the subdivision vertices into triples, and add one new vertex adjacent to each triple. This is possible since the original tree has $3\cdot2^t-2$ vertices and the intermediate cubic graph has a number of edges divisible by three. The old tree vertices form a fort. Color all subdivision vertices, the added vertices and the root at the start. A subdivision vertex forces an old vertex when the opposite old endpoint is blue, so the old vertices fill at their distances from the root in the tree with its leaf cycle. The last distance is $t$. The fort has just one seed and size $M(3,t)$. [Verifier](check_random_lift_tolerance.py)
 
 ## The cover and its connectivity
 
@@ -44,7 +54,7 @@ In a simple cubic graph, three-edge-connectivity implies three-vertex-connectivi
 
 For $k=1$, start with the existing sixteen-vertex cubic certificate, and for $k\geq2$ start with the unpadded cubic prism chain. These are [three-connected certificates with intact time two and designated delay $6k+2$](MULTIPLE_LOSS_TIMING.md). In a cover, for any starting coloring constant on each fiber, the parallel updates are exactly the pullbacks of those on the base. The local bijection preserves the color at each corresponding neighbor. This holds for the intact coloring and for the coloring obtained by deleting all copies of the $k$ designated seeds. It preserves both exact times.
 
-Each iteration of the cover keeps the graph cubic and three-connected, makes it bipartite, and doubles its girth. With maximum degree three and intact time two, the bound above eventually exceeds any given $f$. For example, girth at least $36$ guarantees recovery after any twenty-two seed losses, since $Q\geq8$ gives $\lceil(2\sum_{i=0}^8 2^i)/46\rceil=23$ from the two-root bound. The designated deletion always refers to entire fibers. Its size is the block count times the total cover degree.
+Each iteration of the cover keeps the graph cubic and three-connected, makes it bipartite, and doubles its girth. With maximum degree three and intact time two, the bound above eventually exceeds any given $f$. For example, girth at least $36$ guarantees recovery after any 102 seed losses, since $Q\geq8$ gives $\lceil(2\sum_{i=0}^8 2^i)/10\rceil=103$ from the two-root bound. The designated deletion always refers to entire fibers. Its size is the block count times the total cover degree.
 
 ## Reproduction
 
