@@ -12,6 +12,8 @@ adjacency = MODEL['TOOLS']['adjacency']
 members = MODEL['TOOLS']['neighbors']
 mask = MODEL['mask']
 completion_time = MODEL['completion_time']
+trace = runpy.run_path(str(HERE.parent / 'research-unicyclic' /
+                           'verify_path_padding_reduction.py'))['trace']
 
 
 def check_groups(white, other_singletons, pairs, joins, lost, early, late, cliques=()):
@@ -88,6 +90,44 @@ def check_small_graphs():
     return cases, paired_cases
 
 
+def check_discrepancy_growth():
+    transitions = 0
+    for n in range(1, 6):
+        possible = list(combinations(range(n), 2))
+        for edge_mask in range(1 << len(possible)):
+            adj = adjacency(n, (possible[i] for i in members(edge_mask)))
+            degrees = [row.bit_count() for row in adj]
+            traces = [trace(adj, blue) for blue in range(1 << n)]
+            for blue, (intact, full_arrivals) in enumerate(traces):
+                if intact > n:
+                    continue
+                for lost in members(blue):
+                    _, delayed_arrivals = traces[blue ^ (1 << lost)]
+                    differences = {lost}
+                    for round_number in range(1, intact + 1):
+                        next_differences = {v for v in range(n) if full_arrivals[v] <= round_number
+                                            and (delayed_arrivals[v] is None
+                                                 or delayed_arrivals[v] > round_number)}
+                        bound = sum(degrees[v] + (v == lost) for v in differences)
+                        if len(next_differences) > bound:
+                            raise AssertionError((adj, blue, lost, round_number, bound))
+                        differences = next_differences
+                        transitions += 1
+    return transitions
+
+
+def check_subcubic_example():
+    edges = [(0, 1), (0, 15), (0, 16), (1, 2), (1, 4), (2, 3), (2, 9),
+             (3, 5), (3, 6), (4, 7), (4, 8), (5, 8), (6, 10), (6, 13),
+             (7, 11), (7, 12), (8, 16), (9, 14), (10, 14), (11, 15), (11, 16),
+             (12, 14), (12, 15)]
+    adj = adjacency(17, edges)
+    blue = mask([0, 1, 2, 6, 7, 9, 11, 12, 14])
+    if max(row.bit_count() for row in adj) != 3 or completion_time(adj, blue) > 2:
+        raise AssertionError('Incorrect subcubic graph or intact deadline')
+    MODEL['certify'](adj, blue, mask([0, 11]), 1 << 9, 2, 7)
+
+
 def main():
     extremal_examples()
     print('Sharp one-round examples: two certificates at times 1/5 and 1/4')
@@ -95,6 +135,9 @@ def main():
     cases, paired_cases = check_small_graphs()
     print('Recoverable singleton cases through graph order five:', cases)
     print('Cases with a retained twin:', paired_cases)
+    print('Discrepancy growth transitions:', check_discrepancy_growth())
+    check_subcubic_example()
+    print('Subcubic example: exact restricted time 2 and delayed time 7')
 
 
 if __name__ == '__main__':

@@ -64,6 +64,26 @@ The next-round color of a vertex depends only on the current colors within dista
 
 For maximum degree $\Delta\geq2$, the number of vertices in the radius-$2t$ neighborhood is at most $1+\Delta\sum_{j=0}^{2t-1}(\Delta-1)^j$. Thus at fixed intact time an unbounded delay requires unbounded neighborhoods of the lost vertices. For example, maximum degree three and intact time at most two imply recovery by round 48 whenever it occurs.
 
+## A sharper maximum-degree bound
+
+Let $D_i$ consist of the vertices blue in the intact run and white in the delayed run after round $i$. Monotonicity gives inclusion of the delayed coloring in the intact one. For every round,
+
+$$
+|D_{i+1}|\leq\sum_{w\in D_i}\deg(w)+\mathbf{1}_{z\in D_i}.
+$$
+
+To see this, take a new discrepancy at $u\in D_{i+1}\setminus D_i$. It had to be white in the intact run at round $i$, since otherwise it was already blue in both. Choose one intact source $v$ that forces $u$. Attribute this new discrepancy to $v$ itself if $v\in D_i$. Otherwise $v$ is blue in both runs, and the force is blocked in the delayed run by an additional white neighbor $w\in D_i$. Attribute it to one such $w$. A source forces at most one target, so each vertex $w\in D_i$ receives at most one attribution from itself and one from each of its neighbors. If $w$ itself forces, one of its neighbors is the intact white target and cannot be a source, so at most $\deg(w)$ new discrepancies are attributed to $w$.
+
+When $w\ne z$, it was originally white and had to be forced in the intact run in an earlier round. The earlier source is a neighbor of $w$ with no white neighbors left in the intact run. It remains blue without any white neighbors and cannot generate a new discrepancy. This removes one more potential attribution, even if $w$ itself is a source, because that earlier source and $w$'s intact white target are distinct. Hence at most $\deg(w)-1$ new discrepancies are attributed to such a $w$. Adding at most $|D_i|$ retained discrepancies gives the inequality.
+
+Since $D_0=\{z\}$, the bound implies $|D_t|\leq\sum_{j=0}^{t}\Delta^j$. At the intact completion time all whites of the delayed run are in $D_t$, so finite recovery obeys
+
+$$
+T(B\setminus\{z\})\leq t+\sum_{j=0}^{t}\Delta^j.
+$$
+
+For maximum degree three and intact time at most two, this gives **15 rounds**. The [17-vertex certificate in the replay](check_single_loss_bounds.py) has maximum degree three, restricted time two, and delayed time seven. Its initial blue set is $\{0,1,2,6,7,9,11,12,14\}$, its killing pair is $\{0,11\}$, and its slow loss is $9$. The two bounds leave the best possible maximum-degree-three time open.
+
 ## Reproduction
 
 ```sh
@@ -71,4 +91,4 @@ python -B research-twins/check_single_loss_bounds.py
 lake env lean -DwarningAsError=true research-twins/SingleLossBound.lean
 ```
 
-The replay verifies both sharp examples and 147 instances of the unbounded family, using 49 path lengths and three variants of the lost vertex. The largest path has 100 vertices before $g$. It also checks 25,392 recoverable singleton cases with intact time at most one across all labeled simple graphs through order five. In 7,914 of those cases a blue twin of the lost vertex remains. The Lean proof establishes the upper bounds without a graph-order restriction.
+The replay verifies both sharp examples and 147 instances of the unbounded family, using 49 path lengths and three variants of the lost vertex. The largest path has 100 vertices before $g$. It also checks 25,392 recoverable singleton cases with intact time at most one across all labeled simple graphs through order five. In 7,914 of those cases a blue twin of the lost vertex remains. The replay checks the degree-weighted inequality on 78,122 round transitions through intact completion on the same small graph range, including stalled delayed runs. The Lean proof establishes the one-round upper bounds without a graph-order restriction.
