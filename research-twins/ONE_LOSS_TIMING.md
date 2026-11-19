@@ -133,6 +133,59 @@ Thus nine rounds require exactly eight remaining whites at time two. Rounds thre
 
 A connected 17-vertex graph in the [example replay](check_single_loss_bounds.py) attains the global bound. The initial blue set is $\{0,8,9,10,11,13,15,16\}$. Its intact time is two and its minimum killing support $\{15,16\}$ has restricted time two. The two support vertices are leaves at vertex $14$. Either leaf forces $14$ in round one, and $14$ restores a missing leaf in round two. With both leaves white, $14$ cannot force either of them. Without initial blue vertex $0$, the successive additions are $\{14\},\{12\},\{5\},\{7\},\{4\},\{1\},\{0,2\},\{3\},\{6\}$. The replay checks that every singleton loss recovers and the two-vertex support loss stalls.
 
+## Quadratic growth with the maximum degree
+
+Let $M_d$ be the largest finite recovery time after one initial blue vertex is lost, over graphs of maximum degree at most $d$ whose intact coloring takes at most two rounds. For every $d\geq4$,
+
+$$
+\left\lfloor\frac{d^2}{2}\right\rfloor+5
+\ \leq\ M_d\ \leq\
+\left\lfloor\frac{d^2}{2}\right\rfloor+8.
+$$
+
+In particular the leading coefficient is $1/2$, with an additive gap of three rounds. The lower bound holds for connected graphs of maximum degree exactly $d$ that recover after every singleton loss and have a two-vertex minimum killing support of restricted time two.
+
+### Upper bound
+
+Write $Z$ for the round in which the lost vertex $z$ returns and $S$ for the delayed completion time. At time $Z$ the delayed coloring contains the initial blue set $B$, so $S\leq Z+2$. We may take $Z\geq6$, since otherwise $S\leq7$.
+
+Use the same chosen sources and attributions as in the round-two bound. There are $m$ missed round-one targets, comprising $D_1\setminus\{z\}$. If $z$ is a chosen round-one source, denote its target by $w_0$. Every other missed target has a permanently blue predecessor $p$ whose only possible white neighbors in the delayed run are that target and $z$. If a target were blue by round $Z-2$, its predecessor would force $z$ by round $Z-1$. Thus these targets stay white through round $Z-2$.
+
+Consider the $Z-5$ rounds from $3$ through $Z-3$. Every addition belongs to $D_2$, since the intact process is full by time two. The only old discrepancy that may be added in these rounds is $w_0$. Each other addition $x$ has a chosen intact round-two source. This is either an old discrepancy acting directly, or a vertex $q$ blue in both runs at time one. The only possible white neighbors of such a $q$ after time one are $x$ and vertices of $D_1$.
+
+Suppose $x$ is added in round $j$ in this interval, and $q$ has just one neighbor in $D_1$. If this neighbor is $z$ or a missed target with a permanently blue predecessor, then $q$ forces it by round $j+1$ and $z$ is blue by $j+2<Z$. Thus every such outside source has at least two neighbors in $D_1$, apart from sources whose sole neighbor there is $w_0$. In that exception, $q$ makes $x$ and $w_0$ restore one another within a round once either is blue. If $w_0$ arrives in round $a$, all these targets arrive in rounds $a-1,a,a+1$. Together with $w_0$ they therefore occupy at most three rounds of the interval.
+
+Let $N$ be the number of additions in the interval after excluding $w_0$ and the targets of those exceptional sources. Each outside source among the remaining additions uses at least two incidences at vertices of $D_1$. A direct force uses one incidence. These incidences are distinct across additions because the chosen sources are distinct, and none are the edges spent on the round-one predecessors. Those edges use $m$ incidences at $z$ and one at each of the $m$ other old discrepancies. At most
+
+$$
+(d-m)+m(d-1) = d+m(d-2)\leq d(d-1)
+$$
+
+incidences remain. There are at most $d$ direct forces. If $m<d$, there are at most $m+1$ old discrepancies that can act directly. If $m=d$, the round-one links already use all edges incident to $z$, leaving only the $d$ other old discrepancies as possible direct sources. Thus $2N\leq d(d-1)+d=d^2$.
+
+Let $r$ be the number of rounds in the interval with at least one of the excluded additions. Every unfinished round adds a vertex, so $Z-5\leq N+r$. If $r\leq1$, this and $S\leq Z+2$ give the desired bound. If $r$ is two or three, $w_0$ must be blue by round $Z-3$ because all exceptional arrivals are within one round of its arrival. At least $r-1$ excluded targets use distinct incidences at $w_0$, because only one of the occupied rounds can be explained by $w_0$ itself. None of these incidences is counted for $N$.
+
+At time $Z-2$, the blue vertex $w_0$ must still have another white neighbor $y$ besides $z$. Otherwise it would force $z$ in round $Z-1$. The edge $w_0y$ uses a further incidence outside the count for $N$. If $y$ is old, the incidence at $y$ is also unused. If $y$ is new, its own attribution uses a separate unused old incidence unless it is a direct force from $w_0$. In that last case the early count loses one possible direct force, since the direct force from $w_0$ was assigned to the late vertex $y$. Thus in each case the constraint from $y$ saves two units in the bound for $2N$, in addition to the $r-1$ incidences from the excluded targets. Consequently
+
+$$
+S\leq 7+r+N
+ \leq 7+r+\left\lfloor\frac{d^2-r-1}{2}\right\rfloor
+ \leq \left\lfloor\frac{d^2}{2}\right\rfloor+8
+ \qquad(r=2,3).
+$$
+
+### Construction attaining the lower bound
+
+Use blue vertices $z,p_1,\ldots,p_d$ and white vertices $w_1,\ldots,w_d$, with edges $zp_i,p_iw_i$. Set $k=d-2$. Make a multiset of pairs of old white vertices as follows. Use $k$ copies of the pair $\{w_2,w_3\}$. On the ordered list $w_1,w_4,\ldots,w_d$, take $\lfloor k/2\rfloor$ copies of the consecutive pairs around the cycle, including the closing pair. For $k=2$ a traversal counts the same pair twice. If $k$ is odd, also take $\lfloor k/2\rfloor$ disjoint consecutive pairs from that list. Each vertex occurs at most $k$ times. The number of pairs, including multiplicities, is $k+\lfloor k^2/2\rfloor=\lfloor d(d-2)/2\rfloor$.
+
+For each pair occurrence $e$, add a distinct blue vertex $q_e$ adjacent to both endpoints and to its own white vertex $y_e$. Add white vertices $x_i$ for $i\ne2$ with edges $w_ix_i$, and join each $x_i$ for $i\geq4$ to $x_1$. Add a white vertex $u$ adjacent to $x_3$ and to a blue vertex $q_*$, with $q_*$ also joined to $w_2$. Use two more white vertices $a,b$. In the list consisting of $b$, all $y_e$ in any fixed order, and then $x_3,x_4,\ldots,x_d,x_1$, add one distinct blue relay vertex per consecutive pair, adjacent to both entries of that pair. Add a blue seed $s$ with edges $sa,ab$, and a blue helper $h$ joined to $s$ and to two blue leaves forming the support $H$. These are all the edges. The graph is connected and simple because each pair occurrence uses a different $q_e$. The $w_i$ have at most $k+2=d$ neighbors, the relay vertices and $x_i$ for $i\ne1$ have at most four, and $x_1$ has $d-1$ neighbors. The degree of $z$ is $d$.
+
+In the intact run the $w_i$ and $a$ fill in round one. All $y_e$ fill from the $q_e$, all $x_i$ from the $w_i$, $u$ from $q_*$ and $b$ from $a$ in round two. After losing one leaf from $H$, the helper restores it in round one and both rounds proceed as before. A double loss in $H$ stalls because their common neighbor cannot force either leaf while both are white.
+
+After losing $z$, no $p_i$ or $q_e$ can act while the $w_i$ are white. Once a $y_e$ is blue all its neighbors are already blue. A blue $x_3$ sees both $u,w_3$ white, and $q_*$ sees both $u,w_2$ white. A blue $x_i$ for $i\geq4$ sees both $w_i,x_1$ white until $x_1$ fills. Hence the run traverses $a,b$, then the $L=\lfloor d^2/2\rfloor-1$ vertices $y_e,x_i$ in list order, one per round. When $x_1$ fills, the next round restores $w_1,w_4,\ldots,w_d$. The $q_e$ incident to $w_2$ or $w_3$ are adjacent to both, so they remain blocked, as do $x_3$ and $q_*$. The next three rounds restore $z$, then $w_2,w_3$, then $u$. Thus recovery ends in round $L+6=\lfloor d^2/2\rfloor+5$.
+
+Every other singleton loss recovers. Losing $p_i$, $s$, $h$ or a support leaf is repaired in round one by $z$, $h$, a leaf, or $h$, respectively. The delayed coloring then contains $B$. On loss of a $q_e$, the path from $s$ through the relays still colors every $y_e$ and $x_i$, and all $w_i$ fill in round one. An endpoint of its pair then restores the missing $q_e$. If $q_*$ is lost, $w_2$ restores it after round one, and $q_*$ can then restore $u$. On loss of a relay, both intact rounds can still fill all originally white vertices, and an adjacent vertex then restores that relay. The pair $H$ is therefore a minimum killing support.
+
 ## Reproduction
 
 ```sh
@@ -141,4 +194,4 @@ python -B research-twins/check_saturated_subcubic.py
 lake env lean -DwarningAsError=true research-twins/SingleLossBound.lean
 ```
 
-The replay verifies both sharp examples and 147 instances of the unbounded family, using 49 path lengths and three variants of the lost vertex. The largest path has 100 vertices before $g$. It also checks 25,392 recoverable singleton cases with intact time at most one across all labeled simple graphs through order five. In 7,914 of those cases a blue twin of the lost vertex remains. On the same small graph range, the replay checks the degree-weighted inequality on 78,122 transitions and the refined round-two count on 51,658 singleton losses, including stalled runs. Separate subcubic certificates attain eight rounds with ten white vertices and nine rounds with eight white vertices after round two. The Lean proof establishes the one-round upper bounds without a graph-order restriction.
+The replay verifies both sharp examples and 147 instances of the unbounded family, using 49 path lengths and three variants of the lost vertex. The largest path has 100 vertices before $g$. It also checks 25,392 recoverable singleton cases with intact time at most one across all labeled simple graphs through order five. In 7,914 of those cases a blue twin of the lost vertex remains. On the same small graph range, the replay checks the degree-weighted inequality on 78,122 transitions and the refined round-two count on 51,658 singleton losses, including stalled runs. Separate subcubic certificates attain eight rounds with ten white vertices and nine rounds with eight white vertices after round two. The replay also verifies the degree-dependent lower bound for every maximum degree from 4 through 22, including all singleton losses and the minimum killing support. The Lean proof establishes the one-round upper bounds without a graph-order restriction.

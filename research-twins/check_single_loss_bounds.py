@@ -102,7 +102,9 @@ def check_two_round_bound(degree, lost, full_arrivals, delayed_arrivals):
     if len(missed_second) > bound:
         raise AssertionError((degree, lost, missed_first, missed_second, bound))
     if None not in delayed_arrivals:
-        cap = 9 if degree == 3 else degree**2 + 3
+        cap = min(degree**2 + 3, degree**2 // 2 + 8)
+        if degree == 3:
+            cap = 9
         if degree == 3 and len(missed_second) != 8:
             cap = 8
         if max(delayed_arrivals) > cap:
@@ -215,6 +217,55 @@ def check_nine_round_example():
     MODEL['certify'](adj, blue, mask([15, 16]), 1, 2, 9)
 
 
+def quadratic_degree_certificate(degree):
+    lost = 0
+    predecessors = range(1, degree + 1)
+    missed = range(degree + 1, 2 * degree + 1)
+    group = [missed[0], *missed[3:]]
+    size = len(group)
+    cycle = list(zip(group, [*group[1:], group[0]]))
+    pairs = [(missed[1], missed[2])] * size + cycle * (size // 2)
+    if size % 2:
+        pairs.extend(zip(group[::2], group[1::2]))
+
+    outside_sources = range(missed.stop, missed.stop + len(pairs))
+    outside_targets = range(outside_sources.stop, outside_sources.stop + len(pairs))
+    direct_targets = range(outside_targets.stop, outside_targets.stop + degree - 1)
+    last = direct_targets[0]
+    first, second, seed, helper, leaf_a, leaf_b = range(direct_targets.stop,
+                                                       direct_targets.stop + 6)
+    serial_path = [second, *outside_targets, *direct_targets[1:], last]
+    relays = range(leaf_b + 1, leaf_b + len(serial_path))
+
+    edges = [(lost, p) for p in predecessors] + list(zip(predecessors, missed))
+    for source, pair, target in zip(outside_sources, pairs, outside_targets):
+        edges.extend((source, v) for v in (*pair, target))
+    edges.extend(zip([missed[0], *missed[2:]], direct_targets))
+    edges.extend((last, x) for x in direct_targets[2:])
+    for source, left, right in zip(relays, serial_path, serial_path[1:]):
+        edges.extend(((source, left), (source, right)))
+    edges.extend(((seed, first), (first, second), (seed, helper),
+                  (helper, leaf_a), (helper, leaf_b)))
+
+    final_source, final_target = relays.stop, relays.stop + 1
+    edges.extend(((missed[1], final_source), (final_source, final_target),
+                  (direct_targets[1], final_target)))
+    adj = adjacency(final_target + 1, edges)
+    blue = mask([lost, *predecessors, *outside_sources, *relays,
+                 seed, helper, leaf_a, leaf_b, final_source])
+    return adj, blue, mask([leaf_a, leaf_b])
+
+
+def check_quadratic_degree_family():
+    degrees = range(4, 23)
+    for degree in degrees:
+        adj, blue, support = quadratic_degree_certificate(degree)
+        if max(row.bit_count() for row in adj) != degree or completion_time(adj, blue) != 2:
+            raise AssertionError((degree, len(adj)))
+        MODEL['certify'](adj, blue, support, 1, 2, degree**2 // 2 + 5)
+    return len(degrees)
+
+
 def main():
     extremal_examples()
     print('Sharp one-round examples: two certificates at times 1/5 and 1/4')
@@ -233,6 +284,7 @@ def main():
     print('Saturated subcubic example: exact restricted time 2 and delayed time 8')
     check_nine_round_example()
     print('Sharp subcubic example: exact restricted time 2 and delayed time 9')
+    print('Quadratic-degree examples with exact restricted time 2:', check_quadratic_degree_family())
 
 
 if __name__ == '__main__':

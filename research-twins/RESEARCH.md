@@ -22,7 +22,7 @@ An isolated vertex makes the full property automatic. Every forcing set contains
 
 The gap can still grow without bound in graphs that contain twins. In the [shared-edge family $\Theta(1,2,r)$](../research-bicyclic/NEARBY_FAMILIES.md#two-cycles-sharing-an-edge), the endpoint $x$ is blue and belongs to neither the killing pair nor the slow loss for $r\geq5$. Add a nonadjacent twin of $x$ and color it blue. All compared runs, including the double loss, keep $x$ as a blue representative, so their times are unchanged by the projection. Old singleton losses still finish by monotonicity, and losing the new twin is equivalent to losing $x$ in the enlarged graph. The same certificate therefore exhibits a gap of $\lfloor(r+1)/4\rfloor$ on graphs with a twin pair.
 
-[Sharp single-loss time bounds](ONE_LOSS_TIMING.md) give five rounds when the intact time is one, and nine rounds for subcubic graphs when the intact time is at most two. Without a degree bound, intact time two allows arbitrarily large finite recovery times.
+[Sharp single-loss time bounds](ONE_LOSS_TIMING.md) give five rounds when the intact time is one, and nine rounds for subcubic graphs when the intact time is at most two. For maximum degree $d\geq4$ and intact time at most two, the worst recovery time is between $\lfloor d^2/2\rfloor+5$ and $\lfloor d^2/2\rfloor+8$ rounds. Without a degree bound, intact time two allows arbitrarily large finite recovery times.
 
 ## Exactly one vertex without a twin
 
