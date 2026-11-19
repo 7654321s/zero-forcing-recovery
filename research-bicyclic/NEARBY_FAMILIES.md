@@ -106,6 +106,8 @@ The remaining short triples have the following certificates. Number $x,y$ by $0,
 
 Indeed, $\sum_v(\deg(v)-2)=2$. There is either one vertex of degree four or there are two vertices of degree three. Suppress all chains of degree-two vertices, allowing loops and parallel edges in the resulting multigraph. There is no separate cycle of degree-two vertices because the graph is connected and has a branch vertex. A single degree-four vertex gives two loops, so the original graph is two cycles sharing one vertex. For two degree-three vertices, the number of parallel edges between them is positive and odd, because each loop contributes two to the degree. Three parallel edges give a theta graph. One edge gives a loop at each endpoint, so the graph is two cycles joined by a path. The [two-cycle classification](RESEARCH.md) and the theta theorem exhaust the three cases.
 
+The [single-site attachment theorem](ATTACHMENTS.md) classifies arbitrary rooted trees attached at one vertex of any of the four positive cores.
+
 ## Leaves and paths on a diamond
 
 Let the diamond $\Theta(1,2,2)$ have adjacent degree-three vertices $x,y$ and two degree-two vertices $a,b$ adjacent to both. Attach $s$ leaves at $x$ and $t$ leaves at $y$ with no other attachments. The graph satisfies `EveryMinimumSupport` exactly when one count is zero or both counts are at least two.
