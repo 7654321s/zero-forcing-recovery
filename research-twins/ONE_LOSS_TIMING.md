@@ -6,6 +6,8 @@ Use synchronous zero forcing, with a loss turning an initially blue vertex back 
 
 In contrast, even with recovery from every singleton loss and a two-vertex minimum killing support, restricted time two allows an arbitrarily large finite unrestricted time. The examples below have intact time exactly two as well. The lost vertex can have a retained blue twin, either adjacent or nonadjacent.
 
+In [bridgeless cubic graphs](MULTIPLE_LOSS_TIMING.md#exponential-delay-from-one-lost-seed-in-a-bridgeless-cubic-graph), a single loss can raise the time from $s$ to $2^{s-3}+3s-6$ for every $s\geq5$, with tolerance of all singleton losses.
+
 ## Upper bounds
 
 Let $W=V\setminus B$ be the intact white set. For each $w\in W$, an original source is an initially blue vertex whose only neighbor in $W$ is $w$. There is at least one original source for every $w$ because the intact coloring finishes within one round. A vertex can be an original source for at most one $w$.
