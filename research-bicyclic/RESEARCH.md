@@ -69,3 +69,5 @@ The command checks 9,633 graphs with cycle lengths between 3 and 40, including p
 ```sh
 lake env lean -DwarningAsError=true research-bicyclic/Bowtie.lean
 ```
+
+The [nearby-family results](NEARBY_FAMILIES.md) treat theta cores, several attachments to the diamond, and an arbitrary number of cycles sharing a vertex.
