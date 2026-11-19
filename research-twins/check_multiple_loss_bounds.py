@@ -126,8 +126,8 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
         excess = delayed - 1 - 3 * len(roots)
         if cycle_rank < 2 * excess + group_cost:
             raise AssertionError(('rank cost of restoration groups', cycle_rank, excess, groups))
-    if intact == 2 and len(roots) == 1 and cycle_rank >= 2:
-        upper = min(upper, cycle_rank + 8)
+    if intact == 2 and len(roots) == 1 and cycle_rank:
+        upper = min(upper, (cycle_rank + 19) // 2)
     if revisits > cycle_rank or delayed > upper:
         raise AssertionError(('cycle rank bound', intact, delayed, cycle_rank, revisits))
     return intact, delayed, revisits
@@ -619,7 +619,8 @@ def main():
     exhaustive = sampled = 0
     check_branched_forest_extremizers()
     low_rank_cases = ((2, 1, 0, 4), (2, 1, 1, 4), (2, 1, 2, 4),
-                      (2, 1, 3, 4), (2, 1, 7, 6), (2, 1, 15, 10),
+                      (2, 1, 3, 4), (2, 1, 4, 4), (2, 1, 6, 5), (2, 1, 7, 6),
+                      (2, 1, 15, 10), (2, 1, 16, 10), (2, 1, 35, 20), (2, 1, 100, 52),
                       (2, 2, 1, 4), (2, 4, 3, 4), (2, 4, 4, 4),
                       (3, 3, 2, 4), (3, 2, 7, 5), (4, 2, 2, 4),
                       (7, 5, 3, 4), (9, 3, 5, 4), (8, 3, 16, 7))

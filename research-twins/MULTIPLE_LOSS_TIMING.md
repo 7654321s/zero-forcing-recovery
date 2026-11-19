@@ -6,7 +6,7 @@ Use the synchronous rule and initial-color loss model of the [single-loss bounds
 - **Forests and cycle rank.** The exact value on forests of unrestricted degree is $t+k(2t+1)$. At cycle rank $\beta$ and $t\geq1$, an upper bound is $t+k(2t+1)+(2t-1)\beta$. The bound is exact for $t\geq2$ when $\beta\leq k$, even at degree cap four. For one intact round the exact worst-case time is determined at every cycle rank.
 - **One intact round.** The exact value is $1$ for $d=1$ and $1+3k$ for $d=2,3$. For $d\geq4$ one loss gives $5$. For $d\geq4$ and $k\geq2$, put $U=1+\lfloor kd/2\rfloor+2k$. The exact value is $U$ for even $k$ and for $d=4,5$. For odd $k$ it is $U-1$ at $d=6$, and $U-2+(d\bmod2)$ at $d\geq7$.
 - **Joint degree and cycle rank.** For one intact round the exact maximum is determined jointly for every degree cap at least three, cycle rank, and loss budget.
-- **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$. For one loss, the maximum is ten rounds at cycle rank two and eleven at rank three.
+- **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$. For one loss, the exact maximum at positive cycle rank is $\lfloor(\beta+19)/2\rfloor$.
 - **At least two intact rounds allowed.** Put $P=d(d-1)^{t-1}$. For $d\geq6$, $t\geq2$ and $k\geq1$,
   $$
   M_{d,t,k}=\frac{kP}{2}+\frac{kP}{2(d-1)}+O\!\left(\frac{kP}{d^2}\right),
@@ -85,29 +85,65 @@ In the intact run each $y_i$ is forced at round $t$ by the far endpoint of its n
 
 The extra arms and their attached targets are trees. Routing the crossing through their targets adds $j$ to the rank, and the $j$ direct edges from the targets to $u$ add another $j$. The degree of $z$ is $3+j$, that of $u$ is $2+j$, and each extra target has degree at most four. The initially blue relays still admit the same private paths. All unused rank can be supplied with the all-blue triangle chain.
 
-### Two intact rounds and one lost seed at cycle ranks two and three
+<a id="two-intact-rounds-and-one-lost-seed-at-cycle-ranks-two-and-three"></a>
 
-For connected graphs of cycle rank two, the maximum finite recovery time after a single seed loss is **ten rounds** when the intact run takes at most two. At rank three the maximum is **eleven rounds**. The construction above attains both values at degree cap four. The general upper bound is $T\leq\beta+8$ for every $\beta\geq2$ in this one-loss, two-round setting.
+### Two intact rounds and one lost seed at every cycle rank
 
-**Which visits can be long.** Use the discrepancy forest $F$ and the late trail in the preceding upper bound with $t=2$. The forest has one root $z$ and depth at most two when intermediate relays are suppressed. Call the vertices marked by time one old. There is at most one first-round child $c$ attached directly to $z$. Every other first-round child $w$ is attached by a retained initial source that originally had $w$ as its only white neighbor. Its only possible delayed whites at the start are $w$ and $z$. Thus the delayed arrival times of $w,z$ differ by at most one.
+Let $M_\beta$ be the largest finite recovery time on connected graphs of cycle rank $\beta$ after one lost seed, with intact time at most two and no degree restriction. Then
+$$
+M_0=7,\qquad
+M_\beta=\left\lfloor\frac{\beta+19}{2}\right\rfloor
+\quad(\beta\geq1).
+$$
+The forest bound gives $M_0$. The [extra-target construction](#a-lower-bound-beyond-the-low-rank-range) attains the positive-rank value with $m=\lfloor(\beta-1)/2\rfloor$ and maximum degree at most $\max(4,3+m)$. It gives a one-fault-tolerant initial set, and the same formula is exact under a degree cap $d\geq4$ whenever $\beta\leq2d-4$. In particular, ranks one and two have maximum ten, and ranks three and four have maximum eleven.
 
-A visit without the distinguished root has at most three distinguished vertices. If it has at least two, one must be the first-round child at the top of its branch. Indeed, a path between two depth-two leaves in that branch must pass through this child. If it were an intermediate vertex rather than distinguished, both adjacent vertices on the trail would be distinguished. Both edges leading downward would then have to be direct, since the intermediate relays in $F$ are blue by time two. The child can make only one intact force, so this is impossible. A three-vertex visit has a distinguished first-round child between two depth-two leaves. Its three arrival times are consecutive, centered at the child's arrival.
+#### Near and far arrivals
 
-Write $r$ for the delayed arrival of $z$. When $z$ is distinguished, call the size of its visit $s$. Every other visit contributes at most one distinguished vertex unless it distinguishes a first-round child. A three-vertex visit around a first-round child other than $c$ would include time $r$, already taken by $z$. Such a visit can therefore add at most one to its allowance of one. If $s\geq4$, the root's visit occupies both $r-1$ and $r+1$, leaving no room for an additional visit distinguishing a first-round child other than $c$. If $s=2$ or $3$, the root's visit occupies at least one adjacent slot, leaving at most one such additional visit. At $s=1$ there can be two. The visit around $c$ can add at most two beyond its allowance. Since there are at most $\beta$ visits besides the root's visit, these counts give $T\leq\beta+9$. Equality requires $s=5$, a three-vertex visit centered at $c$, and $\beta-1$ singleton visits.
+It suffices to consider $T>2$. Use the discrepancy forest $F$ and late trail for $t=2$. Its only root is the lost seed $z$. Call vertices marked by intact time one old. There can be at most one first-round child $c$ attached directly to $z$. Every other first-round child $w$ is attached through a retained initial source that originally had $w$ as its only white neighbor. The source's only possible delayed whites at the start are $w$ and $z$, so their delayed arrivals differ by at most one round.
 
-When $z$ is undistinguished, there are at most $\beta+1$ visits. Visits with at least two distinguished vertices centered at first-round children other than $c$ use times within $r-2,\ldots,r+2$. Their total excess over one per visit is at most three. A single visit supplies at most two, and across two or more the five available times supply at most three. The visit around $c$ adds at most two more. Hence $T\leq2+(\beta+1)+3+2=\beta+8$.
+Write $r$ for the return time of $z$, and, if $c$ exists, write $s$ for its arrival time. Call the times in $[r-2,r+2]$ and in $[s-1,s+1]$ near, using just the first interval when $c$ is absent. Other times are far. Let $n$ and $f$ count the distinguished near and far vertices, respectively, so $T-2=n+f$. There are at most eight near times. Every distinguished old vertex is near, and their number $O$ is at most four, since they use only $r-1,r,r+1$ and possibly $s$.
 
-**Excluding equality when there is a singleton visit.** Suppose $T=\beta+9$ with $\beta\geq2$. The root's five marks occupy $r-2,\ldots,r+2$, and the three marks around $c$ occupy its own three consecutive times. Both these visits end at distinguished depth-two leaves. All other visits are singletons. Their targets were born in round two because the other first-round children return within one round of $z$. In particular, every distinguished old vertex is interior to one of the two long visits.
+Every visit with two or more distinguished vertices contains an old distinguished vertex. A visit distinguishing the root has at most two marks on each side of it. Its distinguished vertices therefore all arrive within two rounds of $z$. For a visit without the distinguished root, the marks lie in one branch. If it has two depth-two marks then their first-round parent must also be distinguished. Otherwise that parent would be an intermediate source between two distinguished vertices, with both downward edges direct, since the intact relays of $F$ are blue by time two. A vertex can make at most one intact force, so this cannot happen. A visit of size at least two in the branch thus distinguishes its first-round child, and the other marks are at most one round away from it. They are near, whether the first-round child is $c$ or another child of $z$.
 
-The $\beta+1$ visits to $F$ use all the cycle rank. Indeed, contracting $F$ in the union of $F$ and the trail gives at least $\beta$ repeats, and the contracted rank is at most $\beta$. The union is connected. Every edge outside $F$ with both endpoints in $F$ must therefore be on the trail, since an unused edge between those endpoints would add another cycle. An edge between old vertices outside $F$ is impossible. At least one endpoint would have to be distinguished on the trail, and every distinguished old vertex uses only edges in $F$ at its distinguished occurrence. For the same reason there is no edge outside $F$ from an old vertex to a retained intermediate relay of $F$, since that relay cannot be distinguished.
+It follows that each far target occupies its own visit and is a discrepancy born in round two. All discrepancies born in round two are leaves of $F$.
 
-Take a singleton target $y$. If its intact source is a retained relay, it has only one old neighbor, its parent $w$ in $F$. Additional old neighbors would give the forbidden edges just described. All other neighbors except $y,w$ are already blue at delayed time one, so $y,w$ return within one round of each other. If $w=c$, the arrival of $y$ is in the three times around $c$. If $w=z$ or $w$ is a first-round child other than $c$, the arrival is in $r-2,\ldots,r+2$. Both contradict the singleton visit.
+#### Blocking edges for far targets
 
-The remaining case is that $y$ is a direct child of an old vertex $w$. This vertex is a first-round child since $z$ already spent its intact force on $c$. Since $y$ lies outside both long visits, it arrives at least two rounds earlier or later than $w$. In the early case $y$ must have a neighbor $g\ne w$ still white when it turns blue, or it would force $w$ in the next round. The vertex $g$ belongs to $F$, and $yg$ is outside $F$ since $y$ is a leaf. The edge cannot appear with $y$ distinguished. The later-arriving $g$ cannot be an intermediate source at that occurrence, and $y$ cannot force $g$ while $w$ is white. Using $y$ as an intermediate source with two edges outside $F$ would create a visit containing no distinguished vertex, which equality forbids. Using $y$ as an intermediate source with the edge $yw$ in $F$ would put it at the end of a visit containing a distinguished old vertex $w$. Such visits already have two distinguished depth-two endpoints. Thus $yg$ is unused, a contradiction.
+For each far target $y$, choose one edge outside $F$ by the following rules.
 
-In the late case, when $w$ returns it needs a white neighbor besides $y$, or it would force $y$ in the next round. Its only white neighbor at intact time one was $y$, so the other neighbor must be old. The only edge of $F$ between old vertices is $zc$, and edges outside $F$ between old vertices are impossible. This forces $w=c$, with $z$ still white at the return of $c$. Once $z$ turns blue, $c$ can force $y$ by round $r+1$. Since $y$ is outside $r-2,\ldots,r+2$, it must arrive by round $r-3$. Then $c$ has only $z$ white and forces it before $r$, a contradiction.
+- If its intact source $p$ is a retained relay of $F$, then $p$ has an old neighbor other than the chosen parent of $y$. Without such a neighbor, the source would have only its parent and $y$ as possible whites after delayed round one, and their arrivals would differ by at most one. This would make $y$ near. Choose the edge from $p$ to an extra old neighbor.
+- If $y$ is a direct child of an old vertex $w$ and arrives at least two rounds before $w$, choose an edge $yg$ to another vertex white when $y$ returns. Without it $y$ would force $w$ in the next round.
+- If $y$ is a direct child of $w$ and arrives at least two rounds after $w$, then $w$ needs another late old neighbor. Its other neighbors were blue in the intact run at time one. If $w=z$, the child $c$ does not exist, since the intact force of $z$ was used on $y$. All old neighbors of $z$ then return by $r+1$, and $y$ would fill by $r+2$. For a first-round child other than $c$, every edge to another old vertex is outside $F$. For $w=c$, the edge $cz$ is in $F$, but it cannot be the only edge to an old neighbor still white when $c$ returns. If $z$ is already blue, $y$ would follow immediately. If $z$ is still white, $y$ would arrive by $r+1$. A far arrival would then have to occur by $r-3$, and $c$ could force $z$ at the next round, a contradiction. In the possible cases choose an edge from $w$ to an old neighbor outside $F$ that returns later than $w$.
 
-This rules out $T=\beta+9$ for $\beta\geq2$. At rank two, the matching example is the rank-one block with one all-blue triangle. At rank three, one extra target in the lower-bound construction gives eleven rounds. Both protected examples have maximum degree four and one-fault-tolerant initial sets.
+Each of these edges joins two vertices of $F$. The first type has a retained relay as an endpoint, the second has a round-two target and its later-arriving neighbor, and the third joins two old vertices. Edges of the first type identify a unique intact source and hence a unique target. Edges of the other types identify their owners by the earlier arrival time. An old source owns at most one direct target. Therefore the chosen edges are all distinct.
+
+#### Charging the rank and the trail sides
+
+Let $N$ count visits with at least one near mark, let $Z$ count visits to $F$ with no distinguished mark, and let $U$ count chosen blocking edges not on the trail. There are $f+N+Z$ visits to $F$. The union of $F$ and the trail is connected. Its rank is at least $f+N+Z-1$, since contracting $F$ gives at least that many repeats of its vertex. Each unused blocking edge adds one to that rank, so
+$$
+\beta\geq f+N+Z-1+U .
+$$
+
+Every chosen edge that is on the trail charges either a free side of a distinguished old vertex or one of the $Z$ visits. A side is free when it has no other distinguished vertex in the same visit. A retained-relay edge is used at a distinguished old endpoint because the relay is already blue by delayed time one. A late direct blocker joins two old vertices, at least one distinguished on the step using it. In either case the edge leaves the visit immediately on the charged side.
+
+For an early direct target, the edge $yg$ cannot be used at the distinguished occurrence of $y$. The later-arriving $g$ cannot be an intermediate source there, and $y$ cannot force $g$ while its parent is white. Thus $y$ is an intermediate source between two distinguished vertices. If the other edge of the step is its sole forest edge to its old parent, charge the side of that distinguished parent ending at $y$. Otherwise both edges leave $F$, so this occurrence of $y$ is a visit with no mark. The charges are distinct because each used side has a single boundary edge and each such unmarked visit has just the one intermediate occurrence of its owner. If $C$ old sides are charged, then $f\leq U+C+Z$. In particular,
+$$
+\beta\geq2f+N-1-C .
+$$
+
+Write $L$ for the number of steps between consecutive distinguished old vertices within the same visit, and $B$ for their number across different visits. The available old sides give
+$$
+C-N\leq 2O-n-L-B.
+$$
+To see the within-visit count, consider a near visit with $o$ old marks and $q$ round-two marks. The latter are leaves and can only be endpoints, so $q\leq2$. If $o=0$, it is a singleton round-two visit and has no old sides. Otherwise at most $2-q$ sides are free and the $o-1$ steps between old marks are consecutive within this visit. In both cases the number of free sides minus one is at most $o-q$ minus the number of these internal steps. Summing gives $2O-n-L$ before accounting for the split steps.
+
+Each split step forces one further unused side. A direct step between old vertices uses just one edge. A step through an intermediate vertex also contains at most one chosen blocking edge. If the intermediate vertex is an unmarked retained relay, both edges could belong only to its single intact target. If it is an old vertex, its arrival is earlier than both endpoints of the step, so any old-to-old blocker on the step belongs to its one direct target. If it was born in round two, the only possible owner of a blocker on the step is that same round-two vertex acting as an early direct child. Thus the two facing old sides of a split step receive at most one charge, and these pairs of sides are distinct.
+
+It follows that
+$$
+\beta\geq2(T-2)-(n+2O+1-L-B).
+$$
+If $O\leq3$, the term in parentheses is at most $8+6+1=15$. If $O=4$, the times $r-1,r,r+1$ are all occupied by distinguished old vertices, so $L+B\geq2$. The term is again at most $8+8+1-2=15$. Hence $\beta\geq2T-19$, proving the claimed positive-rank upper bound.
 
 <a id="one-intact-round-at-small-cycle-rank"></a>
 
