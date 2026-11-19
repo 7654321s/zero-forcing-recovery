@@ -931,6 +931,37 @@ In a cubic graph, 3-edge-connectivity implies 3-vertex-connectivity. Removing a 
 
 **Rank.** The base has exactly three white leaves, the two hanging guards and the last vertex of the right arm. The construction adds nine vertices per copy before padding. Combining the base order above with the cubic rank formula $|V|/2+1$ gives the stated thresholds. The unpadded witness for $s=5$ has 210 vertices. The replay checks the exact delayed waves, enumerates single losses in the small witnesses, and tests for a bridge after each individual edge deletion.
 
+#### Arbitrary fault budgets with one slow loss
+
+For each $s\geq5$ and each $K\geq1$, the leaf-cycle construction gives a 3-vertex-connected cubic graph with a blue set that recovers from every loss of at most $K$ seeds. Its intact propagation time is $s$, and losing the designated root alone takes $2^{s-3}+3s-6$ rounds.
+
+Use the same core with $t=s-2$, but give each protected seed a private path of $2K+2$ blue vertices. Use $K+1$ support seeds on the support path, with its $K$ protected edge sources. The connectivity proof above applies to these lengths. Each side of an original bridge still contains a leaf, the internal private-path vertices still have degree two, and the support sources still have three neighbors of lower degree. The old core and its white-leaf caps have the same intact and designated waves. The additional protection is initially blue throughout both runs.
+
+**Recover the original vertices first.** Project the actual failed seeds on the original base to at most $K$ labels. Start a smaller blue set by omitting these labels and the root label in both copies. Temporarily take every new cap and padding vertex as white. This coloring is synchronized under the half-turn, and a matching edge never blocks a force performed in both copies of a label.
+
+Each private path has at most $K$ missing positions, since the root belongs to none of them. Two adjacent positions survive among its $2K+2$ vertices. Grow from this pair toward both ends, using internal path vertices as sources. The first path vertex can then restore its protected seed. A terminal on the cycle never needs to act as a source, so white cycle neighbors cause no obstruction. Once the $K$ support sources are blue, one surviving support seed suffices to restore their subdivided support path. The protection has thus restored every core seed except possibly the root and the ternary pair sources. The base serial schedule with the root absent uses only the restored relays to reach its terminal paths. Each terminal can restore its own missing pair source, giving all original vertices blue. An original white leaf is reached through its old neighbor and has no further old vertex to force.
+
+**Finish the new cycle vertices.** There are three white-leaf segments and more than four original blue leaves in each half. Consequently two consecutive original blue leaves occur within each half in corresponding positions. Their old neighbors are blue. Starting there, traverse the cycle in both halves with the same forces. A padding vertex can forward a force once its preceding vertex and its mate are blue. On entering a cap $b,x,c$, the leaf $v$ is already blue. The incoming port $b$ can color $x$ when its predecessor is blue, and $v$ can color $c$ once $b$ is blue. Then $c$ can continue along the cycle. This reaches all the new vertices even from the smaller blue set, so it proves recovery in the actual coloring.
+
+For the rank, put $a=2^{t-2}$ and let $I=1$ for $t=3$ and $I=0$ otherwise. The unprotected core has $n_0=14a-t+1-I$ vertices, including $Q=6a-2t+4-I$ seeds with private paths. The base has $n_0+2K+1+(Q+K)(2K+2)$ vertices after protection. With nine cap vertices per copy, the new rank threshold is
+$$
+\beta_K=n_0+2K+11+(Q+K)(2K+2).
+$$
+The blue padding gives every rank above $\beta_K$. The code takes $K$ as `fault_budget` with `three_connected=True`. For $s=5$ and $K=1$ it gives 154 vertices at rank 78.
+
+**Exact finite killing sizes.** The rank guarantee provides a construction for each budget. The actual minimum killing size can be much larger. With the original protection parameter $K=2$, the following are computationally exact:
+
+| Intact time | Cycle rank | Minimum killing size |
+| ---: | ---: | ---: |
+| 5 | 106 | 12 |
+| 5 | 108 | 12 |
+| 6 | 200 | 11 |
+| 6 | 201 | 12 |
+| 7 | 387 | 11 |
+| 8 | 774 | 11 |
+
+Run `python research-twins/check_leaf_cycle_forts.py` from the repository root with `python-sat` installed. For each vertex $v$ and neighbor $u$, the clause $v\lor\neg u\lor\bigvee_{w\in N(v)\setminus\{u\}}w$ expresses that an outside vertex cannot have exactly one neighbor in the chosen fort. A nonempty fort must intersect the original blue set in at least one vertex. Its blue intersection is a killing loss. Conversely, a stalled run's final white set is a fort, and every initial blue vertex it contains was lost. Thus minimizing the blue intersection gives the minimum killing size. The replay checks unsatisfiability one below each reported size and validates the returned fort and stalled run at that size. The regular replay uses the standard library.
+
 <a id="the-first-rank-above-six-per-lost-seed"></a>
 
 #### Counting visits down to the fourth round

@@ -1457,20 +1457,30 @@ def cubic_leaf_cycle_lift(base, blue, padding):
     return adjacency(2 * order, edges), blue, white_caps
 
 
-def cubic_single_loss_lift_rank(rounds, *, three_connected=False):
+def cubic_single_loss_lift_rank(rounds, *, three_connected=False, fault_budget=2):
     """The smallest rank in this construction, indexed by the base intact time."""
-    if rounds < 3:
-        raise ValueError('The base needs at least three intact rounds')
+    if rounds < 3 or fault_budget < 1:
+        raise ValueError('Use at least three base rounds and a positive fault budget')
+    size = 2 ** (rounds - 2)
     if three_connected:
-        return 106 if rounds == 3 else 50 * 2 ** (rounds - 2) - 13 * rounds + 52
+        core_order = 14 * size - rounds + 1 - (rounds == 3)
+        protected_core = 6 * size - 2 * rounds + 4 - (rounds == 3)
+        order = (core_order + 2 * fault_budget + 1
+                 + (protected_core + fault_budget) * (2 * fault_budget + 2))
+        return order + 10
+    if fault_budget != 2:
+        raise ValueError('Adjustable protection is available for the leaf cycle lift')
     if rounds == 3:
         return 142
-    return 68 * 2 ** (rounds - 2) - 19 * rounds + 73
+    return 68 * size - 19 * rounds + 73
 
 
-def cubic_single_loss_lift_certificate(rounds, *, cycle_rank=None, three_connected=False):
-    """Keep only one copy of the degree-two root in a bridgeless cubic double."""
-    minimum = cubic_single_loss_lift_rank(rounds, three_connected=three_connected)
+def cubic_single_loss_lift_certificate(rounds, *, cycle_rank=None, three_connected=False,
+                                       fault_budget=2):
+    """Build a cubic double with one retained root and adjustable leaf-cycle protection."""
+    minimum = cubic_single_loss_lift_rank(
+        rounds, three_connected=three_connected, fault_budget=fault_budget
+    )
     surplus = 0 if cycle_rank is None else cycle_rank - minimum
     if surplus < 0:
         raise ValueError('The requested rank is below the rank of the unpadded lift')
@@ -1479,7 +1489,7 @@ def cubic_single_loss_lift_certificate(rounds, *, cycle_rank=None, three_connect
     ordinary = {(0, rounds - 2, side): DetourPlan(None, (), (), None) for side in range(2)}
     base, blue, root, _, _, waves = subcubic_recursive_rank_certificate(
         rounds, 1, 2 * sum(grafts.values()) + 2, layered_detours=grafts,
-        ordinary_detours=ordinary, fault_budget=2
+        ordinary_detours=ordinary, fault_budget=fault_budget
     )
     if three_connected:
         graph, blue, white_caps = cubic_leaf_cycle_lift(base, blue, surplus)
@@ -2015,7 +2025,8 @@ def main():
                 raise AssertionError(('cubic single-loss lift', t, rank, three_connected))
             check_arrival_waves(graph, blue ^ slow, waves)
             if t <= 5:
-                exhaustive += check_all_losses(graph, blue, 1)
+                limit = 2 if three_connected and t == 3 and padding == 0 else 1
+                exhaustive += check_all_losses(graph, blue, limit)
             if three_connected and t <= 5:
                 without_edge = list(graph)
                 for u, row in enumerate(graph):
@@ -2028,6 +2039,23 @@ def main():
                         without_edge[u] = graph[u]
                         without_edge[v] = graph[v]
             print('Cubic single-loss lift:', t + 2, rank, expected, '3-connected:', three_connected)
+
+    rng = Random(421)
+    for t, budget, padding in ((3, 1, 0), (3, 4, 1), (4, 7, 0), (5, 12, 3)):
+        rank = cubic_single_loss_lift_rank(t, three_connected=True, fault_budget=budget) + padding
+        graph, blue, slow, waves = cubic_single_loss_lift_certificate(
+            t, cycle_rank=rank, three_connected=True, fault_budget=budget
+        )
+        if (graph_bridges(graph) or any(row.bit_count() != 3 for row in graph)
+                or len(graph) // 2 + 1 != rank or completion_time(graph, blue) != t + 2
+                or len(waves) != 3 * t + 2 ** (t - 1)):
+            raise AssertionError(('cubic leaf cycle with adjustable protection', t, budget, rank))
+        check_arrival_waves(graph, blue ^ slow, waves)
+        seeds = list(members(blue))
+        for lost_seeds in (seeds[:budget], seeds[-budget:], rng.sample(seeds, budget)):
+            if completion_time(graph, blue ^ mask(lost_seeds)) > len(graph):
+                raise AssertionError(('cubic leaf cycle fault budget', t, budget, lost_seeds))
+        print('Cubic leaf cycle protection:', t + 2, rank, budget, len(waves))
 
     for rank in (4, 5, 12):
         edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()

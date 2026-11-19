@@ -8,6 +8,7 @@ In contrast, even with recovery from every singleton loss and a two-vertex minim
 
 In [bridgeless cubic graphs](MULTIPLE_LOSS_TIMING.md#exponential-delay-from-one-lost-seed-in-a-bridgeless-cubic-graph), a single loss can raise the time from $s$ to $2^{s-3}+3s-6$ for every $s\geq5$, with tolerance of all singleton losses.
 The same times are realized in [3-vertex-connected cubic graphs at smaller ranks](MULTIPLE_LOSS_TIMING.md#three-connected-cubic-witnesses-at-smaller-ranks).
+The [leaf-cycle construction with adjustable protection](MULTIPLE_LOSS_TIMING.md#arbitrary-fault-budgets-with-one-slow-loss) attains these single-loss times with arbitrary prescribed fault tolerance.
 
 ## Upper bounds
 
