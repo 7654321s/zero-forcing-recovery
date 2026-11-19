@@ -5,7 +5,7 @@ Use the synchronous rule and initial-color loss model of the [single-loss bounds
 - **Degree two.** For $t\geq1$ and $k\geq1$, the exact value is $M_{2,t,k}=t+k(2t+1)$. On cycles the exact value is $t(k+1)+\lceil k/2\rceil$.
 - **Forests and cycle rank.** The exact value on forests of unrestricted degree is $t+k(2t+1)$. At cycle rank $\beta$ and $t\geq1$, an upper bound is $t+k(2t+1)+(2t-1)\beta$. For one intact round the exact worst-case time is determined at every cycle rank.
 - **One intact round.** The exact value is $1$ for $d=1$ and $1+3k$ for $d=2,3$. For $d\geq4$ one loss gives $5$. For $d\geq4$ and $k\geq2$, put $U=1+\lfloor kd/2\rfloor+2k$. The exact value is $U$ for even $k$ and for $d=4,5$. For odd $k$ it is $U-1$ at $d=6$, and $U-2+(d\bmod2)$ at $d\geq7$.
-- **Joint degree and cycle rank.** For one intact round the exact maximum is determined with both constraints for degree caps three through five, and for two losses at any cap at least four.
+- **Joint degree and cycle rank.** For one intact round the exact maximum is determined with both constraints for degree caps three through eight, and for two losses at any cap at least four.
 - **Two intact rounds.** At degree three, $2+7k\leq M_{3,2,k}\leq 2+9k$ and $M_{3,2,1}=9$. At degree four, $M_{4,2,k}=2+13k$.
 - **At least two intact rounds allowed.** Put $P=d(d-1)^{t-1}$. For $d\geq6$, $t\geq2$ and $k\geq1$,
   $$
@@ -194,14 +194,25 @@ $$
 \begin{aligned}
 M(3,\beta,k)&=1+3k,\\
 M(4,\beta,k)&=1+3k+\min(k,\lfloor\beta/2\rfloor),\\
-M(5,\beta,k)&=1+3k+
+M(d,\beta,k)&=1+3k+
 \begin{cases}
 \lfloor\beta/2\rfloor, & 0\leq\beta<2k,\\
-k+\min\!\left(\lfloor k/2\rfloor,\lfloor(\beta-2k)/5\rfloor\right),&\beta\geq2k.
+k+E, &\beta\geq2k
 \end{cases}
+\qquad(5\leq d\leq8).
 \end{aligned}
 $$
-For two losses and every $d\geq4$, the two separate upper bounds are simultaneously sharp:
+In the last case set $\ell=d-4$. The integer $E$ is the largest $e$ with $0\leq e\leq\ell\lfloor k/2\rfloor$ and
+$$
+2e+3\lceil e/\ell\rceil\leq\beta-2k.
+$$
+Equivalently, write $\beta-2k=(2\ell+3)a+b$ with $0\leq b<2\ell+3$. Then
+$$
+E=\min\{\ell\lfloor k/2\rfloor,\ \ell a+\max(0,\lfloor(b-3)/2\rfloor)\}.
+$$
+For $d\geq9$ and $k\geq2$ the same formula applies throughout $\beta\leq2k+2(d-4)+4$. In that range the unrestricted cycle-rank maximum requires at most one pair block with degree at most $d$.
+
+For two losses and every $d\geq4$, the two separate upper bounds are simultaneously sharp.
 $$
 M(d,\beta,2)=\min(\mathcal{M}_{\beta,2},d+5).
 $$
@@ -229,13 +240,43 @@ $$
 S\leq h+g+\frac{d-5}{2}(k-s).
 $$
 
-At degree five this yields $S\leq k+g$, so $S>k$ requires $\beta\geq5S-3k$. The separate degree bound gives $S\leq k+\lfloor k/2\rfloor$, and the trail gives $S\leq\lfloor\beta/2\rfloor$. This proves the degree-five formula. The degree-three and degree-four upper bounds follow directly from their separate degree bounds and the general cycle-rank bound.
+The degree-three and degree-four upper bounds follow from their separate degree bounds and the cycle-rank bound. The trail bound $S\leq\lfloor\beta/2\rfloor$ also gives the upper bound for $\beta<2k$ at all higher degrees.
+
+### Degree spent within each restoration group
+
+For each round after one that restores no lost seed, select one arriving vertex and one intact source as in the degree count. Assign each direct target to its lost source's group. Assign each single-neighbor or long shared-source target to the group of its latest lost neighbor. These targets use a boundary slot. Assign each short shared-source target to the group containing its two latest lost neighbors. The last two neighbors have equal or consecutive restoration times, so both belong to that group.
+
+In a group of $p$ seeds and $r$ distinct restoration rounds, let $a,b,q$ be the numbers of direct, boundary-slot and short shared-source targets. Charge one incidence for a direct target, one at the latest lost neighbor for a boundary-slot target, and two for a short target. The incidences are distinct at the lost seeds. In particular,
+$$
+a\leq p,\qquad b\leq2,\qquad a+b+2q\leq dp.
+$$
+The group accounts for at most $r+a+b+q$ rounds, and the sum of these bounds covers all rounds after one. A singleton has no short targets and accounts for at most four rounds. For $p\geq2$, its contribution above $4p$ is at most
+$$
+r-p+\left\lfloor\frac{(d-5)p}{2}\right\rfloor+1.
+$$
+This takes the integer part within the group, since $a+b+q\leq\lfloor(dp+a+b)/2\rfloor$.
+
+For $5\leq d\leq8$, a three-seed group contributes at most $\ell=d-4$ above $12$. If $r\leq2$, the preceding bound is at most $\lfloor 3(d-5)/2\rfloor\leq\ell$. If $r=3$, the restoration rounds are distinct and consecutive. Every short target uses an incidence at the middle seed, giving $q\leq d$. Then $r+a+b+q\leq3+3+2+d=12+\ell$.
+
+Write $c(p)$ for the bound on a group's contribution above $4p$. Take $c(1)=0$, $c(3)=\ell$, and $c(p)=\lfloor(d-5)p/2\rfloor+1$ otherwise. The rank cost $w(p)=\max\{3,2(p-1)\}$ of a nonsingleton group satisfies
+$$
+w(p)\geq 3\lceil c(p)/\ell\rceil.
+$$
+For $p=2,3$ use $c(p)\leq\ell$. For $p=5$ use $c(p)\leq2\ell$. For the remaining $p\geq4$, use $c(p)\leq\ell p/2$ and $2(p-1)\geq3\lceil p/2\rceil$.
+
+If $e=T-1-4k$ is positive, then $e\leq\sum c(p)$. The rank count gives
+$$
+\beta\geq 2(k+e)+\sum_{p\geq2}w(p)\geq 2k+2e+3\lceil e/\ell\rceil.
+$$
+The separate degree bound gives $e\leq\ell\lfloor k/2\rfloor$ for $5\leq d\leq8$. This proves the upper bound for $\beta\geq2k$.
 
 ### Sharp constructions
 
 For degree three, start with the extremal path for intact time one. Attach cycles using bridges in a chain at a retained seed of the last blue pair. The port towards the previous block and the port towards the next block are adjacent on each cycle. The other route between the two ports has $2k+2$ interior vertices. Color every cycle vertex blue. The path's designated loss and killing support leave the attachment seed blue, so their outcomes are preserved. After any loss of at most $k$ seeds, the interior of each long route retains a consecutive blue pair. It restores the entire route and both ports independently of the other blocks. Once the cycles are blue, the remaining path seeds suffice to recover the path. Each cycle adds one to $\beta$ and every vertex has degree at most three.
 
-At degree four, use $\min(k,\lfloor\beta/2\rfloor)$ rank-two blocks from the [cycle-rank construction](#attainment-at-every-cycle-rank), with path blocks for the remaining seeds. At degree five and $\beta<2k$, use the same rule. For $\beta\geq2k$, start with $k$ rank-two blocks, of total rank $2k$. Replace two such blocks by a two-seed block with three shared-source targets whenever another five units of rank are available. Each replacement increases the time by one and raises the rank from four to nine. The two-seed block has maximum degree five, including after seed protection. Use at most $\lfloor k/2\rfloor$ replacements.
+At degree four, use $\min(k,\lfloor\beta/2\rfloor)$ rank-two blocks from the [cycle-rank construction](#attainment-at-every-cycle-rank), with path blocks for the remaining seeds. Use the same rule for $5\leq d\leq8$ and $\beta<2k$. For $\beta\geq2k$, start with $k$ rank-two blocks, of total rank $2k$. Replacing two such blocks by a two-seed block with $2+x$ shared-source targets increases the time by $x$ and the rank by $2x+3$. Any $1\leq x\leq\ell$ fits the degree cap, including after protection. Distribute a total gain of $E$ over $\lceil E/\ell\rceil$ replacements, saturating all but the last. The bounds defining $E$ guarantee that both the cycle rank and the number of seeds suffice.
+
+For $d\geq9$, $k\geq2$ and $\beta\leq2k+2(d-4)+4$, the unrestricted cycle-rank maximum gives an extra gain above $1+4k$ of at most $d-4$. Whenever that gain is positive, one replacement realizes it with at most $d-2$ shared-source targets. The path and rank-two blocks cover the remaining values in this range.
 
 For $k=2$ and $d\geq4$, the degree-four blocks attain the formula whenever the desired surplus is at most two. A larger surplus $S$ is realized by one two-seed block with $S$ shared-source targets. The simultaneous upper bounds give $S\leq d-2$ and $2S+3\leq\beta$, so the block fits both budgets. In all these degree-four and higher constructions, a chain of all-blue triangles uses the unused rank, and seed protection with a path for $J$ preserves the rank and the two propagation times.
 
@@ -243,7 +284,7 @@ For $k=2$ and $d\geq4$, the degree-four blocks attain the formula whenever the d
 
 For every even $k\geq2$ and $d\geq5$, the minimum rank attaining the degree-only maximum is $(2d-1)k/2$. Indeed, that maximum requires $S=(d-2)k/2$. In the joint degree count, $h\leq k$, $g\leq k/2$ and $k-s\leq k$. Equality requires $g=k/2$, so the rank is at least $2S+3k/2$. Using $k/2$ two-seed blocks with $d-2$ shared-source targets attains the threshold.
 
-At degree six and odd $k$, the minimum rank is $(11k-7)/2$. Here the degree-only maximum requires $S=2k-1$, including $S=1$ for $k=1$. Since $S\leq k+g+k/2$, integrality gives $g\geq(k-1)/2$. The rank is at least $2S+3(k-1)/2$. Using $(k-1)/2$ two-seed blocks with four shared-source targets and one rank-two block attains it.
+For odd $k$ and $5\leq d\leq8$, the exact formula gives minimum rank $(2d-1)(k-1)/2+2$. It uses $(k-1)/2$ two-seed blocks with $d-2$ shared-source targets and a single rank-two block.
 
 ## Two or more intact rounds
 

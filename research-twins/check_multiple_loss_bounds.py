@@ -288,13 +288,23 @@ def subcubic_rank_certificate(losses, cycle_rank):
 
 
 def bounded_rank_certificate(degree, losses, cycle_rank):
-    if degree == 5 and cycle_rank >= 2 * losses:
-        pairs = min(losses // 2, (cycle_rank - 2 * losses) // 5)
-        return assemble_one_round_certificate(losses, cycle_rank, losses - 2 * pairs, (3,) * pairs)
-    if losses == 2 and degree >= 6:
-        count = min(degree - 2, (cycle_rank - 3) // 2)
-        if count > 2:
-            return assemble_one_round_certificate(losses, cycle_rank, 0, (count,))
+    if 5 <= degree <= 8 and cycle_rank >= 2 * losses:
+        capacity = degree - 4
+        blocks, spare_rank = divmod(cycle_rank - 2 * losses, 2 * capacity + 3)
+        gain = min(capacity * (losses // 2),
+                   capacity * blocks + max(0, (spare_rank - 3) // 2))
+        full, partial = divmod(gain, capacity)
+        pair_targets = (capacity + 2,) * full
+        if partial:
+            pair_targets += (partial + 2,)
+        return assemble_one_round_certificate(losses, cycle_rank,
+                                              losses - 2 * len(pair_targets), pair_targets)
+    if degree >= 9 and losses >= 2:
+        gain = (cycle_rank - 2 * losses - 3) // 2
+        if losses == 2:
+            gain = min(degree - 4, gain)
+        if 1 <= gain <= degree - 4:
+            return assemble_one_round_certificate(losses, cycle_rank, losses - 2, (gain + 2,))
     return assemble_one_round_certificate(losses, cycle_rank, min(losses, cycle_rank // 2), ())
 
 
@@ -570,7 +580,14 @@ def main():
         (5, 4, 15, 18), (5, 4, 17, 18), (5, 4, 18, 19), (5, 4, 25, 19),
         (5, 5, 14, 21), (5, 5, 15, 22), (5, 5, 20, 23),
         (6, 2, 8, 9), (6, 2, 9, 10), (6, 2, 11, 11), (6, 2, 20, 11),
+        (6, 4, 12, 17), (6, 4, 13, 18), (6, 4, 15, 19), (6, 4, 19, 19),
+        (6, 4, 20, 20), (6, 4, 22, 21),
+        (7, 5, 14, 21), (7, 5, 17, 23), (7, 5, 19, 24), (7, 5, 23, 24),
+        (7, 5, 24, 25), (7, 5, 28, 27),
+        (8, 7, 25, 33), (8, 7, 29, 33), (8, 7, 30, 34), (8, 7, 36, 37),
+        (8, 7, 41, 38), (8, 7, 46, 40), (8, 7, 47, 41),
         (9, 2, 16, 13), (9, 2, 17, 14), (9, 2, 22, 14),
+        (9, 4, 15, 19), (9, 4, 21, 22), (9, 4, 22, 22), (12, 5, 30, 29),
     )
     for cap, k, rank, expected in joint_cases:
         graph, blue, slow, support, paths, degree = bounded_rank_certificate(cap, k, rank)
@@ -581,7 +598,8 @@ def main():
                                         clique_support=False)
         print('Joint one-round family:', cap, rank, k, len(graph), expected)
 
-    for d, k in ((5, 4), (6, 3), (6, 4), (6, 7), (7, 4), (8, 6), (12, 8)):
+    for d, k in ((5, 4), (6, 3), (6, 4), (6, 7), (7, 4), (7, 5),
+                 (8, 3), (8, 6), (8, 7), (12, 8)):
         rank = (2 * d - 1) * (k // 2) + 2 * (k % 2)
         graph, blue, slow, support, paths, degree = assemble_one_round_certificate(
             k, rank, k % 2, (d - 2,) * (k // 2)
