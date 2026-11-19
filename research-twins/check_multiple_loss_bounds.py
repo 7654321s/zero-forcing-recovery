@@ -115,20 +115,29 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
     upper = intact + (2 * intact + 1) * len(roots) + surcharge * revisits
     if intact == 1:
         upper = min(upper, one_round_cycle_rank_time(len(roots), cycle_rank))
-        sizes = []
+        groups = []
         previous_arrival = -2
         for arrival in sorted(late[z] for z in roots):
             if arrival > previous_arrival + 1:
-                sizes.append(0)
-            sizes[-1] += 1
+                groups.append([])
+            groups[-1].append(arrival)
             previous_arrival = arrival
-        group_cost = sum(max(3, 2 * (size - 1)) for size in sizes if size >= 2)
+        group_cost = sum(one_round_group_rank(group) for group in groups)
         excess = delayed - 1 - 3 * len(roots)
         if cycle_rank < 2 * excess + group_cost:
-            raise AssertionError(('rank cost of restoration groups', cycle_rank, excess, sizes))
+            raise AssertionError(('rank cost of restoration groups', cycle_rank, excess, groups))
     if revisits > cycle_rank or delayed > upper:
         raise AssertionError(('cycle rank bound', intact, delayed, cycle_rank, revisits))
     return intact, delayed, revisits
+
+
+def one_round_group_rank(arrivals):
+    size = len(arrivals)
+    if size == 1:
+        return 0
+    if size in (3, 5) and len(set(arrivals)) < size:
+        return 3 * ((size + 1) // 2)
+    return max(3, 2 * (size - 1))
 
 
 def check_branched_forest_extremizers():
@@ -227,16 +236,25 @@ def sparse_one_round_certificate(losses, cycle_rank):
     return assemble_one_round_certificate(losses, cycle_rank, cyclic_blocks, pair_targets)
 
 
-def assemble_one_round_certificate(losses, cycle_rank, cyclic_blocks, pair_targets):
+def assemble_one_round_certificate(losses, cycle_rank, cyclic_blocks, pair_targets, *,
+                                   triple_pairs=()):
     spare_cycles = cycle_rank - 2 * cyclic_blocks - sum(2 * q + 3 for q in pair_targets)
+    shared_blocks = [(2, ((0, 1),) * count) for count in pair_targets]
+    if triple_pairs:
+        spare_cycles -= 2 * len(triple_pairs) + 4
+        shared_blocks.append((3, triple_pairs))
     seed, endpoint = 0, 1
     edges, blue, deliberately_lost = [(seed, endpoint)], [seed], []
     order = 2
-    for count in pair_targets:
-        roots = (order, order + 1)
+    degree = 4
+    for size, pairs in shared_blocks:
+        roots = tuple(range(order, order + size))
         blue.extend(roots)
         deliberately_lost.extend(roots)
-        order, targets, tail = one_round_block(count + 2, roots, edges, blue, order + 2)
+        for index in range(size):
+            root_degree = 1 + (index < 2) + sum(index in pair for pair in pairs)
+            degree = max(degree, root_degree)
+        order, targets, tail = one_round_block(roots, pairs, edges, blue, order + size)
         for left, right in pairwise([endpoint, *targets]):
             edges.extend(((order, left), (order, right)))
             blue.append(order)
@@ -266,7 +284,6 @@ def assemble_one_round_certificate(losses, cycle_rank, cyclic_blocks, pair_targe
         blue.extend((x, y, z))
         anchor = y
         order += 3
-    degree = max(4, max(pair_targets, default=0) + 2)
     graph, initial, support, paths = protect_seeds(
         degree, edges, blue, order, deliberately_lost, seed, clique_support=False
     )
@@ -288,8 +305,23 @@ def subcubic_rank_certificate(losses, cycle_rank):
 
 
 def bounded_rank_certificate(degree, losses, cycle_rank):
-    if 5 <= degree <= 8 and cycle_rank >= 2 * losses:
+    if degree >= 5 and cycle_rank >= 2 * losses:
         capacity = degree - 4
+        if degree >= 9 and losses >= 3 and losses % 2:
+            pairs = losses // 2
+            remaining_rank = cycle_rank - 2 * losses - (2 * capacity + 3) * pairs
+            triple_gain = min((capacity - 3) // 2, (remaining_rank - 5) // 2)
+            if triple_gain > 0:
+                targets = capacity + triple_gain + 5
+                available = list(degree_block_pairs(degree, 3))
+                required = [(0, 1), (0, 2)]
+                for pair in required:
+                    available.remove(pair)
+                triple_pairs = required + available[:targets - len(required)]
+                return assemble_one_round_certificate(
+                    losses, cycle_rank, 0, (capacity + 2,) * (pairs - 1),
+                    triple_pairs=triple_pairs
+                )
         blocks, spare_rank = divmod(cycle_rank - 2 * losses, 2 * capacity + 3)
         gain = min(capacity * (losses // 2),
                    capacity * blocks + max(0, (spare_rank - 3) // 2))
@@ -299,12 +331,6 @@ def bounded_rank_certificate(degree, losses, cycle_rank):
             pair_targets += (partial + 2,)
         return assemble_one_round_certificate(losses, cycle_rank,
                                               losses - 2 * len(pair_targets), pair_targets)
-    if degree >= 9 and losses >= 2:
-        gain = (cycle_rank - 2 * losses - 3) // 2
-        if losses == 2:
-            gain = min(degree - 4, gain)
-        if 1 <= gain <= degree - 4:
-            return assemble_one_round_certificate(losses, cycle_rank, losses - 2, (gain + 2,))
     return assemble_one_round_certificate(losses, cycle_rank, min(losses, cycle_rank // 2), ())
 
 
@@ -329,21 +355,21 @@ def one_round_certificate(degree, losses):
     return graph, initial, mask(deliberately_lost), support, paths, len(terminal)
 
 
-def one_round_block(degree, roots, edges, blue, order):
-    targets = []
-    if len(roots) == 2:
-        pairs = [tuple(roots)] * (degree - 2)
-    elif len(roots) == 3:
+def degree_block_pairs(degree, size):
+    if size == 2:
+        return ((0, 1),) * (degree - 2)
+    if size == 3:
         count, parity = divmod(degree - 2, 2)
-        a, b, c = roots
-        pairs = [(a, b)] * count + [(a, c), (b, c)] * (count + parity)
-    else:
-        pairs = []
+        return ((0, 1),) * count + ((0, 2), (1, 2)) * (count + parity)
+    return ()
 
+
+def one_round_block(roots, pairs, edges, blue, order):
+    targets = []
     for left, right in pairs:
         source, target = order, order + 1
         order += 2
-        edges.extend(((source, left), (source, right), (source, target)))
+        edges.extend(((source, roots[left]), (source, roots[right]), (source, target)))
         blue.append(source)
         targets.append(target)
 
@@ -370,7 +396,8 @@ def sharp_one_round_certificate(degree, losses):
     edges, blue = [(seed, prefix)], [*roots, seed]
     order = prefix + 1
     for group in groups:
-        order, targets, tail = one_round_block(degree, group, edges, blue, order)
+        pairs = degree_block_pairs(degree, len(group))
+        order, targets, tail = one_round_block(group, pairs, edges, blue, order)
         for left, right in pairwise([prefix, *targets]):
             edges.extend(((order, left), (order, right)))
             blue.append(order)
@@ -588,6 +615,9 @@ def main():
         (8, 7, 41, 38), (8, 7, 46, 40), (8, 7, 47, 41),
         (9, 2, 16, 13), (9, 2, 17, 14), (9, 2, 22, 14),
         (9, 4, 15, 19), (9, 4, 21, 22), (9, 4, 22, 22), (12, 5, 30, 29),
+        (9, 3, 23, 18), (9, 3, 24, 18), (9, 3, 25, 18), (9, 3, 26, 19),
+        (11, 5, 48, 35), (11, 5, 49, 35), (11, 5, 51, 36), (11, 5, 53, 37),
+        (12, 4, 31, 25), (12, 4, 32, 26), (12, 4, 45, 32), (12, 4, 46, 33),
     )
     for cap, k, rank, expected in joint_cases:
         graph, blue, slow, support, paths, degree = bounded_rank_certificate(cap, k, rank)
@@ -596,7 +626,7 @@ def main():
         check_ranked_one_round_example(graph, blue, slow, rank, expected)
         sampled += check_robust_samples(graph, blue, slow, support, paths, degree, 1, k,
                                         clique_support=False)
-        print('Joint one-round family:', cap, rank, k, len(graph), expected)
+        print('Joint one-round witness:', cap, rank, k, len(graph), expected)
 
     for d, k in ((5, 4), (6, 3), (6, 4), (6, 7), (7, 4), (7, 5),
                  (8, 3), (8, 6), (8, 7), (12, 8)):
