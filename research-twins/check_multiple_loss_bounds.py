@@ -160,8 +160,9 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
             penalty = min(2 if intact == 3 else intact, 2 * excess_rank)
             if intact >= 4 and cycle_rank > 3 * len(roots):
                 depth_two_penalty = 2 * excess_rank + 2 * (cycle_rank - 3 * len(roots))
-                depth_two_penalty += int(cycle_rank > 6 * len(roots))
-                penalty = min(intact, depth_two_penalty)
+                beyond_depth_two = max(0, cycle_rank - 6 * len(roots))
+                depth_three_penalty = 2 * beyond_depth_two - min(len(roots), beyond_depth_two)
+                penalty = min(intact, depth_two_penalty + depth_three_penalty)
             upper = min(upper, linear_bound - penalty)
             if delayed == linear_bound:
                 root_size = 2 * intact + 1
@@ -1107,6 +1108,8 @@ def main():
     for t, k, rank, expected, gain in ((5, 1, 7, 44, 1), (5, 1, 12, 49, 1),
                                        (10, 2, 14, 248, 2), (10, 2, 24, 358, 2),
                                        (21, 1, 7, 316, 1), (37, 2, 13, 1073, 1),
+                                       (27, 1, 8, 463, 1), (42, 2, 14, 1304, 2),
+                                       (51, 1, 12, 1291, 1),
                                        (12, 3, 27, 555, 3), (7, 1, 44, 157, 2),
                                        (8, 1, 44, 248, 3)):
         baseline, baseline_blue, baseline_loss, _, _, _ = subcubic_recursive_rank_certificate(
