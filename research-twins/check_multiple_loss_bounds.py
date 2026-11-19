@@ -131,8 +131,11 @@ def check_cycle_rank_trace(graph, blue, lost, cycle_rank):
             upper = min(upper, (cycle_rank + 19) // 2)
         elif len(roots) >= 2:
             upper = min(upper, 2 + (3 * cycle_rank + 13 * len(roots)) // 2)
-        if cycle_rank == 1 and all(row.bit_count() <= 3 for row in graph):
-            upper = min(upper, 3 + 5 * len(roots))
+        if all(row.bit_count() <= 3 for row in graph):
+            if len(roots) == 1:
+                upper = min(upper, 8 if cycle_rank <= 3 else 9)
+            elif 1 <= cycle_rank <= 2:
+                upper = min(upper, 2 + 5 * len(roots) + cycle_rank)
     if intact >= 3:
         upper = min(upper, intact + (2 * intact + 3) * len(roots) + (2 * intact - 3) * cycle_rank)
     if revisits > cycle_rank or delayed > upper:
@@ -204,7 +207,8 @@ def check_small_subcubic_one_round():
     return checked
 
 
-def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique_support=True):
+def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique_support=True,
+                  neutral_rank=0):
     """Add private blue paths and a connected minimum killing support."""
     losses = len(deliberately_lost)
     support = range(order, order + losses + 1)
@@ -231,6 +235,10 @@ def protect_seeds(degree, edges, blue, order, deliberately_lost, seed, *, clique
             blue.extend(path)
             paths.append(tuple(path))
             order = path.stop
+    if neutral_rank:
+        start = order
+        order = append_subcubic_blue_cycles(edges, paths[0][-1], order, neutral_rank, losses)
+        blue.extend(range(start, order))
     return adjacency(order, edges), mask([*blue, *support]), mask(support), paths
 
 
@@ -489,17 +497,20 @@ def assemble_one_round_certificate(losses, cycle_rank, cyclic_blocks, pair_targe
     return graph, initial, mask(deliberately_lost), support, paths, degree
 
 
-def subcubic_rank_certificate(losses, cycle_rank):
-    path, blue, lost, support = path_certificate(1, losses)
-    edges = list(pairwise(range(len(path))))
-    anchor = len(path) - 2
-    order = len(path)
-    for _ in range(cycle_rank):
+def append_subcubic_blue_cycles(edges, anchor, order, count, losses):
+    for _ in range(count):
         cycle = range(order, order + 2 * losses + 4)
         edges.append((anchor, cycle.start))
         edges.extend(pairwise([*cycle, cycle.start]))
         anchor = cycle[-1]
         order = cycle.stop
+    return order
+
+
+def subcubic_rank_certificate(losses, cycle_rank):
+    path, blue, lost, support = path_certificate(1, losses)
+    edges = list(pairwise(range(len(path))))
+    order = append_subcubic_blue_cycles(edges, len(path) - 2, len(path), cycle_rank, losses)
     return adjacency(order, edges), blue | mask(range(len(path), order)), lost, support
 
 
@@ -669,7 +680,8 @@ def subcubic_low_rank_certificate(losses, cycle_rank):
         additions.extend(waves)
         endpoint = right[1]
     graph, initial, support, paths = protect_seeds(
-        3, edges, blue, order, lost, seed, clique_support=False
+        3, edges, blue, order, lost, seed, clique_support=False,
+        neutral_rank=max(0, cycle_rank - losses)
     )
     return graph, initial, mask(lost), support, paths, additions
 
@@ -879,18 +891,34 @@ def main():
     if observed_extremizers != rank_extremizers:
         raise AssertionError(('two-round rank extrema', observed_extremizers, rank_extremizers))
 
-    for k, rank in ((1, 1), (2, 1), (2, 2), (3, 1), (5, 1), (5, 3), (7, 7)):
+    for k, rank in ((1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (3, 1), (3, 2),
+                    (5, 1), (5, 3), (7, 7)):
         graph, blue, slow, support, paths, waves = subcubic_low_rank_certificate(k, rank)
         sampled += check_robust_samples(graph, blue, slow, support, paths, 3, 2, k,
                                         clique_support=False)
         intact, delayed, _ = check_cycle_rank_trace(graph, blue, slow, rank)
         actual_rank = sum(row.bit_count() for row in graph) // 2 - len(graph) + 1
-        if (intact, delayed, actual_rank) != (2, 2 + 5 * k + rank, rank):
+        if (intact, delayed, actual_rank) != (2, 2 + 5 * k + min(rank, k), rank):
             raise AssertionError(('subcubic low-rank recovery', k, rank, intact, delayed, actual_rank))
         check_arrival_waves(graph, blue ^ slow, waves)
         if k <= 2:
             exhaustive += check_all_losses(graph, blue, k)
         print('Subcubic low-rank recovery:', k, rank, len(graph), delayed)
+
+    for rank in (4, 5, 12):
+        edges, blue, start, support = SINGLE['subcubic_nine_round_certificate']()
+        order = append_subcubic_blue_cycles(edges, 13, start, rank - 4, 1)
+        graph = adjacency(order, edges)
+        blue |= mask(range(start, order))
+        check_connected(graph, 3)
+        intact, delayed, _ = check_cycle_rank_trace(graph, blue, 1, rank)
+        actual_rank = len(edges) - order + 1
+        if (intact, delayed, actual_rank) != (2, 9, rank):
+            raise AssertionError(('subcubic nine-round rank', rank, intact, delayed, actual_rank))
+        if completion_time(graph, blue ^ support) <= order:
+            raise AssertionError(('subcubic nine-round killing support', rank))
+        exhaustive += check_all_losses(graph, blue, 1)
+        print('Subcubic nine-round recovery:', rank, order, delayed)
 
     for t in (1, 2, 4, 7):
         for k in (1, 2, 3, 4, 6):

@@ -87,7 +87,7 @@ def completion_time(neighbors, rules, white, minimum):
     return elapsed
 
 
-def enumerate_features(neighbors, rules, remaining, white, minimum):
+def enumerate_features(neighbors, rules, remaining, white, minimum, rank_budget):
     free = [v for v, capacity in enumerate(remaining) if capacity]
     free_white = [v for v in free if white & (1 << v)]
     features = {v: [] for v in free}
@@ -104,7 +104,7 @@ def enumerate_features(neighbors, rules, remaining, white, minimum):
                        for v, row in enumerate(neighbors))
     configurations = finishing = longest = 0
 
-    def visit(index, first, possible_start):
+    def visit(index, first, possible_start, budget):
         nonlocal configurations, finishing, longest
         if index == len(free):
             if possible_start:
@@ -117,12 +117,13 @@ def enumerate_features(neighbors, rules, remaining, white, minimum):
 
         # Every feature is picked at its least end with a growing index.
         # This also avoids repeated blue rules with the same neighbor set.
-        visit(index + 1, 0, possible_start)
+        visit(index + 1, 0, possible_start, budget)
         vertex = free[index]
         if not remaining[vertex]:
             return
         for choice, (direct, ends, mask) in enumerate(features[vertex][first:], first):
-            if any(remaining[v] == 0 for v in ends):
+            cost = 1 if direct else len(ends) - 1
+            if cost > budget or any(remaining[v] == 0 for v in ends):
                 continue
             for end in ends:
                 remaining[end] -= 1
@@ -130,7 +131,8 @@ def enumerate_features(neighbors, rules, remaining, white, minimum):
                 toggle_edge(neighbors, *ends)
             else:
                 rules.append(mask)
-            visit(index, choice + 1, possible_start or (mask & white).bit_count() == 1)
+            visit(index, choice + 1, possible_start or (mask & white).bit_count() == 1,
+                  budget - cost)
             if direct:
                 toggle_edge(neighbors, *ends)
             else:
@@ -138,37 +140,39 @@ def enumerate_features(neighbors, rules, remaining, white, minimum):
             for end in ends:
                 remaining[end] += 1
 
-    visit(0, 0, fixed_start)
+    visit(0, 0, fixed_start, rank_budget)
     return configurations, finishing, longest
 
 
-def enumerate_residuals(white_count, minimum):
+def enumerate_residuals(white_count, minimum, rank_budget=float('inf')):
     skeletons = configurations = finishing = longest = 0
     for neighbors, rules, outside_sources, remaining, white, old in templates(white_count):
         skeletons += 1
 
-        def extend_sources(index):
+        def extend_sources(index, budget):
             nonlocal configurations, finishing, longest
             if index == len(outside_sources):
                 count, success, elapsed = enumerate_features(
-                    neighbors, rules, remaining, white, minimum
+                    neighbors, rules, remaining, white, minimum, budget
                 )
                 configurations += count
                 finishing += success
                 longest = max(longest, elapsed)
                 return
-            extend_sources(index + 1)
+            extend_sources(index + 1, budget)
+            if budget == 0:
+                return
             rule_index, parent = outside_sources[index]
             for other in range(old):
                 bit = 1 << other
                 if other != parent and white & bit and remaining[other]:
                     remaining[other] -= 1
                     rules[rule_index] ^= bit
-                    extend_sources(index + 1)
+                    extend_sources(index + 1, budget - 1)
                     rules[rule_index] ^= bit
                     remaining[other] += 1
 
-        extend_sources(0)
+        extend_sources(0, rank_budget)
     return skeletons, configurations, finishing, longest
 
 
@@ -183,3 +187,11 @@ if __name__ == '__main__':
         if observed != expected:
             raise AssertionError((whites, minimum, observed, expected))
         print(f'{whites} whites, at least {minimum} additional rounds: {observed}', flush=True)
+
+    for rank, expected in ((2, (57, 427029, 0, 0)),
+                           (3, (57, 1545781, 0, 0)),
+                           (4, (57, 2907237, 1168, 7))):
+        observed = enumerate_residuals(8, 7, rank)
+        if observed != expected:
+            raise AssertionError((rank, observed, expected))
+        print(f'Eight whites, rank at most {rank}: {observed}', flush=True)

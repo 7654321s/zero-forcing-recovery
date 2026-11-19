@@ -227,11 +227,16 @@ def subcubic_two_round_block():
     return edges, [0, 8, 9, 10, 11], 12, 5, 6
 
 
-def check_nine_round_example():
+def subcubic_nine_round_certificate():
     block, seeds, size, entry, _ = subcubic_two_round_block()
     edges = [*block, (entry, size), (12, 13), (13, 14), (14, 15), (14, 16)]
-    adj = adjacency(17, edges)
     blue = mask([*seeds, 13, 15, 16])
+    return edges, blue, 17, mask([15, 16])
+
+
+def check_nine_round_example():
+    edges, blue, size, support = subcubic_nine_round_certificate()
+    adj = adjacency(size, edges)
     intact, full_arrivals = trace(adj, blue)
     delayed, delayed_arrivals = trace(adj, blue ^ 1)
     degree = max(row.bit_count() for row in adj)
@@ -244,7 +249,7 @@ def check_nine_round_example():
               for round_number in range(1, delayed + 1)]
     if actual != expected:
         raise AssertionError(actual)
-    MODEL['certify'](adj, blue, mask([15, 16]), 1, 2, 9)
+    MODEL['certify'](adj, blue, support, 1, 2, 9)
 
 
 def check_low_degree_examples():

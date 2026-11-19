@@ -133,6 +133,24 @@ Thus nine rounds require exactly eight remaining whites at time two. Rounds thre
 
 A connected 17-vertex graph in the [example replay](check_single_loss_bounds.py) attains the global bound. The initial blue set is $\{0,8,9,10,11,13,15,16\}$. Its intact time is two and its minimum killing support $\{15,16\}$ has restricted time two. The two support vertices are leaves at vertex $14$. Either leaf forces $14$ in round one, and $14$ restores a missing leaf in round two. With both leaves white, $14$ cannot force either of them. Without initial blue vertex $0$, the successive additions are $\{14\},\{12\},\{5\},\{7\},\{4\},\{1\},\{0,2\},\{3\},\{6\}$. The replay checks that every singleton loss recovers and the two-vertex support loss stalls.
 
+### Cycle rank at degree three
+
+For a connected graph of maximum degree at most three, with intact time at most two and one lost seed, the largest finite recovery time at cycle rank $\beta$ is
+$$
+\begin{cases}
+7,&\beta=0,\\
+8,&1\leq\beta\leq3,\\
+9,&\beta\geq4.
+\end{cases}
+$$
+At rank zero the [forest bound](MULTIPLE_LOSS_TIMING.md#sharp-bound-for-forests-and-an-extension-by-cycle-rank) is sharp. At positive rank, any nine-round subcubic example has eight remaining whites after round two, by the finite reduction above. For those templates, the prescribed edges form a tree on the old and new vertices and the prescribed outside sources. Each prescribed new target is attached to its old parent either by one edge or by two edges through a fresh outside source. Likewise the old vertices attach to the lost seed either directly or through distinct retained sources. The tree still includes any old vertices restored in delayed round two.
+
+An extra internal edge and an extra old neighbor of a prescribed outside source each add one unit of cycle rank. An optional outside source with $s$ recorded neighbors adds one vertex and $s$ edges, costing $s-1$ units. An omitted restoring source for a vertex restored in round two needs no charge, since it was adjacent to just one of the residual vertices at time one. All of these template edges survive in a subgraph of the original graph after irrelevant edges and vertices are dropped, so the sum of charged units cannot exceed the original rank.
+
+The [rank-filtered enumeration](check_saturated_subcubic.py) checks the same eight-white templates with these charges. With rank budget two it evaluates 427,029 residuals, and with budget three it evaluates 1,545,781. None finishes in seven further rounds. With budget four the 1,168 seven-round residuals from the unrestricted check all appear. Thus nine rounds require rank at least four.
+
+The [rank-one construction](MULTIPLE_LOSS_TIMING.md#cycle-rank-one-at-degree-three) attains eight rounds. The 17-vertex nine-round witness above has rank four. Both can be raised to any larger prescribed rank by adding all-blue cycles linked by bridges. Attach the cycles to the far endpoint of a private blue path in the rank-one example, or to prefix seed $13$ in the nine-round example. In each added cycle the two attachment ports are adjacent and the other route has at least four interior vertices. Any singleton loss preserves a consecutive blue pair among these interior vertices, so the cycle repairs independently. The added cycles preserve the designated recovery times, the degree cap and the original minimum killing support.
+
 ## Quadratic growth with the maximum degree
 
 Let $M_d$ be the largest finite recovery time after one initial blue vertex is lost, over graphs of maximum degree at most $d$ whose intact coloring takes at most two rounds. Put $F=\lfloor d^2/2\rfloor$. Then
