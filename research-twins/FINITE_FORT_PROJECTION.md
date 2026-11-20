@@ -329,13 +329,7 @@ For eight through eleven blocks, an empty adjacent appended stage pair allows co
 
 For 12 through 30 blocks the projected-support exclusions give an empty adjacent appended pair at cost at most 28. The first 30 appended stages give such a pair at every larger length by the band checks at 31 and 32 blocks. Repeated contraction and the same containment argument give completeness at every length. All patterns are verified by guarded closure and smaller-loss exclusion through 21 blocks. They occupy cyclic arcs of at most four stages, so the radius-eight neighborhood of each end-anchored pattern repeats at all longer lengths.
 
-For every $k\geq5$ and $m\geq34$, cyclic forts of cost at most 28 unroll. Width 28 suffices at five through 24 blocks and at 26 blocks since $24m>28\cdot28$. Width 25 suffices at 25 and 27 through 30 blocks since $21m>25\cdot28$. The 30-stage band contracts all larger lengths to 30 blocks with the same occupied sheets and cost. The following smaller periods suffice by the width-28 bounds and direct wrapped checks.
-
-| Blocks | Verified from this many sheets |
-| --- | ---: |
-| 5–8 | 28 |
-| 9–10 | 29 |
-| 11–24 and 26 | 33 |
+For every $k\geq5$ and $m\geq33$, cyclic forts of cost at most 28 unroll. Width 28 suffices at five through 24 blocks and at 26 blocks since $24m>28\cdot28$. At 25 and 27 through 30 blocks width 25 suffices for $m\geq34$ since $21m>25\cdot28$. The direct wrapped checks exclude cost 28 at those five lengths at $m=33$, using width 26 at 25 and 29 blocks. The 30-stage band contracts all larger lengths to 30 blocks with the same occupied sheets and cost. At five through ten blocks the direct tests also exclude wrapping at cost 28 for all periods from 28 through 32.
 
 All smaller costs already unroll in these ranges. Every finite pattern projects with a unique outer gap and can be recovered from that gap. Thus there are $741m$ distinct minimal 28-seed losses, and the degree-28 coefficient of the blocking probability is $(741-399)m=342m$.
 
@@ -364,7 +358,7 @@ $$
 
 For the finitely many chain lengths in the table, this holds from their listed periods with error $O(mp^{28})$. For all $k\geq4$ and $m\geq37$ the uniform error also improves to $O(mp^{28}+kmp^{30})$, by the ordinary interior threshold below. In particular, if $p\to0$, $m\to\infty$, $mp^{24}\to\lambda<\infty$ and $kp^6\to0$, the blocking probability tends to $1-e^{-5\lambda}$. If $mp^{24}\to\infty$, the probability tends to one for any sequence of chain lengths $k\geq4$. For the latter claim, take disjoint consecutive nine-sheet intervals and place one minimum blocking pattern in each. The $\lfloor m/9\rfloor$ occurrences use disjoint seed sites and each has probability $p^{24}$.
 
-For $k\geq5$ and $m\geq34$, the size-28 catalogue gives the uniform refinement
+For $k\geq5$ and $m\geq33$, the size-28 catalogue gives the uniform refinement
 
 $$
 \Pr(\text{blocking})=1-\exp\bigl(-m(A_k(p)+138p^{27}+342p^{28})\bigr)+O(kmp^{29}).
@@ -510,7 +504,7 @@ $$
 \qquad (a)_d=a(a-1)\cdots(a-d+1).
 $$
 
-To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities for every $\ell\leq27$ when $m\geq30$, as well as for $\ell=28$ at every length of at least five blocks when $m\geq34$ or in the verified smaller cyclic ranges. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
+To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities for every $\ell\leq27$ when $m\geq30$, as well as for $\ell=28$ at every length of at least five blocks when $m\geq33$ or in the verified smaller cyclic ranges. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
 
 The joint component law also extends to a uniform loss of size $\ell$. Set $p=\ell/N$ and let $\Lambda=mp^{24}+kmp^{30}$. For $k\geq4$, $m\geq38$ and $\ell\geq1$, the total variation error is
 
@@ -683,13 +677,20 @@ for blocks in 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
 do
     python -B research-twins/check_cost_25_blocking_sets.py --size-28 "$blocks" || exit 1
 done
-for sheets in 28 29 30 31 32
+for blocks in 5 6 7 8 9 10
 do
-    python -B research-twins/check_short_prism_covers.py --wrapped 5 "$sheets" 28 28 --wrapped 6 "$sheets" 28 28 --wrapped 7 "$sheets" 28 28 --wrapped 8 "$sheets" 28 28 || exit 1
+    for sheets in 28 29 30 31 32
+    do
+        python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" "$sheets" 28 28 || exit 1
+    done
 done
-for sheets in 29 30 31 32
+for blocks in 25 29
 do
-    python -B research-twins/check_short_prism_covers.py --wrapped 9 "$sheets" 28 28 --wrapped 10 "$sheets" 28 28 || exit 1
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 33 28 26 || exit 1
+done
+for blocks in 27 28 30
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 33 28 25 || exit 1
 done
 for blocks in 4 5 6 7 8 9 10 11 12 13 14
 do
