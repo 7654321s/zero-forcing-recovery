@@ -13,6 +13,13 @@ from pysat.solvers import Solver
 COVER = runpy.run_path(str(Path(__file__).with_name('check_cyclic_cover_saturation.py')))
 mask, members = COVER['mask'], COVER['members']
 BAND = runpy.run_path(str(Path(__file__).with_name('check_block_stabilization.py')))
+ORDINARY_BLOCKER = (
+    (3, (5,)), (4, (1,)), (5, (2, 3)), (12, (4,)),
+    (13, (5,)), (16, (5,)), (17, (3, 6)), (19, (6,)),
+    (20, (4, 5)), (21, (3,)), (30, (5, 8)), (31, (5, 9)),
+    (33, (6, 9)), (34, (5, 9)), (35, (7,)), (36, (7, 8)),
+    (37, (6, 7, 9)), (45, (10,)), (46, (11,)), (47, (10,)),
+)
 FRONTIERS = {
     2: (4, (22, 18, 16)),
     3: (5, (27, 23, 22, 21)),
@@ -328,13 +335,63 @@ def check_additional_blocker():
     print('Checked an inclusion-minimal 25-seed loss at lengths four through twenty', flush=True)
 
 
+def check_ordinary_stage_blocker():
+    projection = runpy.run_path(str(Path(__file__).with_name('check_finite_fort_projection.py')))
+    stage_start = BAND['stage_start']
+    base, *_ = BAND['chain'](8)
+    lift = projection['neighborhoods'](
+        len(base), ((u, v, -1 if (u, v) == (0, 1) else 1)
+                    for u, neighbors in enumerate(base) for v in members(neighbors) if u < v))
+    for width in (1, 2):
+        allowed = set(range(stage_start(2), stage_start(2 + width)))
+        if projection['maximal_projection'](lift, allowed):
+            raise AssertionError(('Unexpected finite support in ordinary stages', width))
+
+    # The width-19 bands bound a cost-29 fort to at most 37 interior sheets.
+    strip = runpy.run_path(str(Path(__file__).with_name('check_finite_fort_strip.py')))
+    sheets, budget = 39, 29
+    graph, blue, *_ = COVER['signed_prism_cover'](8, sheets)
+    clauses, seeds, top = strip['strip_formula'](graph, blue, budget, sheets=sheets,
+                                                quotient_bounds=False, require_minimal=False)
+    lower, upper = stage_start(2) * sheets, stage_start(5) * sheets
+    clauses.extend([-(v + 1)] for v in range(len(graph)) if not lower <= v < upper)
+    active_seeds = [seed for seed in seeds if lower <= seed - 1 < upper]
+    with ITotalizer(lits=active_seeds, ubound=budget, top_id=top) as counter:
+        with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
+            if solver.solve(assumptions=[-counter.rhs[budget]]):
+                raise AssertionError('A cheaper fort fits in three ordinary stages')
+
+    expected = ((10, 5), (11, 8), (12, 5), (13, 3), (14, 3), (15, 5), (16, 1))
+    for blocks, sheets, first in ((21, 28, 9), (24, 31, 11), (30, 29, 13)):
+        graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
+        start, stop = stage_start(first), stage_start(first + 3)
+        lost = mask((start + v) * sheets + sheet + 7
+                    for v, times in ORDINARY_BLOCKER for sheet in times)
+        if lost & blue != lost or lost.bit_count() != 30:
+            raise AssertionError(('Unexpected ordinary loss coordinates', blocks, sheets))
+        arrival = COVER['MODEL']['trace'](graph, blue & ~lost)[1]
+        fort = mask(v for v, time in enumerate(arrival) if time is None)
+        if fort & blue != lost or fort.bit_count() != 73 or any(
+                not start <= v // sheets < stop or v % sheets in (0, sheets - 1) for v in members(fort)):
+            raise AssertionError(('Unexpected ordinary residual fort', blocks, sheets))
+        if restoration_profile(graph, blue, lost) != expected:
+            raise AssertionError(('Unexpected ordinary restoration times', blocks, sheets))
+    print('Minimum cost in three ordinary stages is 30, with a 73-vertex residual fort', flush=True)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--longer', type=int, nargs='+', choices=(*range(4, 18), 26), default=(),
                         help='also replay the exclusions at spans ten through thirty-two')
     parser.add_argument('--restoration-times', action='store_true',
                         help='check the completion times after restoring one lost seed')
+    parser.add_argument('--ordinary-stage-blocker', action='store_true',
+                        help='check the finite blocker confined to three ordinary stages')
     args = parser.parse_args()
+    if args.ordinary_stage_blocker:
+        check_ordinary_stage_blocker()
+        if not args.longer and not args.restoration_times:
+            raise SystemExit(0)
     check_minimum_spans()
     check_seed_frontiers()
     check_shortest_minimum_cost_forts(restoration_times=args.restoration_times)

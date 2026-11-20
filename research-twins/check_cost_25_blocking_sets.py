@@ -27,7 +27,7 @@ EXPECTED_SIZE_26_SPANS = {
 }
 
 
-EXPECTED_SIZE_27_SPANS = dict.fromkeys((5, 6, 7), {7: 5, 8: 64, 9: 109, 10: 66, 11: 14})
+EXPECTED_SIZE_27_SPANS = dict.fromkeys(range(5, 11), {7: 5, 8: 64, 9: 109, 10: 66, 11: 14})
 
 
 def minimum_seed_sets(blocks):
@@ -63,12 +63,24 @@ def block_translations(pattern, sheets):
 
 def verify_inherited_patterns(blocks, smaller, templates, *, budget=25):
     stage_start = SPAN['BAND']['stage_start']
+    terminal = stage_start(3)
+    shift = stage_start(blocks - 2) - terminal
+    smaller = tuple(smaller)
+    covers = {}
     patterns = set()
     for template in templates:
-        shift = stage_start(blocks - 2) - stage_start(3) if template[0][0] >= stage_start(3) else 0
-        pattern = tuple((v + shift, s) for v, s in template)
+        pattern = tuple((v + shift if v >= terminal else v, s) for v, s in template)
         sheets = max(s for _, s in pattern) + 10
-        graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
+        if budget == 27:
+            sheets = max(sheets, 31)
+        if sheets not in covers:
+            graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
+            smaller_translates = tuple(
+                mask(v * sheets + (s + delta) % sheets for v, s in smaller_pattern)
+                for smaller_pattern in smaller for delta in range(sheets)
+            )
+            covers[sheets] = (graph, blue, smaller_translates)
+        graph, blue, smaller_translates = covers[sheets]
         lost = mask(v * sheets + s + 4 for v, s in pattern)
         if lost & blue != lost or lost.bit_count() != budget:
             raise AssertionError(('Unexpected inherited seeds', blocks, pattern))
@@ -77,11 +89,8 @@ def verify_inherited_patterns(blocks, smaller, templates, *, budget=25):
         if COVER['fort_cost'](graph, blue, fort) != budget or any(
                 v % sheets in (0, sheets - 1) for v in members(fort)):
             raise AssertionError(('Inherited loss has no finite fort', blocks, pattern))
-        for smaller_pattern in smaller:
-            for delta in range(sheets):
-                projection = mask(v * sheets + (s + delta) % sheets for v, s in smaller_pattern)
-                if projection & lost == projection:
-                    raise AssertionError(('Inherited loss contains a minimum set', blocks, pattern))
+        if any(projection & lost == projection for projection in smaller_translates):
+            raise AssertionError(('Inherited loss contains a smaller pattern', blocks, pattern))
         patterns.add(pattern)
     return patterns
 
@@ -135,10 +144,11 @@ def check_overlap(minimum):
         raise AssertionError('Unexpected overlap of minimum blocking sets')
 
 
-def known_union_coefficients(blocks, minimum, near_minimum, size_26=None):
+def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_27=None):
     """Count unions through one degree above the supplied minimal losses."""
-    budget = 26 if size_26 is None else 27
-    events = {frozenset(pattern) for pattern in (*minimum, *near_minimum, *(size_26 or ()))}
+    budget = 26 + (size_26 is not None) + (size_27 is not None)
+    losses = (*minimum, *near_minimum, *(size_26 or ()), *(size_27 or ()))
+    events = {frozenset(pattern) for pattern in losses}
     unions = set(events)
     pending = list(events)
     while pending:
@@ -175,6 +185,12 @@ def known_union_coefficients(blocks, minimum, near_minimum, size_26=None):
     if size_26 is not None:
         expected[26] += len(size_26)
         expected[27] = -127 if blocks == 4 else -120
+    if size_27 is not None:
+        expected[27] += len(size_27)
+        expected[28] = -399
+        profile = Counter(weight for union, weight in weights.items() if len(union) == 28)
+        if profile != {-2: 3, -1: 443, 0: 35, 1: 50}:
+            raise AssertionError(('Unexpected order-28 weight distribution', blocks, profile))
     if coefficients != expected:
         raise AssertionError(('Unexpected union coefficients', blocks, coefficients))
     return dict(sorted(coefficients.items()))
@@ -191,6 +207,10 @@ def check_size_26(blocks, *, size_27=False):
         raise AssertionError(('Unexpected base size-26 seed catalogue', base))
     if base == 5:
         check_template_stages(patterns, {(0, 1, 2): 88, (3, 4): 9})
+    templates_27 = None
+    if size_27:
+        templates_27 = enumerate_blockers(base, (*minimum, *sorted(near), *sorted(patterns)), budget=27)
+        check_template_stages(templates_27, {(0, 1, 2): 251, (3, 4): 5, (0, 3, 4): 2})
     if blocks > base:
         minimum = minimum_seed_sets(blocks)
         near = verify_inherited_patterns(blocks, minimum, near)
@@ -200,15 +220,22 @@ def check_size_26(blocks, *, size_27=False):
     spans = Counter(max(s for _, s in p) for p in patterns)
     if spans != EXPECTED_SIZE_26_SPANS[blocks]:
         raise AssertionError(('Unexpected size-26 seed catalogue', blocks, spans))
-    coefficients = known_union_coefficients(blocks, minimum, near, patterns)
     size = 26
     if size_27:
         size = 27
-        patterns = enumerate_blockers(blocks, (*minimum, *sorted(near), *sorted(patterns)), budget=size)
-        spans = Counter(max(s for _, s in p) for p in patterns)
+        all_26 = (*minimum, *sorted(near), *sorted(patterns))
+        if blocks > base:
+            inherited = verify_inherited_patterns(blocks, all_26, templates_27, budget=size)
+            exact_27 = enumerate_blockers(blocks, all_26, inherited, budget=size)
+        else:
+            exact_27 = templates_27
+        spans = Counter(max(s for _, s in p) for p in exact_27)
         if spans != EXPECTED_SIZE_27_SPANS[blocks]:
             raise AssertionError(('Unexpected size-27 seed catalogue', blocks, spans))
-        coefficients[27] += len(patterns)
+        coefficients = known_union_coefficients(blocks, minimum, near, patterns, exact_27)
+        patterns = exact_27
+    else:
+        coefficients = known_union_coefficients(blocks, minimum, near, patterns)
     print(json.dumps({'blocks': blocks, 'size': size, 'count': len(patterns),
                       'spans': dict(sorted(spans.items())), 'losses': sorted(patterns),
                       'known_union_coefficients': coefficients}),
@@ -223,7 +250,7 @@ def main():
     mode.add_argument('--size-26', choices=EXPECTED_SIZE_26_SPANS, type=int, metavar='BLOCKS',
                       help='enumerate size-26 losses through 14 blocks and verify inherited patterns through 20')
     mode.add_argument('--size-27', choices=EXPECTED_SIZE_27_SPANS, type=int, metavar='BLOCKS',
-                      help='enumerate size-27 losses at five through seven blocks')
+                      help='enumerate size-27 losses at five through ten blocks')
     args = parser.parse_args()
     if args.size_26 is not None:
         check_size_26(args.size_26)
