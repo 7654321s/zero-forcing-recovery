@@ -20,6 +20,12 @@ ORDINARY_BLOCKER = (
     (33, (6, 9)), (34, (5, 9)), (35, (7,)), (36, (7, 8)),
     (37, (6, 7, 9)), (45, (10,)), (46, (11,)), (47, (10,)),
 )
+ORDINARY_PACKING_LOSS = (
+    (3, (5,)), (4, (1,)), (5, (2, 3)), (12, (4,)), (13, (5,)), (15, (6,)),
+    (16, (5,)), (17, (3, 5, 6)), (18, (6,)), (21, (3, 4, 6)), (28, (5,)),
+    (30, (5, 8)), (31, (5, 8)), (33, (7, 8)), (34, (8,)), (35, (7,)),
+    (36, (7,)), (37, (7, 8)), (45, (9,)), (46, (9, 10)),
+)
 FRONTIERS = {
     2: (4, (22, 18, 16)),
     3: (5, (27, 23, 22, 21)),
@@ -379,6 +385,34 @@ def check_ordinary_stage_blocker():
     print('Minimum cost in three ordinary stages is 30, with a 73-vertex residual fort', flush=True)
 
 
+def check_ordinary_packing():
+    sites = [(label, sheet) for label, group in ORDINARY_PACKING_LOSS for sheet in group]
+    residues = {((label // 16) % 2, label % 16, (sheet - 3 * (label // 32)) % 4)
+                for label, sheet in sites}
+    if len(sites) != 30 or len(residues) != 30:
+        raise AssertionError('Two ordinary loss sites have the same lattice residue')
+    stages = {label // 16 for label, _ in sites}
+    span = min(s for _, s in sites), max(s for _, s in sites)
+    if stages != {0, 1, 2} or span != (1, 10):
+        raise AssertionError('Unexpected support of the packing loss')
+
+    blocks, sheets, first = 24, 31, 10
+    graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
+    start, stop = BAND['stage_start'](first), BAND['stage_start'](first + 3)
+    lost = mask((start + label) * sheets + sheet + 7 for label, sheet in sites)
+    if lost & blue != lost:
+        raise AssertionError('Packing loss includes a nonseed')
+    arrivals = COVER['MODEL']['trace'](graph, blue & ~lost)[1]
+    fort = mask(v for v, time in enumerate(arrivals) if time is None)
+    if fort & blue != lost or any(
+            not start <= v // sheets < stop or v % sheets in (0, sheets - 1) for v in members(fort)):
+        raise AssertionError('Packing loss has no guarded ordinary fort')
+    if sum(count for _, count in restoration_profile(graph, blue, lost)) != 30:
+        raise AssertionError('Packing loss failed a one-seed restoration')
+    print('Thirty distinct lattice residues give one ordinary blocker per eight cells',
+          flush=True)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--longer', type=int, nargs='+', choices=(*range(4, 18), 26), default=(),
@@ -387,11 +421,15 @@ if __name__ == '__main__':
                         help='check the completion times after restoring one lost seed')
     parser.add_argument('--ordinary-stage-blocker', action='store_true',
                         help='check the finite blocker confined to three ordinary stages')
+    parser.add_argument('--ordinary-packing', action='store_true',
+                        help='check a lattice packing of disjoint ordinary size-30 blockers')
     args = parser.parse_args()
+    if args.ordinary_packing:
+        check_ordinary_packing()
     if args.ordinary_stage_blocker:
         check_ordinary_stage_blocker()
-        if not args.longer and not args.restoration_times:
-            raise SystemExit(0)
+    if (args.ordinary_stage_blocker or args.ordinary_packing) and not args.longer and not args.restoration_times:
+        raise SystemExit(0)
     check_minimum_spans()
     check_seed_frontiers()
     check_shortest_minimum_cost_forts(restoration_times=args.restoration_times)

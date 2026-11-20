@@ -424,7 +424,7 @@ $$
 \Pr(\text{blocking})=1-\exp\bigl(-m(A_k(p)+c_kp^{27})\bigr)+O(kmp^{28}).
 $$
 
-For the finitely many chain lengths in the table, this holds from their listed periods with error $O(mp^{28})$. For all $k\geq4$ and $m\geq34$ the uniform error also improves to $O(mp^{28}+kmp^{30})$, by the ordinary interior threshold below. In particular, if $p\to0$, $m\to\infty$, $mp^{24}\to\lambda<\infty$ and $kp^6\to0$, the blocking probability tends to $1-e^{-5\lambda}$. If $mp^{24}\to\infty$, the probability tends to one for any sequence of chain lengths $k\geq4$. For the latter claim, take disjoint consecutive nine-sheet intervals and place one minimum blocking pattern in each. The $\lfloor m/9\rfloor$ occurrences use disjoint seed sites and each has probability $p^{24}$.
+For the finitely many chain lengths in the table, this holds from their listed periods with error $O(mp^{28})$. For all $k\geq4$ and $m\geq33$ the uniform error also improves to $O(mp^{28}+kmp^{30})$, by the ordinary interior threshold below. In particular, if $p\to0$, $m\to\infty$, $mp^{24}\to\lambda<\infty$ and $kp^6\to0$, the blocking probability tends to $1-e^{-5\lambda}$. If $mp^{24}\to\infty$, the probability tends to one for any sequence of chain lengths $k\geq4$. For the latter claim, take disjoint consecutive nine-sheet intervals and place one minimum blocking pattern in each. The $\lfloor m/9\rfloor$ occurrences use disjoint seed sites and each has probability $p^{24}$.
 
 For $k\geq5$ and $m\geq30$, the size-28 catalogue gives the uniform refinement
 
@@ -566,19 +566,34 @@ At budget 30 the 32-stage ordinary band forces an empty pair. As before, two non
 
 Radius-eight locality transfers each of the ten seed sets and its restoration outcomes to every suitable ordinary position. For $k\geq21$ and $m\geq28$, there are $k-20$ allowed stage starts with eight ordinary stages of margin on each side. All ten sets occupy all three stages and both extreme sheets, giving at least $10m(k-20)$ distinct minimal 30-seed losses. The complete ordinary classifications at costs through 30 give $\alpha_d=0$ for $d\leq29$ and $\alpha_{30}=10$.
 
-The ordinary exclusions also apply to cyclic forts at smaller periods than the general eventual-count bound. In the ordinary region, an empty stage pair between nonempty parts would split a cyclic fort into two of cost at least 24 each, since the cyclic minimum at these periods is 24. The same stage-band caps therefore fit an ordinary cyclic fort of cost at most 29 into the 35-block window, where the width-19 band excludes sheet wrapping at $m\geq37$ by $15m>19\cdot29$. At cost 30 the 36-block window and the width-20 band exclude wrapping at $m\geq38$ by $16m>20\cdot30$. At 37 sheets the wrapped verifier excludes cost 30 in the same stage window. At 36 sheets width 20 excludes costs up to 28, and the complement of any single sheet splits into bands of widths 17 and 18, containing at least $13+14=27$ seeds in total. Each sheet then has at most two seeds at cost 29 and three at cost 30. The wrapped verifier with the same ordinary stage windows excludes both budgets. At 35 and 34 sheets the complement bounds are 26 and 25 respectively, obtained from widths 17 and 17 or 16 and 17. The corresponding wrapped checks exclude costs 28 through 30 at both periods, and all smaller budgets already unroll by the general 27-seed classification. The complete ordinary classification therefore holds from 34 sheets.
+The ordinary exclusions also apply to cyclic forts at smaller periods than the general eventual-count bound. In the ordinary region, an empty stage pair between nonempty parts would split a cyclic fort into two of cost at least 24 each, since the cyclic minimum at these periods is 24. The same stage-band caps therefore fit an ordinary cyclic fort of cost at most 29 into the 35-block window, where the width-19 band excludes sheet wrapping at $m\geq37$ by $15m>19\cdot29$. At cost 30 the 36-block window and the width-20 band exclude wrapping at $m\geq38$ by $16m>20\cdot30$. At 37 sheets the wrapped verifier excludes cost 30 in the same stage window. At 36 sheets width 20 excludes costs up to 28, and the complement of any single sheet splits into bands of widths 17 and 18, containing at least $13+14=27$ seeds in total. Each sheet then has at most two seeds at cost 29 and three at cost 30. The wrapped verifier with the same ordinary stage windows excludes both budgets. At 35 and 34 sheets the complement bounds are 26 and 25 respectively, obtained from widths 17 and 17 or 16 and 17. The corresponding wrapped checks exclude costs 28 through 30 at both periods, and all smaller budgets already unroll by the general 27-seed classification. At 33 sheets the smaller costs already unroll, and the wrapped test excludes cost 30 in the ordinary window. The complete ordinary classification therefore holds from 33 sheets.
 
-For independent losses, take disjoint placements in both coordinates. With stage starts spaced three apart and sheet starts spaced 11 apart, there are $J=\lfloor(k-18)/3\rfloor\lfloor m/11\rfloor$ patterns on disjoint sets of seed sites. Hence
+### A packing of disjoint ordinary blocking losses
+
+One of the ordinary size-30 templates spans ten sheets. Translate its seed support by the lattice
+$\{(2i,3i+4j):i,j\in\mathbb{Z}\}$ in the stage and sheet coordinates. For a seed with stage offset $x$, within-stage label $v$ and sheet coordinate $y$, the residue modulo this lattice is represented by
+$(x\bmod2,\ v,\ (y-3\lfloor x/2\rfloor)\bmod4)$.
+The [packing verifier](check_finite_fort_span.py) checks all thirty residues are distinct. It also replays the guarded ordinary fort and its thirty one-seed restorations. Thus the translates have disjoint seed sets and their centers have density $1/8$ per stage-sheet cell.
+
+For $k\geq21$ and $m\geq28$, use starts $9,11,\ldots$ through stage $k-12$. Within each chosen stage start, take the matching sheet phase modulo four with the template wholly within the $m$ consecutive sheet positions. This gives at least
+$J=\lfloor(k-19)/2\rfloor\lfloor(m-9)/4\rfloor$ disjoint blocking losses. Their full-loss events are independent, so
 
 $$
-\Pr(\text{blocking})\geq 1-(1-p^{30})^J .
+\Pr(\text{blocking})\geq 1-(1-p^{30})^J.
+$$
+
+Every successful seed set keeps at least one seed in each packed support. Taking the growing-cover limit in both conclusions gives
+
+$$
+\Phi(p)\leq \tfrac18\log(1-p^{30}),\qquad
+\sigma_{\mathrm{prism}}\geq \tfrac18.
 $$
 
 In particular, blocking tends to one if $kmp^{30}\to\infty$ in this parameter range.
 
 ## Failure from the ends and the interior
 
-Let $d_*=\min\{d:\alpha_d>0\}$ and $\alpha=\alpha_{d_*}$, using the coefficients of the eventual minimal-loss count. The ordinary interior classification gives $d_*=30$ and $\alpha=\alpha_{30}=10$. For all $k\geq4$, $m\geq34$ and $0\leq p\leq1$ there is a uniform approximation
+Let $d_*=\min\{d:\alpha_d>0\}$ and $\alpha=\alpha_{d_*}$, using the coefficients of the eventual minimal-loss count. The ordinary interior classification gives $d_*=30$ and $\alpha=\alpha_{30}=10$. For all $k\geq4$, $m\geq33$ and $0\leq p\leq1$ there is a uniform approximation
 
 $$
 \Pr(\text{blocking})=
@@ -602,7 +617,7 @@ $$
 \Pr(\text{blocking})=1-\exp(-mB(p))+O(kmp^{30}).
 $$
 
-For all $k\geq5$, $m\geq34$ and $0\leq p\leq1$, the ordinary classification further gives
+For all $k\geq5$, $m\geq33$ and $0\leq p\leq1$, the ordinary classification further gives
 
 $$
 \Pr(\text{blocking})=
@@ -614,7 +629,7 @@ Select the complete catalogue through size 29 and the ordinary size-30 placement
 
 ### Joint counts and locations of blocking components
 
-On the auxiliary graph of seed sites defined above, call a connected component of the deleted seeds blocking when deleting that component alone prevents recovery. For $k\geq4$ and $m\geq34$, use the five size-24 templates, with $m$ placements each, and the ten ordinary size-30 templates, with $m(k-20)_+$ placements each, where $x_+=\max(x,0)$. The ordinary placements use three consecutive stages with eight ordinary stages of margin on both sides.
+On the auxiliary graph of seed sites defined above, call a connected component of the deleted seeds blocking when deleting that component alone prevents recovery. For $k\geq4$ and $m\geq33$, use the five size-24 templates, with $m$ placements each, and the ten ordinary size-30 templates, with $m(k-20)_+$ placements each, where $x_+=\max(x,0)$. The ordinary placements use three consecutive stages with eight ordinary stages of margin on both sides.
 
 The process of blocking components is within $O(mp^{25}+kmp^{31})$ in total variation of independent Poisson variables on these placements, with mean $p^{24}$ at each size-24 placement and $p^{30}$ at each chosen ordinary placement. The comparison process assigns zero mass to every other component. In particular the two counts are approximated jointly by independent Poisson variables of means $5mp^{24}$ and $10m(k-20)_+p^{30}$. Keeping the fifteen template labels gives a product of fifteen Poisson laws as the approximation to the vector of type counts.
 
@@ -635,7 +650,7 @@ $$
 
 To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities through loss size 27 for $m\geq30$, and at every length of at least five blocks through size 28 for $m\geq30$ and size 29 for $m\geq33$. The smaller verified cyclic ranges also apply. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
 
-The joint component law also extends to a uniform loss of size $\ell$. Set $p=\ell/N$ and let $\Lambda=mp^{24}+kmp^{30}$. For $k\geq4$, $m\geq34$ and $\ell\geq1$, the total variation error is
+The joint component law also extends to a uniform loss of size $\ell$. Set $p=\ell/N$ and let $\Lambda=mp^{24}+kmp^{30}$. For $k\geq4$, $m\geq33$ and $\ell\geq1$, the total variation error is
 
 $$
 O\left(mp^{25}+kmp^{31}+\frac{\Lambda}{\sqrt{\ell}}\right).
@@ -746,11 +761,13 @@ The restoration-time table and the inclusion-minimal 25-seed loss are checked wi
 ```sh
 python -B research-twins/check_finite_fort_span.py --restoration-times
 python -B research-twins/check_finite_fort_span.py --ordinary-stage-blocker
+python -B research-twins/check_finite_fort_span.py --ordinary-packing
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-30-exact
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-threshold
 python -B research-twins/check_short_prism_covers.py --ordinary-wrapped 37 30 --ordinary-wrapped 36 29 --ordinary-wrapped 36 30
 python -B research-twins/check_short_prism_covers.py --ordinary-wrapped 35 28 --ordinary-wrapped 35 29 --ordinary-wrapped 35 30
 python -B research-twins/check_short_prism_covers.py --ordinary-wrapped 34 28 --ordinary-wrapped 34 29 --ordinary-wrapped 34 30
+python -B research-twins/check_short_prism_covers.py --ordinary-wrapped 33 30
 ```
 
 The size-25 checks enumerate four through fourteen blocks and verify the transposed catalogue through 20 blocks. The stage-pair test gives completeness for all larger lengths. The size-26 checks use the same direct range and locality representative, with a separate stage-pair test.
