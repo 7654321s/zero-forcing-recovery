@@ -149,7 +149,7 @@ if __name__ == '__main__':
         for blocks in (stages + 1, stages + 2):
             BLOCK['check_band'](blocks, stages=stages, budget=budget)
             print(f'{blocks} blocks: the {stages}-stage band forces an empty pair', flush=True)
-        direct_last = {27: 13, 28: 11, 29: 11, 30: 11}.get(budget, 14)
+        direct_last = {27: 13, 28: 11, 29: 11, 30: 10}.get(budget, 14)
         for blocks in range(stages, direct_last, -1):
             check_projected_case(blocks, budget, require_opening=False)
             print(f'{blocks} blocks: every finite fort of cost at most {budget} has an empty stage pair',

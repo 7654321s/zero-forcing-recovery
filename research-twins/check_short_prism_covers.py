@@ -240,7 +240,7 @@ def check_four_sheet_barrier(blocks):
 
 def check_stage_ancestry():
     """Check that a vertex needs seeds only in its own stage and its successor."""
-    blocks, sheets = 14, 13
+    blocks, sheets = 13, 13
     graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
     arrivals, supporters, _ = WRAPPED['LOSS']['nominal_cones'](graph, blue)
     if max(arrivals) != 2:
@@ -328,7 +328,7 @@ if __name__ == '__main__':
         for sheets in args.insertion_obstruction:
             check_insertion_obstruction(sheets)
     elif args.four_sheet_barrier:
-        for blocks in range(14, 28):
+        for blocks in range(13, 28):
             check_four_sheet_barrier(blocks)
             print(f'{blocks} blocks: four intact sheets separate remaining whites at round five',
                   flush=True)

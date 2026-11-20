@@ -343,7 +343,7 @@ def check_five_block_catalogue(*, exhaustive=False):
     }), flush=True)
 
 
-def check_size_30_boundary(catalogues, *, blocks=14):
+def check_size_30_boundary(catalogues, *, blocks=13):
     smaller = tuple(minimum_seed_sets(blocks))
     for budget, catalogue in enumerate(catalogues, start=25):
         if blocks > 5:
@@ -554,7 +554,7 @@ def main():
     mode.add_argument('--size-29', choices=EXPECTED_SIZE_29_SPANS, type=int, metavar='BLOCKS',
                       help='verify size-29 losses from five blocks through the locality representative')
     mode.add_argument('--size-30-boundary', action='store_true',
-                      help='enumerate the 14-block representative for the size-30 boundary term')
+                      help='enumerate the 13-block representative for the size-30 boundary term')
     mode.add_argument('--size-30-five-blocks', action='store_true',
                       help='verify the 5975 size-30 seed loss types at five blocks')
     mode.add_argument('--five-block-catalogue', choices=('witnesses', 'exhaustive'),
@@ -581,7 +581,7 @@ def main():
         check_size_26(args.size_29, size_29=True)
         return
     if args.size_30_boundary or args.size_30_five_blocks:
-        check_size_26(5, size_30_representative=14 if args.size_30_boundary else 5)
+        check_size_26(5, size_30_representative=13 if args.size_30_boundary else 5)
         return
     if args.five_block_catalogue:
         check_five_block_catalogue(exhaustive=args.five_block_catalogue == 'exhaustive')

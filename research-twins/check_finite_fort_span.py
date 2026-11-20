@@ -26,6 +26,26 @@ ORDINARY_PACKING_LOSS = (
     (30, (5, 8)), (31, (5, 8)), (33, (7, 8)), (34, (8,)), (35, (7,)),
     (36, (7,)), (37, (7, 8)), (45, (9,)), (46, (9, 10)),
 )
+ORDINARY_INCIDENCE_LOSS = (
+    (3, (5,)), (4, (1,)), (5, (2, 3)), (12, (4,)), (13, (5,)), (16, (5,)),
+    (17, (3, 6)), (19, (6,)), (20, (4,)), (21, (3,)), (28, (6,)),
+    (30, (5, 8)), (31, (5, 9)), (33, (6, 9)), (34, (5, 9)), (35, (7,)),
+    (36, (7, 8)), (37, (6, 9)), (45, (8, 10)), (46, (11,)), (47, (10,)),
+)
+ORDINARY_SURVIVOR_PERIOD = 128
+# Bit y of a label's mask keeps that seed on sheet phase y.
+ORDINARY_SURVIVOR_MASKS = (
+    (0, 0x00020000000800200000000007600000),
+    (1, 0x00040000001000400000000009810000),
+    (2, 0x0c504024220443126800100000001106),
+    (3, 0x001000000000000000000000aa020000),
+    (4, 0x90c2408006904a5002a1110504510010),
+    (5, 0x8022a90a902800008212001141a4ae08),
+    (12, 0x00000000000000000000001244c00000),
+    (13, 0x00000100010640000052180034308120),
+    (14, 0x48005145000010344202840148000081),
+    (15, 0x0000000000000000000000000a000000),
+)
 FRONTIERS = {
     2: (4, (22, 18, 16)),
     3: (5, (27, 23, 22, 21)),
@@ -385,6 +405,22 @@ def check_ordinary_stage_blocker():
     print('Minimum cost in three ordinary stages is 30, with a 73-vertex residual fort', flush=True)
 
 
+def check_guarded_ordinary_loss(sites):
+    blocks, sheets, first = 24, 31, 10
+    graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
+    start, stop = BAND['stage_start'](first), BAND['stage_start'](first + 3)
+    lost = mask((start + label) * sheets + sheet + 7 for label, sheet in sites)
+    if lost.bit_count() != 30 or lost & blue != lost:
+        raise AssertionError('Unexpected seed sites of the ordinary loss')
+    arrivals = COVER['MODEL']['trace'](graph, blue & ~lost)[1]
+    fort = mask(v for v, time in enumerate(arrivals) if time is None)
+    if fort & blue != lost or any(
+            not start <= v // sheets < stop or v % sheets in (0, sheets - 1) for v in members(fort)):
+        raise AssertionError('Loss has no guarded ordinary fort')
+    if sum(count for _, count in restoration_profile(graph, blue, lost)) != 30:
+        raise AssertionError('Loss failed a one-seed restoration')
+
+
 def check_ordinary_packing():
     sites = [(label, sheet) for label, group in ORDINARY_PACKING_LOSS for sheet in group]
     residues = {((label // 16) % 2, label % 16, (sheet - 3 * (label // 32)) % 4)
@@ -395,22 +431,61 @@ def check_ordinary_packing():
     span = min(s for _, s in sites), max(s for _, s in sites)
     if stages != {0, 1, 2} or span != (1, 10):
         raise AssertionError('Unexpected support of the packing loss')
-
-    blocks, sheets, first = 24, 31, 10
-    graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
-    start, stop = BAND['stage_start'](first), BAND['stage_start'](first + 3)
-    lost = mask((start + label) * sheets + sheet + 7 for label, sheet in sites)
-    if lost & blue != lost:
-        raise AssertionError('Packing loss includes a nonseed')
-    arrivals = COVER['MODEL']['trace'](graph, blue & ~lost)[1]
-    fort = mask(v for v, time in enumerate(arrivals) if time is None)
-    if fort & blue != lost or any(
-            not start <= v // sheets < stop or v % sheets in (0, sheets - 1) for v in members(fort)):
-        raise AssertionError('Packing loss has no guarded ordinary fort')
-    if sum(count for _, count in restoration_profile(graph, blue, lost)) != 30:
-        raise AssertionError('Packing loss failed a one-seed restoration')
+    check_guarded_ordinary_loss(sites)
     print('Thirty distinct lattice residues give one ordinary blocker per eight cells',
           flush=True)
+
+
+def check_ordinary_incidence():
+    sites = [(label, sheet) for label, group in ORDINARY_INCIDENCE_LOSS for sheet in group]
+    occurrences = Counter(label % 16 for label, _ in sites)
+    if max(occurrences.values()) != 5 or {label // 16 for label, _ in sites} != {0, 1, 2}:
+        raise AssertionError('Unexpected incidence counts of the ordinary loss')
+    check_guarded_ordinary_loss(sites)
+    print('Every seed is in at most five translates of the verified ordinary loss', flush=True)
+
+
+def check_periodic_ordinary_survivors():
+    period = ORDINARY_SURVIVOR_PERIOD
+    sheets, first = 11, 9
+    graph, seeds, *_ = COVER['signed_prism_cover'](17, sheets)
+    start = BAND['stage_start'](first)
+    offsets = {v for v in range(16) if seeds & (1 << ((start + v) * sheets))}
+    blue = set()
+    for label, phases in ORDINARY_SURVIVOR_MASKS:
+        if label not in offsets or phases >> period:
+            raise AssertionError('Unexpected periodic survivor coordinate')
+        blue.update(16 * sheet + label for sheet in members(phases))
+    if len(blue) != 151:
+        raise AssertionError(('Unexpected periodic survivor count', len(blue)))
+
+    local = []
+    for label in range(16):
+        neighbors = []
+        for w in members(graph[(start + label) * sheets]):
+            vertex, sheet = divmod(w, sheets)
+            shift = sheet if sheet <= sheets // 2 else sheet - sheets
+            if abs(shift) != 1:
+                raise AssertionError(('Unexpected ordinary sheet shift', shift))
+            neighbors.append(((vertex - start) % 16, shift))
+        local.append(neighbors)
+    # Keep all neighbor occurrences, even if two vertices have the same phase and label.
+    rows = [tuple(16 * ((sheet + shift) % period) + label for label, shift in neighbors)
+            for sheet in range(period) for neighbors in local]
+    for rounds in range(1, len(rows) + 1):
+        additions = set()
+        for source in blue:
+            white = [w for w in rows[source] if w not in blue]
+            if len(white) == 1:
+                additions.add(white[0])
+        if not additions:
+            raise AssertionError('Periodic forcing stopped before completion')
+        blue.update(additions)
+        if len(blue) == len(rows):
+            break
+    if rounds != 668 or len(blue) != len(rows):
+        raise AssertionError(('Unexpected periodic forcing rounds', rounds))
+    print('151 seeds per ordinary 128-sheet period force all vertices by round 668', flush=True)
 
 
 if __name__ == '__main__':
@@ -423,12 +498,18 @@ if __name__ == '__main__':
                         help='check the finite blocker confined to three ordinary stages')
     parser.add_argument('--ordinary-packing', action='store_true',
                         help='check a lattice packing of disjoint ordinary size-30 blockers')
+    parser.add_argument('--ordinary-density', action='store_true',
+                        help='check ordinary witnesses for the survivor density bounds')
     args = parser.parse_args()
     if args.ordinary_packing:
         check_ordinary_packing()
     if args.ordinary_stage_blocker:
         check_ordinary_stage_blocker()
-    if (args.ordinary_stage_blocker or args.ordinary_packing) and not args.longer and not args.restoration_times:
+    if args.ordinary_density:
+        check_ordinary_incidence()
+        check_periodic_ordinary_survivors()
+    ordinary_only = args.ordinary_stage_blocker or args.ordinary_packing or args.ordinary_density
+    if ordinary_only and not args.longer and not args.restoration_times:
         raise SystemExit(0)
     check_minimum_spans()
     check_seed_frontiers()
