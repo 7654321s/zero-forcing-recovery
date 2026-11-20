@@ -23,7 +23,7 @@ EXPECTED_SPANS = {
 }
 EXPECTED_SIZE_26_SPANS = {
     4: {7: 4, 8: 25, 9: 42, 10: 23, 11: 10},
-    5: {7: 4, 8: 25, 9: 42, 10: 23, 11: 3},
+    **dict.fromkeys(range(5, 9), {7: 4, 8: 25, 9: 42, 10: 23, 11: 3}),
 }
 
 
@@ -58,7 +58,7 @@ def block_translations(pattern, sheets):
         yield [-(v * sheets + s + shift + 1) for v, s in pattern]
 
 
-def verify_inherited_patterns(blocks, minimum, templates):
+def verify_inherited_patterns(blocks, smaller, templates, *, budget=25):
     stage_start = SPAN['BAND']['stage_start']
     patterns = set()
     for template in templates:
@@ -67,16 +67,16 @@ def verify_inherited_patterns(blocks, minimum, templates):
         sheets = max(s for _, s in pattern) + 10
         graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
         lost = mask(v * sheets + s + 4 for v, s in pattern)
-        if lost & blue != lost or lost.bit_count() != 25:
+        if lost & blue != lost or lost.bit_count() != budget:
             raise AssertionError(('Unexpected inherited seeds', blocks, pattern))
         arrival = COVER['MODEL']['trace'](graph, blue & ~lost)[1]
         fort = mask(v for v, time in enumerate(arrival) if time is None)
-        if COVER['fort_cost'](graph, blue, fort) != 25 or any(
+        if COVER['fort_cost'](graph, blue, fort) != budget or any(
                 v % sheets in (0, sheets - 1) for v in members(fort)):
             raise AssertionError(('Inherited loss has no finite fort', blocks, pattern))
-        for smaller in minimum:
+        for smaller_pattern in smaller:
             for delta in range(sheets):
-                projection = mask(v * sheets + (s + delta) % sheets for v, s in smaller)
+                projection = mask(v * sheets + (s + delta) % sheets for v, s in smaller_pattern)
                 if projection & lost == projection:
                     raise AssertionError(('Inherited loss contains a minimum set', blocks, pattern))
         patterns.add(pattern)
@@ -173,6 +173,29 @@ def known_union_coefficients(blocks, minimum, near_minimum):
     return dict(sorted(coefficients.items()))
 
 
+def check_size_26(blocks):
+    base = min(blocks, 5)
+    minimum = minimum_seed_sets(base)
+    near = enumerate_blockers(base, minimum)
+    if Counter(max(s for _, s in p) for p in near) != EXPECTED_SPANS[base]:
+        raise AssertionError(('Unexpected size-25 seed catalogue', base))
+    patterns = enumerate_blockers(base, (*minimum, *sorted(near)), budget=26)
+    if Counter(max(s for _, s in p) for p in patterns) != EXPECTED_SIZE_26_SPANS[base]:
+        raise AssertionError(('Unexpected base size-26 seed catalogue', base))
+    if blocks > base:
+        minimum = minimum_seed_sets(blocks)
+        near = verify_inherited_patterns(blocks, minimum, near)
+        smaller = (*minimum, *sorted(near))
+        known = verify_inherited_patterns(blocks, smaller, patterns, budget=26)
+        patterns = enumerate_blockers(blocks, smaller, known, budget=26)
+    spans = Counter(max(s for _, s in p) for p in patterns)
+    if spans != EXPECTED_SIZE_26_SPANS[blocks]:
+        raise AssertionError(('Unexpected size-26 seed catalogue', blocks, spans))
+    print(json.dumps({'blocks': blocks, 'size': 26, 'count': len(patterns),
+                      'spans': dict(sorted(spans.items())), 'losses': sorted(patterns)}),
+          flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
@@ -182,18 +205,7 @@ def main():
                       help='enumerate size-26 losses after excluding sizes 24 and 25')
     args = parser.parse_args()
     if args.size_26 is not None:
-        blocks = args.size_26
-        minimum = minimum_seed_sets(blocks)
-        near = enumerate_blockers(blocks, minimum)
-        if Counter(max(s for _, s in p) for p in near) != EXPECTED_SPANS[blocks]:
-            raise AssertionError(('Unexpected size-25 seed catalogue', blocks))
-        patterns = enumerate_blockers(blocks, (*minimum, *sorted(near)), budget=26)
-        spans = Counter(max(s for _, s in p) for p in patterns)
-        if spans != EXPECTED_SIZE_26_SPANS[blocks]:
-            raise AssertionError(('Unexpected size-26 seed catalogue', blocks, spans))
-        print(json.dumps({'blocks': blocks, 'size': 26, 'count': len(patterns),
-                          'spans': dict(sorted(spans.items())), 'losses': sorted(patterns)}),
-              flush=True)
+        check_size_26(args.size_26)
         return
     templates = enumerate_blockers(5, minimum_seed_sets(5)) if any(k >= 5 for k in args.blocks) else ()
     if templates:
