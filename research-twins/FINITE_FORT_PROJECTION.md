@@ -353,6 +353,27 @@ Direct wrapped checks also give the smaller sufficient period 28 at five through
 
 The signed unions of size 30 from the catalogues through size 29 have weights $-2,-1,0,1,2$ with respective counts 73, 5536, 723, 1743 and 39 up to translation. The overlapping-union profile is checked directly at five, six and seven blocks, and the disjoint opening and terminal label intervals preserve it at every greater length. The same cyclic lifting argument applies since the union span is at most twelve sheets and any three constituents have at least $3\cdot24-2\cdot30=12$ shared seeds. Writing $N_{30}(k,m)$ for the number of inclusion-minimal 30-seed losses, the degree-30 coefficient at these periods is $N_{30}(k,m)-3861m$.
 
+## The exact degree-30 term at five blocks
+
+There are exactly 5,975 inclusion-minimal 30-seed blocking losses on the five-block integer lift, up to sheet translation.
+
+| Seed span in sheets | 7 | 8 | 9 | 10 | 11 | 12 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Number of loss types | 47 | 679 | 2,001 | 2,136 | 998 | 114 |
+
+A fort costing at most 30 cannot have two consecutive empty interior sheets, since the two sides would be forts of cost at least 24 each. A span of at least 39 sheets contains disjoint bands of widths 19 and 20, which together require at least 31 seeds. The exhaustive search uses the remaining 38 interior sheets and two blue guards. It excludes every translate of the 3,103 minimal losses of sizes 24 through 29. After enumerating the 5,975 size-30 types and excluding all their translates, the formula is unsatisfiable. Each reported type also passes a direct forcing-closure check and the smaller-loss containment check.
+
+At five blocks all cyclic forts costing at most 30 unroll from 28 sheets. The direct wrapped checks exclude cost 30 on 28 through 35 sheets. The width-28 band gives $24m>28\cdot30$ for $m\geq36$, and the smaller costs already unroll from 28 sheets.
+
+Every size-30 type and every smaller type spans at most 12 sheets. Aligning two representatives at a common seed leaves sheet differences of magnitude at most 11. At $m\geq28$, congruence of two such differences implies equality. Thus projecting a finite size-30 type cannot create a contained smaller minimal loss. Its outer gap is strictly longer than any internal gap, giving $m$ distinct translates, and any minimal cyclic loss lifts to a finite type. The overlap correction from the smaller types is $-3861m$, so for $k=5$ and $m\geq28$,
+
+$$
+M_{30}(5,m)=5975m,\qquad
+[p^{30}]\Pr(\text{blocking})=2114m .
+$$
+
+The degree-30 coefficient of the logarithmic recovery probability is $-2114m$, since blocking starts in degree 24.
+
 ## A finite representative for the degree-30 boundary term
 
 Let $A_{30}(14)$ count the inclusion-minimal 30-seed blocking losses on the 14-block integer lift, up to sheet translation. One guarded search on this length determines the degree-30 coefficient for every $k\geq14$ and $m\geq42$. Put $\beta_{30}=A_{30}(14)-140$. Then
@@ -363,8 +384,6 @@ M_{30}(k,m)=m(10k+\beta_{30}),\qquad
 $$
 
 The coefficient $[p^{30}]\log R_{k,m}(p)$ is the negative of the second expression because blocking starts in degree 24. The numeric value of $A_{30}(14)$ remains to be enumerated.
-
-At five blocks all cyclic forts costing at most 30 unroll from 28 sheets. The direct wrapped checks exclude cost 30 on 28 through 35 sheets. The width-28 band gives $24m>28\cdot30$ for $m\geq36$, and the smaller costs already unroll from 28 sheets.
 
 The projected-support checks give two consecutive empty appended stages in every finite fort of cost at most 30 at lengths 12 through 32. For every larger length the first 32 appended stages give an empty pair by the terminal and nonterminal band checks at 33 and 34 blocks. A fort cannot have two distinct runs of at least two empty stages in the cyclic stage order. The occupied portions between two such runs would each be nonempty finite forts, because every edge changes the stage by at most one and an outside vertex cannot see both portions. Each portion costs at least 24 seeds. Contracting an empty appended pair therefore shortens the unique run of at least two empty stages. It preserves the length of the occupied arc complementary to this run. Repeated contraction reaches 11 blocks with at least one empty stage remaining, so the original occupied arc spans at most ten stages.
 
@@ -747,6 +766,7 @@ python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-
 python -B research-twins/check_short_prism_covers.py --four-sheet-barrier
 python -B research-twins/check_short_prism_covers.py --stage-ancestry
 python -B research-twins/check_short_prism_covers.py --rectangle-separation
+python -B research-twins/check_cost_25_blocking_sets.py --size-30-five-blocks
 python -B research-twins/check_cost_25_blocking_sets.py --size-30-boundary
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 25 27 28 29
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 26 --band-blocks 25 29
