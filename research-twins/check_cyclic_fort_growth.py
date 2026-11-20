@@ -1,5 +1,7 @@
-"""Compute cyclic and finite fort costs with a finite transfer graph."""
+"""Compute fort costs and recovery polynomials with a finite transfer graph."""
 
+from collections import Counter, defaultdict
+from functools import lru_cache
 from heapq import heappop, heappush
 from itertools import combinations, product
 from math import gcd
@@ -41,6 +43,61 @@ def cyclic_costs(edges, zero, last):
             if start in current:
                 best[i] = min(best[i], current[start])
     return best
+
+
+def recovery_polynomials(graph, seeds, last):
+    """Count recoverable loss sets by cardinality for one through last sheets."""
+    edges, zero = transfer(graph, seeds)
+    states = sorted(set(edges) | {v for row in edges.values() for v, _ in row})
+    labels = {state: i for i, state in enumerate(states)}
+    centers = [state[len(zero) // 2] for state in states]
+    seed_positions = [v for v in range(len(graph)) if seeds & (1 << v)]
+    letters = [sum(1 << v for v, lost in zip(seed_positions, flags) if lost)
+               for flags in product((False, True), repeat=len(seed_positions))]
+    rows = [sum(1 << labels[v] for v, _ in edges.get(state, ())) for state in states]
+    rows_for_loss = {
+        lost: tuple(row if center & seeds & ~lost == 0 else 0
+                    for row, center in zip(rows, centers))
+        for lost in letters
+    }
+    marked_rows = {lost: tuple(row if center else 0 for row, center in zip(step, centers))
+                   for lost, step in rows_for_loss.items()}
+    identity = tuple(1 << i for i in range(len(states)))
+    empty = (0,) * len(states)
+
+    def follow(reachable, step):
+        result = 0
+        while reachable:
+            first = reachable & -reachable
+            result |= step[first.bit_length() - 1]
+            reachable ^= first
+        return result
+
+    @lru_cache(maxsize=None)
+    def append(relation, lost):
+        total, marked = relation
+        step = rows_for_loss[lost]
+        marked_step = marked_rows[lost]
+        return (tuple(follow(row, step) for row in total),
+                tuple(follow(previous, step) | follow(row, marked_step)
+                      for previous, row in zip(marked, total)))
+
+    current = {(identity, empty): Counter({0: 1})}
+    results = []
+    for _ in range(last):
+        following = defaultdict(Counter)
+        for relation, counts in current.items():
+            for lost in letters:
+                target = following[append(relation, lost)]
+                for degree, count in counts.items():
+                    target[degree + lost.bit_count()] += count
+        current = following
+        recovery = Counter()
+        for (_, marked), counts in current.items():
+            if not any(row & bit for row, bit in zip(marked, identity)):
+                recovery.update(counts)
+        results.append(recovery)
+    return results
 
 
 def distances(edges, start):
@@ -105,6 +162,14 @@ def deletion_cost(graph, seeds, sheets):
     raise AssertionError('Deleting all seeds did not block recovery')
 
 
+def recovery_by_deletion(graph, seeds, sheets):
+    adjacent, lifted_seeds = reduce(graph, seeds, sheets)
+    intact = sum(lifted_seeds)
+    return Counter(count for count in range(len(lifted_seeds) + 1)
+                   for loss in combinations(lifted_seeds, count)
+                   if forces(adjacent, intact ^ sum(loss)))
+
+
 def reduced_shifts(graph):
     potentials = {0: 0}
     pending = [0]
@@ -128,6 +193,7 @@ def main():
     tested = 0
     by_finite = 0
     by_reduction = 0
+    polynomials = 0
     pairs = tuple(combinations(range(3), 2))
     for shifts in product((None, -1, 0, 1), repeat=len(pairs)):
         graph = neighborhoods(3, ((u, v, d) for (u, v), d in zip(pairs, shifts) if d is not None))
@@ -139,6 +205,10 @@ def main():
                 continue
             edges, zero = transfer(graph, seeds)
             costs = cyclic_costs(edges, zero, 4)
+            for sheets, counts in enumerate(recovery_polynomials(graph, seeds, 3), 1):
+                if counts != recovery_by_deletion(graph, seeds, sheets):
+                    raise AssertionError(('recovery polynomial', shifts, seeds, sheets, counts))
+                polynomials += 1
             for sheets, value in enumerate(costs, 1):
                 if value != deletion_cost(graph, seeds, sheets):
                     raise AssertionError(('cyclic cost', shifts, seeds, sheets, value))
@@ -158,6 +228,11 @@ def main():
         # Distribute the total shift along the other three edges to keep the window small.
         distributed = neighborhoods(4, ((u, (u + 1) % 4, int(u >= 4 - q)) for u in range(4)))
         edges, zero = transfer(distributed, 0b0011)
+        for sheets, counts in enumerate(recovery_polynomials(distributed, 0b0011, 4), 1):
+            d = gcd(sheets, q)
+            period = sheets // d
+            if sum(counts.values()) != (4**period - 3**period)**d:
+                raise AssertionError(('shifted cycle recovery probability', sheets, q, counts))
         for sheets, value in enumerate(cyclic_costs(edges, zero, 7), 1):
             expected = sheets // gcd(sheets, q)
             if value != expected or deletion_cost(graph, 0b0011, sheets) != expected:
@@ -167,6 +242,7 @@ def main():
     print(f'{tested} cyclic transfer costs checked by deletion, {by_finite} finite existence comparisons')
     print('Shifted four-cycle formula verified on 21 cyclic covers')
     print(f'{by_reduction} closed-walk reductions verified by deletion')
+    print(f'{polynomials} recovery polynomials verified by exhaustive deletion')
 
 
 if __name__ == '__main__':

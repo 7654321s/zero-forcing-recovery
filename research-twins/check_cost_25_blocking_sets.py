@@ -37,6 +37,7 @@ EXPECTED_SIZE_27_SPANS = {
 
 EXPECTED_SIZE_28_SPANS = dict.fromkeys(
     range(5, LOCALITY_REPRESENTATIVE + 1), {7: 13, 8: 129, 9: 301, 10: 218, 11: 80})
+EXPECTED_SIZE_29_SPANS = {5: {7: 20, 8: 316, 9: 750, 10: 616, 11: 271, 12: 9}}
 
 
 def minimum_seed_sets(blocks):
@@ -173,46 +174,74 @@ def check_overlap(minimum):
         raise AssertionError('Unexpected overlap of minimum blocking sets')
 
 
-def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_27=None, size_28=None):
-    """Count unions through one degree above the supplied minimal losses."""
-    budget = 26 + sum(part is not None for part in (size_26, size_27, size_28))
-    losses = (*minimum, *near_minimum, *(size_26 or ()), *(size_27 or ()), *(size_28 or ()))
-    events = {frozenset(pattern) for pattern in losses}
-    by_label = defaultdict(list)
-    for event in events:
-        for v, s in event:
-            by_label[v].append((event, s))
-    unions = set(events)
-    pending = list(events)
-    while pending:
-        union = pending.pop()
-        if len(union) == budget:
-            continue
-        translations = {(event, s - t) for v, s in union for event, t in by_label[v]}
-        for event, shift in translations:
-            joined = union | {(v, s + shift) for v, s in event}
-            if len(union) < len(joined) <= budget:
-                normalized_union = frozenset(normalized(joined))
-                if normalized_union not in unions:
-                    unions.add(normalized_union)
-                    pending.append(normalized_union)
+def signed_union_weights(losses, budget):
+    label_count = 1 + max(v for pattern in losses for v, _ in pattern)
+    # At these budgets any two contributing losses intersect, so two spans bound the union span.
+    margin = 2 * max(s for pattern in losses for _, s in normalized(pattern))
+    pivot_count = budget - min(map(len, losses)) + 1
+    events = {mask((s - 1) * label_count + v for v, s in normalized(pattern)) for pattern in losses}
 
+    def record(index, pattern):
+        for site in members(pattern):
+            sheet, v = divmod(site, label_count)
+            index[v].append((pattern, sheet))
+
+    def translated_candidates(union, index):
+        sites = sorted((divmod(site, label_count) for site in members(union)),
+                       key=lambda site: len(index[site[1]]))
+        # A feasible union leaves at most pivot_count - 1 sites outside the candidate.
+        return {(pattern, margin + sheet - origin)
+                for sheet, v in sites[:pivot_count] for pattern, origin in index[v]}
+
+    by_label = defaultdict(list)
+    unions = defaultdict(set)
+    for event in events:
+        record(by_label, event)
+        unions[event.bit_count()].add(event)
+    for degree in range(min(unions), budget):
+        for union in unions[degree]:
+            padded = union << (margin * label_count)
+            for event, offset in translated_candidates(union, by_label):
+                joined = padded | (event << (offset * label_count))
+                size = joined.bit_count()
+                if degree < size <= budget:
+                    origin = ((joined & -joined).bit_length() - 1) // label_count
+                    unions[size].add(joined >> (origin * label_count))
+
+    by_label.clear()
     weights = {}
-    coefficients = Counter()
-    maximum_span = 13 if blocks == 4 and size_27 is not None else 11
-    for union in sorted(unions, key=lambda sites: (len(sites), tuple(sorted(sites)))):
-        last_sheet = max(s for _, s in union)
-        if last_sheet > maximum_span:
-            raise AssertionError(('Unexpected span for a small union', blocks, last_sheet))
-        coefficient = 1
-        for smaller, weight in weights.items():
-            if len(smaller) < len(union):
-                smaller_span = max(s for _, s in smaller)
-                for shift in range(last_sheet - smaller_span + 1):
-                    if all((v, s + shift) in union for v, s in smaller):
-                        coefficient -= weight
-        weights[union] = coefficient
-        coefficients[len(union)] += coefficient
+    profiles = defaultdict(Counter)
+    for degree in sorted(unions):
+        for union in unions[degree]:
+            padded = union << (margin * label_count)
+            coefficient = 1
+            for smaller, offset in translated_candidates(union, by_label):
+                shifted = smaller << (offset * label_count)
+                if shifted & padded == shifted:
+                    coefficient -= weights[smaller]
+            weights[union] = coefficient
+            profiles[degree][coefficient] += 1
+        for union in unions[degree]:
+            if weights[union]:
+                record(by_label, union)
+    largest_span = max((union.bit_length() - 1) // label_count + 1 for union in weights)
+    return profiles, largest_span
+
+
+def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_27=None, size_28=None,
+                             size_29=None):
+    """Count unions through one degree above the supplied minimal losses."""
+    catalogue = (size_26, size_27, size_28, size_29)
+    budget = 26 + sum(part is not None for part in catalogue)
+    losses = (*minimum, *near_minimum, *(pattern for part in catalogue if part for pattern in part))
+    profiles, span = signed_union_weights(losses, budget)
+    maximum_span = 12 if size_29 is not None else 11
+    if blocks == 4 and size_27 is not None:
+        maximum_span = 13
+    if span > maximum_span:
+        raise AssertionError(('Unexpected span for a small union', blocks, span))
+    coefficients = {degree: sum(weight * count for weight, count in profile.items())
+                    for degree, profile in profiles.items()}
 
     expected = {24: 5, 25: len(near_minimum) - 2, 26: -16 if blocks == 4 else -15}
     if size_26 is not None:
@@ -221,7 +250,7 @@ def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_2
     if size_27 is not None:
         expected[27] += len(size_27)
         expected[28] = -417 if blocks == 4 else -399
-        profile = Counter(weight for union, weight in weights.items() if len(union) == 28)
+        profile = profiles[28]
         expected_profile = {-2: 3, -1: 463, 0: 35, 1: 52} if blocks == 4 else {
             -2: 3, -1: 443, 0: 35, 1: 50,
         }
@@ -232,15 +261,21 @@ def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_2
     if size_28 is not None:
         expected[28] += len(size_28)
         expected[29] = -1585
-        profile = Counter(weight for union, weight in weights.items() if len(union) == 29)
-        if profile != {-2: 28, -1: 1812, 0: 124, 1: 273, 2: 5}:
+        profile = profiles[29]
+        if profile != {-2: 28, -1: 1812, 0: 124, 1: 273 + len(size_29 or ()), 2: 5}:
             raise AssertionError(('Unexpected order-29 weight distribution', blocks, profile))
+    if size_29 is not None:
+        expected[29] += len(size_29)
+        expected[30] = -3861
+        if profiles[30] != {-2: 73, -1: 5536, 0: 723, 1: 1743, 2: 39}:
+            raise AssertionError(('Unexpected order-30 weight distribution', blocks, profiles[30]))
     if coefficients != expected:
         raise AssertionError(('Unexpected union coefficients', blocks, coefficients))
     return dict(sorted(coefficients.items()))
 
 
-def check_size_26(blocks, *, size_27=False, size_28=False):
+def check_size_26(blocks, *, size_27=False, size_28=False, size_29=False):
+    size_28 = size_28 or size_29
     size_27 = size_27 or size_28
     base = min(blocks, 5)
     minimum = minimum_seed_sets(base)
@@ -302,8 +337,16 @@ def check_size_26(blocks, *, size_27=False, size_28=False):
             spans = Counter(max(s for _, s in p) for p in patterns)
             if spans != EXPECTED_SIZE_28_SPANS[blocks]:
                 raise AssertionError(('Unexpected size-28 seed catalogue', blocks, spans))
-        coefficients = known_union_coefficients(blocks, minimum, near, exact_26, exact_27,
-                                                patterns if size_28 else None)
+        exact_28 = patterns if size_28 else None
+        if size_29:
+            size = 29
+            smaller = (*all_26, *sorted(exact_27), *sorted(exact_28))
+            patterns = enumerate_blockers(blocks, smaller, budget=size)
+            spans = Counter(max(s for _, s in p) for p in patterns)
+            if spans != EXPECTED_SIZE_29_SPANS[blocks]:
+                raise AssertionError(('Unexpected size-29 seed catalogue', blocks, spans))
+        coefficients = known_union_coefficients(blocks, minimum, near, exact_26, exact_27, exact_28,
+                                                patterns if size_29 else None)
     else:
         coefficients = known_union_coefficients(blocks, minimum, near, patterns)
     print(json.dumps({'blocks': blocks, 'size': size, 'count': len(patterns),
@@ -398,6 +441,8 @@ def main():
                       help='verify the complete cost-30 ordinary interior catalogue')
     mode.add_argument('--size-28', choices=EXPECTED_SIZE_28_SPANS, type=int, metavar='BLOCKS',
                       help='verify size-28 losses from five blocks through the locality representative')
+    mode.add_argument('--size-29', choices=EXPECTED_SIZE_29_SPANS, type=int, metavar='BLOCKS',
+                      help='enumerate size-29 losses at five blocks')
     mode.add_argument('--ordinary-threshold', action='store_true',
                       help='certify the absence of ordinary interior forts of cost up to 29')
     args = parser.parse_args()
@@ -415,6 +460,9 @@ def main():
         return
     if args.size_28 is not None:
         check_size_26(args.size_28, size_28=True)
+        return
+    if args.size_29 is not None:
+        check_size_26(args.size_29, size_29=True)
         return
     templates = enumerate_blockers(5, minimum_seed_sets(5)) if any(k >= 5 for k in args.blocks) else ()
     if templates:

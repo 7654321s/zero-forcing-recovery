@@ -122,6 +122,25 @@ def check_wrapped_budget(blocks, sheets, budget, band_through):
     print(f'{blocks} blocks, {sheets} sheets: no wrapped fort of cost {budget}', flush=True)
 
 
+def check_ordinary_wrapping(sheets, budget):
+    if budget not in (28, 29, 30):
+        raise ValueError('Ordinary wrapping check requires a budget from 28 to 30')
+    graph, blue, *_ = CHECKS['signed_prism_cover'](36, sheets)
+    clauses = wrapped_formula(graph, blue, sheets, budget, band_through=20,
+                              require_minimal=False, compact_bands=True)
+    if clauses is not None:
+        stage_start = WRAPPED['BLOCK']['stage_start']
+        stages = 31 if budget == 30 else 30
+        first = stage_start(2) * sheets
+        stop = stage_start(2 + stages) * sheets
+        clauses.extend([-(v + 1)] for v in range(len(graph)) if not first <= v < stop)
+        clauses.append(list(range(first + 1, stage_start(3) * sheets + 1)))
+        with Solver(name='cadical195', bootstrap_with=clauses) as solver:
+            if solver.solve():
+                raise AssertionError(('An ordinary wrapped fort exists', sheets, budget))
+    print(f'{sheets} sheets: no ordinary wrapped fort of cost {budget}', flush=True)
+
+
 def check_insertion_obstruction(sheets):
     blocks, budget = 24, 24
     graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
@@ -157,6 +176,9 @@ if __name__ == '__main__':
     mode.add_argument('--wrapped', type=int, nargs=4, action='append',
                       metavar=('BLOCKS', 'SHEETS', 'BUDGET', 'BAND_WIDTH'),
                       help='exclude a wrapped fort using the specified certified sheet bands')
+    mode.add_argument('--ordinary-wrapped', type=int, nargs=2, action='append',
+                      metavar=('SHEETS', 'BUDGET'),
+                      help='exclude wrapping in the ordinary stage window at budget 28, 29 or 30')
     mode.add_argument('--insertion-obstruction', type=int, nargs='+', choices=range(23, 29),
                       metavar='SHEETS',
                       help='exclude wrapping at cost 24 when insertion is blocked at 24 blocks')
@@ -164,6 +186,9 @@ if __name__ == '__main__':
     if args.wrapped:
         for case in args.wrapped:
             check_wrapped_budget(*case)
+    elif args.ordinary_wrapped:
+        for case in args.ordinary_wrapped:
+            check_ordinary_wrapping(*case)
     elif args.insertion_obstruction:
         for sheets in args.insertion_obstruction:
             check_insertion_obstruction(sheets)
