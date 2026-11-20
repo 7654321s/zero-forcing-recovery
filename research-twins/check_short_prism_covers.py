@@ -1,5 +1,6 @@
-"""Verify the small signed prism covers using periodic sheet-band counts."""
+"""Verify signed prism covers using periodic sheet-band counts."""
 
+import argparse
 from pathlib import Path
 import runpy
 
@@ -18,10 +19,10 @@ CASES = {
 }
 
 
-def residual_bounds(sheets, budget):
+def residual_bounds(sheets, budget, band_through=BAND_WIDTH):
     # Full periods in a band contribute exactly budget seeds per period.
     bounds = {}
-    for width in range(10, BAND_WIDTH + 1):
+    for width in range(10, band_through + 1):
         periods, residual = divmod(width, sheets)
         lower = width - 4 - periods * budget
         if lower > 0:
@@ -31,17 +32,19 @@ def residual_bounds(sheets, budget):
     return bounds
 
 
-def wrapped_formula(graph, blue, sheets, budget):
-    bounds = residual_bounds(sheets, budget)
+def wrapped_formula(graph, blue, sheets, budget, *, band_through=BAND_WIDTH,
+                    require_minimal=True, compact_bands=False):
+    bounds = residual_bounds(sheets, budget, band_through)
     if bounds is None:
         return None
     cap = budget - bounds.get(sheets - 1, 0)
     if cap < 1:
         return None
     order = len(graph)
-    neighbors = [tuple(members(row)) for row in graph]
     clauses = list(WRAPPED['BLOCK']['fort_clauses'](graph, range(order)))
-    clauses.extend(WRAPPED['STRIP']['minimal_fort_clauses'](neighbors))
+    if require_minimal:
+        neighbors = [tuple(members(row)) for row in graph]
+        clauses.extend(WRAPPED['STRIP']['minimal_fort_clauses'](neighbors))
     times, ancestry, _ = WRAPPED['LOSS']['nominal_cones'](graph, blue)
     for v in range(order):
         if times[v]:
@@ -64,11 +67,17 @@ def wrapped_formula(graph, blue, sheets, budget):
     top = total.nv
 
     for width, lower in sorted(bounds.items()):
+        if compact_bands and width == sheets - 1:
+            continue  # The per-sheet counters already impose this complement bound.
+        complement = compact_bands and 2 * width > sheets
+        length = sheets - width if complement else width
+        bound = budget - lower if complement else lower
+        encode = CardEnc.atmost if complement else CardEnc.atleast
         for sheet in range(sheets):
-            window = [flag for j in range(width) for flag in flags[(sheet + j) % sheets]]
-            if lower > len(window):
+            window = [flag for j in range(length) for flag in flags[(sheet + j) % sheets]]
+            if not complement and bound > len(window):
                 return None
-            count = CardEnc.atleast(lits=window, bound=lower, top_id=top, encoding=EncType.seqcounter)
+            count = encode(lits=window, bound=bound, top_id=top, encoding=EncType.seqcounter)
             clauses.extend(count.clauses)
             top = count.nv
     return clauses
@@ -99,7 +108,27 @@ def check_cyclic_cost(blocks, sheets, expected):
     print(f'{blocks} blocks, {sheets} sheets: blocking cost {expected}', flush=True)
 
 
+def check_wrapped_budget(blocks, sheets, budget, band_through):
+    graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
+    clauses = wrapped_formula(graph, blue, sheets, budget, band_through=band_through,
+                              require_minimal=False, compact_bands=True)
+    if clauses is not None:
+        with Solver(name='cadical195', bootstrap_with=clauses) as solver:
+            if solver.solve():
+                raise AssertionError(('A wrapped fort exists', blocks, sheets, budget))
+    print(f'{blocks} blocks, {sheets} sheets: no wrapped fort of cost {budget}', flush=True)
+
+
 if __name__ == '__main__':
-    for blocks, cases in CASES.items():
-        for sheets, expected in cases:
-            check_cyclic_cost(blocks, sheets, expected)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--wrapped', type=int, nargs=4, action='append',
+                        metavar=('BLOCKS', 'SHEETS', 'BUDGET', 'BAND_WIDTH'),
+                        help='exclude a wrapped fort using the specified certified sheet bands')
+    args = parser.parse_args()
+    if args.wrapped:
+        for case in args.wrapped:
+            check_wrapped_budget(*case)
+    else:
+        for blocks, cases in CASES.items():
+            for sheets, expected in cases:
+                check_cyclic_cost(blocks, sheets, expected)

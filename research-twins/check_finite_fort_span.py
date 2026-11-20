@@ -262,7 +262,7 @@ def check_larger_optimal_spans(lengths):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--longer', type=int, nargs='+', choices=range(4, 12), default=(),
+    parser.add_argument('--longer', type=int, nargs='+', choices=range(4, 14), default=(),
                         help='also replay the exclusions at spans ten through thirty-two')
     args = parser.parse_args()
     check_minimum_spans()

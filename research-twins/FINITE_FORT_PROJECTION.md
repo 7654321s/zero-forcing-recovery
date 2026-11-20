@@ -48,7 +48,7 @@ For the four-cycle example above, the integer lift has no finite fort. In the cy
 
 ## Application to shorter prism chains
 
-For the [signed unpadded prism chain](BLOCK_STABILIZATION.md), the finite blocking numbers at two and three blocks are 16 and 21. Every chain with at least four blocks has finite blocking number 24. The cyclic blocking numbers equal their finite values from eight sheets at two blocks, 22 sheets at three blocks, and 28 sheets at every length of at least four blocks. At four through eight blocks the agreement starts by 27 sheets, and at least 24 blocks it starts by 25 sheets.
+For the [signed unpadded prism chain](BLOCK_STABILIZATION.md), the finite blocking numbers at two and three blocks are 16 and 21. Every chain with at least four blocks has finite blocking number 24. The cyclic blocking numbers equal their finite values from eight sheets at two blocks, 22 sheets at three blocks, and 26 sheets at every length of at least four blocks. Chains with at least 24 blocks reach the finite value by 25 sheets.
 
 The finite result for at least 24 blocks follows from [block and sheet stabilization](BLOCK_STABILIZATION.md). To descend from $k+1$ blocks to $k$, consider a hypothetical finite fort of cost at most 23. If the fort has two successive empty appended stages, insert a new empty stage between them to preserve the cost. If the fort avoids all opening seeds, the opening fills from its own seeds in two rounds. The fort then avoids the opening and the old stage ports adjacent to it, so the opening insertion preserves its cost. Each insertion would produce a finite fort at the excluded budget on $k+1$ blocks.
 
@@ -64,7 +64,9 @@ The same width-16 band check passes at four blocks. Counting cyclic translates i
 
 ## A lower cyclic threshold for shorter chains
 
-For each of the thirteen lengths from 11 through 23 blocks, the verifier checks the sheet bands of widths 10 through 23. The ten-sheet test permits five lost seeds and forces a consecutive pair of sheets in the core. The larger widths use the two overlapping shorter bands and the complement bounds from the [26-block proof](BLOCK_STABILIZATION.md#a-smaller-sheet-threshold-for-long-chains). Each 23-sheet band of a wrapped fort contains at least 19 seeds. Counting cyclic translates gives $19m\leq23b$ for a wrapped fort of cost $b$. At $m\geq28$ and $b\leq23$ that inequality is impossible. Two empty sheets then turn the cyclic fort into a finite fort of the same cost, excluded by the projected-support argument above. The inherited cost-24 fort supplies the matching upper bound. The same test at four through ten blocks gives the identical 28-sheet guarantee there. Width 28 passes at four through eight blocks, which excludes wrapping below cost 24 from 27 sheets by $24m\leq28b$.
+At every length from four through 23 blocks, the sheet-band verifier checks widths 10 through 28. The ten-sheet test permits five lost seeds and forces a consecutive pair of sheets in the core. The larger widths use the overlapping shorter bands and their complement bounds. A wrapped fort of cost $b$ must place at least 24 seeds in every 28-sheet band of its periodic lift. Counting over one period gives $24m\leq28b$, which excludes $b\leq23$ for $m\geq27$.
+
+At 26 sheets and every length from four through 23 blocks, a 27-sheet band counts the full budget plus the seeds on one extra sheet. At $b\leq22$ each sheet would need a seed, contradicting $b\leq22<26$. At $b=23$, a 25-sheet band contains at least 21 seeds, so any single sheet contains at most two. The wrapped verifier excludes this remaining budget using the periodic band inequalities, the exact total of 23 seeds and the requirement that every adjacent pair of sheets meets the fort. For every window spanning more than half a period it encodes the equivalent upper bound on the complementary window. These checks cover all forts at that budget. A fort with two consecutive empty sheets unrolls, where the finite lower bound applies. The inherited 24-seed witness supplies the matching upper bound.
 
 ## Cyclic thresholds at two and three blocks
 
@@ -133,13 +135,15 @@ The 26-stage band extends this statement to every greater length. A finite fort 
 | 9 | 4 | 51 | 53 |
 | 9 | 8 | 50 | 54 |
 
-## Complete counts from four through eleven blocks
+## Complete counts from four through thirteen blocks
 
-For these eight lengths the width-16 and width-17 band checks give a span bound for every cost-24 fort. Any pair of empty interior sheets would split it into two nonempty finite forts, each of cost at least 24. A span of at least 33 would contain disjoint bands of widths 16 and 17. They would require at least 12 and 13 lost seeds respectively. A cost-24 fort thus fits inside the 32 interior sheets of a 34-sheet guarded strip.
+For these lengths the width-16 and width-17 band checks give a span bound for every cost-24 fort. Any pair of empty interior sheets would split it into two nonempty finite forts, each of cost at least 24. A span of at least 33 would contain disjoint bands of widths 16 and 17. They would require at least 12 and 13 lost seeds respectively. A cost-24 fort thus fits inside the 32 interior sheets of a 34-sheet guarded strip.
 
-The longer-span verifier translates the first occupied sheet to one and demands an occupied sheet at index ten or higher. It keeps the fort clauses, the guards, the absence of an interior two-sheet gap and the seed ancestry conditions. It permits arbitrary forts including those with proper fort subsets. The cost-24 test is unsatisfiable at each length from four through eleven blocks. The 54 shapes and five seed sets above are therefore the complete lists of finite minimum-cost forts and their seed sets up to sheet translation at these lengths.
+The longer-span verifier translates the first occupied sheet to one and demands an occupied sheet at index ten or higher. It keeps the fort clauses, the guards, the absence of an interior two-sheet gap and the seed ancestry conditions. It permits arbitrary forts including those with proper fort subsets. The cost-24 test is unsatisfiable at each length from four through thirteen blocks. The 54 shapes and five seed sets above are therefore the complete lists of finite minimum-cost forts and their seed sets up to sheet translation at these lengths.
 
-For the cyclic version on $m\geq29$ sheets, the width-25 band at these lengths rules out wrapped forts of cost 24 by $21m>25\cdot24$. Every minimum-cost cyclic fort then unrolls to one of the listed finite forts, and each listed fort projects to the cycle. Its span is at most nine, so the outer run of at least $m-9$ empty sheets is strictly longer than any interior run. The first occupied sheet after this unique longest run determines the translation. The same argument applies to the seed sets, as each meets both extreme sheets of its fort. Thus the exact numbers are $54m$ minimum-cost cyclic forts and $5m$ minimum blocking sets. For a minimum blocking set the final white fort contains all its lost seeds, since any smaller seed intersection would contradict minimal cost.
+For the cyclic version on $m\geq29$ sheets, the width-25 band at these lengths rules out wrapped forts of cost 24 by $21m>25\cdot24$. At 27 and 28 sheets the wrapped verifier excludes cost 24 using the certified bands through width 28. The width-26 bound gives at most two seeds on one sheet at $m=27$, and the width-27 bound gives at most one at $m=28$.
+
+Thus for $m\geq27$ every minimum-cost cyclic fort unrolls to one of the listed finite forts, and each listed fort projects to the cycle. Its span is at most nine, so the outer run of at least $m-9$ empty sheets is strictly longer than any interior run. The first occupied sheet after this unique longest run determines the translation. The same argument applies to the seed sets, as each meets both extreme sheets of its fort. The exact numbers are $54m$ minimum-cost cyclic forts and $5m$ minimum blocking sets. For a minimum blocking set the final white fort contains all its lost seeds, since any smaller seed intersection would contradict minimal cost.
 
 ## Reproduction
 
@@ -165,14 +169,22 @@ do
 done
 ```
 
-The sheet-band checks for the shorter chains can be replayed with the same verifier as at 26 blocks. The 28-sheet guarantees use the following runs.
+The sheet-band checks for the shorter chains can be replayed with the same verifier as at 26 blocks. The 26-sheet guarantee uses the following runs.
 
 ```sh
-python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 23 --band-blocks 4 5 6 7 8 9 10
-python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 28 --band-blocks 4 5 6 7 8
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 28 --band-blocks 4 5 6 7 8 9 10
+python -B research-twins/check_block_stabilization.py --subbands-from 17 --band-through 28 --band-blocks 11 12 13 14 15 16 17 18 19 20 21 22 23
+for blocks in 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 26 23 28 || exit 1
+done
+```
+
+The two- and three-block results use their own band checks and wrapped verifier.
+
+```sh
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 2 3
 python -B research-twins/check_short_prism_covers.py
-python -B research-twins/check_block_stabilization.py --subbands-from 17 --band-through 23 --band-blocks 11 12 13 14 15 16 17 18 19 20 21 22 23
 ```
 
 The following command reproduces the minimum spans, the cost table and the classifications of the seven-, eight- and nine-sheet minimum-cost forts and their seed families.
@@ -181,9 +193,12 @@ The following command reproduces the minimum spans, the cost table and the class
 python -B research-twins/check_finite_fort_span.py
 ```
 
-The complete counts at four through eleven blocks use the following additional checks.
+The complete counts at four through thirteen blocks use the band checks above and these additional checks.
 
 ```sh
-python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 4 5 6 7 8 9 10 11
-python -B research-twins/check_finite_fort_span.py --longer 4 5 6 7 8 9 10 11
+python -B research-twins/check_finite_fort_span.py --longer 4 5 6 7 8 9 10 11 12 13
+for blocks in 4 5 6 7 8 9 10 11 12 13
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 27 24 28 --wrapped "$blocks" 28 24 28 || exit 1
+done
 ```
