@@ -109,6 +109,14 @@ The [verifier](check_finite_fort_span.py) lists 40 vertices common to the termin
 
 At a longer length, contract an empty pair from the 26-stage band as above. The resulting fort meets both of the last two appended stages, so the deleted empty stage must precede them. This preserves the fort's terminal coordinates. Conversely, move any of the 40 patterns to the last two stages of a longer chain. The signed internal edges and the splice into the preceding stage have the same normalized description. The opening hub keeps its two links to the terminal stage. Thus every vertex next to the pattern has the same count of fort neighbors. All other outside vertices have count zero, and the seed labels on the pattern are unchanged. This gives the same 40 shapes and two seed sets at every length.
 
+## The nine-sheet minimum-cost forts
+
+For every chain with at least four blocks, up to sheet translation there are exactly 12 finite forts of seed cost 24 and span nine. They lie in the opening and the first two appended stages, have 50 through 54 vertices, and realize exactly two 24-seed blocking sets.
+
+The verifier starts with 48 common vertices and tests the subsets of seven optional vertices. It checks the resulting 12 shapes and excludes every other membership assignment in the nine-sheet guarded strips at lengths from four through 27 blocks. Each displayed shape meets both of the first two appended stages and uses the same opening labels. Contraction of an empty pair in the first 26 appended stages therefore extends the exhaustive classification. The appended-stage edits beyond these shapes preserve their neighbors and seed labels.
+
+Taken together, the spans of seven, eight and nine give 54 minimum-cost fort shapes and five distinct 24-seed blocking sets among the finite forts of span at most nine. Each seed set occupies both extreme sheets of its fort, so the sets counted at the three spans stay distinct under sheet translation.
+
 ## Reproduction
 
 ```sh
@@ -143,7 +151,7 @@ python -B research-twins/check_short_prism_covers.py
 python -B research-twins/check_block_stabilization.py --subbands-from 17 --band-through 23 --band-blocks 11 12 13 14 15 16 17 18 19 20 21 22 23
 ```
 
-The following command reproduces the minimum spans, the cost table and the classifications of the seven- and eight-sheet minimum-cost forts.
+The following command reproduces the minimum spans, the cost table and the classifications of the seven-, eight- and nine-sheet minimum-cost forts.
 
 ```sh
 python -B research-twins/check_finite_fort_span.py

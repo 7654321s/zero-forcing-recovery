@@ -115,6 +115,9 @@ def check_guarded_shapes(blocks, span, shapes):
         occupied = {v % sheets for v in members(fort)}
         if min(occupied) != 1 or max(occupied) != span:
             raise AssertionError(('Incorrect witness span', blocks, span))
+        seed_sheets = {v % sheets for v in members(fort & seeds)}
+        if min(seed_sheets) != 1 or max(seed_sheets) != span:
+            raise AssertionError(('Incorrect seed-set span', blocks, span))
 
     free = [v + 1 for v in range(len(graph)) if not outside & (1 << v)]
     clauses = list(BAND['fort_clauses'](graph, range(len(graph))))
@@ -157,16 +160,15 @@ TAIL_OPTIONAL = ((9, 5), (20, 5), (21, 4), (22, 4), (23, 4), (23, 5),
                  (24, 5), (25, 4), (25, 5))
 
 
-def check_eight_sheet_forts():
-    representative = 4
-    start = BAND['stage_start'](representative - 2)
-    graph, seeds, _ = guarded_strip(representative, 8)
+def patterns_from_optional_vertices(span, start, common, optional):
+    graph, seeds, _ = guarded_strip(4, span)
+    sheets = span + 2
     patterns = []
     supports = set()
-    for length in range(len(TAIL_OPTIONAL) + 1):
-        for included in combinations(TAIL_OPTIONAL, length):
-            coordinates = TAIL_COMMON + included
-            fort = mask((v + start) * 10 + s for v, s in coordinates)
+    for length in range(len(optional) + 1):
+        for included in combinations(optional, length):
+            coordinates = common + included
+            fort = mask((v + start) * sheets + s for v, s in coordinates)
             try:
                 cost = COVER['fort_cost'](graph, seeds, fort)
             except AssertionError:
@@ -174,6 +176,12 @@ def check_eight_sheet_forts():
             if cost == 24:
                 patterns.append(coordinates)
                 supports.add(fort & seeds)
+    return patterns, supports
+
+
+def check_eight_sheet_forts():
+    start = BAND['stage_start'](2)
+    patterns, supports = patterns_from_optional_vertices(8, start, TAIL_COMMON, TAIL_OPTIONAL)
     if len(patterns) != 40 or len(supports) != 2:
         raise AssertionError('Unexpected eight-sheet terminal patterns')
     if {len(pattern) for pattern in patterns} != set(range(42, 48)):
@@ -187,8 +195,35 @@ def check_eight_sheet_forts():
     print('Exactly 40 cost-24 forts of span eight, with two seed sets, at every length from four blocks')
 
 
+OPENING_NINE_COMMON = (
+    (0, 1), (0, 2), (3, 1), (3, 2), (5, 3), (6, 2), (6, 3), (7, 2),
+    (9, 3), (9, 4), (12, 2), (14, 3), (15, 3), (15, 4), (21, 5), (22, 2),
+    (25, 5), (26, 4), (26, 5), (27, 4), (27, 5), (28, 4), (29, 5), (31, 5),
+    (33, 7), (35, 4), (35, 7), (36, 7), (38, 5), (38, 6), (39, 4), (39, 5),
+    (39, 7), (40, 4), (40, 5), (40, 6), (41, 5), (41, 6), (42, 7), (43, 5),
+    (43, 6), (44, 5), (44, 6), (45, 6), (47, 8), (48, 6), (48, 9), (49, 6),
+)
+OPENING_NINE_OPTIONAL = ((2, 2), (4, 1), (36, 5), (42, 6), (43, 7), (44, 7), (49, 8))
+
+
+def check_nine_sheet_forts():
+    patterns, supports = patterns_from_optional_vertices(9, 0, OPENING_NINE_COMMON,
+                                                       OPENING_NINE_OPTIONAL)
+    if len(patterns) != 12 or len(supports) != 2:
+        raise AssertionError('Unexpected nine-sheet opening patterns')
+    if {len(pattern) for pattern in patterns} != set(range(50, 55)):
+        raise AssertionError('Unexpected sizes of nine-sheet forts')
+
+    shapes = [mask(v * 11 + s for v, s in pattern) for pattern in patterns]
+    for blocks in range(4, 28):
+        if check_guarded_shapes(blocks, 9, shapes) != 2:
+            raise AssertionError(('Unexpected number of opening seed patterns', blocks))
+    print('Exactly 12 cost-24 forts of span nine, with two seed sets, at every length from four blocks')
+
+
 if __name__ == '__main__':
     check_minimum_spans()
     check_seed_frontiers()
     check_shortest_minimum_cost_forts()
     check_eight_sheet_forts()
+    check_nine_sheet_forts()
