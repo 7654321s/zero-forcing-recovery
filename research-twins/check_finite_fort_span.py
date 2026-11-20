@@ -30,6 +30,12 @@ RESTORATION_PROFILES = {
     (9, 8): ((8, 3), (9, 1), (10, 1), (11, 4), (12, 1), (13, 4), (14, 4),
              (15, 4), (16, 1), (17, 1)),
 }
+ADDITIONAL_BLOCKER = (
+    (0, 1), (0, 2), (9, 4), (10, 2), (11, 2), (15, 4), (18, 3), (20, 2),
+    (22, 2), (23, 3), (23, 4), (32, 5), (33, 7), (35, 4), (35, 7), (36, 5),
+    (36, 7), (37, 5), (38, 5), (38, 6), (39, 4), (39, 5), (39, 7), (47, 8),
+    (48, 9),
+)
 
 
 def guarded_strip(blocks, span):
@@ -117,6 +123,17 @@ def check_seed_frontiers():
         print(f'{blocks} blocks: minimum seed costs {costs} from span {first}')
 
 
+def restoration_profile(graph, seeds, lost):
+    counts = Counter()
+    surviving = seeds & ~lost
+    for restored in members(lost):
+        arrival = COVER['MODEL']['trace'](graph, surviving | (1 << restored))[1]
+        if None in arrival:
+            raise AssertionError(('Restoring a seed leaves an obstruction', restored))
+        counts[max(arrival)] += 1
+    return tuple(sorted(counts.items()))
+
+
 def check_seed_families(blocks, span, shapes, expected, *, restoration_times=False):
     # Four sheets on either side suffice for two rounds of intact dependence.
     sheets = 19
@@ -147,15 +164,9 @@ def check_seed_families(blocks, span, shapes, expected, *, restoration_times=Fal
             raise AssertionError(('Missing a combination of optional groups', blocks, span))
         observed.append((len(family), least.bit_count(), maximal.bit_count(), sizes))
         if restoration_times and blocks <= 20:
-            counts = Counter()
-            surviving = seeds & ~lost
-            for restored in members(lost):
-                arrival = COVER['MODEL']['trace'](graph, surviving | (1 << restored))[1]
-                if None in arrival:
-                    raise AssertionError(('Restoring a seed leaves an obstruction', blocks, span))
-                counts[max(arrival)] += 1
-            if tuple(sorted(counts.items())) != RESTORATION_PROFILES[span, len(family)]:
-                raise AssertionError(('Unexpected restoration times', blocks, span, counts))
+            observed_profile = restoration_profile(graph, seeds, lost)
+            if observed_profile != RESTORATION_PROFILES[span, len(family)]:
+                raise AssertionError(('Unexpected restoration times', blocks, span, observed_profile))
     if tuple(sorted(observed)) != expected:
         raise AssertionError(('Unexpected seed-family statistics', blocks, span, observed))
 
@@ -297,6 +308,26 @@ def check_larger_optimal_spans(lengths):
         print(f'{blocks} blocks: every cost-24 fort spans at most nine sheets', flush=True)
 
 
+def check_additional_blocker():
+    sheets = 19
+    lost = mask(v * sheets + s + 4 for v, s in ADDITIONAL_BLOCKER)
+    if lost.bit_count() != 25:
+        raise AssertionError('Expected a 25-seed loss set')
+    for blocks in range(4, 21):
+        graph, seeds, *_ = COVER['signed_prism_cover'](blocks, sheets)
+        if lost & seeds != lost:
+            raise AssertionError(('Expected seed labels in the loss set', blocks))
+        arrival = COVER['MODEL']['trace'](graph, seeds & ~lost)[1]
+        remaining = mask(v for v, t in enumerate(arrival) if t is None)
+        occupied = {v % sheets for v in members(remaining)}
+        if remaining.bit_count() != 59 or min(occupied) != 5 or max(occupied) != 13:
+            raise AssertionError(('Unexpected residual fort for the 25-seed loss', blocks))
+        profile = restoration_profile(graph, seeds, lost)
+        if profile[0][0] != 10 or profile[-1][0] != 17:
+            raise AssertionError(('Unexpected range of restoration times', blocks, profile))
+    print('Checked an inclusion-minimal 25-seed loss at lengths four through twenty', flush=True)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--longer', type=int, nargs='+', choices=(*range(4, 18), 26), default=(),
@@ -312,5 +343,6 @@ if __name__ == '__main__':
     print('Checked the five seed families, their forcing closures and all optional-group combinations')
     if args.restoration_times:
         print('Checked all 2040 single-seed restorations at lengths four through twenty')
+        check_additional_blocker()
     if args.longer:
         check_larger_optimal_spans(args.longer)

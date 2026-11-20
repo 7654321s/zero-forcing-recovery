@@ -33,11 +33,13 @@ def residual_bounds(sheets, budget, band_through=BAND_WIDTH):
 
 
 def wrapped_formula(graph, blue, sheets, budget, *, band_through=BAND_WIDTH,
-                    require_minimal=True, compact_bands=False):
+                    require_minimal=True, compact_bands=False, sheet_cap=None):
     bounds = residual_bounds(sheets, budget, band_through)
     if bounds is None:
         return None
     cap = budget - bounds.get(sheets - 1, 0)
+    if sheet_cap is not None:
+        cap = min(cap, sheet_cap)
     if cap < 1:
         return None
     order = len(graph)
@@ -119,15 +121,51 @@ def check_wrapped_budget(blocks, sheets, budget, band_through):
     print(f'{blocks} blocks, {sheets} sheets: no wrapped fort of cost {budget}', flush=True)
 
 
+def check_insertion_obstruction(sheets):
+    blocks, budget = 24, 24
+    graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
+    # Two bands partition the complement of one sheet at these three periods.
+    cap = 33 - sheets if sheets > 25 else None
+    clauses = wrapped_formula(graph, blue, sheets, budget, band_through=24,
+                              require_minimal=False, compact_bands=True, sheet_cap=cap)
+    stage_start = WRAPPED['BLOCK']['stage_start']
+    opening = stage_start(1) * sheets
+    clauses.append([v + 1 for v in members(blue) if v < opening])
+    for stage in range(1, blocks - 1):
+        start = stage_start(stage) * sheets
+        stop = stage_start(stage + 2) * sheets
+        clauses.append(list(range(start + 1, stop + 1)))
+
+    # Every projected seed must have exactly one lifted representative.
+    top = max(abs(v) for clause in clauses for v in clause)
+    for start in range(0, len(graph), sheets):
+        if (blue >> start) & 1:
+            bound = CardEnc.atmost(lits=list(range(start + 1, start + sheets + 1)),
+                                   bound=1, top_id=top, encoding=EncType.seqcounter)
+            clauses.extend(bound.clauses)
+            top = bound.nv
+    with Solver(name='cadical195', bootstrap_with=clauses) as solver:
+        if solver.solve():
+            raise AssertionError(('A wrapped fort prevents insertion at 24 blocks', sheets))
+    print(f'24 blocks, {sheets} sheets: no cost-24 wrapped fort prevents insertion', flush=True)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--wrapped', type=int, nargs=4, action='append',
-                        metavar=('BLOCKS', 'SHEETS', 'BUDGET', 'BAND_WIDTH'),
-                        help='exclude a wrapped fort using the specified certified sheet bands')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--wrapped', type=int, nargs=4, action='append',
+                      metavar=('BLOCKS', 'SHEETS', 'BUDGET', 'BAND_WIDTH'),
+                      help='exclude a wrapped fort using the specified certified sheet bands')
+    mode.add_argument('--insertion-obstruction', type=int, nargs='+', choices=range(25, 29),
+                      metavar='SHEETS',
+                      help='exclude wrapping at cost 24 when insertion is blocked at 24 blocks')
     args = parser.parse_args()
     if args.wrapped:
         for case in args.wrapped:
             check_wrapped_budget(*case)
+    elif args.insertion_obstruction:
+        for sheets in args.insertion_obstruction:
+            check_insertion_obstruction(sheets)
     else:
         for blocks, cases in CASES.items():
             for sheets, expected in cases:
