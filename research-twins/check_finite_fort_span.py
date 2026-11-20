@@ -103,6 +103,41 @@ def check_seed_frontiers():
         print(f'{blocks} blocks: minimum seed costs {costs} from span {first}')
 
 
+def check_shortest_minimum_cost_forts():
+    for blocks in (27, 28):
+        BAND['check_band'](blocks, stages=26, budget=24)
+
+    common = mask(v * 9 + s for v, s in COVER['FOUR_BLOCK_FORT'])
+    removed = mask(v * 9 + 4 for v in (43, 44))
+    if common & removed != removed or common.bit_count() != 46:
+        raise AssertionError('Unexpected common fort')
+    shapes = (common ^ removed, common)
+    for blocks in range(4, 28):
+        graph, seeds, guards = guarded_strip(blocks, 7)
+        times = COVER['MODEL']['trace'](graph, guards)[1]
+        outside = mask(v for v, t in enumerate(times) if t is not None)
+        for fort in shapes:
+            if (fort & outside or {v % 9 for v in members(fort)} != set(range(1, 8))
+                    or COVER['fort_cost'](graph, seeds, fort) != 24):
+                raise AssertionError(('Invalid seven-sheet fort', blocks))
+        if removed & seeds:
+            raise AssertionError(('The two shapes have different seed sets', blocks))
+
+        free = [v + 1 for v in range(len(graph)) if not outside & (1 << v)]
+        clauses = list(BAND['fort_clauses'](graph, range(len(graph))))
+        clauses.extend([-(v + 1)] for v in members(outside))
+        clauses.append(free)
+        for fort in shapes:
+            clauses.append([-v if fort & (1 << (v - 1)) else v for v in free])
+        with ITotalizer(lits=[v + 1 for v in members(seeds & ~outside)], ubound=24,
+                        top_id=len(graph)) as counter:
+            with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
+                if solver.solve(assumptions=[-counter.rhs[24]]):
+                    raise AssertionError(('An additional shortest minimum-cost fort exists', blocks))
+    print('Exactly two cost-24 forts of span seven at every length from four blocks')
+
+
 if __name__ == '__main__':
     check_minimum_spans()
     check_seed_frontiers()
+    check_shortest_minimum_cost_forts()

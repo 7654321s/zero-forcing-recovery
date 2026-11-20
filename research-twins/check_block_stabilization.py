@@ -56,25 +56,24 @@ def fort_clauses(graph, sources, start=0):
                    *(w - start + 1 for w in neighbors if w != u)]
 
 
-def check_band(blocks):
-    """Exclude a restricted fort of cost at most 23 occupying every stage pair."""
+def check_band(blocks, *, stages=25, budget=23):
+    """Exclude a restricted fort within the given budget occupying every stage pair."""
     graph, blue, _, _ = chain(blocks)
-    start, stop = stage_start(1), stage_start(26)
+    start, stop = stage_start(1), stage_start(stages + 1)
     band = range(start, stop)
     active = mask(band)
     sources = [v for v in band if not graph[v] & ~active]
     clauses = list(fort_clauses(graph, sources, start))
-    for stage in range(1, 25):
+    for stage in range(1, stages):
         a = stage_start(stage) - start + 1
         clauses.append(list(range(a, a + 32)))
     seeds = [v - start + 1 for v in members(blue & active)]
-    if len(seeds) != 250:
+    if len(seeds) != 10 * stages:
         raise AssertionError(('seed count in stage band', len(seeds)))
-    budget = 23
     with ITotalizer(lits=seeds, ubound=budget, top_id=len(band)) as counter:
         with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
             if solver.solve(assumptions=[-counter.rhs[budget]]):
-                raise AssertionError(('23 seed labels block the band', blocks))
+                raise AssertionError(('Seed labels block the stage band', blocks, stages, budget))
 
 
 def check_sheet_band(width, budget, pin_ends=False, *, blocks=26, subband_constraints=False):

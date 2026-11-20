@@ -91,6 +91,14 @@ The common cost-24 witness occupies seven sheets. Consequently the minimum span 
 
 For each displayed numerical cost, the guarded fort formula is satisfiable at that cost and unsatisfiable one seed below it. Dashes mark spans omitted from the table. The least span among minimum-cost forts is six sheets at two blocks, eight at three blocks, and seven at every length from four blocks onward.
 
+## The two shortest minimum-cost forts
+
+For every chain with at least four blocks, up to translation of the sheet coordinate there are exactly two finite forts with seed cost 24 and span seven. The 46-vertex fort is the common four-block witness. Removing vertices $(43,4)$ and $(44,4)$ gives the 44-vertex fort. Both removed vertices are nonseeds, so the two forts give the same blocking set of 24 seeds. Both shapes use the opening and the first two appended stages.
+
+For four through 27 blocks, put the two blue guard sheets around the seven interior sheets. Every fort in the strip avoids the vertices forced from the guards. The verifier imposes the fort clauses on the remaining candidates and a seed budget of 24. It forbids the exact membership assignments of the two displayed forts. The formulas are unsatisfiable at all 24 lengths, and the verifier checks both displayed witnesses at each length.
+
+The 26-stage band extends this classification to every longer chain. With at most 24 seed-label losses, the restricted base forcing process still fills a pair of consecutive stages in the first 26 appended stages. The verifier checks the terminal and nonterminal band types at 27 and 28 blocks. Project a cost-24 fort's lost seeds onto base labels, retaining all lifted seeds outside those labels. The restricted base process lifts to the integer sheets, filling two consecutive appended stages disjoint from the fort. [Contract that pair](BLOCK_STABILIZATION.md#insertion-and-contraction). This preserves the seed cost and the sheet span. By induction, the contracted fort is one of the two displayed shapes. It meets both of the first two appended stages, so the retained empty stage has index at least three and the deleted stage was beyond the support. Expanding the chain preserves the same shape and seed labels.
+
 ## Reproduction
 
 ```sh
@@ -125,7 +133,7 @@ python -B research-twins/check_short_prism_covers.py
 python -B research-twins/check_block_stabilization.py --subbands-from 17 --band-through 23 --band-blocks 11 12 13 14 15 16 17 18 19 20 21 22 23
 ```
 
-The following command reproduces the minimum spans and the cost table.
+The following command reproduces the minimum spans, the cost table and the classification of the two shortest minimum-cost forts.
 
 ```sh
 python -B research-twins/check_finite_fort_span.py
