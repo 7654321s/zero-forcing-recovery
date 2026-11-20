@@ -48,7 +48,7 @@ For the four-cycle example above, the integer lift has no finite fort. In the cy
 
 ## Application to shorter prism chains
 
-For the [signed unpadded prism chain](BLOCK_STABILIZATION.md), the finite blocking numbers at two and three blocks are 16 and 21. Every chain with at least four blocks has finite blocking number 24. The cyclic blocking numbers equal their finite values from eight sheets at two blocks, 22 sheets at three blocks, and 26 sheets at every length of at least four blocks. Chains with at least 24 blocks reach the finite value by 25 sheets.
+For the [signed unpadded prism chain](BLOCK_STABILIZATION.md), the finite blocking numbers at two and three blocks are 16 and 21. Every chain with at least four blocks has finite blocking number 24. The cyclic blocking numbers equal their finite values from eight sheets at two blocks, 22 sheets at three blocks, and 25 sheets at every length of at least four blocks.
 
 The finite result for at least 24 blocks follows from [block and sheet stabilization](BLOCK_STABILIZATION.md). To descend from $k+1$ blocks to $k$, consider a hypothetical finite fort of cost at most 23. If the fort has two successive empty appended stages, insert a new empty stage between them to preserve the cost. If the fort avoids all opening seeds, the opening fills from its own seeds in two rounds. The fort then avoids the opening and the old stage ports adjacent to it, so the opening insertion preserves its cost. Each insertion would produce a finite fort at the excluded budget on $k+1$ blocks.
 
@@ -67,6 +67,8 @@ The same width-16 band check passes at four blocks. Counting cyclic translates i
 At every length from four through 23 blocks, the sheet-band verifier checks widths 10 through 28. The ten-sheet test permits five lost seeds and forces a consecutive pair of sheets in the core. The larger widths use the overlapping shorter bands and their complement bounds. A wrapped fort of cost $b$ must place at least 24 seeds in every 28-sheet band of its periodic lift. Counting over one period gives $24m\leq28b$, which excludes $b\leq23$ for $m\geq27$.
 
 At 26 sheets and every length from four through 23 blocks, a 27-sheet band counts the full budget plus the seeds on one extra sheet. At $b\leq22$ each sheet would need a seed, contradicting $b\leq22<26$. At $b=23$, a 25-sheet band contains at least 21 seeds, so any single sheet contains at most two. The wrapped verifier excludes this remaining budget using the periodic band inequalities, the exact total of 23 seeds and the requirement that every adjacent pair of sheets meets the fort. For every window spanning more than half a period it encodes the equivalent upper bound on the complementary window. These checks cover all forts at that budget. A fort with two consecutive empty sheets unrolls, where the finite lower bound applies. The inherited 24-seed witness supplies the matching upper bound.
+
+At 25 sheets, the width-26 band requires at least 22 seeds. Below budget 22 each sheet would again need a seed, which is impossible. At budgets 22 and 23 the width-24 band leaves respective caps of two and three seeds on each sheet. The same wrapped verifier excludes both budgets at every length from four through 23 blocks. Together with the finite lower bound, the common witness and the [long-chain result](BLOCK_STABILIZATION.md#the-25-sheet-case), this proves $\kappa_{k,m}=24$ for every $k\geq4$ and $m\geq25$.
 
 ## Cyclic thresholds at two and three blocks
 
@@ -169,14 +171,14 @@ do
 done
 ```
 
-The sheet-band checks for the shorter chains can be replayed with the same verifier as at 26 blocks. The 26-sheet guarantee uses the following runs.
+The sheet-band checks for the shorter chains can be replayed with the same verifier as at 26 blocks. The 25-sheet guarantee uses the following runs.
 
 ```sh
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 28 --band-blocks 4 5 6 7 8 9 10
 python -B research-twins/check_block_stabilization.py --subbands-from 17 --band-through 28 --band-blocks 11 12 13 14 15 16 17 18 19 20 21 22 23
 for blocks in 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 do
-    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 26 23 28 || exit 1
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 25 22 28 --wrapped "$blocks" 25 23 28 --wrapped "$blocks" 26 23 28 || exit 1
 done
 ```
 
