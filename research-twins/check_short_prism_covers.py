@@ -1,7 +1,7 @@
 """Verify signed prism covers using periodic sheet-band counts."""
 
 import argparse
-from itertools import accumulate, combinations_with_replacement
+from itertools import accumulate, combinations_with_replacement, product
 from math import gcd
 from pathlib import Path
 import runpy
@@ -257,6 +257,42 @@ def check_stage_ancestry():
     print('Nominal two-round proofs use seeds only in the same or next stage', flush=True)
 
 
+def check_rectangle_separation():
+    """Replay four rectangles with ordinary stage guards and four-sheet guards."""
+    enumerate_losses = runpy.run_path(str(Path(__file__).with_name('check_cost_25_blocking_sets.py')))
+    ordinary_blocker = enumerate_losses['SPAN']['ORDINARY_BLOCKER']
+    stage_start = WRAPPED['BLOCK']['stage_start']
+    blocks, sheets = 17, 30
+    graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
+    neighbors = tuple(tuple(members(row)) for row in graph)
+    white = bytearray(not (blue >> v) & 1 for v in range(len(graph)))
+    final_white = enumerate_losses['remaining_white']
+    losses, isolated = [], []
+    for first in (4, 9):
+        for sheet in (0, 15):
+            lost = mask((stage_start(first) + v) * sheets + sheet + offset - 1
+                        for v, offsets in ordinary_blocker for offset in offsets)
+            if lost & blue != lost or lost.bit_count() != 30:
+                raise AssertionError(('Unexpected rectangle seed labels', first, sheet))
+            repaired = lost ^ (lost & -lost)
+            fort = final_white(neighbors, white, lost)
+            if not fort or final_white(neighbors, white, repaired):
+                raise AssertionError(('Unexpected isolated rectangle recovery', first, sheet))
+            losses.append((repaired, lost))
+            isolated.append(fort)
+
+    for choices in product((0, 1), repeat=len(losses)):
+        combined = 0
+        expected = 0
+        for index, choice in enumerate(choices):
+            combined |= losses[index][choice]
+            if choice:
+                expected |= isolated[index]
+        if final_white(neighbors, white, combined) != expected:
+            raise AssertionError(('Rectangle white sets do not factor', choices))
+    print('All 16 mixed four-rectangle closures agree with isolated closures', flush=True)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
@@ -276,6 +312,8 @@ if __name__ == '__main__':
                       help='check the round-five separation across four intact sheets')
     mode.add_argument('--stage-ancestry', action='store_true',
                       help='check the one-sided stage support of two-round forcing proofs')
+    mode.add_argument('--rectangle-separation', action='store_true',
+                      help='replay combined ordinary rectangles with intact guards')
     args = parser.parse_args()
     if args.wrapped:
         for case in args.wrapped:
@@ -296,6 +334,8 @@ if __name__ == '__main__':
                   flush=True)
     elif args.stage_ancestry:
         check_stage_ancestry()
+    elif args.rectangle_separation:
+        check_rectangle_separation()
     else:
         for blocks, cases in CASES.items():
             for sheets, expected in cases:

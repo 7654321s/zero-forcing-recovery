@@ -500,7 +500,7 @@ $$
 \Phi(p)=\lim_{k,m\to\infty}\frac{\log R_{k,m}(p)}{km}
 $$
 
-exists. Let $H_{a,c}(p)$ be the probability of recovery when losses are confined to an $a$-stage by $c$-sheet rectangle of the infinite ordinary graph. This graph repeats the ordinary stage labels and port edges in both coordinates. Put $Q=(a+10)(c+10)$. Then
+exists. Let $H_{a,c}(p)$ be the probability of recovery when losses are confined to an $a$-stage by $c$-sheet rectangle of the infinite ordinary graph. This graph repeats the ordinary stage labels and port edges in both coordinates. Put $Q=(a+2)(c+4)$. Then
 
 $$
 \frac{\log H_{a,c}(p)+10(Q-ac)\log(1-p)}{Q}
@@ -509,13 +509,17 @@ $$
 
 The width of the interval is at most $10[-\log(1-p)](1-ac/Q)$. A rectangle containing an ordinary cost-30 fort has $H_{a,c}(p)<1$, so $\Phi(p)<0$. For small positive $p$, $\Phi(p)=F(p)$ by the analytic estimate above.
 
-The intact ordinary graph recovers within two rounds by locality of the intact traces in finite covers. The closure after an isolated rectangle loss uses only the surrounding eight-stage and eight-sheet margins, by the radius-eight argument above. If two rectangles are separated by ten intact positions in either coordinate, their possible white regions at round two are separated in that coordinate by at least two entirely blue positions. Each graph edge changes either coordinate by at most one. No vertex can therefore see white vertices in both regions, and a fort in their union restricts to a fort in one region. Thus isolated recovery in every rectangle suffices for simultaneous recovery with these buffers. [One-dimensional interval argument](CYCLIC_FORT_GROWTH.md#exponential-recovery-rate-and-finite-interval-bounds)
+The intact ordinary graph recovers within two rounds by locality of the intact traces in finite covers. The closure after an isolated rectangle loss uses only the surrounding eight-stage and eight-sheet margins, by the radius-eight argument above.
 
-For the upper bound, tile a region away from the exceptional stages by disjoint $a$ by $c$ rectangles. Each rectangle has the ordinary local graph within its eight-position margins. A successful full loss must succeed on every isolated rectangle by monotonicity, giving an upper bound of $H_{a,c}$ raised to the number of tiles. For fixed $a,c$ the number of tiles divided by $km$ tends to $1/(ac)$. For the lower bound, place the same rectangles with ten intact positions between consecutive tiles along each axis and with room for the ordinary margins near the exceptional stages. The density of tiles tends to $1/Q$. Require all uncovered designated seeds to survive and let each rectangle have an independent successful isolated loss. This event suffices for full recovery and gives the lower bound. There are ten seed sites per stage-sheet cell in the ordinary graph and $10km$ in the cover. The difference of the two rates is at most the stated width since $(1-p)^{10ac}\le H_{a,c}\le1$. Sending both $a$ and $c$ to infinity proves the limit.
+Two consecutive ordinary stages with their seeds intact separate the remaining white vertices across the first stage by round two. The one-sided stage ancestry fills that stage. A pair of white vertices on opposite sides at distance at most two would have to share a neighbor in the filled stage. The port lists give incoming offsets $0,1,2$ and outgoing offsets $0,9,10,12$. Only offset $0$ can serve both sides, and its outgoing neighbor has seed offset $0$ in the second intact stage. That neighbor is blue. In the sheet coordinate the four-sheet certificate gives separation across the center of four intact sheets by round five. Each statement concerns a strip of seeds intact across the entire other coordinate.
+
+Place these intact strips between the rectangles in a grid, with cuts in ordinary stages and all seeds outside rectangles intact. Use unoccupied margins at the exceptional stages and place strips also along the seams of the cyclic tiling. Any two vertices in distinct regions of this grid at graph distance at most two would have to cross at least one of the guarded cuts in a path of length at most two. After round five no such pair is white. The final white fort therefore splits into separate forts on the regions. Each part uses lost seeds from at most one rectangle, so it lies in the final white set for those isolated losses. Conversely each isolated final white set is contained in the combined final white set by monotonicity. Thus the combined final white set is the union of the isolated ones. [One-dimensional interval argument](CYCLIC_FORT_GROWTH.md#exponential-recovery-rate-and-finite-interval-bounds)
+
+For the upper bound, tile a region away from the exceptional stages by disjoint $a$ by $c$ rectangles. Each rectangle has the ordinary local graph within its eight-position margins. A successful full loss must succeed on every isolated rectangle by monotonicity, giving an upper bound of $H_{a,c}$ raised to the number of tiles. For fixed $a,c$ the number of tiles divided by $km$ tends to $1/(ac)$. For the lower bound, place the same rectangles with two intact ordinary stages between stage intervals and four intact sheets between sheet intervals. Keep the ordinary margins near the exceptional stages. The density of tiles tends to $1/Q$. Require all uncovered designated seeds to survive and let each rectangle have an independent successful isolated loss. This event suffices for full recovery and gives the lower bound. There are ten seed sites per stage-sheet cell in the ordinary graph and $10km$ in the cover. The difference of the two rates is at most the stated width since $(1-p)^{10ac}\le H_{a,c}\le1$. Sending both $a$ and $c$ to infinity proves the limit.
 
 ### Minimum survivor density in growing covers
 
-Let $s_{k,m}$ be the smallest number of surviving designated seeds that force the prism cover. For an ordinary rectangle of $a$ stages by $c$ sheets, let $h_{a,c}$ be the smallest number that must survive inside it when every seed outside it survives. With $Q=(a+10)(c+10)$, the limit $\sigma_{\mathrm{prism}}=\lim_{k,m\to\infty}s_{k,m}/(km)$ exists and satisfies
+Let $s_{k,m}$ be the smallest number of surviving designated seeds that force the prism cover. For an ordinary rectangle of $a$ stages by $c$ sheets, let $h_{a,c}$ be the smallest number that must survive inside it when every seed outside it survives. With $Q=(a+2)(c+4)$, the limit $\sigma_{\mathrm{prism}}=\lim_{k,m\to\infty}s_{k,m}/(km)$ exists and satisfies
 
 $$
 \frac{h_{a,c}}{ac}
@@ -523,7 +527,7 @@ $$
 \frac{h_{a,c}+10(Q-ac)}{Q}.
 $$
 
-A successful cover loss, isolated in any ordinary rectangle, requires at least $h_{a,c}$ survivors there. Summing over disjoint rectangles gives the lower bound. Place an optimal rectangle configuration in each of the tiles with ten-position buffers from the rate proof. Keeping all uncovered seeds makes the full cover recover, giving the upper bound. Since $0\le h_{a,c}\le10ac$, the two bounds differ by at most $10(1-ac/Q)$, which tends to zero. A rectangle containing the seeds of an ordinary finite fort has $h_{a,c}\geq1$, so the limiting density is positive.
+A successful cover loss, isolated in any ordinary rectangle, requires at least $h_{a,c}$ survivors there. Summing over disjoint rectangles gives the lower bound. Place an optimal rectangle configuration in each of the tiles with two-stage and four-sheet buffers from the rate proof. Keeping all uncovered seeds makes the full cover recover, giving the upper bound. Since $0\le h_{a,c}\le10ac$, the two bounds differ by at most $10(1-ac/Q)$, which tends to zero. A rectangle containing the seeds of an ordinary finite fort has $h_{a,c}\geq1$, so the limiting density is positive.
 
 An optimal survivor set gives one probability term of size $p^{10km-s_{k,m}}(1-p)^{s_{k,m}}$. The total number of successful sets is at most $2^{10km}$ and each contributes at most $(1-p)^{s_{k,m}}$. Thus the two-dimensional loss rate also has the high-loss limit
 
@@ -742,6 +746,7 @@ python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 15 --band-blocks 27 28 29 30 31 32
 python -B research-twins/check_short_prism_covers.py --four-sheet-barrier
 python -B research-twins/check_short_prism_covers.py --stage-ancestry
+python -B research-twins/check_short_prism_covers.py --rectangle-separation
 python -B research-twins/check_cost_25_blocking_sets.py --size-30-boundary
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 25 27 28 29
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 26 --band-blocks 25 29
