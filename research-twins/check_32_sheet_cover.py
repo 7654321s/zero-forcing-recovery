@@ -1,4 +1,4 @@
-"""Certify the wrapped-fort bounds at 26 through 32 sheets."""
+"""Certify the wrapped-fort bounds at 25 through 32 sheets."""
 
 import argparse
 from itertools import product
@@ -16,6 +16,7 @@ SHEETS = 32
 BUDGET = 23
 SHEET_CAP = 4
 CASES = {
+    25: ((21, 1), (22, 2)),
     26: ((22, 5), (23, 6)),
     27: ((21, 3), (22, 4), (23, 5)),
     28: ((20, 2), (21, 3), (22, 4), (23, 5)),
@@ -127,11 +128,11 @@ def main():
     upper = mask(v * args.sheets + sheet for v, sheet in CHECKS['FOUR_BLOCK_FORT'])
     if CHECKS['fort_cost'](graph, blue, upper) != 24:
         raise AssertionError('Missing the 24-seed upper witness')
-    band_through = {26: 17, 27: 16}.get(args.sheets, 13)
+    band_through = {25: 25, 26: 17, 27: 16}.get(args.sheets, 13)
     for budget, cap in CASES[args.sheets]:
         check_thresholds(cap)
         clauses = wrapped_formula(graph, blue, args.sheets, budget, cap,
-                                  band_through=band_through, maximum_at_zero=args.sheets == 26)
+                                  band_through=band_through, maximum_at_zero=args.sheets in (25, 26))
         with Solver(name='cadical195', bootstrap_with=clauses) as solver:
             if args.conflicts is None:
                 result = solver.solve()

@@ -48,7 +48,7 @@ For the four-cycle example above, the integer lift has no finite fort. In the cy
 
 ## Application to shorter prism chains
 
-For the [signed unpadded prism chain](BLOCK_STABILIZATION.md), the finite blocking numbers at two and three blocks are 16 and 21. Every chain with at least four blocks has finite blocking number 24. For any chain with at least four blocks the cyclic blocking number is also 24 from 31 sheets. The cyclic guarantee starts at 28 sheets for chains with four through seven blocks or at least eleven blocks, and at 26 sheets for at least 24 blocks.
+For the [signed unpadded prism chain](BLOCK_STABILIZATION.md), the finite blocking numbers at two and three blocks are 16 and 21. Every chain with at least four blocks has finite blocking number 24. The cyclic blocking numbers equal their finite values from 16 sheets at two blocks, 22 sheets at three blocks, and 28 sheets at every length of at least four blocks. At four through eight blocks the agreement starts by 27 sheets, and at least 24 blocks it starts by 26 sheets.
 
 The finite result for at least 24 blocks follows from [block and sheet stabilization](BLOCK_STABILIZATION.md). To descend from $k+1$ blocks to $k$, consider a hypothetical finite fort of cost at most 23. If the fort has two successive empty appended stages, insert a new empty stage between them to preserve the cost. If the fort avoids all opening seeds, the opening fills from its own seeds in two rounds. The fort then avoids the opening and the old stage ports adjacent to it, so the opening insertion preserves its cost. Each insertion would produce a finite fort at the excluded budget on $k+1$ blocks.
 
@@ -64,7 +64,13 @@ The same width-16 band check passes at four blocks. Counting cyclic translates i
 
 ## A lower cyclic threshold for shorter chains
 
-For each of the thirteen lengths from 11 through 23 blocks, the verifier checks the sheet bands of widths 10 through 23. The ten-sheet test permits five lost seeds and forces a consecutive pair of sheets in the core. The larger widths use the two overlapping shorter bands and the complement bounds from the [26-block proof](BLOCK_STABILIZATION.md#a-smaller-sheet-threshold-for-long-chains). Each 23-sheet band of a wrapped fort contains at least 19 seeds. Counting cyclic translates gives $19m\leq23b$ for a wrapped fort of cost $b$. At $m\geq28$ and $b\leq23$ that inequality is impossible. Two empty sheets then turn the cyclic fort into a finite fort of the same cost, excluded by the projected-support argument above. The inherited cost-24 fort supplies the matching upper bound. The same test at four through seven blocks gives the identical 28-sheet guarantee there.
+For each of the thirteen lengths from 11 through 23 blocks, the verifier checks the sheet bands of widths 10 through 23. The ten-sheet test permits five lost seeds and forces a consecutive pair of sheets in the core. The larger widths use the two overlapping shorter bands and the complement bounds from the [26-block proof](BLOCK_STABILIZATION.md#a-smaller-sheet-threshold-for-long-chains). Each 23-sheet band of a wrapped fort contains at least 19 seeds. Counting cyclic translates gives $19m\leq23b$ for a wrapped fort of cost $b$. At $m\geq28$ and $b\leq23$ that inequality is impossible. Two empty sheets then turn the cyclic fort into a finite fort of the same cost, excluded by the projected-support argument above. The inherited cost-24 fort supplies the matching upper bound. The same test at four through ten blocks gives the identical 28-sheet guarantee there. Width 28 passes at four through eight blocks, which excludes wrapping below cost 24 from 27 sheets by $24m\leq28b$.
+
+## Cyclic thresholds at two and three blocks
+
+The width-25 band test passes at both lengths, yielding $21m\leq25b$ for a wrapped fort of cost $b$ on $m$ cyclic sheets. At two blocks it excludes all wrapped costs below 16 from 18 sheets. At three blocks it excludes all wrapped costs below 21 from 24 sheets. A fort with two consecutive empty sheets unrolls, and the respective finite lower bounds apply. The finite forts give cyclic upper bounds at every modulus by projection.
+
+The [small-cover verifier](check_short_prism_covers.py) treats the two remaining sheet counts immediately below each range. At two blocks the wrapped budgets are 14 and 15 at 16 sheets, and 15 at 17 sheets. At three blocks they are 19 and 20 at 22 sheets, and 20 at 23 sheets. For every verified band width $w$, write $w=qm+r$ with $0\leq r<m$. Each such band counts the full seed cost $q$ times plus the seeds of an $r$-sheet window. The verifier therefore imposes a lower bound of $w-4-qb$ on that window. This keeps the periodic constraint useful even when the band width exceeds the period. It also bounds each sheet using the strongest window of length $m-1$ and rotates a sheet of maximum seed count to zero. The six wrapped formulas are unsatisfiable. The resulting cyclic values are 16 from 16 sheets at two blocks and 21 from 22 sheets at three blocks.
 
 ## Exact minimum spans in signed prism chains
 
@@ -112,7 +118,10 @@ done
 The sheet-band checks for the shorter chains can be replayed with the same verifier as at 26 blocks. The 28-sheet guarantees use the following runs.
 
 ```sh
-python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 23 --band-blocks 4 5 6 7
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 23 --band-blocks 4 5 6 7 8 9 10
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 28 --band-blocks 4 5 6 7 8
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 2 3
+python -B research-twins/check_short_prism_covers.py
 python -B research-twins/check_block_stabilization.py --subbands-from 17 --band-through 23 --band-blocks 11 12 13 14 15 16 17 18 19 20 21 22 23
 ```
 

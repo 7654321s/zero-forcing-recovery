@@ -120,6 +120,10 @@ The width-21 inequality excludes wrapped forts of cost at most 21, and a fort wi
 
 The width-25 certificate also gives a tighter bound of two seeds per sheet for the wrapped cost-23 case, since the other 25 sheets require at least 21 seeds.
 
+## Bounds at 25 sheets
+
+The width-21 inequality $17m\leq21b$ excludes wrapping at budget 20 because $17\cdot25>21\cdot20$. The finite exclusion handles the cases with two consecutive empty sheets. At budgets 21 and 22, the other 24 sheets around a given sheet form a verified band and contain at least 20 seeds. The corresponding caps of one and two seeds on the given sheet, together with the band bounds through width 25 and the maximum-count rotation, give two unsatisfiable formulas. Thus $23\leq\kappa_{k,25}\leq24$ for at least 24 blocks, by the stage reduction and the common witness.
+
 ## Reproduction
 
 ```sh
@@ -136,6 +140,7 @@ python -B research-twins/check_32_sheet_cover.py --sheets 29
 python -B research-twins/check_32_sheet_cover.py --sheets 28
 python -B research-twins/check_32_sheet_cover.py --sheets 27
 python -B research-twins/check_32_sheet_cover.py --sheets 26
+python -B research-twins/check_32_sheet_cover.py --sheets 25
 python -B research-twins/check_prism_opening_insertion.py
 ```
 
