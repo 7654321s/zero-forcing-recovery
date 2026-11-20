@@ -162,12 +162,31 @@ def deletion_cost(graph, seeds, sheets):
     raise AssertionError('Deleting all seeds did not block recovery')
 
 
-def recovery_by_deletion(graph, seeds, sheets):
+def recovery_by_deletion(graph, seeds, sheets, loss_sheets=None):
     adjacent, lifted_seeds = reduce(graph, seeds, sheets)
     intact = sum(lifted_seeds)
-    return Counter(count for count in range(len(lifted_seeds) + 1)
-                   for loss in combinations(lifted_seeds, count)
+    eligible = lifted_seeds
+    if loss_sheets is not None:
+        eligible = [v for v in lifted_seeds if (v.bit_length() - 1) // len(graph) in loss_sheets]
+    return Counter(count for count in range(len(eligible) + 1)
+                   for loss in combinations(eligible, count)
                    if forces(adjacent, intact ^ sum(loss)))
+
+
+def check_guarded_intervals(graph, seeds, cyclic_counts):
+    radius = max(1, PROJECTION['largest_shift'](graph))
+    # The intact run uses at most one round per base vertex.
+    gap = (4 * len(graph) + 2) * radius
+    first = recovery_by_deletion(graph, seeds, gap + 1, range(1))
+    second = recovery_by_deletion(graph, seeds, gap + 2, range(2))
+    joined = recovery_by_deletion(graph, seeds, gap + 3, range(3))
+    separated = recovery_by_deletion(graph, seeds, 2 * gap + 3, (0, gap + 1, gap + 2))
+    product_counts = Counter()
+    for i, left in first.items():
+        for j, right in second.items():
+            product_counts[i + j] += left * right
+    if separated != product_counts or not cyclic_counts <= joined <= product_counts:
+        raise AssertionError(('guarded recovery counts', graph, seeds))
 
 
 def reduced_shifts(graph):
@@ -208,6 +227,8 @@ def main():
             for sheets, counts in enumerate(recovery_polynomials(graph, seeds, 3), 1):
                 if counts != recovery_by_deletion(graph, seeds, sheets):
                     raise AssertionError(('recovery polynomial', shifts, seeds, sheets, counts))
+                if sheets == 3:
+                    check_guarded_intervals(graph, seeds, counts)
                 polynomials += 1
             for sheets, value in enumerate(costs, 1):
                 if value != deletion_cost(graph, seeds, sheets):
@@ -243,6 +264,7 @@ def main():
     print('Shifted four-cycle formula verified on 21 cyclic covers')
     print(f'{by_reduction} closed-walk reductions verified by deletion')
     print(f'{polynomials} recovery polynomials verified by exhaustive deletion')
+    print(f'{by_finite} guarded-interval factorizations and coefficient bounds checked')
 
 
 if __name__ == '__main__':

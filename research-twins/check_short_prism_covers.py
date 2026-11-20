@@ -1,6 +1,8 @@
 """Verify signed prism covers using periodic sheet-band counts."""
 
 import argparse
+from itertools import accumulate, combinations_with_replacement
+from math import gcd
 from pathlib import Path
 import runpy
 
@@ -32,13 +34,45 @@ def residual_bounds(sheets, budget, band_through=BAND_WIDTH):
     return bounds
 
 
+def tight_sheet_cap(sheets, budget, bounds, cap):
+    bands = [(width * budget - sheets * lower, width) for width, lower in bounds.items()
+             if gcd(width, sheets) == 1]
+    surplus, width = min(bands, default=(3, 0))
+    # Sparse surplus profiles are cheap to enumerate. The complement bound handles the other cases.
+    if surplus > 2:
+        return cap
+    orbit = [(j * width) % sheets for j in range(sheets)]
+    largest = 0
+    for positions in combinations_with_replacement(range(sheets), surplus):
+        extras = [0] * sheets
+        for position in positions:
+            extras[position] += 1
+        counts = [0] * sheets
+        for current, following in zip(orbit, orbit[1:]):
+            counts[following] = counts[current] + extras[(current + 1) % sheets] - extras[current]
+        shift, remainder = divmod(budget - sum(counts), sheets)
+        if remainder or min(counts) + shift < 0:
+            continue
+        counts = [value + shift for value in counts]
+        prefix = list(accumulate(counts + counts, initial=0))
+        if all(prefix[start + length] - prefix[start] >= lower
+               for length, lower in bounds.items() for start in range(sheets)):
+            largest = max(largest, max(counts))
+    return min(largest, cap)
+
+
 def wrapped_formula(graph, blue, sheets, budget, *, band_through=BAND_WIDTH,
                     require_minimal=True, compact_bands=False, sheet_cap=None):
     bounds = residual_bounds(sheets, budget, band_through)
-    if bounds is None:
+    if bounds is None or any(width * budget < sheets * lower for width, lower in bounds.items()):
         return None
-    # Rotate the strongest band so its complement contains the chosen sheet.
-    cap = budget - max(bounds.values(), default=0)
+    # Combine disjoint certified windows in the complement of the chosen sheet.
+    required = [0] * sheets
+    for length in range(1, sheets):
+        packed = max((required[length - width] + bound for width, bound in bounds.items()
+                      if width <= length), default=0)
+        required[length] = max(required[length - 1], packed)
+    cap = tight_sheet_cap(sheets, budget, bounds, budget - required[-1])
     if sheet_cap is not None:
         cap = min(cap, sheet_cap)
     if cap < 1 or cap * sheets < budget:
@@ -111,15 +145,22 @@ def check_cyclic_cost(blocks, sheets, expected):
     print(f'{blocks} blocks, {sheets} sheets: blocking cost {expected}', flush=True)
 
 
-def check_wrapped_budget(blocks, sheets, budget, band_through):
+def check_wrapped_budget(blocks, sheets, budget, band_through, *, occupied_stage_pairs=False):
     graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
     clauses = wrapped_formula(graph, blue, sheets, budget, band_through=band_through,
                               require_minimal=False, compact_bands=True)
     if clauses is not None:
+        if occupied_stage_pairs:
+            stage_start = WRAPPED['BLOCK']['stage_start']
+            for stage in range(1, blocks - 1):
+                start = stage_start(stage) * sheets
+                stop = stage_start(stage + 2) * sheets
+                clauses.append(list(range(start + 1, stop + 1)))
         with Solver(name='cadical195', bootstrap_with=clauses) as solver:
             if solver.solve():
                 raise AssertionError(('A wrapped fort exists', blocks, sheets, budget))
-    print(f'{blocks} blocks, {sheets} sheets: no wrapped fort of cost {budget}', flush=True)
+    scope = ' meeting every appended stage pair' if occupied_stage_pairs else ''
+    print(f'{blocks} blocks, {sheets} sheets: no wrapped fort of cost {budget}{scope}', flush=True)
 
 
 def check_ordinary_wrapping(sheets, budget):
@@ -176,6 +217,9 @@ if __name__ == '__main__':
     mode.add_argument('--wrapped', type=int, nargs=4, action='append',
                       metavar=('BLOCKS', 'SHEETS', 'BUDGET', 'BAND_WIDTH'),
                       help='exclude a wrapped fort using the specified certified sheet bands')
+    mode.add_argument('--wrapped-with-occupied-pairs', type=int, nargs=4, action='append',
+                      metavar=('BLOCKS', 'SHEETS', 'BUDGET', 'BAND_WIDTH'),
+                      help='exclude a wrapped fort that meets every adjacent appended stage pair')
     mode.add_argument('--ordinary-wrapped', type=int, nargs=2, action='append',
                       metavar=('SHEETS', 'BUDGET'),
                       help='exclude wrapping in the ordinary stage window at budget 28, 29 or 30')
@@ -186,6 +230,9 @@ if __name__ == '__main__':
     if args.wrapped:
         for case in args.wrapped:
             check_wrapped_budget(*case)
+    elif args.wrapped_with_occupied_pairs:
+        for case in args.wrapped_with_occupied_pairs:
+            check_wrapped_budget(*case, occupied_stage_pairs=True)
     elif args.ordinary_wrapped:
         for case in args.ordinary_wrapped:
             check_ordinary_wrapping(*case)

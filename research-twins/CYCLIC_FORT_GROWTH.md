@@ -95,10 +95,42 @@ $$
 R_m(p)=\bigl(1-(2p-p^2)^{m/d}\bigr)^d.
 $$
 
+## Exponential recovery rate and finite interval bounds
+
+Let $s=|S|$, let $t$ be the number of parallel rounds for the intact base forcing set, and keep $R$ as the maximum sheet shift, rounded up to one. Put $b=(4t+2)R$. For independent seed losses with $0<p<1$, let $H_n(p)$ be the probability of recovery on the integer lift when only seeds on $n$ consecutive sheets are subject to loss. The rate
+
+$$
+\lambda(p)=\lim_{m\to\infty}\frac{1}{m}\log R_m(p)
+$$
+
+exists and has the finite interval bounds
+
+$$
+\frac{\log H_n(p)+bs\log(1-p)}{n+b}
+\ \leq\ \lambda(p)\ \leq\
+\frac{\log H_n(p)}{n}.
+$$
+
+The interval has width at most $bs[-\log(1-p)]/(n+b)$. The probability $H_n(p)$ can be computed exactly on the $(n+b)$-sheet cover by allowing losses only on the first $n$ sheets.
+
+Indeed, the intact $t$-round forcing lifts to every cover. An update at a vertex uses only the previous colors within distance two. At time $t$ all remaining white vertices must therefore lie within $2tR$ sheets of some loss. Two loss intervals separated by $b$ sheets whose designated seeds are all intact have at least $2R$ completely blue sheets between their possible white regions at that time. No vertex can have a neighbor in both regions. Restricting any stalled fort to a nonempty region then gives a fort supported near that region alone. Conversely an initially white fort near an isolated loss interval remains white when the other intervals are also subject to loss. The same argument for the periodically repeated configuration of a cyclic cover proves exact factorization for loss intervals separated by these buffers. It also establishes the finite computation of $H_n$.
+
+For an upper bound, partition the cyclic loss word into $\lfloor m/n\rfloor$ disjoint intervals of length $n$, with any remaining sheets at the end. A successful cyclic loss word must recover on every isolated interval by monotonicity on the integer lift. Independence therefore gives $R_m\leq H_n^{\lfloor m/n\rfloor}$. For a lower bound, place $\lfloor m/(n+b)\rfloor$ intervals of length $n$ on the cycle separated by at least $b$ untouched sheets, requiring recovery in each interval and survival of every seed outside them. This gives the claimed lower bound on the limit inferior, while the upper bound holds for the limit superior. Since $(1-p)^{sn}\le H_n\le1$, the two bounds differ by at most the stated width, which tends to zero as $n$ grows.
+
+Equivalently, $\exp(\lambda(p))$ is the spectral radius of the probability-weighted transfer matrix restricted to states reachable from the start and able to reach a recovery state. Each retained path begins and ends in that restriction. The matrix norm gives the upper exponential rate. In a strongly connected component of maximum spectral radius, take returns to a fixed state along lengths permitted by its period. Fixed positive-weight paths into and out of that state give the same exponential rate for the limit superior of accepted walks by Perron–Frobenius. The preceding interval bounds give the limit for all sheet counts.
+
+If the integer lift has a finite fort, choose $n$ containing its seed support. That support is lost with positive probability, so $H_n<1$ and $\lambda(p)<0$. If the integer lift has no finite fort, a loss on finitely many sheets recovers because every white vertex at time $t$ lies in a finite neighborhood of the losses. In this case $H_n=1$ for every $n$ and $\lambda(p)=0$. More specifically, a single intact buffer of $b$ consecutive sheets guarantees cyclic recovery, by isolating the remainder of the cycle. The probability of blocking is at most
+
+$$
+\left(1-(1-p)^{bs}\right)^{\lfloor m/b\rfloor},
+$$
+
+by testing disjoint potential buffers. For the shifted four-cycle with $q=2$, the exact formula above gives blocking exponents $\log(2p-p^2)$ on odd sheet counts and $\tfrac12\log(2p-p^2)$ on even sheet counts.
+
 ## Reproduction
 
 ```sh
 python -B research-twins/check_cyclic_fort_growth.py
 ```
 
-The checker compares 1,192 transfer costs to exhaustive seed deletion on small cyclic covers and compares 298 all-empty round-trip existence tests with the endpoint criterion. It verifies the shifted four-cycle blocking number on 21 moduli and shift choices with both direct forcing and the transfer graph. It checks the closed-walk reduction on the connected three-vertex cases. The relation-pair algorithm also reproduces 894 complete recovery polynomials by exhaustive seed deletion and checks the shifted-cycle recovery formula at $p=1/2$ on twelve cases.
+The checker compares 1,192 transfer costs to exhaustive seed deletion on small cyclic covers and compares 298 all-empty round-trip existence tests with the endpoint criterion. It verifies the shifted four-cycle blocking number on 21 moduli and shift choices with both direct forcing and the transfer graph. It checks the closed-walk reduction on the connected three-vertex cases. The relation-pair algorithm also reproduces 894 complete recovery polynomials by exhaustive seed deletion and checks the shifted-cycle recovery formula at $p=1/2$ on twelve cases. For the 298 base instances it checks guarded-interval factorization and the coefficient bounds from isolating losses.
