@@ -12,7 +12,10 @@ CHECKS = WRAPPED['CHECKS']
 members = WRAPPED['members']
 mask = WRAPPED['mask']
 BAND_WIDTH = 25
-CASES = {2: ((16, 16), (17, 16)), 3: ((22, 21), (23, 21))}
+CASES = {
+    2: tuple((sheets, min(2 * sheets, 16)) for sheets in range(1, 18)),
+    3: ((22, 21), (23, 21)),
+}
 
 
 def residual_bounds(sheets, budget):

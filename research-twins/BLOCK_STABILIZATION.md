@@ -4,7 +4,7 @@ Let $\kappa_{k,m}$ be the minimum number of seeds whose loss blocks recovery in 
 $$
 \kappa_{k,m}=\kappa_{26,m} \qquad (k\geq26).
 $$
-The common value is exactly 24 when $k\geq24$ and $m\geq26$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 26 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
+The common value is exactly 24 when $k\geq24$ and $m\geq25$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 25 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
 
 ## The prism stage labels
 
@@ -120,9 +120,11 @@ The width-21 inequality excludes wrapped forts of cost at most 21, and a fort wi
 
 The width-25 certificate also gives a tighter bound of two seeds per sheet for the wrapped cost-23 case, since the other 25 sheets require at least 21 seeds.
 
-## Bounds at 25 sheets
+## The 25-sheet case
 
-The width-21 inequality $17m\leq21b$ excludes wrapping at budget 20 because $17\cdot25>21\cdot20$. The finite exclusion handles the cases with two consecutive empty sheets. At budgets 21 and 22, the other 24 sheets around a given sheet form a verified band and contain at least 20 seeds. The corresponding caps of one and two seeds on the given sheet, together with the band bounds through width 25 and the maximum-count rotation, give two unsatisfiable formulas. Thus $23\leq\kappa_{k,25}\leq24$ for at least 24 blocks, by the stage reduction and the common witness.
+The width-21 inequality $17m\leq21b$ excludes wrapping at budget 20 because $17\cdot25>21\cdot20$. The finite exclusion handles the cases with two consecutive empty sheets. At budgets 21, 22 and 23, the other 24 sheets around a given sheet form a verified band and contain at least 20 seeds. The corresponding caps are one, two and three seeds on the given sheet.
+
+The first two wrapped formulas use the band bounds through width 25 and the maximum-count rotation. At budget 23, the verifier encodes a band longer than half the period by an upper bound of $b-w+4$ on the complement of the band. The total cost is exactly $b$, so this is equivalent to the band lower bound $w-4$. Redundant complement bounds can be omitted. The compact formula has 348,856 clauses and is unsatisfiable, as are the two lower-budget formulas. The common witness gives $\kappa_{k,25}=24$ for at least 24 blocks by stage reduction and opening insertion.
 
 ## Reproduction
 

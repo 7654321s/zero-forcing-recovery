@@ -16,7 +16,7 @@ SHEETS = 32
 BUDGET = 23
 SHEET_CAP = 4
 CASES = {
-    25: ((21, 1), (22, 2)),
+    25: ((21, 1), (22, 2), (23, 3)),
     26: ((22, 5), (23, 6)),
     27: ((21, 3), (22, 4), (23, 5)),
     28: ((20, 2), (21, 3), (22, 4), (23, 5)),
@@ -68,7 +68,7 @@ def check_thresholds(cap=SHEET_CAP):
 
 
 def wrapped_formula(graph, blue, sheets=SHEETS, budget=BUDGET, cap=SHEET_CAP, *,
-                    band_through=13, maximum_at_zero=False):
+                    band_through=13, maximum_at_zero=False, compact_bands=False):
     order = len(graph)
     adjacent = [tuple(members(row)) for row in graph]
     clauses = list(BLOCK['fort_clauses'](graph, range(order)))
@@ -96,10 +96,19 @@ def wrapped_formula(graph, blue, sheets=SHEETS, budget=BUDGET, cap=SHEET_CAP, *,
     clauses.extend(total.clauses)
     for width in range(10, band_through + 1):
         for sheet in range(sheets):
-            window = [flag for j in range(width) for flag in counters[(sheet + j) % sheets]]
-            lower = CardEnc.atleast(lits=window, bound=width - 4, top_id=top, encoding=EncType.seqcounter)
-            top = lower.nv
-            clauses.extend(lower.clauses)
+            if not compact_bands or 2 * width <= sheets:
+                window = [flag for j in range(width) for flag in counters[(sheet + j) % sheets]]
+                bound = CardEnc.atleast(lits=window, bound=width - 4, top_id=top,
+                                        encoding=EncType.seqcounter)
+            else:
+                window = [flag for j in range(width, sheets) for flag in counters[(sheet + j) % sheets]]
+                upper = budget - width + 4
+                if upper >= len(window):
+                    continue
+                bound = CardEnc.atmost(lits=window, bound=upper, top_id=top,
+                                       encoding=EncType.seqcounter)
+            top = bound.nv
+            clauses.extend(bound.clauses)
 
     empty_stages = {}
     for stage in range(1, 26):
@@ -132,7 +141,8 @@ def main():
     for budget, cap in CASES[args.sheets]:
         check_thresholds(cap)
         clauses = wrapped_formula(graph, blue, args.sheets, budget, cap,
-                                  band_through=band_through, maximum_at_zero=args.sheets in (25, 26))
+                                  band_through=band_through, maximum_at_zero=args.sheets in (25, 26),
+                                  compact_bands=args.sheets == 25 and budget == 23)
         with Solver(name='cadical195', bootstrap_with=clauses) as solver:
             if args.conflicts is None:
                 result = solver.solve()
