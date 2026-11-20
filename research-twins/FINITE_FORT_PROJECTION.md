@@ -117,6 +117,30 @@ The verifier starts with 48 common vertices and tests the subsets of seven optio
 
 Taken together, the spans of seven, eight and nine give 54 minimum-cost fort shapes and five distinct 24-seed blocking sets among the finite forts of span at most nine. Each seed set occupies both extreme sheets of its fort, so the sets counted at the three spans stay distinct under sheet translation.
 
+## The forts supported by each of the five seed sets
+
+Fix one of the five seed sets above and delete it from the original blue set. Every fort with that seed set remains white. The complement of the resulting forcing closure is itself a fort and is the unique largest one with that seed set.
+
+After the intact two rounds, any vertex whose radius-four neighborhood misses the deleted seeds follows the intact process. The deleted seeds lie in at most nine sheets. Translate them to start on sheet five in a 19-sheet cover. The white set at round two lies within sheets one through seventeen, since edge shifts have magnitude at most one. After round two both guards are blue and the remaining dynamics agree with the integer lift inside the strip. The verifier computes these closures for each of the five seed sets at every length from four through 27. Each largest fort is one of the shapes already listed at the original span.
+
+The 26-stage band extends this statement to every greater length. A finite fort on one of these seed sets has cost 24, so an empty pair may be contracted. Each seed set meets both stages of its occupied end of the chain. The contraction preserves their coordinates relative to that end, as well as the sheet coordinates. Hence any fort with one of the five seed sets retains its known span and belongs to its listed family. The family counts and their inclusion-minimal and maximal fort sizes are as follows.
+
+| Span | Forts with that seed set | Vertices in its unique inclusion-minimal fort | Vertices in its largest fort |
+| --- | --- | --- | --- |
+| 7 | 2 | 44 | 46 |
+| 8 | 8 | 44 | 47 |
+| 8 | 32 | 42 | 47 |
+| 9 | 4 | 51 | 53 |
+| 9 | 8 | 50 | 54 |
+
+## Complete counts from four through eleven blocks
+
+For these eight lengths the width-16 and width-17 band checks give a span bound for every cost-24 fort. Any pair of empty interior sheets would split it into two nonempty finite forts, each of cost at least 24. A span of at least 33 would contain disjoint bands of widths 16 and 17. They would require at least 12 and 13 lost seeds respectively. A cost-24 fort thus fits inside the 32 interior sheets of a 34-sheet guarded strip.
+
+The longer-span verifier translates the first occupied sheet to one and demands an occupied sheet at index ten or higher. It keeps the fort clauses, the guards, the absence of an interior two-sheet gap and the seed ancestry conditions. It permits arbitrary forts including those with proper fort subsets. The cost-24 test is unsatisfiable at each length from four through eleven blocks. The 54 shapes and five seed sets above are therefore the complete lists of finite minimum-cost forts and their seed sets up to sheet translation at these lengths.
+
+For the cyclic version on $m\geq29$ sheets, the width-25 band at these lengths rules out wrapped forts of cost 24 by $21m>25\cdot24$. Every minimum-cost cyclic fort then unrolls to one of the listed finite forts, and each listed fort projects to the cycle. Its span is at most nine, so the outer run of at least $m-9$ empty sheets is strictly longer than any interior run. The first occupied sheet after this unique longest run determines the translation. The same argument applies to the seed sets, as each meets both extreme sheets of its fort. Thus the exact numbers are $54m$ minimum-cost cyclic forts and $5m$ minimum blocking sets. For a minimum blocking set the final white fort contains all its lost seeds, since any smaller seed intersection would contradict minimal cost.
+
 ## Reproduction
 
 ```sh
@@ -151,8 +175,15 @@ python -B research-twins/check_short_prism_covers.py
 python -B research-twins/check_block_stabilization.py --subbands-from 17 --band-through 23 --band-blocks 11 12 13 14 15 16 17 18 19 20 21 22 23
 ```
 
-The following command reproduces the minimum spans, the cost table and the classifications of the seven-, eight- and nine-sheet minimum-cost forts.
+The following command reproduces the minimum spans, the cost table and the classifications of the seven-, eight- and nine-sheet minimum-cost forts and their seed families.
 
 ```sh
 python -B research-twins/check_finite_fort_span.py
+```
+
+The complete counts at four through eleven blocks use the following additional checks.
+
+```sh
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 4 5 6 7 8 9 10 11
+python -B research-twins/check_finite_fort_span.py --longer 4 5 6 7 8 9 10 11
 ```

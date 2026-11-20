@@ -61,7 +61,7 @@ def add_projection_bound(clauses, seed_vars, budget, period, quotient_cost, top,
     return bound.nv
 
 
-def strip_formula(graph, blue, budget, *, sheets=SHEETS, quotient_bounds=True):
+def strip_formula(graph, blue, budget, *, sheets=SHEETS, quotient_bounds=True, require_minimal=True):
     order = len(graph)
     _, arrival = MODEL['trace'](graph, blue)
     if None in arrival or max(arrival) != 2:
@@ -72,7 +72,8 @@ def strip_formula(graph, blue, budget, *, sheets=SHEETS, quotient_bounds=True):
         return 0 < v % sheets < sheets - 1
 
     clauses = [[-(v + 1)] for v in range(order) if not active(v)]
-    clauses.extend(minimal_fort_clauses(neighbors))
+    if require_minimal:
+        clauses.extend(minimal_fort_clauses(neighbors))
     top = 3 * order
     occupied = range(top + 1, top + 1 + sheets)
     suffix = range(top + 1 + sheets, top + 2 + 2 * sheets)

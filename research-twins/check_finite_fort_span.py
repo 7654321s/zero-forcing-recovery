@@ -1,5 +1,6 @@
 """Verify the minimum span of a finite fort in the signed prism lift."""
 
+import argparse
 from itertools import combinations
 from pathlib import Path
 import runpy
@@ -104,7 +105,32 @@ def check_seed_frontiers():
         print(f'{blocks} blocks: minimum seed costs {costs} from span {first}')
 
 
-def check_guarded_shapes(blocks, span, shapes):
+def check_seed_families(blocks, span, shapes, expected):
+    # Four sheets on either side suffice for two rounds of intact dependence.
+    sheets = 19
+    graph, seeds, _, _ = COVER['signed_prism_cover'](blocks, sheets)
+    families = {}
+    for shape in shapes:
+        coordinates = (divmod(v, span + 2) for v in members(shape))
+        fort = mask(v * sheets + s + 4 for v, s in coordinates)
+        families.setdefault(fort & seeds, []).append(fort)
+
+    observed = []
+    for lost, family in families.items():
+        times = COVER['MODEL']['trace'](graph, seeds & ~lost)[1]
+        maximal = mask(v for v, t in enumerate(times) if t is None)
+        if maximal not in family:
+            raise AssertionError(('Closure outside the listed family', blocks, span))
+        minimal = [fort for fort in family
+                   if all(other == fort or (other & fort) != other for other in family)]
+        if len(minimal) != 1:
+            raise AssertionError(('Unexpected inclusion-minimal forts', blocks, span))
+        observed.append((len(family), minimal[0].bit_count(), maximal.bit_count()))
+    if tuple(sorted(observed)) != expected:
+        raise AssertionError(('Unexpected seed-family statistics', blocks, span, observed))
+
+
+def check_guarded_shapes(blocks, span, shapes, expected_families):
     sheets = span + 2
     graph, seeds, guards = guarded_strip(blocks, span)
     times = COVER['MODEL']['trace'](graph, guards)[1]
@@ -130,7 +156,7 @@ def check_guarded_shapes(blocks, span, shapes):
         with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
             if solver.solve(assumptions=[-counter.rhs[24]]):
                 raise AssertionError(('An additional minimum-cost fort exists', blocks, span))
-    return len({fort & seeds for fort in shapes})
+    check_seed_families(blocks, span, shapes, expected_families)
 
 
 def check_shortest_minimum_cost_forts():
@@ -143,8 +169,7 @@ def check_shortest_minimum_cost_forts():
         raise AssertionError('Unexpected common fort')
     shapes = (common ^ removed, common)
     for blocks in range(4, 28):
-        if check_guarded_shapes(blocks, 7, shapes) != 1:
-            raise AssertionError(('The two shapes have different seed sets', blocks))
+        check_guarded_shapes(blocks, 7, shapes, ((2, 44, 46),))
     print('Exactly two cost-24 forts of span seven at every length from four blocks')
 
 
@@ -190,8 +215,7 @@ def check_eight_sheet_forts():
     for blocks in range(4, 28):
         start = BAND['stage_start'](blocks - 2)
         shapes = [mask((v + start) * 10 + s for v, s in pattern) for pattern in patterns]
-        if check_guarded_shapes(blocks, 8, shapes) != 2:
-            raise AssertionError(('Unexpected number of terminal seed patterns', blocks))
+        check_guarded_shapes(blocks, 8, shapes, ((8, 44, 47), (32, 42, 47)))
     print('Exactly 40 cost-24 forts of span eight, with two seed sets, at every length from four blocks')
 
 
@@ -216,14 +240,36 @@ def check_nine_sheet_forts():
 
     shapes = [mask(v * 11 + s for v, s in pattern) for pattern in patterns]
     for blocks in range(4, 28):
-        if check_guarded_shapes(blocks, 9, shapes) != 2:
-            raise AssertionError(('Unexpected number of opening seed patterns', blocks))
+        check_guarded_shapes(blocks, 9, shapes, ((4, 51, 53), (8, 50, 54)))
     print('Exactly 12 cost-24 forts of span nine, with two seed sets, at every length from four blocks')
 
 
+def check_larger_optimal_spans(lengths):
+    strip = runpy.run_path(str(Path(__file__).with_name('check_finite_fort_strip.py')))
+    sheets = 34
+    budget = 24
+    for blocks in lengths:
+        graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
+        clauses, seeds, top = strip['strip_formula'](graph, blue, budget, sheets=sheets,
+                                                    quotient_bounds=False, require_minimal=False)
+        clauses.append([v + 1 for v in range(len(graph)) if 10 <= v % sheets < sheets - 1])
+        with ITotalizer(lits=seeds, ubound=budget, top_id=top) as counter:
+            with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
+                if solver.solve(assumptions=[-counter.rhs[budget]]):
+                    raise AssertionError(('A cost-24 fort spans at least ten sheets', blocks))
+        print(f'{blocks} blocks: every cost-24 fort spans at most nine sheets', flush=True)
+
+
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--longer', type=int, nargs='+', choices=range(4, 12), default=(),
+                        help='also replay the exclusions at spans ten through thirty-two')
+    args = parser.parse_args()
     check_minimum_spans()
     check_seed_frontiers()
     check_shortest_minimum_cost_forts()
     check_eight_sheet_forts()
     check_nine_sheet_forts()
+    print('Checked the five seed families with their unique minimal forts and forced closures')
+    if args.longer:
+        check_larger_optimal_spans(args.longer)
