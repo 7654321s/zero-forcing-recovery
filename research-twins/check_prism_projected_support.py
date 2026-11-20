@@ -137,7 +137,7 @@ if __name__ == '__main__':
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--minimum-forts', action='store_true',
                       help='replay the budget-24 insertion checks for minimum forts')
-    for budget in (25, 26, 27):
+    for budget in (25, 26, 27, 28):
         mode.add_argument(f'--cost-{budget}-stage-pairs', action='store_const', const=budget,
                           dest='stage_pair_budget',
                           help=f'certify empty stage pairs at cost up to {budget}')
@@ -149,7 +149,7 @@ if __name__ == '__main__':
         for blocks in (stages + 1, stages + 2):
             BLOCK['check_band'](blocks, stages=stages, budget=budget)
             print(f'{blocks} blocks: the {stages}-stage band forces an empty pair', flush=True)
-        direct_last = 13 if budget == 27 else 14
+        direct_last = {27: 13, 28: 11}.get(budget, 14)
         for blocks in range(stages, direct_last, -1):
             check_projected_case(blocks, budget, require_opening=False)
             print(f'{blocks} blocks: every finite fort of cost at most {budget} has an empty stage pair',

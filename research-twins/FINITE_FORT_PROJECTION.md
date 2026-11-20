@@ -322,13 +322,25 @@ At five blocks and above, the opening coordinates and shifted terminal coordinat
 
 Every pair in a cyclic union of size at most 28 shares a seed, and any three share at least $3\cdot24-2\cdot28=16$ seeds. With constituent spans at most 13, each lift relative to a shared seed is unique at periods of at least 25. The three-way intersections ensure that each pair of lifted constituents intersects, so their combined span is at most 25. No selected sites then alias modulo the period. The enumerated unions span at most 13, and the unique outer gap gives $m$ distinct translates of each finite union. A size-28 minimal loss contributes one new degree-28 monomial, since its union with any distinct minimal loss has size at least 29.
 
-## The fifth term at five through seven blocks
+## The fifth term for chains with at least five blocks
 
-There are exactly 741 inclusion-minimal 28-seed losses on each integer lift with five through seven blocks, up to sheet translation. Their spans from seven through eleven have counts 13, 129, 301, 218 and 80. A finite fort of cost at most 28 cannot split across two empty sheets. A span of at least 37 contains disjoint bands of widths 18 and 19, requiring at least 29 seeds. The search uses 36 interior sheets and two blue guards. It excludes every translate of the complete catalogues at sizes 24 through 27 before enumerating. At six blocks, 733 patterns transfer by holding the opening and the first two appended stages fixed and moving the last two stages. Three others use four opening stages and five use three terminal stages. Holding each of those full supports fixed relative to its own end gives exactly the eight additional patterns from the six-block search. At seven blocks the same rules transfer all 741 patterns, and the guarded search excludes any further pattern. The transferred sets pass closure traces and smaller-loss containment checks in a 33-sheet representative.
+There are exactly 741 inclusion-minimal 28-seed losses up to sheet translation at each length of at least five blocks on the integer lift. Their spans from seven through eleven have counts 13, 129, 301, 218 and 80. At five through eleven blocks, a finite fort of cost at most 28 cannot split across two empty sheets, and a span of at least 37 contains disjoint bands of widths 18 and 19 requiring at least 29 seeds. The search uses 36 interior sheets and two blue guards. It excludes every translate of the complete catalogues at sizes 24 through 27 before enumerating. At six blocks, 733 patterns transfer by holding the opening and the first two appended stages fixed and moving the last two stages. Three others use four opening stages and five use three terminal stages. Holding each of those full supports fixed relative to its own end gives exactly the eight additional patterns from the six-block search. At seven blocks the same rules transfer all 741 patterns, and the guarded search excludes any further pattern.
 
-For $m\geq33$ the width-28 bound excludes wrapping at cost 28 since $24m>28\cdot28$. Direct wrapped checks at all three lengths extend this to $m\geq28$. All smaller costs already unroll in this range. Every finite pattern projects with a unique outer gap and can be recovered from that gap. Thus there are $741m$ distinct minimal 28-seed losses, and the degree-28 coefficient of the blocking probability is $(741-399)m=342m$.
+For eight through eleven blocks, an empty adjacent appended stage pair allows contraction to the previous length. Every known pattern of size at most 28 occupies every stage in each of its anchored opening or terminal intervals. A pattern contained in the contracted loss must avoid the retained empty stage, so reinsertion preserves that containment with the same anchors. Any further minimal loss would therefore have a fort meeting every adjacent pair. The guarded searches with this additional condition exclude further losses at each of the four lengths.
 
-The catalogue through size 28 also gives the next overlap correction. The normalized unions of degree 29 have weights $-2,-1,0,1,2$ with counts 28, 1812, 124, 273 and 5. All these unions span at most 11 sheets. Any two contributors share a seed and any three have at least $3\cdot24-2\cdot29=14$ seeds in common. The same lifting argument therefore identifies the signed correction on the cycle. At each length in its verified cyclic range the degree-29 coefficient is $N_{29}(k,m)-1585m$, where $N_{29}$ counts the inclusion-minimal 29-seed losses.
+For 12 through 30 blocks the projected-support exclusions give an empty adjacent appended pair at cost at most 28. The first 30 appended stages give such a pair at every larger length by the band checks at 31 and 32 blocks. Repeated contraction and the same containment argument give completeness at every length. All patterns are verified by guarded closure and smaller-loss exclusion through 21 blocks. They occupy cyclic arcs of at most four stages, so the radius-eight neighborhood of each end-anchored pattern repeats at all longer lengths.
+
+For every $k\geq5$ and $m\geq34$, cyclic forts of cost at most 28 unroll. Width 28 suffices at five through 24 blocks and at 26 blocks since $24m>28\cdot28$. Width 25 suffices at 25 and 27 through 30 blocks since $21m>25\cdot28$. The 30-stage band contracts all larger lengths to 30 blocks with the same occupied sheets and cost. The following smaller periods suffice by the width-28 bounds and direct wrapped checks.
+
+| Blocks | Verified from this many sheets |
+| --- | ---: |
+| 5–8 | 28 |
+| 9–10 | 29 |
+| 11–24 and 26 | 33 |
+
+All smaller costs already unroll in these ranges. Every finite pattern projects with a unique outer gap and can be recovered from that gap. Thus there are $741m$ distinct minimal 28-seed losses, and the degree-28 coefficient of the blocking probability is $(741-399)m=342m$.
+
+The catalogue through size 28 also gives the next overlap correction. The normalized unions of degree 29 have weights $-2,-1,0,1,2$ with counts 28, 1812, 124, 273 and 5. From seven blocks onward the first four and last three stages are disjoint, so keeping the opening labels fixed and shifting the terminal labels preserves all seed coincidences with their sheet offsets. This preserves the union profile. All these unions span at most 11 sheets. Any two contributors share a seed and any three have at least $3\cdot24-2\cdot29=14$ seeds in common. The same lifting argument therefore identifies the signed correction on the cycle. At each length in its verified cyclic range the degree-29 coefficient is $N_{29}(k,m)-1585m$, where $N_{29}$ counts the inclusion-minimal 29-seed losses.
 
 ## Independent losses on growing covers
 
@@ -353,6 +365,14 @@ $$
 
 For the finitely many chain lengths in the table, this holds from their listed periods with error $O(mp^{28})$. For all $k\geq4$ and $m\geq37$ the uniform error also improves to $O(mp^{28}+kmp^{30})$, by the ordinary interior threshold below. In particular, if $p\to0$, $m\to\infty$, $mp^{24}\to\lambda<\infty$ and $kp^6\to0$, the blocking probability tends to $1-e^{-5\lambda}$. If $mp^{24}\to\infty$, the probability tends to one for any sequence of chain lengths $k\geq4$. For the latter claim, take disjoint consecutive nine-sheet intervals and place one minimum blocking pattern in each. The $\lfloor m/9\rfloor$ occurrences use disjoint seed sites and each has probability $p^{24}$.
 
+For $k\geq5$ and $m\geq34$, the size-28 catalogue gives the uniform refinement
+
+$$
+\Pr(\text{blocking})=1-\exp\bigl(-m(A_k(p)+138p^{27}+342p^{28})\bigr)+O(kmp^{29}).
+$$
+
+For $m\geq37$ the error improves to $O(mp^{29}+kmp^{30})$. Minimal losses of size 29 at these periods must meet the vicinity of an exceptional stage by the ordinary exclusion, so their total probability is $O(mp^{29})$. Larger losses give the second term of the error by the connected loss bound.
+
 ### Separate loss components
 
 Suppose the intact seed set of any finite graph colors every vertex by round $t$. Simultaneous forcing updates a vertex using only the previous colors at distance at most two. At round $t$, all white vertices are therefore within distance $2t$ of some lost seed. Join two distinct seed sites in an auxiliary graph when their distance in the original graph is at most $4t+2$. For a specific loss, take the components induced by its lost sites in the auxiliary graph.
@@ -363,7 +383,7 @@ In particular, every inclusion-minimal blocking loss is connected in the auxilia
 
 ### A uniform exponential approximation
 
-Use all translated inclusion-minimal blocking patterns of size at most $r$, where $r=26$ for general $k$ and $r=27$ in the ranges of the exact cyclic size-27 classification. There are at most $408m$ events in either catalogue, each supported within 13 consecutive sheets. Let $X_i$ indicate that every seed in the $i$th pattern is lost and order the events arbitrarily. Define $Y_i$ to be one when $X_i=1$ and all earlier events sharing a seed with event $i$ are absent, and zero otherwise. The earliest occurring event always has its $Y_i=1$, so the two families have the same union event. If $Y_i=Y_j=1$ for distinct $i,j$, their original patterns are disjoint. Thus $\mathbb E Y_i\leq p^{24}$ and $\mathbb E(Y_iY_j)\leq p^{48}$.
+Use all translated inclusion-minimal blocking patterns of size at most $r$, with $r=26$, 27 or 28 in the ranges of the corresponding exact cyclic classification. The largest catalogue has $1121m$ events, each supported within 13 consecutive sheets. Let $X_i$ indicate that every seed in the $i$th pattern is lost and order the events arbitrarily. Define $Y_i$ to be one when $X_i=1$ and all earlier events sharing a seed with event $i$ are absent, and zero otherwise. The earliest occurring event always has its $Y_i=1$, so the two families have the same union event. If $Y_i=Y_j=1$ for distinct $i,j$, their original patterns are disjoint. Thus $\mathbb E Y_i\leq p^{24}$ and $\mathbb E(Y_iY_j)\leq p^{48}$.
 
 Each $Y_i$ depends on seed coins in an interval of at most 37 sheets. If the pattern starts at sheet $a$, any overlapping pattern starts within twelve sheets of $a$ on the cycle, and ends by sheet $a+24$ in those coordinates. Only a bounded number of the other intervals intersect this one, since the number of pattern starts per sheet is bounded. Intervals disjoint from it use independent seed coins. For $W=\sum_i Y_i$, the independent neighborhoods give $b_3=0$ in the Chen–Stein bound, and $b_1+b_2=O(mp^{48})$ by the one- and two-event bounds. Consequently $\Pr(W=0)=\exp(-\mathbb EW)+O(mp^{48})$ with a uniform constant. [Arratia, Goldstein and Gordon, Theorem 1](https://doi.org/10.1214/aop/1176991491)
 
@@ -391,6 +411,46 @@ For a normalized template spanning $s$ stages, the enlarged stage arc has length
 For $M_d$, give each valid placement weight one if it is inclusion-minimal and blocking, and zero otherwise. All inclusion-minimal losses belong to the connected sets considered above. Each normalized template has a constant weight at its $k-(h+1)$ ordinary placements and at each exceptional offset. Summing these weights gives the first identity.
 
 For the logarithmic coefficient, first use an independent loss variable $p_v$ for each seed $v$. For a monomial with support $S$, set every variable outside $S$ to zero. The component decomposition proves that the recovery probability with losses allowed only in $S$ factors over the components of $S$ in the auxiliary graph. The formal logarithm is a sum over those factors, so the coefficient vanishes when the monomial uses variables from more than one component. Every contributing support of total degree $d$ therefore fits in the same rectangle as before. Decorate each template with the positive integer exponent of its variable at each site, with the exponents summing to $d$. Its coefficient is computed by the local recovery polynomial with only those variables active, and so depends on the same radius-eight data. Summing the coefficient weights over ordinary and exceptional placements and then setting each $p_v=p$ gives the second identity. The exponents may exceed one because the formal logarithm is taken before the common specialization.
+
+### Analytic recovery rate for growing covers
+
+The fixed-order coefficients of the logarithmic recovery probability define convergent series
+
+$$
+F(p)=\sum_{d\geq1}\gamma_d p^d,\qquad G(p)=\sum_{d\geq1}\delta_d p^d
+$$
+
+in a disk of radius independent of the cover dimensions. Let $D=3(2^{10}-1)$ and $\rho=1/[16e(D+1)]$. For $k,m\geq19$ put $r=1+\lfloor(\min(k,m)-19)/20\rfloor$. For $|p|\leq\rho/2$ one has
+
+$$
+\log R_{k,m}(p)=km F(p)+mG(p)+O\left(km(|p|/\rho)^{r+1}\right).
+$$
+
+In particular $F(p)$ is the limit of $(km)^{-1}\log R_{k,m}(p)$ when both dimensions tend to infinity. An ordinary support first blocks at size 30 and contributes the negative of its minimum-loss count to the logarithmic coefficient at that order. The classification below therefore gives $F(p)=-10p^{30}+O(p^{31})$. The cyclic coefficients through order 28 give $G(p)=-5p^{24}-18p^{25}-82p^{26}-138p^{27}-342p^{28}+O(p^{29})$.
+
+For the uniform analytic bound, let $H$ be the auxiliary graph on the seed sites and let $U$ be any subset of those sites. Write $Z_U(z)=\sum_L z^{|L|}$, summing over losses $L\subseteq U$ that allow recovery. The component decomposition says that such a loss is exactly a collection of connected, individually recoverable sets that are pairwise disjoint and nonadjacent in $H$. This gives a compatible-polymer partition function. [Kotecký and Preiss](https://doi.org/10.1007/BF01211762)
+
+For $v\in U$, separating the term where $v$ survives from those where its loss component is $C$ gives
+
+$$
+Z_U=Z_{U\setminus\{v\}}+
+\sum_{\substack{v\in C\subseteq U\\ C\text{ connected and recoverable}}}
+z^{|C|}Z_{U\setminus N_H[C]},
+$$
+
+where $N_H[C]$ includes $C$ and all its neighbors in $H$. The number of connected $s$-sets containing $v$ is at most $(4D)^{s-1}$. Encode a rooted spanning tree by the forward and return steps of its depth-first traversal. The sequence has $\binom{2s-2}{s-1}\leq4^{s-1}$ possibilities, and there are at most $D$ choices for each forward edge. The code and the root determine the visited set. [Connected-set count](LOSS_COMPONENTS.md#a-bounded-degree-search)
+
+Let $\varepsilon=1/[2(D+1)]$. Inductively, for every proper subset $V$ and $u\in V$, the ratio $Z_V/Z_{V\setminus\{u\}}$ differs from one by at most $\varepsilon$. In the recurrence, the ratio $Z_{U\setminus N_H[C]}/Z_{U\setminus\{v\}}$ deletes at most $(D+1)|C|$ vertices from a proper subset. Its modulus is at most $(1-\varepsilon)^{-(D+1)|C|}\leq e^{|C|}$. Thus
+
+$$
+\left|\frac{Z_U}{Z_{U\setminus\{v\}}}-1\right|
+\leq \frac{e|z|}{1-4eD|z|}<\varepsilon
+\quad\text{for } |z|\leq 1/[8e(D+1)] .
+$$
+
+The empty-set value is one, so the induction proves nonvanishing. For $|p|\leq\rho$, one has $|p/(1-p)|\leq2\rho$. With $U$ the full set of $N=10km$ seed sites, $R_{k,m}(p)=(1-p)^N Z_U(p/(1-p))$. The logarithm with value zero at $p=0$ is the sum of $N\log(1-p)$ and the logarithms of the successive vertex-deletion ratios. Its modulus is at most $2N$ on $|p|\leq\rho$.
+
+Cauchy's bound now gives $|[p^d]\log R_{k,m}|\leq20km\,\rho^{-d}$. In the coefficient identity above, fix $m\geq20(d-1)+19$ and send $k$ to infinity to obtain $|\gamma_d|\leq20\rho^{-d}$. Taking $k=m=20(d-1)+19$ then gives $|\delta_d|\leq40(20(d-1)+19)\rho^{-d}$. These bounds prove convergence of both series for $|p|<\rho$. The coefficients agree through degree $r$, and summing the remaining geometric tails, with their linear factors in $d$, gives the stated error since $r+1\leq k$.
 
 ## Blocking losses in ordinary stages
 
@@ -451,7 +511,7 @@ $$
 \qquad (a)_d=a(a-1)\cdots(a-d+1).
 $$
 
-To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities for every $\ell\leq27$ when $m\geq31$, as well as for $\ell=28$ in the verified cyclic ranges at five through seven blocks. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
+To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities for every $\ell\leq27$ when $m\geq31$, as well as for $\ell=28$ at every length of at least five blocks when $m\geq34$ or in the verified smaller cyclic ranges. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
 
 The joint component law also extends to a uniform loss of size $\ell$. Set $p=\ell/N$ and let $\Lambda=mp^{24}+kmp^{30}$. For $k\geq4$, $m\geq38$ and $\ell\geq1$, the total variation error is
 
@@ -575,7 +635,9 @@ python -B research-twins/check_cost_25_blocking_sets.py
 python -B research-twins/check_prism_projected_support.py --cost-25-stage-pairs
 python -B research-twins/check_prism_projected_support.py --cost-26-stage-pairs
 python -B research-twins/check_prism_projected_support.py --cost-27-stage-pairs
+python -B research-twins/check_prism_projected_support.py --cost-28-stage-pairs
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 25 27 28 29
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 30
 for blocks in 25 27 28 29
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 31 27 25 --wrapped "$blocks" 32 27 25 || exit 1
@@ -609,12 +671,17 @@ do
 done
 python -B research-twins/check_short_prism_covers.py --wrapped 5 25 26 28 --wrapped 5 25 27 28 --wrapped 6 25 26 28 --wrapped 5 26 27 28 --wrapped 6 26 27 28 --wrapped 7 26 27 28 --wrapped 9 27 26 28 --wrapped 4 25 26 28 --wrapped 4 25 27 28 --wrapped 4 26 26 28 --wrapped 4 26 27 28 --wrapped 4 27 26 28 --wrapped 4 27 27 28 --wrapped 11 28 26 28 --wrapped 11 29 26 28 --wrapped 11 29 27 28 --wrapped 11 30 26 28 --wrapped 11 30 27 28
 python -B research-twins/check_short_prism_covers.py --wrapped 12 29 26 28 --wrapped 12 29 27 28 --wrapped 12 30 26 28 --wrapped 12 30 27 28 --wrapped 13 30 26 28 --wrapped 13 30 27 28
-python -B research-twins/check_cost_25_blocking_sets.py --size-28 5
-python -B research-twins/check_cost_25_blocking_sets.py --size-28 6
-python -B research-twins/check_cost_25_blocking_sets.py --size-28 7
+for blocks in 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
+do
+    python -B research-twins/check_cost_25_blocking_sets.py --size-28 "$blocks" || exit 1
+done
 for sheets in 28 29 30 31 32
 do
-    python -B research-twins/check_short_prism_covers.py --wrapped 5 "$sheets" 28 28 --wrapped 6 "$sheets" 28 28 --wrapped 7 "$sheets" 28 28 || exit 1
+    python -B research-twins/check_short_prism_covers.py --wrapped 5 "$sheets" 28 28 --wrapped 6 "$sheets" 28 28 --wrapped 7 "$sheets" 28 28 --wrapped 8 "$sheets" 28 28 || exit 1
+done
+for sheets in 29 30 31 32
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped 9 "$sheets" 28 28 --wrapped 10 "$sheets" 28 28 || exit 1
 done
 for blocks in 4 5 6 7 8 9 10 11 12 13 14
 do
