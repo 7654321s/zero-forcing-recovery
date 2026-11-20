@@ -72,7 +72,7 @@ At 25 sheets, the width-26 band requires at least 22 seeds. Below budget 22 each
 
 At 24 sheets, the width-25 band requires at least 21 seeds. Below budget 21 this would force at least one seed on each sheet. At budgets 21, 22 and 23 the width-23 band leaves respective caps of two, three and four on a single sheet. The wrapped verifier excludes all three budgets at every length from four through 23 blocks. The [long-chain result at 24 sheets](BLOCK_STABILIZATION.md#the-24-sheet-case) then gives $\kappa_{k,m}=24$ for every $k\geq4$ and $m\geq24$.
 
-At 23 sheets and four through fourteen blocks, the width-24 band requires at least 20 seeds. Below budget 20, every sheet would again need a seed. At budgets from 20 through 23, the width-22 band caps the omitted sheet at two through five seeds. The wrapped verifier excludes all four budgets at each of these lengths, giving $\kappa_{k,23}=24$ for $4\leq k\leq14$. The [long-chain check at 23 sheets](BLOCK_STABILIZATION.md#the-23-sheet-case) gives the same value for every $k\geq24$.
+At 23 sheets and four through sixteen blocks, the width-24 band requires at least 20 seeds. Below budget 20, every sheet would again need a seed. At budgets from 20 through 23, the width-22 band caps the omitted sheet at two through five seeds. The wrapped verifier excludes all four budgets at each of these lengths, giving $\kappa_{k,23}=24$ for $4\leq k\leq16$. The [long-chain check at 23 sheets](BLOCK_STABILIZATION.md#the-23-sheet-case) gives the same value for every $k\geq24$.
 
 ## Cyclic thresholds at two and three blocks
 
@@ -184,7 +184,7 @@ Any fort of cost at most 25 has no internal pair of empty sheets, since such a g
 
 The enumeration at five blocks supplies four patterns supported in the last two stages and 16 in opening coordinates. At six through fourteen blocks the verifier moves the four terminal patterns to the last two stages, checks all 20 patterns by forcing closure with empty sheet guards, and excludes any additional set in the 35-sheet formula.
 
-At $m\geq30$, the 28-sheet band gives $24m>28\cdot25$, ruling out all wrapped forts of cost at most 25. At 27, 28 and 29 sheets, the width-$(m-1)$ band caps each sheet at $30-m$ seeds when the total is 25. The wrapped verifier excludes all three cases at four through fourteen blocks, and the minimum-budget classification handles costs through 24. The verifier also excludes wrapped cost 25 at 26 sheets for four through twelve blocks, with a cap of four seeds per sheet. In these ranges, every inclusion-minimal 25-seed loss lifts to one of the listed finite patterns. Each listed finite loss also projects to an inclusion-minimal loss. It occupies at most 11 sheets, and any contained cost-24 pattern has span at most nine, so it can be lifted into the same interval. The cyclic count is $22m$ at four blocks and $20m$ at each other classified length.
+At $m\geq30$, the 28-sheet band gives $24m>28\cdot25$, ruling out all wrapped forts of cost at most 25. At 26 through 29 sheets, the width-$(m-1)$ band caps each sheet at $30-m$ seeds when the total is 25. The wrapped verifier excludes all four cases at four through fourteen blocks, and the minimum-budget classification handles costs through 24. For $m\geq26$, every inclusion-minimal 25-seed loss lifts to one of the listed finite patterns. Each listed finite loss also projects to an inclusion-minimal loss. It occupies at most 11 sheets, and any contained cost-24 pattern has span at most nine, so it can be lifted into the same interval. The cyclic count is $22m$ at four blocks and $20m$ at each other classified length.
 
 ## The first two terms of the independent-loss probability
 
@@ -200,7 +200,7 @@ The first summand counts single extensions of the minimum losses. The overlap su
 
 $$
 \Pr(\text{blocking})=5m p^{24}+(q_k-2)m p^{25}+O(p^{26})
-\qquad (4\leq k\leq14,\ m\geq27)\ \text{or}\ (4\leq k\leq12,\ m=26).
+\qquad (4\leq k\leq14,\ m\geq26).
 $$
 
 ## Overlap correction at order 26
@@ -279,7 +279,7 @@ do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 25 22 28 --wrapped "$blocks" 25 23 28 --wrapped "$blocks" 26 23 28 || exit 1
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 24 21 28 --wrapped "$blocks" 24 22 28 --wrapped "$blocks" 24 23 28 || exit 1
 done
-for blocks in 4 5 6 7 8 9 10 11 12 13 14
+for blocks in 4 5 6 7 8 9 10 11 12 13 14 15 16
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 23 20 28 --wrapped "$blocks" 23 21 28 --wrapped "$blocks" 23 22 28 --wrapped "$blocks" 23 23 28 || exit 1
 done
@@ -310,11 +310,7 @@ The complete four- through fourteen-block enumeration emits a JSON record per ch
 python -B research-twins/check_cost_25_blocking_sets.py --blocks 4 5 6 7 8 9 10 11 12 13 14
 for blocks in 4 5 6 7 8 9 10 11 12 13 14
 do
-    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 27 25 28 --wrapped "$blocks" 28 25 28 --wrapped "$blocks" 29 25 28 || exit 1
-done
-for blocks in 4 5 6 7 8 9 10 11 12
-do
-    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 26 25 28 || exit 1
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 26 25 28 --wrapped "$blocks" 27 25 28 --wrapped "$blocks" 28 25 28 --wrapped "$blocks" 29 25 28 || exit 1
 done
 ```
 
