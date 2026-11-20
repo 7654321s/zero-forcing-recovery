@@ -1,7 +1,7 @@
 """Enumerate small inclusion-minimal seed losses in the integer prism lift."""
 
 import argparse
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 import json
 from pathlib import Path
 import runpy
@@ -73,6 +73,28 @@ def block_translations(pattern, sheets):
         yield [-(v * sheets + s + shift + 1) for v, s in pattern]
 
 
+def remaining_white(neighbors, intact_white, lost):
+    """Compute the final white set by updating only neighbors of each force."""
+    white = intact_white.copy()
+    for vertex in members(lost):
+        white[vertex] = 1
+    counts = bytearray(sum(white[v] for v in row) for row in neighbors)
+    sources = deque(u for u, count in enumerate(counts) if count == 1 and not white[u])
+    while sources:
+        source = sources.popleft()
+        if counts[source] != 1:
+            continue
+        target = next(v for v in neighbors[source] if white[v])
+        white[target] = 0
+        if counts[target] == 1:
+            sources.append(target)
+        for neighbor in neighbors[target]:
+            counts[neighbor] -= 1
+            if counts[neighbor] == 1 and not white[neighbor]:
+                sources.append(neighbor)
+    return mask(v for v, remains_white in enumerate(white) if remains_white)
+
+
 def verify_inherited_patterns(blocks, smaller, templates, *, budget=25):
     stage_start = SPAN['BAND']['stage_start']
     terminal = stage_start(3)
@@ -98,13 +120,14 @@ def verify_inherited_patterns(blocks, smaller, templates, *, budget=25):
                 for delta in range(sheets):
                     translated = mask(v * sheets + (s + delta) % sheets for v, s in smaller_pattern)
                     smaller_translates[translated & -translated].add(translated)
-            covers[sheets] = (graph, blue, smaller_translates)
-        graph, blue, smaller_translates = covers[sheets]
+            neighbors = tuple(tuple(members(row)) for row in graph)
+            white = bytearray(not (blue >> v) & 1 for v in range(len(graph)))
+            covers[sheets] = (graph, blue, smaller_translates, neighbors, white)
+        graph, blue, smaller_translates, neighbors, white = covers[sheets]
         lost = mask(v * sheets + s + 4 for v, s in pattern)
         if lost & blue != lost or lost.bit_count() != budget:
             raise AssertionError(('Unexpected inherited seeds', blocks, pattern))
-        arrival = COVER['MODEL']['trace'](graph, blue & ~lost)[1]
-        fort = mask(v for v, time in enumerate(arrival) if time is None)
+        fort = remaining_white(neighbors, white, lost)
         if COVER['fort_cost'](graph, blue, fort) != budget or any(
                 v % sheets in (0, sheets - 1) for v in members(fort)):
             raise AssertionError(('Inherited loss has no finite fort', blocks, pattern))
@@ -279,7 +302,7 @@ def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_2
 
 
 def check_size_30_boundary(catalogues):
-    blocks = 28
+    blocks = 27
     smaller = tuple(minimum_seed_sets(blocks))
     for budget, catalogue in enumerate(catalogues, start=25):
         inherited = verify_inherited_patterns(blocks, smaller, catalogue, budget=budget)
@@ -480,7 +503,7 @@ def main():
     mode.add_argument('--size-29', choices=EXPECTED_SIZE_29_SPANS, type=int, metavar='BLOCKS',
                       help='verify size-29 losses from five blocks through the locality representative')
     mode.add_argument('--size-30-boundary', action='store_true',
-                      help='enumerate the 28-block representative for the size-30 boundary term')
+                      help='enumerate the 27-block representative for the size-30 boundary term')
     mode.add_argument('--ordinary-threshold', action='store_true',
                       help='certify the absence of ordinary interior forts of cost up to 29')
     args = parser.parse_args()

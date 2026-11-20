@@ -216,6 +216,29 @@ def check_insertion_obstruction(sheets):
     print(f'24 blocks, {sheets} sheets: no cost-24 wrapped fort prevents insertion', flush=True)
 
 
+def check_four_sheet_barrier():
+    """Check separation at the center of four intact sheets by round five."""
+    blocks, sheets, cut = 27, 31, 15
+    graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
+    intact = mask(v for v in members(blue) if cut - 2 <= v % sheets < cut + 2)
+    _, arrivals = CHECKS['MODEL']['trace'](graph, intact)
+    left = []
+    right = 0
+    for v, arrival in enumerate(arrivals):
+        if arrival is None or arrival > 5:
+            if cut - 2 <= v % sheets < cut:
+                left.append(v)
+            elif cut <= v % sheets < cut + 2:
+                right |= 1 << v
+    for v in left:
+        neighborhood = graph[v]
+        for u in members(graph[v]):
+            neighborhood |= graph[u]
+        if neighborhood & right:
+            raise AssertionError(('Two late white vertices cross the cut', v))
+    print('Four intact sheets separate the remaining whites at round five', flush=True)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
@@ -231,6 +254,8 @@ if __name__ == '__main__':
     mode.add_argument('--insertion-obstruction', type=int, nargs='+', choices=range(22, 29),
                       metavar='SHEETS',
                       help='exclude wrapping at cost 24 when insertion is blocked at 24 blocks')
+    mode.add_argument('--four-sheet-barrier', action='store_true',
+                      help='check the round-five separation across four intact sheets')
     args = parser.parse_args()
     if args.wrapped:
         for case in args.wrapped:
@@ -244,6 +269,8 @@ if __name__ == '__main__':
     elif args.insertion_obstruction:
         for sheets in args.insertion_obstruction:
             check_insertion_obstruction(sheets)
+    elif args.four_sheet_barrier:
+        check_four_sheet_barrier()
     else:
         for blocks, cases in CASES.items():
             for sheets, expected in cases:
