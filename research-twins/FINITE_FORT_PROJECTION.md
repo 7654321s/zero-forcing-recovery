@@ -101,6 +101,14 @@ For four through 27 blocks, put the two blue guard sheets around the seven inter
 
 The 26-stage band extends this classification to every longer chain. With at most 24 seed-label losses, the restricted base forcing process still fills a pair of consecutive stages in the first 26 appended stages. The verifier checks the terminal and nonterminal band types at 27 and 28 blocks. Project a cost-24 fort's lost seeds onto base labels, retaining all lifted seeds outside those labels. The restricted base process lifts to the integer sheets, filling two consecutive appended stages disjoint from the fort. [Contract that pair](BLOCK_STABILIZATION.md#insertion-and-contraction). This preserves the seed cost and the sheet span. By induction, the contracted fort is one of the two displayed shapes. It meets both of the first two appended stages, so the retained empty stage has index at least three and the deleted stage was beyond the support. Expanding the chain preserves the same shape and seed labels.
 
+## The eight-sheet minimum-cost forts
+
+For every chain with at least four blocks, up to sheet translation there are exactly 40 finite forts of seed cost 24 and span eight. They occupy the last two appended stages and realize exactly two distinct 24-seed blocking sets. Their vertex counts range from 42 through 47. The two forts of span seven have 44 and 46 vertices and share one seed set near the opening.
+
+The [verifier](check_finite_fort_span.py) lists 40 vertices common to the terminal shapes and nine optional vertices, all in coordinates relative to the start of the penultimate stage. It checks all subsets of the optional vertices at four blocks. In the guarded strip for each length from four through 27 blocks, the verifier requires the first and last interior sheets to be occupied. It then excludes every one of the 40 full membership assignments. The remaining formula at cost at most 24 is unsatisfiable at each length. The 40 displayed shapes are checked individually and yield the same two seed patterns in terminal coordinates.
+
+At a longer length, contract an empty pair from the 26-stage band as above. The resulting fort meets both of the last two appended stages, so the deleted empty stage must precede them. This preserves the fort's terminal coordinates. Conversely, move any of the 40 patterns to the last two stages of a longer chain. The signed internal edges and the splice into the preceding stage have the same normalized description. The opening hub keeps its two links to the terminal stage. Thus every vertex next to the pattern has the same count of fort neighbors. All other outside vertices have count zero, and the seed labels on the pattern are unchanged. This gives the same 40 shapes and two seed sets at every length.
+
 ## Reproduction
 
 ```sh
@@ -135,7 +143,7 @@ python -B research-twins/check_short_prism_covers.py
 python -B research-twins/check_block_stabilization.py --subbands-from 17 --band-through 23 --band-blocks 11 12 13 14 15 16 17 18 19 20 21 22 23
 ```
 
-The following command reproduces the minimum spans, the cost table and the classification of the two shortest minimum-cost forts.
+The following command reproduces the minimum spans, the cost table and the classifications of the seven- and eight-sheet minimum-cost forts.
 
 ```sh
 python -B research-twins/check_finite_fort_span.py

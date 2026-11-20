@@ -1,5 +1,6 @@
 """Verify the minimum span of a finite fort in the signed prism lift."""
 
+from itertools import combinations
 from pathlib import Path
 import runpy
 
@@ -103,6 +104,32 @@ def check_seed_frontiers():
         print(f'{blocks} blocks: minimum seed costs {costs} from span {first}')
 
 
+def check_guarded_shapes(blocks, span, shapes):
+    sheets = span + 2
+    graph, seeds, guards = guarded_strip(blocks, span)
+    times = COVER['MODEL']['trace'](graph, guards)[1]
+    outside = mask(v for v, t in enumerate(times) if t is not None)
+    for fort in shapes:
+        if fort & outside or COVER['fort_cost'](graph, seeds, fort) != 24:
+            raise AssertionError(('Invalid minimum-cost fort', blocks, span))
+        occupied = {v % sheets for v in members(fort)}
+        if min(occupied) != 1 or max(occupied) != span:
+            raise AssertionError(('Incorrect witness span', blocks, span))
+
+    free = [v + 1 for v in range(len(graph)) if not outside & (1 << v)]
+    clauses = list(BAND['fort_clauses'](graph, range(len(graph))))
+    clauses.extend([-(v + 1)] for v in members(outside))
+    clauses.extend([v for v in free if (v - 1) % sheets == sheet] for sheet in (1, span))
+    for fort in shapes:
+        clauses.append([-v if fort & (1 << (v - 1)) else v for v in free])
+    with ITotalizer(lits=[v + 1 for v in members(seeds & ~outside)], ubound=24,
+                    top_id=len(graph)) as counter:
+        with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
+            if solver.solve(assumptions=[-counter.rhs[24]]):
+                raise AssertionError(('An additional minimum-cost fort exists', blocks, span))
+    return len({fort & seeds for fort in shapes})
+
+
 def check_shortest_minimum_cost_forts():
     for blocks in (27, 28):
         BAND['check_band'](blocks, stages=26, budget=24)
@@ -113,31 +140,55 @@ def check_shortest_minimum_cost_forts():
         raise AssertionError('Unexpected common fort')
     shapes = (common ^ removed, common)
     for blocks in range(4, 28):
-        graph, seeds, guards = guarded_strip(blocks, 7)
-        times = COVER['MODEL']['trace'](graph, guards)[1]
-        outside = mask(v for v, t in enumerate(times) if t is not None)
-        for fort in shapes:
-            if (fort & outside or {v % 9 for v in members(fort)} != set(range(1, 8))
-                    or COVER['fort_cost'](graph, seeds, fort) != 24):
-                raise AssertionError(('Invalid seven-sheet fort', blocks))
-        if removed & seeds:
+        if check_guarded_shapes(blocks, 7, shapes) != 1:
             raise AssertionError(('The two shapes have different seed sets', blocks))
-
-        free = [v + 1 for v in range(len(graph)) if not outside & (1 << v)]
-        clauses = list(BAND['fort_clauses'](graph, range(len(graph))))
-        clauses.extend([-(v + 1)] for v in members(outside))
-        clauses.append(free)
-        for fort in shapes:
-            clauses.append([-v if fort & (1 << (v - 1)) else v for v in free])
-        with ITotalizer(lits=[v + 1 for v in members(seeds & ~outside)], ubound=24,
-                        top_id=len(graph)) as counter:
-            with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
-                if solver.solve(assumptions=[-counter.rhs[24]]):
-                    raise AssertionError(('An additional shortest minimum-cost fort exists', blocks))
     print('Exactly two cost-24 forts of span seven at every length from four blocks')
+
+
+# These coordinates are relative to the beginning of the penultimate stage.
+TAIL_COMMON = (
+    (3, 5), (4, 1), (4, 2), (5, 2), (5, 3), (6, 3), (6, 4), (7, 4),
+    (9, 3), (9, 4), (10, 3), (10, 4), (11, 4), (11, 5), (12, 4), (13, 5),
+    (15, 6), (16, 5), (17, 3), (17, 4), (17, 6), (18, 6), (19, 6), (21, 3),
+    (21, 6), (22, 3), (22, 5), (22, 6), (25, 6), (26, 5), (26, 6), (27, 5),
+    (27, 6), (28, 5), (29, 5), (30, 5), (30, 6), (30, 8), (31, 5), (31, 8),
+)
+TAIL_OPTIONAL = ((9, 5), (20, 5), (21, 4), (22, 4), (23, 4), (23, 5),
+                 (24, 5), (25, 4), (25, 5))
+
+
+def check_eight_sheet_forts():
+    representative = 4
+    start = BAND['stage_start'](representative - 2)
+    graph, seeds, _ = guarded_strip(representative, 8)
+    patterns = []
+    supports = set()
+    for length in range(len(TAIL_OPTIONAL) + 1):
+        for included in combinations(TAIL_OPTIONAL, length):
+            coordinates = TAIL_COMMON + included
+            fort = mask((v + start) * 10 + s for v, s in coordinates)
+            try:
+                cost = COVER['fort_cost'](graph, seeds, fort)
+            except AssertionError:
+                continue
+            if cost == 24:
+                patterns.append(coordinates)
+                supports.add(fort & seeds)
+    if len(patterns) != 40 or len(supports) != 2:
+        raise AssertionError('Unexpected eight-sheet terminal patterns')
+    if {len(pattern) for pattern in patterns} != set(range(42, 48)):
+        raise AssertionError('Unexpected sizes of eight-sheet forts')
+
+    for blocks in range(4, 28):
+        start = BAND['stage_start'](blocks - 2)
+        shapes = [mask((v + start) * 10 + s for v, s in pattern) for pattern in patterns]
+        if check_guarded_shapes(blocks, 8, shapes) != 2:
+            raise AssertionError(('Unexpected number of terminal seed patterns', blocks))
+    print('Exactly 40 cost-24 forts of span eight, with two seed sets, at every length from four blocks')
 
 
 if __name__ == '__main__':
     check_minimum_spans()
     check_seed_frontiers()
     check_shortest_minimum_cost_forts()
+    check_eight_sheet_forts()
