@@ -2,6 +2,7 @@
 
 import argparse
 from collections import Counter, defaultdict, deque
+import gzip
 import json
 from pathlib import Path
 import runpy
@@ -40,6 +41,7 @@ EXPECTED_SIZE_28_SPANS = dict.fromkeys(
     range(5, LOCALITY_REPRESENTATIVE + 1), {7: 13, 8: 129, 9: 301, 10: 218, 11: 80})
 EXPECTED_SIZE_29_SPANS = dict.fromkeys(
     range(5, LOCALITY_REPRESENTATIVE + 1), {7: 20, 8: 316, 9: 750, 10: 616, 11: 271, 12: 9})
+EXPECTED_SIZE_30_SPANS = dict(zip(range(7, 13), (47, 679, 2001, 2136, 998, 114)))
 
 
 def minimum_seed_sets(blocks):
@@ -301,6 +303,46 @@ def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_2
     return dict(sorted(coefficients.items()))
 
 
+def check_five_block_catalogue(*, exhaustive=False):
+    """Replay the finite witnesses, with optional SAT exhaustion at each size."""
+    with gzip.open(HERE / 'five-block-loss-catalogue.json.gz', 'rt', encoding='utf-8') as source:
+        data = json.load(source)
+    if (data['schema_version'], data['blocks'], data['first_sheet']) != (1, 5, 1):
+        raise AssertionError('Unexpected loss catalogue format')
+    expected = (
+        {7: 1, 8: 2, 9: 2}, EXPECTED_SPANS[5], EXPECTED_SIZE_26_SPANS[5],
+        EXPECTED_SIZE_27_SPANS[5], EXPECTED_SIZE_28_SPANS[5], EXPECTED_SIZE_29_SPANS[5],
+        EXPECTED_SIZE_30_SPANS,
+    )
+    if set(data['losses_by_size']) != {str(size) for size in range(24, 31)}:
+        raise AssertionError('Unexpected loss catalogue sizes')
+    smaller, verified = (), []
+    for cost, spans in enumerate(expected, start=24):
+        patterns = tuple(tuple(map(tuple, row)) for row in data['losses_by_size'][str(cost)])
+        if tuple(sorted(set(patterns))) != patterns or any(
+                len(row) != cost or normalized(row) != row or len(set(row)) != cost
+                for row in patterns):
+            raise AssertionError(('Unnormalized catalogue entry', cost))
+        if Counter(max(s for _, s in row) for row in patterns) != spans:
+            raise AssertionError(('Unexpected catalogue spans', cost))
+        replay = verify_inherited_patterns(5, smaller, patterns, budget=cost)
+        if len(replay) != len(patterns):
+            raise AssertionError(('Catalogue changed during replay', cost))
+        if cost == 24 and replay != set(minimum_seed_sets(5)):
+            raise AssertionError('Unexpected minimum catalogue')
+        if exhaustive and enumerate_blockers(5, smaller, replay, budget=cost) != replay:
+            raise AssertionError(('Unlisted minimal blocking loss', cost))
+        smaller += patterns
+        verified.append(patterns)
+    coefficients = known_union_coefficients(5, *verified[:-1])
+    coefficients[30] += len(verified[-1])
+    print(json.dumps({
+        'blocks': 5, 'exhaustive': exhaustive,
+        'counts': {cost: len(group) for cost, group in enumerate(verified, start=24)},
+        'blocking_coefficients_per_sheet': coefficients,
+    }), flush=True)
+
+
 def check_size_30_boundary(catalogues, *, blocks=14):
     smaller = tuple(minimum_seed_sets(blocks))
     for budget, catalogue in enumerate(catalogues, start=25):
@@ -316,7 +358,7 @@ def check_size_30_boundary(catalogues, *, blocks=14):
     }
     if blocks == 5:
         spans = Counter(max(s for _, s in pattern) for pattern in patterns)
-        if spans != dict(zip(range(7, 13), (47, 679, 2001, 2136, 998, 114))):
+        if spans != EXPECTED_SIZE_30_SPANS:
             raise AssertionError(('Unexpected five-block size-30 seed catalogue', spans))
         result['spans'] = dict(sorted(spans.items()))
         result['blocking_coefficient_per_sheet'] = len(patterns) - 3861
@@ -515,6 +557,8 @@ def main():
                       help='enumerate the 14-block representative for the size-30 boundary term')
     mode.add_argument('--size-30-five-blocks', action='store_true',
                       help='verify the 5975 size-30 seed loss types at five blocks')
+    mode.add_argument('--five-block-catalogue', choices=('witnesses', 'exhaustive'),
+                      help='verify the published catalogue and optionally replay SAT exhaustion')
     mode.add_argument('--ordinary-threshold', action='store_true',
                       help='certify the absence of ordinary interior forts of cost up to 29')
     args = parser.parse_args()
@@ -538,6 +582,9 @@ def main():
         return
     if args.size_30_boundary or args.size_30_five_blocks:
         check_size_26(5, size_30_representative=14 if args.size_30_boundary else 5)
+        return
+    if args.five_block_catalogue:
+        check_five_block_catalogue(exhaustive=args.five_block_catalogue == 'exhaustive')
         return
     templates = enumerate_blockers(5, minimum_seed_sets(5)) if any(k >= 5 for k in args.blocks) else ()
     if templates:
