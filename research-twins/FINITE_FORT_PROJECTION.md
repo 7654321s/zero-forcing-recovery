@@ -76,7 +76,7 @@ At 23 sheets and four through 23 blocks, the width-24 band requires at least 20 
 
 At four and five blocks and 21 sheets, the width-22 band requires at least 18 seeds. Below budget 18 each sheet would need a seed. At budgets 18 through 23 the width-20 band leaves caps of two through seven on the omitted sheet. The wrapped verifier excludes all six budgets at each length, giving $\kappa_{4,21}=\kappa_{5,21}=24$.
 
-At four through nine blocks and at 26 blocks, the width-23 band requires at least 19 seeds on a 22-sheet cover. Below budget 19, every sheet would need a seed. At budgets from 19 through 23 the width-21 band gives caps of two through six on the omitted sheet. The wrapped verifier excludes each budget at these lengths. The finite lower bound and the common witness give the value 24, and the budget-23 contraction and opening insertion extend it from 26 blocks to all $k\geq24$.
+At four through ten blocks and at 26 blocks, the width-23 band requires at least 19 seeds on a 22-sheet cover. Below budget 19, every sheet would need a seed. At budgets from 19 through 23 the width-21 band gives caps of two through six on the omitted sheet. The wrapped verifier excludes each budget at these lengths. The finite lower bound and the common witness give the value 24, and the budget-23 contraction and opening insertion extend it from 26 blocks to all $k\geq24$.
 
 ## Cyclic thresholds at two and three blocks
 
@@ -349,7 +349,7 @@ The 35-sheet exclusion at 31 blocks also has a certificate using the narrower wi
 
 The wrapped verifier also packs disjoint certified subwindows inside a longer window when their summed lower bound improves on every single subwindow. This adds valid count constraints before the fort search. The 34-sheet exclusion at 31 blocks has also been checked with these constraints and the width-25 band.
 
-Direct wrapped checks also give the smaller sufficient period 28 at five through eight blocks. The smaller costs already unroll there. There are therefore $1982m$ distinct 29-seed minimal losses in the verified ranges, and the degree-29 coefficient of the blocking probability is $(1982-1585)m=397m$.
+Direct wrapped checks also give the smaller sufficient period 28 at five through eight blocks, and exclude wrapping at 33 sheets for nine through 16 blocks and at 25 and 27 blocks. At 26 blocks the width-34 band covers a complete 33-sheet period and one additional sheet. If a wrapped fort had cost at most 29, each window would need at least 30 seeds, forcing at least one seed on every sheet. This contradicts the total budget. The smaller costs already unroll in these ranges. There are therefore $1982m$ distinct 29-seed minimal losses, and the degree-29 coefficient of the blocking probability is $(1982-1585)m=397m$.
 
 The signed unions of size 30 from the catalogues through size 29 have weights $-2,-1,0,1,2$ with respective counts 73, 5536, 723, 1743 and 39 up to translation. The overlapping-union profile is checked directly at five, six and seven blocks, and the disjoint opening and terminal label intervals preserve it at every greater length. The same cyclic lifting argument applies since the union span is at most twelve sheets and any three constituents have at least $3\cdot24-2\cdot30=12$ shared seeds. Writing $N_{30}(k,m)$ for the number of inclusion-minimal 30-seed losses, the degree-30 coefficient at these periods is $N_{30}(k,m)-3861m$.
 
@@ -363,6 +363,8 @@ M_{30}(k,m)=m(10k+\beta_{30}),\qquad
 $$
 
 The coefficient $[p^{30}]\log R_{k,m}(p)$ is the negative of the second expression because blocking starts in degree 24. The numeric value of $A_{30}(28)$ remains to be enumerated.
+
+At five blocks all cyclic forts costing at most 30 unroll from 29 sheets. The direct wrapped checks exclude cost 30 on 29 through 35 sheets. The width-28 band gives $24m>28\cdot30$ for $m\geq36$, and the smaller costs already unroll from 28 sheets.
 
 The projected-support checks give two consecutive empty appended stages in every finite fort of cost at most 30 at lengths 13 through 32. For every larger length the first 32 appended stages give an empty pair by the terminal and nonterminal band checks at 33 and 34 blocks. A fort cannot have two distinct runs of at least two empty stages in the cyclic stage order. The occupied portions between two such runs would each be nonempty finite forts, because every edge changes the stage by at most one and an outside vertex cannot see both portions. Each portion costs at least 24 seeds. Contracting an empty appended pair therefore shortens the unique run of at least two empty stages. It preserves the length of the occupied arc complementary to this run. Repeated contraction reaches 12 blocks with at least one empty stage remaining, so the original occupied arc spans at most 11 stages.
 
@@ -637,7 +639,7 @@ At 24 blocks, a wrapped fort at 22 through 28 sheets would have to contain an op
 
 Once unwrapping holds, every minimum-cost cyclic fort is the projection of one of the listed finite forts. Its span is at most nine, so the outer run of at least $m-9$ empty sheets is strictly longer than any interior run at the periods here. The first occupied sheet after this unique longest run determines the translation. The same argument applies to the seed sets, as each meets both extreme sheets of its fort. The exact numbers are $54m$ minimum-cost cyclic forts and $5m$ minimum blocking sets. Their cyclic fort-size polynomial is $mP(x)$. For a minimum blocking set the final white fort contains all its lost seeds, since any smaller seed intersection would contradict minimal cost.
 
-At 24 sheets the direct verifier excludes wrapped forts of cost 24 at four through 23 blocks and at 26 blocks. The cap is five seeds per sheet. At 23 sheets the width-22 band gives a cap of six, and the direct verifier excludes cost 24 at all lengths from four through 23 blocks and at 26 blocks. Contraction and insertion give the same exclusion at 23 and 24 sheets for every chain of at least 24 blocks. Thus the exact counts and polynomial hold at 23 sheets and every longer period for all chain lengths of at least four blocks. At 22 sheets the width-21 band gives a cap of seven, and the direct verifier excludes wrapping at cost 24 at four through nine blocks and at 26 blocks. The contraction and insertion proofs extend the 26-block result to every length of at least 24 blocks. In these ranges there are 1,188 minimum-cost forts and 110 minimum blocking sets at 22 sheets.
+At 24 sheets the direct verifier excludes wrapped forts of cost 24 at four through 23 blocks and at 26 blocks. The cap is five seeds per sheet. At 23 sheets the width-22 band gives a cap of six, and the direct verifier excludes cost 24 at all lengths from four through 23 blocks and at 26 blocks. Contraction and insertion give the same exclusion at 23 and 24 sheets for every chain of at least 24 blocks. Thus the exact counts and polynomial hold at 23 sheets and every longer period for all chain lengths of at least four blocks. At 22 sheets the width-21 band gives a cap of seven, and the direct verifier excludes wrapping at cost 24 at four through ten blocks and at 26 blocks. The contraction and insertion proofs extend the 26-block result to every length of at least 24 blocks. In these ranges there are 1,188 minimum-cost forts and 110 minimum blocking sets at 22 sheets.
 
 The chain has $10k$ seed labels. Among uniform 24-element losses from the $10km$ lifted seeds, the exact probability of blocking recovery is $5m/\binom{10km}{24}$. For independent losses with probability $p$ per seed, the blocking probability at fixed $k,m$ is $5m p^{24}+O(p^{25})$ as $p\to0$.
 
@@ -683,7 +685,7 @@ for blocks in 4 5
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 21 18 --wrapped "$blocks" 21 19 --wrapped "$blocks" 21 20 --wrapped "$blocks" 21 21 --wrapped "$blocks" 21 22 --wrapped "$blocks" 21 23 || exit 1
 done
-for blocks in 4 5 6 7 8 9 26
+for blocks in 4 5 6 7 8 9 10 26
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 22 19 28 --wrapped "$blocks" 22 20 28 --wrapped "$blocks" 22 21 28 --wrapped "$blocks" 22 22 28 --wrapped "$blocks" 22 23 28 || exit 1
 done
@@ -731,6 +733,16 @@ python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 26 --band-blocks 25 29
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 30
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 31
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 34 --band-blocks 26
+for blocks in 9 10 11 12 13 14 15 16
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 33 29 28 || exit 1
+done
+python -B research-twins/check_short_prism_covers.py --wrapped 25 33 29 26 --wrapped 27 33 29 25
+for sheets in 29 30 31 32 33 34 35
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped 5 "$sheets" 30 28 || exit 1
+done
 for blocks in 25 29
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 30 26 26 --wrapped "$blocks" 30 27 26 || exit 1
@@ -836,7 +848,7 @@ for blocks in 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 26
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 23 24 28 || exit 1
 done
-for blocks in 4 5 6 7 8 9 26
+for blocks in 4 5 6 7 8 9 10 26
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 22 24 28 || exit 1
 done
