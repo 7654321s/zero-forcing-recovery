@@ -245,7 +245,7 @@ At five blocks the catalogue has 88 opening losses meeting the first three stage
 
 Contract an empty appended stage pair. Each loss of size 24 or 25 meets all appended stages of its anchored interval. If that interval contains the retained empty stage, the contracted loss cannot contain the smaller pattern. If the interval avoids the retained empty stage, reinsertion carries any contained smaller pattern back with the same anchor. Thus contraction preserves inclusion-minimality. Iterating to 14 blocks gives one of the 97 patterns. Each meets every stage of its anchored interval, so its coordinates relative to that end remain unchanged on reversing the contractions. The verifier checks the existence of all 97 patterns through 20 blocks. They extend to every longer chain by radius-eight locality and by the disjoint opening and terminal labels.
 
-Wrapped forts of cost at most 26 are excluded for $m\geq31$ at every length. The width-28 bound gives $24m>28\cdot26$ at four through 24 blocks and at 26 blocks. The width-25 bound gives $21m>25\cdot26$ at 25, 27 and 28 blocks. The 28-stage band permits every chain of at least 29 blocks to contract to 28 while preserving its occupied sheets and seed cost, so the same unwrapping holds there.
+Wrapped forts of cost at most 26 are excluded for $m\geq30$ at every length. For $m\geq31$ the width-28 bound gives $24m>28\cdot26$ at four through 24 blocks and at 26 blocks. The width-25 bound gives $21m>25\cdot26$ at 25, 27 and 28 blocks. The 28-stage band permits every chain of at least 29 blocks to contract to 28 while preserving its occupied sheets and seed cost. The direct checks below treat 30 sheets.
 
 In these ranges each listed loss projects injectively because its span is at most 11. Any contained smaller cyclic blocking set would have to unroll, and its finite seed pattern has span at most 11, so it lifts into the same interval. Thus $N_{26}(4,m)=104m$ and $N_{26}(k,m)=97m$ for $k\geq5$. The independent-loss probabilities are
 
@@ -286,7 +286,7 @@ All 258 translated losses retain their blocking property and inclusion-minimalit
 
 For 14 through 29 blocks the projected-support verifier excludes any cost-27 finite fort meeting every consecutive pair of appended stages. From 30 blocks onward the first 29 appended stages force an empty adjacent pair, by the band checks at 30 and 31 blocks. Contract such a pair. The smaller losses of sizes 24 through 26 occupy every appended stage of their anchored support. An occurrence after contraction either avoids the retained empty stage and lifts back with the same coordinates, or would require a seed in that empty stage. Thus contraction preserves minimality. Iterating to 13 blocks gives one of the 258 patterns. The same argument preserves coordinates when reversing the contractions, including for the two patterns using both ends. This proves finite completeness at all lengths.
 
-For all $k\geq4$ and $m\geq31$ every fort of cost at most 27 unrolls. At four through 24 blocks and at 26 blocks the width-28 band gives $24m>28\cdot27$ for $m\geq32$. At 25, 27, 28 and 29 blocks the width-25 band gives $21m>25\cdot27$ for $m\geq33$. All lower costs already unroll at the remaining periods, since $24\cdot31>28\cdot26$ and $21\cdot31>25\cdot26$. The direct wrapped checks exclude cost 27 at 31 sheets for every length through 29, and at 32 sheets for the four lengths using the narrower band. For every larger $k$, the 29-stage band contracts the cyclic fort to length 29 while preserving its cost and sheet occupancy. The wrapped verifier and the width-28 bounds give the following smaller sufficient periods at the listed lengths.
+For all $k\geq4$ and $m\geq30$ every fort of cost at most 27 unrolls. At four through 24 blocks and at 26 blocks the width-28 band gives $24m>28\cdot27$ for $m\geq32$. At 25, 27, 28 and 29 blocks the width-25 band gives $21m>25\cdot27$ for $m\geq33$. At 31 sheets those same bands already exclude cost 26 and below. At 30 sheets they exclude cost 25 and below, since $24\cdot30>28\cdot25$ and $21\cdot30>25\cdot25$. The wrapped checks exclude costs 26 and 27 at 30 sheets at every length through 29, cost 27 at 31 sheets, and cost 27 at 32 sheets for the four lengths using the narrower band. The 30-sheet tests at 25 and 29 blocks use certified bands through width 26. For every larger $k$, the 29-stage band contracts the cyclic fort to length 29 while preserving its cost and sheet occupancy. The wrapped verifier and the width-28 bounds give the following smaller sufficient periods at the listed lengths.
 
 | Blocks | Verified from this many sheets |
 | --- | ---: |
@@ -295,7 +295,6 @@ For all $k\geq4$ and $m\geq31$ every fort of cost at most 27 unrolls. At four th
 | 8 | 27 |
 | 9–10 | 28 |
 | 11–12 | 29 |
-| 13 | 30 |
 
 The enumerated losses retain their finite blocking property and minimality after projection. At four blocks, the guarded closures of all 277 losses are checked in a 31-sheet representative. With periodic losses, after two rounds each copy of the loss lies in a band of potential white vertices extending four sheets on either side. The initial colors within distance four of each vertex in that band depend on only the original copy of the loss, since the loss span is at most 13 and the period is at least 25. Different such bands are separated by at least four blue sheets. The later forcing inside each band therefore agrees with that from a single copy in the integer lift. The smaller cyclic losses unroll and cannot be contained unless a corresponding finite loss was contained. There are $277m$ size-27 losses at four blocks and $258m$ from five blocks onward. The fourth coefficient is $(277-127)m=150m$ at four blocks and $(258-120)m=138m$ at the other lengths. The cost-26 tests also lower the third-term threshold to 25 sheets at six blocks, 26 sheets at eight blocks, 27 sheets at nine blocks, and 28 sheets at eleven blocks.
 
@@ -351,13 +350,13 @@ A_4(p)=5p^{24}+20p^{25}+88p^{26},\qquad
 A_k(p)=5p^{24}+18p^{25}+82p^{26}\quad (k\geq5).
 $$
 
-There are constants independent of $k$ and $m$ such that for $k\geq4$, $m\geq31$ and $0\leq p\leq1$,
+There are constants independent of $k$ and $m$ such that for $k\geq4$, $m\geq30$ and $0\leq p\leq1$,
 
 $$
 \Pr(\text{blocking})=1-\exp(-m A_k(p))+O(km p^{27}).
 $$
 
-Put $c_4=150$ and $c_k=138$ for $k\geq5$. For all $k\geq4$ and $m\geq31$, the complete size-27 catalogue gives
+Put $c_4=150$ and $c_k=138$ for $k\geq5$. For all $k\geq4$ and $m\geq30$, the complete size-27 catalogue gives
 
 $$
 \Pr(\text{blocking})=1-\exp\bigl(-m(A_k(p)+c_kp^{27})\bigr)+O(kmp^{28}).
@@ -511,7 +510,7 @@ $$
 \qquad (a)_d=a(a-1)\cdots(a-d+1).
 $$
 
-To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities for every $\ell\leq27$ when $m\geq31$, as well as for $\ell=28$ at every length of at least five blocks when $m\geq34$ or in the verified smaller cyclic ranges. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
+To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities for every $\ell\leq27$ when $m\geq30$, as well as for $\ell=28$ at every length of at least five blocks when $m\geq34$ or in the verified smaller cyclic ranges. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
 
 The joint component law also extends to a uniform loss of size $\ell$. Set $p=\ell/N$ and let $\Lambda=mp^{24}+kmp^{30}$. For $k\geq4$, $m\geq38$ and $\ell\geq1$, the total variation error is
 
@@ -637,14 +636,23 @@ python -B research-twins/check_prism_projected_support.py --cost-26-stage-pairs
 python -B research-twins/check_prism_projected_support.py --cost-27-stage-pairs
 python -B research-twins/check_prism_projected_support.py --cost-28-stage-pairs
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 25 27 28 29
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 26 --band-blocks 25 29
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 30
+for blocks in 25 29
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 30 26 26 --wrapped "$blocks" 30 27 26 || exit 1
+done
+for blocks in 27 28
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 30 26 25 --wrapped "$blocks" 30 27 25 || exit 1
+done
 for blocks in 25 27 28 29
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 31 27 25 --wrapped "$blocks" 32 27 25 || exit 1
 done
 for blocks in 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 26
 do
-    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 31 27 28 || exit 1
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 30 26 28 --wrapped "$blocks" 30 27 28 --wrapped "$blocks" 31 27 28 || exit 1
 done
 for blocks in 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
 do
