@@ -322,11 +322,11 @@ At five blocks and above, the opening coordinates and shifted terminal coordinat
 
 Every pair in a cyclic union of size at most 28 shares a seed, and any three share at least $3\cdot24-2\cdot28=16$ seeds. With constituent spans at most 13, each lift relative to a shared seed is unique at periods of at least 25. The three-way intersections ensure that each pair of lifted constituents intersects, so their combined span is at most 25. No selected sites then alias modulo the period. The enumerated unions span at most 13, and the unique outer gap gives $m$ distinct translates of each finite union. A size-28 minimal loss contributes one new degree-28 monomial, since its union with any distinct minimal loss has size at least 29.
 
-## The fifth term at five and six blocks
+## The fifth term at five through seven blocks
 
-There are exactly 741 inclusion-minimal 28-seed losses on each of the five- and six-block integer lifts, up to sheet translation. Their spans from seven through eleven have counts 13, 129, 301, 218 and 80. A finite fort of cost at most 28 cannot split across two empty sheets. A span of at least 37 contains disjoint bands of widths 18 and 19, requiring at least 29 seeds. The search uses 36 interior sheets and two blue guards. It excludes every translate of the complete catalogues at sizes 24 through 27 before enumerating. At six blocks, 733 patterns transfer by holding the opening and the first two appended stages fixed and moving the last two stages. Three others use four opening stages and five use three terminal stages. Holding each of those full supports fixed relative to its own end gives exactly the eight additional patterns from the six-block search. All 741 seed sets at each length pass direct closure traces and smaller-loss containment checks in a 33-sheet representative.
+There are exactly 741 inclusion-minimal 28-seed losses on each integer lift with five through seven blocks, up to sheet translation. Their spans from seven through eleven have counts 13, 129, 301, 218 and 80. A finite fort of cost at most 28 cannot split across two empty sheets. A span of at least 37 contains disjoint bands of widths 18 and 19, requiring at least 29 seeds. The search uses 36 interior sheets and two blue guards. It excludes every translate of the complete catalogues at sizes 24 through 27 before enumerating. At six blocks, 733 patterns transfer by holding the opening and the first two appended stages fixed and moving the last two stages. Three others use four opening stages and five use three terminal stages. Holding each of those full supports fixed relative to its own end gives exactly the eight additional patterns from the six-block search. At seven blocks the same rules transfer all 741 patterns, and the guarded search excludes any further pattern. The transferred sets pass closure traces and smaller-loss containment checks in a 33-sheet representative.
 
-For $m\geq33$ the width-28 bound excludes wrapping at cost 28 since $24m>28\cdot28$. Direct wrapped checks at both lengths extend this to $m\geq28$. All smaller costs already unroll in this range. Every finite pattern projects with a unique outer gap and can be recovered from that gap. Thus there are $741m$ distinct minimal 28-seed losses, and the degree-28 coefficient of the blocking probability is $(741-399)m=342m$.
+For $m\geq33$ the width-28 bound excludes wrapping at cost 28 since $24m>28\cdot28$. Direct wrapped checks at all three lengths extend this to $m\geq28$. All smaller costs already unroll in this range. Every finite pattern projects with a unique outer gap and can be recovered from that gap. Thus there are $741m$ distinct minimal 28-seed losses, and the degree-28 coefficient of the blocking probability is $(741-399)m=342m$.
 
 The catalogue through size 28 also gives the next overlap correction. The normalized unions of degree 29 have weights $-2,-1,0,1,2$ with counts 28, 1812, 124, 273 and 5. All these unions span at most 11 sheets. Any two contributors share a seed and any three have at least $3\cdot24-2\cdot29=14$ seeds in common. The same lifting argument therefore identifies the signed correction on the cycle. At each length in its verified cyclic range the degree-29 coefficient is $N_{29}(k,m)-1585m$, where $N_{29}$ counts the inclusion-minimal 29-seed losses.
 
@@ -451,7 +451,7 @@ $$
 \qquad (a)_d=a(a-1)\cdots(a-d+1).
 $$
 
-To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities for every $\ell\leq27$ when $m\geq31$, as well as for $\ell=28$ at five and six blocks when $m\geq28$. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
+To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities for every $\ell\leq27$ when $m\geq31$, as well as for $\ell=28$ in the verified cyclic ranges at five through seven blocks. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
 
 The joint component law also extends to a uniform loss of size $\ell$. Set $p=\ell/N$ and let $\Lambda=mp^{24}+kmp^{30}$. For $k\geq4$, $m\geq38$ and $\ell\geq1$, the total variation error is
 
@@ -611,9 +611,10 @@ python -B research-twins/check_short_prism_covers.py --wrapped 5 25 26 28 --wrap
 python -B research-twins/check_short_prism_covers.py --wrapped 12 29 26 28 --wrapped 12 29 27 28 --wrapped 12 30 26 28 --wrapped 12 30 27 28 --wrapped 13 30 26 28 --wrapped 13 30 27 28
 python -B research-twins/check_cost_25_blocking_sets.py --size-28 5
 python -B research-twins/check_cost_25_blocking_sets.py --size-28 6
+python -B research-twins/check_cost_25_blocking_sets.py --size-28 7
 for sheets in 28 29 30 31 32
 do
-    python -B research-twins/check_short_prism_covers.py --wrapped 5 "$sheets" 28 28 --wrapped 6 "$sheets" 28 28 || exit 1
+    python -B research-twins/check_short_prism_covers.py --wrapped 5 "$sheets" 28 28 --wrapped 6 "$sheets" 28 28 --wrapped 7 "$sheets" 28 28 || exit 1
 done
 for blocks in 4 5 6 7 8 9 10 11 12 13 14
 do

@@ -34,7 +34,7 @@ EXPECTED_SIZE_27_SPANS = {
 }
 
 
-EXPECTED_SIZE_28_SPANS = dict.fromkeys((5, 6), {7: 13, 8: 129, 9: 301, 10: 218, 11: 80})
+EXPECTED_SIZE_28_SPANS = dict.fromkeys((5, 6, 7), {7: 13, 8: 129, 9: 301, 10: 218, 11: 80})
 
 
 def minimum_seed_sets(blocks):
@@ -386,7 +386,7 @@ def main():
     mode.add_argument('--ordinary-size-30-exact', action='store_true',
                       help='verify the complete cost-30 ordinary interior catalogue')
     mode.add_argument('--size-28', choices=EXPECTED_SIZE_28_SPANS, type=int, metavar='BLOCKS',
-                      help='enumerate size-28 losses at five and six blocks')
+                      help='enumerate size-28 losses at five through seven blocks')
     mode.add_argument('--ordinary-threshold', action='store_true',
                       help='certify the absence of ordinary interior forts of cost up to 29')
     args = parser.parse_args()
