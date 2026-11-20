@@ -4,7 +4,7 @@ Let $\kappa_{k,m}$ be the minimum number of seeds whose loss blocks recovery in 
 $$
 \kappa_{k,m}=\kappa_{26,m} \qquad (k\geq26).
 $$
-The common value is exactly 24 when $k\geq24$ and $m\geq24$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 24 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
+The common value is exactly 24 when $k\geq24$ and $m\geq23$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 23 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
 
 ## The prism stage labels
 
@@ -130,6 +130,10 @@ The first two wrapped formulas use the band bounds through width 25 and the maxi
 
 At 26 blocks, a wrapped fort on 24 sheets gives at least 21 seeds in every width-25 band of its periodic lift. The count in such a band is the total cost plus the seeds on the single repeat sheet. At cost at most 20 each sheet would require a seed, contradicting the cost bound. At budgets 21, 22 and 23, the width-23 band leaves respective caps of two, three and four seeds on the omitted sheet. The [periodic-band verifier](check_short_prism_covers.py) excludes all three budgets using the bands through width 28. The same finite exclusion, cost-24 witness, stage reduction and opening insertion give $\kappa_{k,24}=24$ for every $k\geq24$.
 
+## The 23-sheet case
+
+At 26 blocks, the width-24 band requires at least 20 seeds. It contains a full period and one extra sheet. A wrapped fort of cost at most 19 would therefore place at least one seed on each of the 23 sheets, a contradiction. At budgets 20 through 23, the width-22 band requires at least 18 seeds on the complement of one sheet, leaving caps of two through five. The periodic-band verifier uses widths up through 28 and rules out all four exact budgets. A fort with two consecutive empty sheets unrolls and has cost at least 24 by the finite-strip result. Thus the common upper witness is optimal at 26 blocks, and stage reduction and opening insertion extend the value to all $k\geq24$.
+
 ## Reproduction
 
 ```sh
@@ -150,6 +154,7 @@ python -B research-twins/check_32_sheet_cover.py --sheets 25
 python -B research-twins/check_prism_opening_insertion.py
 python -B research-twins/check_block_stabilization.py --band-through 28
 python -B research-twins/check_short_prism_covers.py --wrapped 26 24 21 28 --wrapped 26 24 22 28 --wrapped 26 24 23 28
+python -B research-twins/check_short_prism_covers.py --wrapped 26 23 20 28 --wrapped 26 23 21 28 --wrapped 26 23 22 28 --wrapped 26 23 23 28
 ```
 
 The script checks both stage band types and the sheet bands with PySAT and the normalized seed and edge identifications in 120 interior contractions, including splices next to the first or terminal stage.
