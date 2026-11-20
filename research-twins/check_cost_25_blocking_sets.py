@@ -1,7 +1,7 @@
 """Enumerate small inclusion-minimal seed losses in the integer prism lift."""
 
 import argparse
-from collections import Counter
+from collections import Counter, defaultdict
 import json
 from pathlib import Path
 import runpy
@@ -29,8 +29,11 @@ EXPECTED_SIZE_26_SPANS = {
 
 EXPECTED_SIZE_27_SPANS = {
     4: {7: 5, 8: 64, 9: 110, 10: 68, 11: 28, 12: 1, 13: 1},
-    **dict.fromkeys(range(5, 12), {7: 5, 8: 64, 9: 109, 10: 66, 11: 14}),
+    **dict.fromkeys(range(5, 14), {7: 5, 8: 64, 9: 109, 10: 66, 11: 14}),
 }
+
+
+EXPECTED_SIZE_28_SPANS = {5: {7: 13, 8: 129, 9: 301, 10: 218, 11: 80}}
 
 
 def minimum_seed_sets(blocks):
@@ -106,11 +109,16 @@ def check_template_stages(templates, expected):
         raise AssertionError(('Unexpected occupied stages at five blocks', stages))
 
 
-def enumerate_blockers(blocks, smaller, known=(), *, budget=25):
+def enumerate_blockers(blocks, smaller, known=(), *, budget=25, ordinary_stages=None):
     sheets = budget + 10
     graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
     clauses, seeds, top = STRIP['strip_formula'](
         graph, blue, budget, sheets=sheets, quotient_bounds=False, require_minimal=False)
+    if ordinary_stages is not None:
+        stage_start = SPAN['BAND']['stage_start']
+        lower, upper = stage_start(2) * sheets, stage_start(2 + ordinary_stages) * sheets
+        clauses.extend([-(v + 1)] for v in range(len(graph)) if not lower <= v < upper)
+        seeds = [v for v in seeds if lower <= v - 1 < upper]
     for pattern in (*smaller, *sorted(known)):
         clauses.extend(block_translations(pattern, sheets))
 
@@ -147,26 +155,29 @@ def check_overlap(minimum):
         raise AssertionError('Unexpected overlap of minimum blocking sets')
 
 
-def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_27=None):
+def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_27=None, size_28=None):
     """Count unions through one degree above the supplied minimal losses."""
-    budget = 26 + (size_26 is not None) + (size_27 is not None)
-    losses = (*minimum, *near_minimum, *(size_26 or ()), *(size_27 or ()))
+    budget = 26 + sum(part is not None for part in (size_26, size_27, size_28))
+    losses = (*minimum, *near_minimum, *(size_26 or ()), *(size_27 or ()), *(size_28 or ()))
     events = {frozenset(pattern) for pattern in losses}
+    by_label = defaultdict(list)
+    for event in events:
+        for v, s in event:
+            by_label[v].append((event, s))
     unions = set(events)
     pending = list(events)
     while pending:
         union = pending.pop()
-        last_sheet = max(s for _, s in union)
-        for event in events:
-            event_span = max(s for _, s in event)
-            for shift in range(1 - event_span, last_sheet):
-                moved = {(v, s + shift) for v, s in event}
-                joined = union | moved
-                if len(union) < len(joined) <= budget:
-                    normalized_union = frozenset(normalized(joined))
-                    if normalized_union not in unions:
-                        unions.add(normalized_union)
-                        pending.append(normalized_union)
+        if len(union) == budget:
+            continue
+        translations = {(event, s - t) for v, s in union for event, t in by_label[v]}
+        for event, shift in translations:
+            joined = union | {(v, s + shift) for v, s in event}
+            if len(union) < len(joined) <= budget:
+                normalized_union = frozenset(normalized(joined))
+                if normalized_union not in unions:
+                    unions.add(normalized_union)
+                    pending.append(normalized_union)
 
     weights = {}
     coefficients = Counter()
@@ -196,14 +207,23 @@ def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_2
         expected_profile = {-2: 3, -1: 463, 0: 35, 1: 52} if blocks == 4 else {
             -2: 3, -1: 443, 0: 35, 1: 50,
         }
+        if size_28 is not None:
+            expected_profile[1] += len(size_28)
         if profile != expected_profile:
             raise AssertionError(('Unexpected order-28 weight distribution', blocks, profile))
+    if size_28 is not None:
+        expected[28] += len(size_28)
+        expected[29] = -1585
+        profile = Counter(weight for union, weight in weights.items() if len(union) == 29)
+        if profile != {-2: 28, -1: 1812, 0: 124, 1: 273, 2: 5}:
+            raise AssertionError(('Unexpected order-29 weight distribution', blocks, profile))
     if coefficients != expected:
         raise AssertionError(('Unexpected union coefficients', blocks, coefficients))
     return dict(sorted(coefficients.items()))
 
 
-def check_size_26(blocks, *, size_27=False):
+def check_size_26(blocks, *, size_27=False, size_28=False):
+    size_27 = size_27 or size_28
     base = min(blocks, 5)
     minimum = minimum_seed_sets(base)
     near = enumerate_blockers(base, minimum)
@@ -240,14 +260,71 @@ def check_size_26(blocks, *, size_27=False):
         spans = Counter(max(s for _, s in p) for p in exact_27)
         if spans != EXPECTED_SIZE_27_SPANS[blocks]:
             raise AssertionError(('Unexpected size-27 seed catalogue', blocks, spans))
-        coefficients = known_union_coefficients(blocks, minimum, near, patterns, exact_27)
+        exact_26 = patterns
         patterns = exact_27
+        if size_28:
+            size = 28
+            patterns = enumerate_blockers(blocks, (*all_26, *sorted(exact_27)), budget=size)
+            spans = Counter(max(s for _, s in p) for p in patterns)
+            if spans != EXPECTED_SIZE_28_SPANS[blocks]:
+                raise AssertionError(('Unexpected size-28 seed catalogue', blocks, spans))
+        coefficients = known_union_coefficients(blocks, minimum, near, exact_26, exact_27,
+                                                patterns if size_28 else None)
     else:
         coefficients = known_union_coefficients(blocks, minimum, near, patterns)
     print(json.dumps({'blocks': blocks, 'size': size, 'count': len(patterns),
                       'spans': dict(sorted(spans.items())), 'losses': sorted(patterns),
                       'known_union_coefficients': coefficients}),
           flush=True)
+
+
+def check_ordinary_size_30():
+    if enumerate_blockers(13, (), budget=29, ordinary_stages=8):
+        raise AssertionError('A cost-29 fort fits in eight ordinary stages')
+    catalogue = enumerate_blockers(8, (), budget=30, ordinary_stages=3)
+    if len(catalogue) != 10:
+        raise AssertionError(('Unexpected size-30 ordinary catalogue', len(catalogue)))
+    stage_start = SPAN['BAND']['stage_start']
+    sheets = 32
+    graph, blue, *_ = COVER['signed_prism_cover'](21, sheets)
+    original = stage_start(2)
+    start, stop = stage_start(9), stage_start(12)
+    spans = Counter()
+    residual_sizes = Counter()
+    restoration_rounds = Counter()
+    for pattern in sorted(catalogue):
+        if {(v - original) // 16 for v, _ in pattern} != {0, 1, 2}:
+            raise AssertionError(('Ordinary loss misses a stage', pattern))
+        lost = mask((start + v - original) * sheets + s + 7 for v, s in pattern)
+        if lost & blue != lost or lost.bit_count() != 30:
+            raise AssertionError(('Invalid ordinary seed coordinates', pattern))
+        arrival = COVER['MODEL']['trace'](graph, blue & ~lost)[1]
+        fort = mask(v for v, time in enumerate(arrival) if time is None)
+        if fort & blue != lost or any(
+                not start <= v // sheets < stop or v % sheets in (0, sheets - 1) for v in members(fort)):
+            raise AssertionError(('Invalid ordinary closure', pattern))
+        spans[max(s for _, s in pattern)] += 1
+        residual_sizes[fort.bit_count()] += 1
+        restoration_rounds.update(dict(SPAN['restoration_profile'](graph, blue, lost)))
+    print(json.dumps({
+        'size': 30, 'ordinary_stages': 3, 'count': len(catalogue),
+        'spans': dict(sorted(spans.items())), 'residual_sizes': dict(sorted(residual_sizes.items())),
+        'restoration_rounds': dict(sorted(restoration_rounds.items())),
+        'losses': [[(v - original, s) for v, s in pattern] for pattern in sorted(catalogue)],
+    }), flush=True)
+
+
+def check_ordinary_threshold():
+    band = SPAN['BAND']
+    band['check_band'](33, stages=31, budget=29)
+    print('A 31-stage ordinary band forces an empty pair at budget 29', flush=True)
+    for width in range(10, 20):
+        band['check_sheet_band'](width, width - 5, pin_ends=width > 10,
+                                 blocks=35, subband_constraints=width >= 13)
+    print('A width-19 sheet band requires at least 15 seeds at 35 blocks', flush=True)
+    if enumerate_blockers(35, (), budget=29, ordinary_stages=30):
+        raise AssertionError('A cost-29 fort fits in 30 ordinary stages')
+    print('No finite fort of cost up to 29 is supported in the ordinary interior', flush=True)
 
 
 def main():
@@ -258,13 +335,28 @@ def main():
     mode.add_argument('--size-26', choices=EXPECTED_SIZE_26_SPANS, type=int, metavar='BLOCKS',
                       help='enumerate size-26 losses through 14 blocks and verify inherited patterns through 20')
     mode.add_argument('--size-27', choices=EXPECTED_SIZE_27_SPANS, type=int, metavar='BLOCKS',
-                      help='enumerate size-27 losses at four through eleven blocks')
+                      help='enumerate size-27 losses at four through thirteen blocks')
+    mode.add_argument('--ordinary-size-30', action='store_true',
+                      help='classify cost-30 forts confined to three ordinary stages by seed loss')
+    mode.add_argument('--size-28', choices=EXPECTED_SIZE_28_SPANS, type=int, metavar='BLOCKS',
+                      help='enumerate size-28 losses at five blocks')
+    mode.add_argument('--ordinary-threshold', action='store_true',
+                      help='certify the absence of ordinary interior forts of cost up to 29')
     args = parser.parse_args()
+    if args.ordinary_threshold:
+        check_ordinary_threshold()
+        return
+    if args.ordinary_size_30:
+        check_ordinary_size_30()
+        return
     if args.size_26 is not None:
         check_size_26(args.size_26)
         return
     if args.size_27 is not None:
         check_size_26(args.size_27, size_27=True)
+        return
+    if args.size_28 is not None:
+        check_size_26(args.size_28, size_28=True)
         return
     templates = enumerate_blockers(5, minimum_seed_sets(5)) if any(k >= 5 for k in args.blocks) else ()
     if templates:

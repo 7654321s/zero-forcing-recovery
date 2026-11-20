@@ -271,16 +271,16 @@ $$
 
 The verifier includes the size-26 catalogue and forms unions through size 27. Every constituent spans at most 11 sheets. The same lifting argument applies because the reference and any two other constituents share at least $3\cdot24-2\cdot27=18$ seeds in a union of size at most 27. The spans of the resulting unions are at most 11, so each type gives $m$ translates. At four blocks there are 131 degree-27 union types of weight $-1$, two of weight zero and four of weight $+1$. At five blocks the respective counts are 124, two and four. Disjoint opening and terminal seed labels preserve these union weights when the terminal patterns move. A new inclusion-minimal 27-seed loss contributes one degree-27 monomial, and its union with any different minimal loss has size at least 28.
 
-## The exact fourth term at four through eleven blocks
+## The exact fourth term at four through thirteen blocks
 
-There are 277 inclusion-minimal 27-seed losses up to sheet translation at four blocks and 258 at each length from five through eleven blocks.
+There are 277 inclusion-minimal 27-seed losses up to sheet translation at four blocks and 258 at each length from five through thirteen blocks.
 
 | Blocks | Span 7 | Span 8 | Span 9 | Span 10 | Span 11 | Span 12 | Span 13 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | 4 | 5 | 64 | 110 | 68 | 28 | 1 | 1 |
-| 5–11 | 5 | 64 | 109 | 66 | 14 | 0 | 0 |
+| 5–13 | 5 | 64 | 109 | 66 | 14 | 0 | 0 |
 
-Of the 258 losses at five blocks, 251 meet the first three stages, five meet both terminal stages, and two meet the opening and both terminal stages. For the mixed losses, the last two stages followed by the opening form a three-stage arc. The catalogues at six through eleven blocks have the same seed coordinates relative to the opening and terminal stages as at five blocks. A fort of cost at most 27 has no internal empty sheet pair. If its span were at least 36, two disjoint width-18 bands would require at least 28 seeds. The verifier searches the resulting guarded strip with 35 interior sheets, excluding all translates of the known losses of sizes 24 through 26. It then excludes each newly found 27-seed loss in every translation, and ends with an unsatisfiable formula.
+Of the 258 losses at five blocks, 251 meet the first three stages, five meet both terminal stages, and two meet the opening and both terminal stages. For the mixed losses, the last two stages followed by the opening form a three-stage arc. The catalogues at six through thirteen blocks have the same seed coordinates relative to the opening and terminal stages as at five blocks. A fort of cost at most 27 has no internal empty sheet pair. If its span were at least 36, two disjoint width-18 bands would require at least 28 seeds. The verifier searches the resulting guarded strip with 35 interior sheets, excluding all translates of the known losses of sizes 24 through 26. It then excludes each newly found 27-seed loss in every translation, and ends with an unsatisfiable formula.
 
 All 258 translated losses retain their blocking property and inclusion-minimality through 20 blocks. The check places the stage coordinates from the five-block catalogue relative to their end or ends and tests the resulting closure with two blue guards and excludes the smaller patterns. Every template occupies a cyclic arc of at most three stages. Radius-eight locality extends these witnesses to all greater lengths.
 
@@ -288,14 +288,14 @@ For $m\geq32$, the width-28 band gives $24m>28\cdot27$. The wrapped verifier at 
 
 | Blocks | Verified from this many sheets |
 | --- | ---: |
-| 4 | 27 |
-| 5 | 25 |
+| 4–5 | 25 |
 | 6–7 | 26 |
 | 8 | 27 |
 | 9–10 | 28 |
-| 11 | 29 |
+| 11–12 | 29 |
+| 13 | 30 |
 
-The enumerated losses retain their finite blocking property and minimality after projection. At four blocks, the guarded closures of all 277 losses are checked in a 31-sheet representative. With periodic losses, after two rounds each copy of the loss lies in a band of potential white vertices extending four sheets on either side. The initial colors within distance four of each vertex in that band depend on only the original copy of the loss, since the loss span is at most 13 and the period is at least 25. Different such bands are separated by at least four blue sheets. The later forcing inside each band therefore agrees with that from a single copy in the integer lift. The smaller cyclic losses unroll and cannot be contained unless a corresponding finite loss was contained. There are $277m$ size-27 losses at four blocks and $258m$ at five through eleven blocks. The fourth coefficient is $(277-127)m=150m$ at four blocks and $(258-120)m=138m$ at the other lengths. The cost-26 tests also lower the third-term threshold to 25 sheets at six blocks, 26 sheets at eight blocks, 27 sheets at nine blocks, and 28 sheets at eleven blocks.
+The enumerated losses retain their finite blocking property and minimality after projection. At four blocks, the guarded closures of all 277 losses are checked in a 31-sheet representative. With periodic losses, after two rounds each copy of the loss lies in a band of potential white vertices extending four sheets on either side. The initial colors within distance four of each vertex in that band depend on only the original copy of the loss, since the loss span is at most 13 and the period is at least 25. Different such bands are separated by at least four blue sheets. The later forcing inside each band therefore agrees with that from a single copy in the integer lift. The smaller cyclic losses unroll and cannot be contained unless a corresponding finite loss was contained. There are $277m$ size-27 losses at four blocks and $258m$ at five through thirteen blocks. The fourth coefficient is $(277-127)m=150m$ at four blocks and $(258-120)m=138m$ at the other lengths. The cost-26 tests also lower the third-term threshold to 25 sheets at six blocks, 26 sheets at eight blocks, 27 sheets at nine blocks, and 28 sheets at eleven blocks.
 
 ## Overlap correction at order 28
 
@@ -305,20 +305,28 @@ $$
 [p^{28}]\Pr(\text{blocking})=
 \begin{cases}
 N_{28}(4,m)-417m & k=4,\\
-N_{28}(k,m)-399m & 5\leq k\leq11.
+N_{28}(k,m)-399m & 5\leq k\leq13.
 \end{cases}
 $$
 
-The enumerator forms the translated unions through size 28 from the catalogues at sizes 24 through 27. The union supports span at most 13 sheets at four blocks and at most 11 at five through eleven blocks. The degree-28 union weights have these counts up to translation.
+The enumerator forms the translated unions through size 28 from the catalogues at sizes 24 through 27. The union supports span at most 13 sheets at four blocks and at most 11 at five through thirteen blocks. The degree-28 union weights have these counts up to translation.
 
 | Blocks | Weight $-2$ | Weight $-1$ | Weight zero | Weight $+1$ |
 | --- | ---: | ---: | ---: | ---: |
 | 4 | 3 | 463 | 35 | 52 |
-| 5–11 | 3 | 443 | 35 | 50 |
+| 5–13 | 3 | 443 | 35 | 50 |
 
 At five blocks and above, the opening coordinates and shifted terminal coordinates preserve all seed-label coincidences among these events, including the mixed losses.
 
 Every pair in a cyclic union of size at most 28 shares a seed, and any three share at least $3\cdot24-2\cdot28=16$ seeds. With constituent spans at most 13, each lift relative to a shared seed is unique at periods of at least 25. The three-way intersections ensure that each pair of lifted constituents intersects, so their combined span is at most 25. No selected sites then alias modulo the period. The enumerated unions span at most 13, and the unique outer gap gives $m$ distinct translates of each finite union. A size-28 minimal loss contributes one new degree-28 monomial, since its union with any distinct minimal loss has size at least 29.
+
+## The fifth term at five blocks
+
+There are exactly 741 inclusion-minimal 28-seed losses on the five-block integer lift, up to sheet translation. Their spans from seven through eleven have counts 13, 129, 301, 218 and 80. A finite fort of cost at most 28 cannot split across two empty sheets. A span of at least 37 contains disjoint bands of widths 18 and 19, requiring at least 29 seeds. The search uses 36 interior sheets and two blue guards. It excludes every translate of the complete catalogues at sizes 24 through 27 before enumerating. All 741 seed sets also pass direct closure traces and smaller-loss containment checks in a 33-sheet representative.
+
+For $m\geq33$ the width-28 bound excludes wrapping at cost 28 since $24m>28\cdot28$. Direct wrapped checks at 28 through 32 sheets extend this to $m\geq28$. All smaller costs already unroll in this range. Every finite pattern projects with a unique outer gap and can be recovered from that gap. Thus there are $741m$ distinct minimal 28-seed losses, and the degree-28 coefficient of the blocking probability is $(741-399)m=342m$.
+
+The catalogue through size 28 also gives the next overlap correction. The normalized unions of degree 29 have weights $-2,-1,0,1,2$ with counts 28, 1812, 124, 273 and 5. All these unions span at most 11 sheets. Any two contributors share a seed and any three have at least $3\cdot24-2\cdot29=14$ seeds in common. The same lifting argument therefore identifies the signed correction on the cycle. For five blocks and $m\geq28$, the degree-29 coefficient is $N_{29}(5,m)-1585m$, where $N_{29}$ counts the inclusion-minimal 29-seed losses.
 
 ## Independent losses on growing covers
 
@@ -335,7 +343,7 @@ $$
 \Pr(\text{blocking})=1-\exp(-m A_k(p))+O(km p^{27}).
 $$
 
-In the exact cyclic size-27 ranges above, put $c_4=150$ and $c_k=138$ for $5\leq k\leq11$. Including that catalogue gives
+In the exact cyclic size-27 ranges above, put $c_4=150$ and $c_k=138$ for $5\leq k\leq13$. Including that catalogue gives
 
 $$
 \Pr(\text{blocking})=1-\exp\bigl(-m(A_k(p)+c_kp^{27})\bigr)+O(m p^{28}).
@@ -384,11 +392,11 @@ For the logarithmic coefficient, first use an independent loss variable $p_v$ fo
 
 ## Blocking losses in ordinary stages
 
-A finite fort wholly contained in three consecutive ordinary stages, with ordinary neighbors on both sides, has minimum seed cost 30. The greatest finite projection in a window of one or two such stages is empty by the endpoint test. Three stages allow a fort. Stage translation reduces the verification to stages two through four of the eight-block prism, where the stage ports on either side have their ordinary form.
+The ordinary interior has minimum finite fort cost exactly 30. The greatest projected support inside one or two consecutive ordinary stages with ordinary neighbors on both sides is empty by the endpoint test. Three stages admit a cost-30 fort. At this cost there are ten seed sets for forts confined to three ordinary stages, up to sheet translation. Two have span ten and eight have span eleven. Their closures have 66 to 75 vertices. All 300 one-seed restorations were replayed on each of two representative covers, where completion took eight to sixteen rounds.
 
-A fort of cost at most 29 cannot split at a pair of empty interior sheets, since its two parts would cost at least 24 each. If the span were at least 38, two disjoint width-19 bands would require at least 30 seeds. The verifier searches 37 interior sheets and two guards at budget 29 and restricts the white vertices to the three-stage window. It excludes every such fort. The matching cost-30 witness uses 30 lost sites spanning 11 sheets. Its closure leaves 73 white vertices, all in the three ordinary stages. Its 30 single-seed restorations finish in 10 through 16 rounds, with counts $(5,8,5,3,3,5,1)$ in round order. Thus its seed set is inclusion-minimal even among losses whose forts could extend outside those three stages.
+A fort supported in the ordinary interior cannot have two empty intervening stages at cost at most 29. Such a gap separates two nonempty forts because no vertex can have a neighbor on both sides. Each part would cost at least 24. The 31-stage band check at 33 blocks excludes any 31 consecutive ordinary stages occupied in every adjacent pair at budget 29. The permitted sources agree in every translated ordinary band, so a candidate occupies at most 30 consecutive stages. For the same reason a pair of empty interior sheets cannot occur. If the sheet span were at least 38, two disjoint bands of width 19 would require at least 30 seeds. The width-19 bound is checked at 35 blocks, which accommodates the full 30-stage window with ordinary neighbors. By translating the candidate into that window and preserving its ordinary neighborhood, it suffices to search 37 interior sheets and two guards. This search excludes every candidate at cost at most 29. The size-30 classification in three stages uses 38 interior sheets and two guards since disjoint bands of widths 19 and 20 require 31 seeds.
 
-The witness and all these restoration outcomes are determined by radius-eight locality. For $k\geq21$ and $m\geq28$ they apply to every 11-sheet translate and every three-stage placement with eight ordinary stages of margin on each side. There are $k-20$ allowed stage starts, and the loss occupies all three stages and both extreme sheets. This gives at least $m(k-20)$ distinct minimal 30-seed losses and shows that the coefficient $\alpha_{30}$ in the eventual count is positive. The complete catalogues through size 26 give $\alpha_d=0$ for $d\leq26$.
+Radius-eight locality transfers each of the ten seed sets and its restoration outcomes to every suitable ordinary position. For $k\geq21$ and $m\geq28$, there are $k-20$ allowed stage starts with eight ordinary stages of margin on each side. All ten sets occupy all three stages and both extreme sheets, giving at least $10m(k-20)$ distinct minimal 30-seed losses. In particular $\alpha_{30}\geq10$. For orders through 29 the ordinary coefficient vanishes. Indeed an ordinary placement in the eventual counting argument has a closure supported entirely in ordinary stages, by locality, and at sufficiently large $m$ it gives a finite fort by unwrapping the resulting bounded sheet interval. The cost-29 exclusion rules out every such placement.
 
 For independent losses, take disjoint placements in both coordinates. With stage starts spaced three apart and sheet starts spaced 11 apart, there are $J=\lfloor(k-18)/3\rfloor\lfloor m/11\rfloor$ patterns on disjoint sets of seed sites. Hence
 
@@ -396,11 +404,11 @@ $$
 \Pr(\text{blocking})\geq 1-(1-p^{30})^J .
 $$
 
-In particular, blocking tends to one if $kmp^{30}\to\infty$ in this parameter range. The minimum-cost assertion above concerns forts confined to three ordinary stages.
+In particular, blocking tends to one if $kmp^{30}\to\infty$ in this parameter range.
 
 ## Failure from the ends and the interior
 
-Let $d_*=\min\{d:\alpha_d>0\}$ and $\alpha=\alpha_{d_*}$, using the coefficients of the eventual minimal-loss count. The complete catalogues through order 26 and the translated 30-seed witness give $27\leq d_*\leq30$. For all $k,m\geq20(d_*-1)+19$ and $0\leq p\leq1$ there is a uniform approximation
+Let $d_*=\min\{d:\alpha_d>0\}$ and $\alpha=\alpha_{d_*}$, using the coefficients of the eventual minimal-loss count. The ordinary interior threshold gives $d_*=30$ and $\alpha=\alpha_{30}\geq10$. For all $k,m\geq599$ and $0\leq p\leq1$ there is a uniform approximation
 
 $$
 \Pr(\text{blocking})=
@@ -436,7 +444,7 @@ At 24 blocks, a wrapped fort at 23 through 28 sheets would have to contain an op
 
 For every $k\geq4$ and $m\geq24$, every minimum-cost cyclic fort therefore unrolls to one of the listed finite forts, and each listed fort projects to the cycle. Its span is at most nine, so the outer run of at least $m-9$ empty sheets is strictly longer than any interior run. The first occupied sheet after this unique longest run determines the translation. The same argument applies to the seed sets, as each meets both extreme sheets of its fort. The exact numbers are $54m$ minimum-cost cyclic forts and $5m$ minimum blocking sets. Their cyclic fort-size polynomial is $mP(x)$. For a minimum blocking set the final white fort contains all its lost seeds, since any smaller seed intersection would contradict minimal cost.
 
-At 24 sheets the direct verifier excludes wrapped forts of cost 24 at four through 23 blocks and at 26 blocks. The cap is five seeds per sheet. At 23 sheets the width-22 band gives a cap of six, and the direct verifier excludes cost 24 at four through nineteen blocks and at 26 blocks. Contraction and insertion give the same exclusion at 23 and 24 sheets for every chain of at least 24 blocks. Thus the exact counts and polynomial also hold at 23 sheets for four through nineteen blocks and for at least 24 blocks. The direct test also excludes wrapped cost-24 forts at four through seven blocks and 22 sheets, where the width-21 band gives a sheet cap of seven. This gives 1,188 minimum-cost forts and 110 minimum blocking sets at each of those four lengths.
+At 24 sheets the direct verifier excludes wrapped forts of cost 24 at four through 23 blocks and at 26 blocks. The cap is five seeds per sheet. At 23 sheets the width-22 band gives a cap of six, and the direct verifier excludes cost 24 at four through twenty blocks and at 26 blocks. Contraction and insertion give the same exclusion at 23 and 24 sheets for every chain of at least 24 blocks. Thus the exact counts and polynomial also hold at 23 sheets for four through twenty blocks and for at least 24 blocks. The direct test also excludes wrapped cost-24 forts at four through seven blocks and 22 sheets, where the width-21 band gives a sheet cap of seven. This gives 1,188 minimum-cost forts and 110 minimum blocking sets at each of those four lengths.
 
 The chain has $10k$ seed labels. Among uniform 24-element losses from the $10km$ lifted seeds, the exact probability of blocking recovery is $5m/\binom{10km}{24}$. For independent losses with probability $p$ per seed, the blocking probability at fixed $k,m$ is $5m p^{24}+O(p^{25})$ as $p\to0$.
 
@@ -506,6 +514,8 @@ The restoration-time table and the inclusion-minimal 25-seed loss are checked wi
 ```sh
 python -B research-twins/check_finite_fort_span.py --restoration-times
 python -B research-twins/check_finite_fort_span.py --ordinary-stage-blocker
+python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-30
+python -B research-twins/check_cost_25_blocking_sets.py --ordinary-threshold
 ```
 
 The size-25 checks enumerate four through fourteen blocks and verify the transposed catalogue through 20 blocks. The stage-pair test gives completeness for all larger lengths. The size-26 checks use the same direct range and locality representative, with a separate stage-pair test.
@@ -519,7 +529,7 @@ for blocks in 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
 do
     python -B research-twins/check_cost_25_blocking_sets.py --size-26 "$blocks" || exit 1
 done
-for blocks in 4 5 6 7 8 9 10 11
+for blocks in 4 5 6 7 8 9 10 11 12 13
 do
     python -B research-twins/check_cost_25_blocking_sets.py --size-27 "$blocks" || exit 1
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 31 27 28 || exit 1
@@ -535,7 +545,13 @@ for blocks in 5 6 7 8
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 27 26 28 --wrapped "$blocks" 27 27 28 --wrapped "$blocks" 26 26 28 || exit 1
 done
-python -B research-twins/check_short_prism_covers.py --wrapped 5 25 26 28 --wrapped 5 25 27 28 --wrapped 6 25 26 28 --wrapped 5 26 27 28 --wrapped 6 26 27 28 --wrapped 7 26 27 28 --wrapped 9 27 26 28 --wrapped 4 27 26 28 --wrapped 4 27 27 28 --wrapped 11 28 26 28 --wrapped 11 29 26 28 --wrapped 11 29 27 28 --wrapped 11 30 26 28 --wrapped 11 30 27 28
+python -B research-twins/check_short_prism_covers.py --wrapped 5 25 26 28 --wrapped 5 25 27 28 --wrapped 6 25 26 28 --wrapped 5 26 27 28 --wrapped 6 26 27 28 --wrapped 7 26 27 28 --wrapped 9 27 26 28 --wrapped 4 25 26 28 --wrapped 4 25 27 28 --wrapped 4 26 26 28 --wrapped 4 26 27 28 --wrapped 4 27 26 28 --wrapped 4 27 27 28 --wrapped 11 28 26 28 --wrapped 11 29 26 28 --wrapped 11 29 27 28 --wrapped 11 30 26 28 --wrapped 11 30 27 28
+python -B research-twins/check_short_prism_covers.py --wrapped 12 29 26 28 --wrapped 12 29 27 28 --wrapped 12 30 26 28 --wrapped 12 30 27 28 --wrapped 13 30 26 28 --wrapped 13 30 27 28
+python -B research-twins/check_cost_25_blocking_sets.py --size-28 5
+for sheets in 28 29 30 31 32
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped 5 "$sheets" 28 28 || exit 1
+done
 for blocks in 4 5 6 7 8 9 10 11 12 13 14
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 25 25 28 --wrapped "$blocks" 26 25 28 --wrapped "$blocks" 27 25 28 --wrapped "$blocks" 28 25 28 --wrapped "$blocks" 29 25 28 || exit 1
@@ -559,5 +575,5 @@ for blocks in 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 26
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 24 24 28 || exit 1
 done
-python -B research-twins/check_short_prism_covers.py --wrapped 4 23 24 28 --wrapped 5 23 24 28 --wrapped 6 23 24 28 --wrapped 7 23 24 28 --wrapped 8 23 24 28 --wrapped 9 23 24 28 --wrapped 10 23 24 28 --wrapped 11 23 24 28 --wrapped 12 23 24 28 --wrapped 13 23 24 28 --wrapped 14 23 24 28 --wrapped 15 23 24 28 --wrapped 16 23 24 28 --wrapped 17 23 24 28 --wrapped 18 23 24 28 --wrapped 19 23 24 28 --wrapped 26 23 24 28 --wrapped 4 22 24 28 --wrapped 5 22 24 28 --wrapped 6 22 24 28 --wrapped 7 22 24 28
+python -B research-twins/check_short_prism_covers.py --wrapped 4 23 24 28 --wrapped 5 23 24 28 --wrapped 6 23 24 28 --wrapped 7 23 24 28 --wrapped 8 23 24 28 --wrapped 9 23 24 28 --wrapped 10 23 24 28 --wrapped 11 23 24 28 --wrapped 12 23 24 28 --wrapped 13 23 24 28 --wrapped 14 23 24 28 --wrapped 15 23 24 28 --wrapped 16 23 24 28 --wrapped 17 23 24 28 --wrapped 18 23 24 28 --wrapped 19 23 24 28 --wrapped 20 23 24 28 --wrapped 26 23 24 28 --wrapped 4 22 24 28 --wrapped 5 22 24 28 --wrapped 6 22 24 28 --wrapped 7 22 24 28
 ```
