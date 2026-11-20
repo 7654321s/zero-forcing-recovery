@@ -135,15 +135,15 @@ The 26-stage band extends this statement to every greater length. A finite fort 
 | 9 | 4 | 51 | 53 |
 | 9 | 8 | 50 | 54 |
 
-## Complete counts from four through thirteen blocks
+## Complete counts from four through fifteen blocks
 
 For these lengths the width-16 and width-17 band checks give a span bound for every cost-24 fort. Any pair of empty interior sheets would split it into two nonempty finite forts, each of cost at least 24. A span of at least 33 would contain disjoint bands of widths 16 and 17. They would require at least 12 and 13 lost seeds respectively. A cost-24 fort thus fits inside the 32 interior sheets of a 34-sheet guarded strip.
 
-The longer-span verifier translates the first occupied sheet to one and demands an occupied sheet at index ten or higher. It keeps the fort clauses, the guards, the absence of an interior two-sheet gap and the seed ancestry conditions. It permits arbitrary forts including those with proper fort subsets. The cost-24 test is unsatisfiable at each length from four through thirteen blocks. The 54 shapes and five seed sets above are therefore the complete lists of finite minimum-cost forts and their seed sets up to sheet translation at these lengths.
+The longer-span verifier translates the first occupied sheet to one and demands an occupied sheet at index ten or higher. It keeps the fort clauses, the guards, the absence of an interior two-sheet gap and the seed ancestry conditions. It permits arbitrary forts including those with proper fort subsets. The cost-24 test is unsatisfiable at each length from four through fifteen blocks. The 54 shapes and five seed sets above are therefore the complete lists of finite minimum-cost forts and their seed sets up to sheet translation at these lengths.
 
-For the cyclic version on $m\geq29$ sheets, the width-25 band at these lengths rules out wrapped forts of cost 24 by $21m>25\cdot24$. At 27 and 28 sheets the wrapped verifier excludes cost 24 using the certified bands through width 28. The width-26 bound gives at most two seeds on one sheet at $m=27$, and the width-27 bound gives at most one at $m=28$.
+For the cyclic version on $m\geq29$ sheets, the width-25 band at these lengths rules out wrapped forts of cost 24 by $21m>25\cdot24$. At 26, 27 and 28 sheets the wrapped verifier excludes cost 24 using the certified bands through width 28. In each case the width-$(m-1)$ band forces every sheet to contain at most $24-(m-5)=29-m$ seeds.
 
-Thus for $m\geq27$ every minimum-cost cyclic fort unrolls to one of the listed finite forts, and each listed fort projects to the cycle. Its span is at most nine, so the outer run of at least $m-9$ empty sheets is strictly longer than any interior run. The first occupied sheet after this unique longest run determines the translation. The same argument applies to the seed sets, as each meets both extreme sheets of its fort. The exact numbers are $54m$ minimum-cost cyclic forts and $5m$ minimum blocking sets. For a minimum blocking set the final white fort contains all its lost seeds, since any smaller seed intersection would contradict minimal cost.
+Thus for $m\geq26$ every minimum-cost cyclic fort unrolls to one of the listed finite forts, and each listed fort projects to the cycle. Its span is at most nine, so the outer run of at least $m-9$ empty sheets is strictly longer than any interior run. The first occupied sheet after this unique longest run determines the translation. The same argument applies to the seed sets, as each meets both extreme sheets of its fort. The exact numbers are $54m$ minimum-cost cyclic forts and $5m$ minimum blocking sets. For a minimum blocking set the final white fort contains all its lost seeds, since any smaller seed intersection would contradict minimal cost.
 
 ## Reproduction
 
@@ -193,12 +193,12 @@ The following command reproduces the minimum spans, the cost table and the class
 python -B research-twins/check_finite_fort_span.py
 ```
 
-The complete counts at four through thirteen blocks use the band checks above and these additional checks.
+The complete counts at four through fifteen blocks use the band checks above and these additional checks.
 
 ```sh
-python -B research-twins/check_finite_fort_span.py --longer 4 5 6 7 8 9 10 11 12 13
-for blocks in 4 5 6 7 8 9 10 11 12 13
+python -B research-twins/check_finite_fort_span.py --longer 4 5 6 7 8 9 10 11 12 13 14 15
+for blocks in 4 5 6 7 8 9 10 11 12 13 14 15
 do
-    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 27 24 28 --wrapped "$blocks" 28 24 28 || exit 1
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 26 24 28 --wrapped "$blocks" 27 24 28 --wrapped "$blocks" 28 24 28 || exit 1
 done
 ```
