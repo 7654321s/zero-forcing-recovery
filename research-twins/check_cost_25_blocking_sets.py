@@ -34,7 +34,7 @@ EXPECTED_SIZE_27_SPANS = {
 }
 
 
-EXPECTED_SIZE_28_SPANS = {5: {7: 13, 8: 129, 9: 301, 10: 218, 11: 80}}
+EXPECTED_SIZE_28_SPANS = dict.fromkeys((5, 6), {7: 13, 8: 129, 9: 301, 10: 218, 11: 80})
 
 
 def minimum_seed_sets(blocks):
@@ -72,14 +72,20 @@ def verify_inherited_patterns(blocks, smaller, templates, *, budget=25):
     stage_start = SPAN['BAND']['stage_start']
     terminal = stage_start(3)
     shift = stage_start(blocks - 2) - terminal
+    opening = stage_start(1)
     smaller = tuple(smaller)
     covers = {}
     patterns = set()
     for template in templates:
-        pattern = tuple((v + shift if v >= terminal else v, s) for v, s in template)
-        sheets = max(s for _, s in pattern) + 10
-        if budget == 27:
-            sheets = max(sheets, 31)
+        cut = terminal
+        if budget == 28:
+            stages = {0 if v < opening else (v - opening) // 16 + 1 for v, _ in template}
+            if stages == {2, 3, 4}:
+                cut = stage_start(2)
+            elif stages == {0, 1, 2, 3}:
+                cut = stage_start(5)
+        pattern = tuple((v + shift if v >= cut else v, s) for v, s in template)
+        sheets = max(max(s for _, s in pattern) + 10, {27: 31, 28: 33}.get(budget, 0))
         if sheets not in covers:
             graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
             smaller_translates = tuple(
@@ -243,6 +249,13 @@ def check_size_26(blocks, *, size_27=False, size_28=False):
         templates_27 = enumerate_blockers(base, (*minimum, *sorted(near), *sorted(patterns)), budget=27)
         if base == 5:
             check_template_stages(templates_27, {(0, 1, 2): 251, (3, 4): 5, (0, 3, 4): 2})
+    templates_28 = None
+    if size_28:
+        lower = (*minimum, *sorted(near), *sorted(patterns), *sorted(templates_27))
+        templates_28 = enumerate_blockers(base, lower, budget=28)
+        check_template_stages(templates_28, {
+            (0, 1, 2): 715, (3, 4): 12, (0, 3, 4): 6, (2, 3, 4): 5, (0, 1, 2, 3): 3,
+        })
     if blocks > base:
         minimum = minimum_seed_sets(blocks)
         near = verify_inherited_patterns(blocks, minimum, near)
@@ -270,7 +283,11 @@ def check_size_26(blocks, *, size_27=False, size_28=False):
         patterns = exact_27
         if size_28:
             size = 28
-            patterns = enumerate_blockers(blocks, (*all_26, *sorted(exact_27)), budget=size)
+            patterns = templates_28
+            if blocks > base:
+                smaller = (*all_26, *sorted(exact_27))
+                inherited = verify_inherited_patterns(blocks, smaller, templates_28, budget=size)
+                patterns = enumerate_blockers(blocks, smaller, inherited, budget=size)
             spans = Counter(max(s for _, s in p) for p in patterns)
             if spans != EXPECTED_SIZE_28_SPANS[blocks]:
                 raise AssertionError(('Unexpected size-28 seed catalogue', blocks, spans))
@@ -369,7 +386,7 @@ def main():
     mode.add_argument('--ordinary-size-30-exact', action='store_true',
                       help='verify the complete cost-30 ordinary interior catalogue')
     mode.add_argument('--size-28', choices=EXPECTED_SIZE_28_SPANS, type=int, metavar='BLOCKS',
-                      help='enumerate size-28 losses at five blocks')
+                      help='enumerate size-28 losses at five and six blocks')
     mode.add_argument('--ordinary-threshold', action='store_true',
                       help='certify the absence of ordinary interior forts of cost up to 29')
     args = parser.parse_args()
