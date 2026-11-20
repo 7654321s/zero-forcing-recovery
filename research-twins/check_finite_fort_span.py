@@ -1,6 +1,7 @@
 """Verify the minimum span of a finite fort in the signed prism lift."""
 
 import argparse
+from collections import Counter
 from itertools import combinations
 from pathlib import Path
 import runpy
@@ -17,6 +18,17 @@ FRONTIERS = {
     3: (5, (27, 23, 22, 21)),
     4: (5, (41, 34, 24)),
     5: (6, (42, 24)),
+}
+RESTORATION_PROFILES = {
+    (7, 2): ((6, 2), (7, 3), (8, 4), (9, 3), (10, 1), (11, 1), (12, 2),
+             (13, 5), (14, 3)),
+    (8, 8): ((7, 3), (8, 4), (9, 2), (10, 5), (11, 2), (12, 1), (13, 4),
+             (14, 2), (17, 1)),
+    (8, 32): ((7, 3), (8, 4), (9, 2), (10, 4), (11, 5), (12, 1), (13, 3), (14, 2)),
+    (9, 4): ((7, 2), (8, 1), (9, 1), (10, 1), (11, 4), (12, 2), (13, 3),
+             (14, 5), (15, 3), (16, 1), (17, 1)),
+    (9, 8): ((8, 3), (9, 1), (10, 1), (11, 4), (12, 1), (13, 4), (14, 4),
+             (15, 4), (16, 1), (17, 1)),
 }
 
 
@@ -105,7 +117,7 @@ def check_seed_frontiers():
         print(f'{blocks} blocks: minimum seed costs {costs} from span {first}')
 
 
-def check_seed_families(blocks, span, shapes, expected):
+def check_seed_families(blocks, span, shapes, expected, *, restoration_times=False):
     # Four sheets on either side suffice for two rounds of intact dependence.
     sheets = 19
     graph, seeds, _, _ = COVER['signed_prism_cover'](blocks, sheets)
@@ -134,11 +146,21 @@ def check_seed_families(blocks, span, shapes, expected):
         if len(family) != 2 ** len(sizes):
             raise AssertionError(('Missing a combination of optional groups', blocks, span))
         observed.append((len(family), least.bit_count(), maximal.bit_count(), sizes))
+        if restoration_times and blocks <= 20:
+            counts = Counter()
+            surviving = seeds & ~lost
+            for restored in members(lost):
+                arrival = COVER['MODEL']['trace'](graph, surviving | (1 << restored))[1]
+                if None in arrival:
+                    raise AssertionError(('Restoring a seed leaves an obstruction', blocks, span))
+                counts[max(arrival)] += 1
+            if tuple(sorted(counts.items())) != RESTORATION_PROFILES[span, len(family)]:
+                raise AssertionError(('Unexpected restoration times', blocks, span, counts))
     if tuple(sorted(observed)) != expected:
         raise AssertionError(('Unexpected seed-family statistics', blocks, span, observed))
 
 
-def check_guarded_shapes(blocks, span, shapes, expected_families):
+def check_guarded_shapes(blocks, span, shapes, expected_families, *, restoration_times=False):
     sheets = span + 2
     graph, seeds, guards = guarded_strip(blocks, span)
     times = COVER['MODEL']['trace'](graph, guards)[1]
@@ -164,10 +186,11 @@ def check_guarded_shapes(blocks, span, shapes, expected_families):
         with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
             if solver.solve(assumptions=[-counter.rhs[24]]):
                 raise AssertionError(('An additional minimum-cost fort exists', blocks, span))
-    check_seed_families(blocks, span, shapes, expected_families)
+    check_seed_families(blocks, span, shapes, expected_families,
+                        restoration_times=restoration_times)
 
 
-def check_shortest_minimum_cost_forts():
+def check_shortest_minimum_cost_forts(*, restoration_times=False):
     for blocks in (27, 28):
         BAND['check_band'](blocks, stages=26, budget=24)
 
@@ -177,7 +200,8 @@ def check_shortest_minimum_cost_forts():
         raise AssertionError('Unexpected common fort')
     shapes = (common ^ removed, common)
     for blocks in range(4, 28):
-        check_guarded_shapes(blocks, 7, shapes, ((2, 44, 46, (2,)),))
+        check_guarded_shapes(blocks, 7, shapes, ((2, 44, 46, (2,)),),
+                             restoration_times=restoration_times)
     print('Exactly two cost-24 forts of span seven at every length from four blocks')
 
 
@@ -212,7 +236,7 @@ def patterns_from_optional_vertices(span, start, common, optional):
     return patterns, supports
 
 
-def check_eight_sheet_forts():
+def check_eight_sheet_forts(*, restoration_times=False):
     start = BAND['stage_start'](2)
     patterns, supports = patterns_from_optional_vertices(8, start, TAIL_COMMON, TAIL_OPTIONAL)
     if len(patterns) != 40 or len(supports) != 2:
@@ -224,7 +248,8 @@ def check_eight_sheet_forts():
         start = BAND['stage_start'](blocks - 2)
         shapes = [mask((v + start) * 10 + s for v, s in pattern) for pattern in patterns]
         check_guarded_shapes(blocks, 8, shapes, ((8, 44, 47, (1, 1, 1)),
-                                                (32, 42, 47, (1, 1, 1, 1, 1))))
+                                                (32, 42, 47, (1, 1, 1, 1, 1))),
+                             restoration_times=restoration_times)
     print('Exactly 40 cost-24 forts of span eight, with two seed sets, at every length from four blocks')
 
 
@@ -239,7 +264,7 @@ OPENING_NINE_COMMON = (
 OPENING_NINE_OPTIONAL = ((2, 2), (4, 1), (36, 5), (42, 6), (43, 7), (44, 7), (49, 8))
 
 
-def check_nine_sheet_forts():
+def check_nine_sheet_forts(*, restoration_times=False):
     patterns, supports = patterns_from_optional_vertices(9, 0, OPENING_NINE_COMMON,
                                                        OPENING_NINE_OPTIONAL)
     if len(patterns) != 12 or len(supports) != 2:
@@ -250,7 +275,8 @@ def check_nine_sheet_forts():
     shapes = [mask(v * 11 + s for v, s in pattern) for pattern in patterns]
     for blocks in range(4, 28):
         check_guarded_shapes(blocks, 9, shapes, ((4, 51, 53, (1, 1)),
-                                                (8, 50, 54, (1, 1, 2))))
+                                                (8, 50, 54, (1, 1, 2))),
+                             restoration_times=restoration_times)
     print('Exactly 12 cost-24 forts of span nine, with two seed sets, at every length from four blocks')
 
 
@@ -275,12 +301,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--longer', type=int, nargs='+', choices=(*range(4, 18), 26), default=(),
                         help='also replay the exclusions at spans ten through thirty-two')
+    parser.add_argument('--restoration-times', action='store_true',
+                        help='check the completion times after restoring one lost seed')
     args = parser.parse_args()
     check_minimum_spans()
     check_seed_frontiers()
-    check_shortest_minimum_cost_forts()
-    check_eight_sheet_forts()
-    check_nine_sheet_forts()
+    check_shortest_minimum_cost_forts(restoration_times=args.restoration_times)
+    check_eight_sheet_forts(restoration_times=args.restoration_times)
+    check_nine_sheet_forts(restoration_times=args.restoration_times)
     print('Checked the five seed families, their forcing closures and all optional-group combinations')
+    if args.restoration_times:
+        print('Checked all 2040 single-seed restorations at lengths four through twenty')
     if args.longer:
         check_larger_optimal_spans(args.longer)

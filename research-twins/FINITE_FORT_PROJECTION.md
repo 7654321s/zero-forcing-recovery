@@ -143,6 +143,24 @@ $$
 P(x)=x^{44}(1+x^2)+x^{44}(1+x)^3+x^{42}(1+x)^5+x^{51}(1+x)^2+x^{50}(1+x)^2(1+x^2).
 $$
 
+## Recovery after restoring one seed
+
+Delete one of the five listed seed sets and restore one of its 24 seeds at time zero. The synchronous recovery time is between six and 17 rounds. The distribution depends on the seed family and is the same at every chain length of at least four blocks. This holds in the integer lift and in every cyclic cover with at least 19 sheets.
+
+| Fort span | Forts with that seed set | Pairs of (rounds, number of restoration choices) |
+| --- | --- | --- |
+| 7 | 2 | (6, 2), (7, 3), (8, 4), (9, 3), (10, 1), (11, 1), (12, 2), (13, 5), (14, 3) |
+| 8 | 8 | (7, 3), (8, 4), (9, 2), (10, 5), (11, 2), (12, 1), (13, 4), (14, 2), (17, 1) |
+| 8 | 32 | (7, 3), (8, 4), (9, 2), (10, 4), (11, 5), (12, 1), (13, 3), (14, 2) |
+| 9 | 4 | (7, 2), (8, 1), (9, 1), (10, 1), (11, 4), (12, 2), (13, 3), (14, 5), (15, 3), (16, 1), (17, 1) |
+| 9 | 8 | (8, 3), (9, 1), (10, 1), (11, 4), (12, 1), (13, 4), (14, 4), (15, 4), (16, 1), (17, 1) |
+
+The radius-four neighborhood of the original deleted seed set contains all white vertices after round two. The colors on this neighborhood at that time depend on the induced radius-eight neighborhood and its initial blue vertices. Thereafter a force on any remaining white vertex uses vertices at distance at most six from the deleted seed set. Vertices outside the radius-four neighborhood are already blue, so the radius-eight data determine all subsequent forces on the remaining whites.
+
+The seed sets are supported on an arc of at most three consecutive stages. A path of length eight can visit only this arc and its eight adjacent stages on either side. At $k\geq20$ these at most 19 consecutive stages have the same opening, terminal and ordinary stage types in the same order, with the same signed edges and seed labels. The radius-eight data therefore agree with the 20-block case under relative stage coordinates.
+
+For the sheet comparison place the deleted seeds within sheets five through thirteen. The radius-four neighborhood is contained in sheets one through seventeen. In a cyclic cover with $m\geq19$ the first two rounds for vertices there depend only on sheets $-3$ through $21$. These sheets contain no period translate of the deleted seeds other than the original set. After two rounds, the two guard sheets zero and eighteen are blue, so all forces onto the remaining whites have the same sources and prerequisites as in the integer lift. The verifier checks the table on the 19-sheet cover for every length from four through 20 blocks.
+
 ## Complete classification of minimum-cost finite forts
 
 At four through 17 blocks and at 26 blocks, the width-16 and width-17 band checks give a span bound for every cost-24 fort. Any pair of empty interior sheets would split it into two nonempty finite forts, each of cost at least 24. A span of at least 33 would contain disjoint bands of widths 16 and 17. They would require at least 12 and 13 lost seeds respectively. A cost-24 fort thus fits inside the 32 interior sheets of a 34-sheet guarded strip.
@@ -207,6 +225,12 @@ The following command reproduces the minimum spans, the cost table and the class
 
 ```sh
 python -B research-twins/check_finite_fort_span.py
+```
+
+The restoration-time table is checked with the same verifier.
+
+```sh
+python -B research-twins/check_finite_fort_span.py --restoration-times
 ```
 
 The complete counts use the band checks above and these additional checks. At 26 blocks the long-chain verification supplies the bands through width 25 and the nine- and ten-sheet costs.
