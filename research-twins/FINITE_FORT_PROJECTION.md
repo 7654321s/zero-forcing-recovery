@@ -286,7 +286,7 @@ All 258 translated losses retain their blocking property and inclusion-minimalit
 
 For 14 through 29 blocks the projected-support verifier excludes any cost-27 finite fort meeting every consecutive pair of appended stages. From 30 blocks onward the first 29 appended stages force an empty adjacent pair, by the band checks at 30 and 31 blocks. Contract such a pair. The smaller losses of sizes 24 through 26 occupy every appended stage of their anchored support. An occurrence after contraction either avoids the retained empty stage and lifts back with the same coordinates, or would require a seed in that empty stage. Thus contraction preserves minimality. Iterating to 13 blocks gives one of the 258 patterns. The same argument preserves coordinates when reversing the contractions, including for the two patterns using both ends. This proves finite completeness at all lengths.
 
-For all $k\geq4$ and $m\geq32$ every fort of cost at most 27 unrolls. At four through 24 blocks and at 26 blocks the width-28 band gives $24m>28\cdot27$. At 25, 27, 28 and 29 blocks the width-25 band gives $21m>25\cdot27$ for $m\geq33$. The direct wrapped checks exclude cost 27 at those four lengths at $m=32$, where all lower costs already unroll. For every larger $k$, the 29-stage band contracts the cyclic fort to length 29 while preserving its cost and sheet occupancy. The wrapped verifier and the width-28 bounds give the following smaller sufficient periods at the listed lengths.
+For all $k\geq4$ and $m\geq31$ every fort of cost at most 27 unrolls. At four through 24 blocks and at 26 blocks the width-28 band gives $24m>28\cdot27$ for $m\geq32$. At 25, 27, 28 and 29 blocks the width-25 band gives $21m>25\cdot27$ for $m\geq33$. All lower costs already unroll at the remaining periods, since $24\cdot31>28\cdot26$ and $21\cdot31>25\cdot26$. The direct wrapped checks exclude cost 27 at 31 sheets for every length through 29, and at 32 sheets for the four lengths using the narrower band. For every larger $k$, the 29-stage band contracts the cyclic fort to length 29 while preserving its cost and sheet occupancy. The wrapped verifier and the width-28 bounds give the following smaller sufficient periods at the listed lengths.
 
 | Blocks | Verified from this many sheets |
 | --- | ---: |
@@ -345,7 +345,7 @@ $$
 \Pr(\text{blocking})=1-\exp(-m A_k(p))+O(km p^{27}).
 $$
 
-Put $c_4=150$ and $c_k=138$ for $k\geq5$. For all $k\geq4$ and $m\geq32$, the complete size-27 catalogue gives
+Put $c_4=150$ and $c_k=138$ for $k\geq5$. For all $k\geq4$ and $m\geq31$, the complete size-27 catalogue gives
 
 $$
 \Pr(\text{blocking})=1-\exp\bigl(-m(A_k(p)+c_kp^{27})\bigr)+O(kmp^{28}).
@@ -441,6 +441,38 @@ To prove the bound, first count occurrences of the chosen minimal losses, whethe
 Every chosen pattern is connected in the auxiliary graph. If it occurs and is part of a larger component, at least one seed outside it and adjacent to it in the auxiliary graph must also be lost. There are at most $30D$ choices for such a seed per pattern. A union bound over the placements gives probability $O(mp^{25}+kmp^{31})$ for this to happen anywhere. The probability of seeing any other inclusion-minimal blocking loss is of this same order, by the exceptional-stage count through size 30 and the connected loss bound at size 31. Every blocking component contains an inclusion-minimal blocking loss. Outside these two exceptional events, the blocking components are therefore exactly the chosen patterns that occurred. Coupling the two processes on the original seed coins proves the claimed total variation bound.
 
 Suppose also $k,m\to\infty$ in the joint rare-loss limit. Record each chosen component's initial sheet as $j/m$ on the unit circle, using the first occupied sheet after the unique largest gap, and for ordinary components also record its first stage as $i/k$. For each of the five size-24 templates the rescaled points converge to a homogeneous Poisson process of intensity $\lambda$ on the circle. For each of the ten ordinary templates they converge to a homogeneous Poisson process of intensity $\mu$ on the unit torus. All fifteen limiting processes are independent. In the approximating processes, the intensity measures are uniform grids with weights $p^{24}$ or $p^{30}$. The grids converge by Riemann sums, since the omitted $O(1)$ ordinary stage starts have total intensity $O(mp^{30})$. The Poisson Laplace functionals then converge, and the total variation error tends to zero.
+
+### Uniform losses of a prescribed size
+
+Let $N=10km$ be the number of seed sites. Write the independent-loss blocking probability as $\sum_d c_d p^d$. If the loss set is chosen uniformly among $\ell$-element subsets of the seeds, then
+
+$$
+\Pr(\text{blocking at size }\ell)=\sum_{d=0}^{\ell}c_d\,\frac{(\ell)_d}{(N)_d},
+\qquad (a)_d=a(a-1)\cdots(a-d+1).
+$$
+
+To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities for every $\ell\leq27$ when $m\geq31$, as well as for $\ell=28$ at five and six blocks when $m\geq28$. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
+
+The joint component law also extends to a uniform loss of size $\ell$. Set $p=\ell/N$ and let $\Lambda=mp^{24}+kmp^{30}$. For $k\geq4$, $m\geq38$ and $\ell\geq1$, the total variation error is
+
+$$
+O\left(mp^{25}+kmp^{31}+\frac{\Lambda}{\sqrt{\ell}}\right).
+$$
+
+The independent Poisson comparison now uses means $(\ell)_{24}/(N)_{24}$ and $(\ell)_{30}/(N)_{30}$ per placement. The formula includes zero means when the budget is below the corresponding template size.
+
+For the coupling, draw a uniform permutation of the $N$ seed sites and an independent $B\sim\operatorname{Bin}(N,p)$. Take the first $\ell$ sites for the fixed-size loss and the first $B$ for the independent loss. For a specified $d$-site pattern, the probability of a mismatch of its occurrence indicators, conditional on $B$, is
+
+$$
+\frac{\left|\binom{B}{d}-\binom{\ell}{d}\right|}{\binom Nd}
+\leq \frac{d\,|B-\ell|\,\max(B,\ell)^{d-1}}{(N)_d}.
+$$
+
+Here the inequality follows by summing consecutive binomial differences. Since $\mathbb E(B-\ell)^2\leq\ell$ and $\mathbb E\max(B,\ell)^{2d-2}=O_d(\ell^{2d-2})$, Cauchy–Schwarz gives mismatch probability $O_d(p^d/\sqrt{\ell})$. The moment bound follows by expanding powers of $B$ in falling factorials and using $\mathbb E(B)_j=(N)_j p^j\leq\ell^j$. Summing over the two template families gives $O(\Lambda/\sqrt{\ell})$.
+
+In the fixed-size model any $e$ specified seeds are lost with probability at most $p^e$. The bounds for a chosen template acquiring an adjacent extra loss and for any uncatalogued minimal loss therefore apply unchanged. Finally, for $d\in\{24,30\}$ the difference between $p^d$ and $(\ell)_d/(N)_d$ is $O_d(p^d/\ell)$. For $\ell\geq d$ this follows by bounding the ratio of the means below by $\prod_{j=0}^{d-1}(1-j/\ell)\geq1-d(d-1)/(2\ell)$. The bound also holds for $\ell<d$. Adding independent Poisson variables for the differences of the means changes the comparison process with probability $O(\Lambda/\ell)$.
+
+Consequently under $p\to0$, $mp^{24}\to\lambda$ and $kmp^{30}\to\mu$ with finite limits, the joint count limits agree for both loss models. If $\ell$ stays bounded along a subsequence, both limiting intensities on that subsequence are zero. When both cover dimensions grow, the marked spatial limits also agree.
 
 ## Complete classification of minimum-cost finite forts
 
@@ -546,7 +578,11 @@ python -B research-twins/check_prism_projected_support.py --cost-27-stage-pairs
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 25 27 28 29
 for blocks in 25 27 28 29
 do
-    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 32 27 25 || exit 1
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 31 27 25 --wrapped "$blocks" 32 27 25 || exit 1
+done
+for blocks in 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 26
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 31 27 28 || exit 1
 done
 for blocks in 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
 do
@@ -555,7 +591,6 @@ done
 for blocks in 4 5 6 7 8 9 10 11 12 13
 do
     python -B research-twins/check_cost_25_blocking_sets.py --size-27 "$blocks" || exit 1
-    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 31 27 28 || exit 1
 done
 for blocks in 14 15 16 17 18 19 20
 do
