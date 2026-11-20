@@ -15,9 +15,15 @@ SPAN = runpy.run_path(str(HERE / 'check_finite_fort_span.py'))
 STRIP = runpy.run_path(str(HERE / 'check_finite_fort_strip.py'))
 COVER = SPAN['COVER']
 mask, members = SPAN['mask'], SPAN['members']
+DIRECT_LAST = 14
+LOCALITY_REPRESENTATIVE = 20
 EXPECTED_SPANS = {
     4: {7: 1, 8: 7, 9: 8, 10: 4, 11: 2},
-    **dict.fromkeys(range(5, 15), {7: 1, 8: 7, 9: 8, 10: 4}),
+    **dict.fromkeys(range(5, LOCALITY_REPRESENTATIVE + 1), {7: 1, 8: 7, 9: 8, 10: 4}),
+}
+EXPECTED_SIZE_26_SPANS = {
+    4: {7: 4, 8: 25, 9: 42, 10: 23, 11: 10},
+    5: {7: 4, 8: 25, 9: 42, 10: 23, 11: 3},
 }
 
 
@@ -77,12 +83,20 @@ def verify_inherited_patterns(blocks, minimum, templates):
     return patterns
 
 
-def enumerate_blockers(blocks, minimum, known=()):
-    sheets, budget = 35, 25
+def check_template_stages(templates):
+    opening = SPAN['BAND']['stage_start'](1)
+    stages = Counter(tuple(sorted({0 if v < opening else (v - opening) // 16 + 1
+                                   for v, _ in template})) for template in templates)
+    if stages != {(0, 1, 2): 16, (3, 4): 4}:
+        raise AssertionError(('Unexpected occupied stages at five blocks', stages))
+
+
+def enumerate_blockers(blocks, smaller, known=(), *, budget=25):
+    sheets = budget + 10
     graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
     clauses, seeds, top = STRIP['strip_formula'](
         graph, blue, budget, sheets=sheets, quotient_bounds=False, require_minimal=False)
-    for pattern in (*minimum, *sorted(known)):
+    for pattern in (*smaller, *sorted(known)):
         clauses.extend(block_translations(pattern, sheets))
 
     patterns = set(known)
@@ -161,10 +175,29 @@ def known_union_coefficients(blocks, minimum, near_minimum):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--blocks', choices=EXPECTED_SPANS, type=int, nargs='+',
-                        default=tuple(EXPECTED_SPANS))
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--blocks', choices=EXPECTED_SPANS, type=int, nargs='+',
+                      default=tuple(EXPECTED_SPANS))
+    mode.add_argument('--size-26', choices=EXPECTED_SIZE_26_SPANS, type=int, metavar='BLOCKS',
+                      help='enumerate size-26 losses after excluding sizes 24 and 25')
     args = parser.parse_args()
+    if args.size_26 is not None:
+        blocks = args.size_26
+        minimum = minimum_seed_sets(blocks)
+        near = enumerate_blockers(blocks, minimum)
+        if Counter(max(s for _, s in p) for p in near) != EXPECTED_SPANS[blocks]:
+            raise AssertionError(('Unexpected size-25 seed catalogue', blocks))
+        patterns = enumerate_blockers(blocks, (*minimum, *sorted(near)), budget=26)
+        spans = Counter(max(s for _, s in p) for p in patterns)
+        if spans != EXPECTED_SIZE_26_SPANS[blocks]:
+            raise AssertionError(('Unexpected size-26 seed catalogue', blocks, spans))
+        print(json.dumps({'blocks': blocks, 'size': 26, 'count': len(patterns),
+                          'spans': dict(sorted(spans.items())), 'losses': sorted(patterns)}),
+              flush=True)
+        return
     templates = enumerate_blockers(5, minimum_seed_sets(5)) if any(k >= 5 for k in args.blocks) else ()
+    if templates:
+        check_template_stages(templates)
     for blocks in args.blocks:
         minimum = minimum_seed_sets(blocks)
         check_overlap(minimum)
@@ -172,7 +205,7 @@ def main():
             patterns = templates
         else:
             known = verify_inherited_patterns(blocks, minimum, templates) if blocks > 5 else ()
-            patterns = enumerate_blockers(blocks, minimum, known)
+            patterns = enumerate_blockers(blocks, minimum, known) if blocks <= DIRECT_LAST else known
         spans = Counter(max(s for _, s in pattern) for pattern in patterns)
         if spans != EXPECTED_SPANS[blocks]:
             raise AssertionError(('Unexpected distribution of loss spans', blocks, spans))

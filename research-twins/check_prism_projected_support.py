@@ -91,7 +91,7 @@ def check_comparators():
                     raise AssertionError(('integer comparator', i, j, offset))
 
 
-def projected_formula(blocks):
+def projected_formula(blocks, *, require_opening=True):
     graph, blue, _, _ = BLOCK['chain'](blocks)
     order = len(graph)
     lift = PROJECTION['neighborhoods'](order, ((u, v, -1 if (u, v) == (0, 1) else 1)
@@ -99,7 +99,8 @@ def projected_formula(blocks):
                                               for v in members(row) if u < v))
     formula = Formula(order)
     formula.clauses.extend(BLOCK['fort_clauses'](graph, range(order)))
-    formula.clauses.append([v + 1 for v in members(blue) if v < OPENING['OPENING']])
+    if require_opening:
+        formula.clauses.append([v + 1 for v in members(blue) if v < OPENING['OPENING']])
     for stage in range(1, blocks - 1):
         start = BLOCK['stage_start'](stage)
         formula.clauses.append(list(range(start + 1, start + 33)))
@@ -121,9 +122,10 @@ def projected_formula(blocks):
     return formula, [v + 1 for v in members(blue)]
 
 
-def check_projected_case(blocks, budget=BUDGET):
-    OPENING['check_insertion'](blocks)
-    formula, seeds = projected_formula(blocks)
+def check_projected_case(blocks, budget=BUDGET, *, require_opening=True):
+    if require_opening:
+        OPENING['check_insertion'](blocks)
+    formula, seeds = projected_formula(blocks, require_opening=require_opening)
     with ITotalizer(lits=seeds, ubound=budget, top_id=formula.top) as counter:
         with Solver(name='cadical195', bootstrap_with=formula.clauses + counter.cnf.clauses) as solver:
             if solver.solve(assumptions=[-counter.rhs[budget]]):
@@ -132,16 +134,28 @@ def check_projected_case(blocks, budget=BUDGET):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--minimum-forts', action='store_true',
-                        help='replay the budget-24 insertion checks for minimum forts')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--minimum-forts', action='store_true',
+                      help='replay the budget-24 insertion checks for minimum forts')
+    mode.add_argument('--cost-25-stage-pairs', action='store_true',
+                      help='certify the empty stage pairs for finite forts of cost at most 25')
     args = parser.parse_args()
     check_comparators()
-    if args.minimum_forts:
+    if args.cost_25_stage_pairs:
+        for blocks in (28, 29):
+            BLOCK['check_band'](blocks, stages=27, budget=25)
+            print(f'{blocks} blocks: the 27-stage band forces an empty pair', flush=True)
+        for blocks in range(27, 14, -1):
+            check_projected_case(blocks, 25, require_opening=False)
+            print(f'{blocks} blocks: every finite fort of cost at most 25 has an empty stage pair',
+                  flush=True)
+    elif args.minimum_forts:
         OPENING['check_base_budget'](25, 24)
         print('Base obstruction at budget 24 excluded at 25 blocks', flush=True)
-        lengths, budget = range(25, 17, -1), 24
+        for blocks in range(25, 17, -1):
+            check_projected_case(blocks, 24)
+            print(f'Projected obstruction at budget 24 excluded at {blocks} blocks', flush=True)
     else:
-        lengths, budget = range(CERTIFIED_LAST, CERTIFIED_FIRST - 1, -1), BUDGET
-    for blocks in lengths:
-        check_projected_case(blocks, budget)
-        print(f'Projected obstruction at budget {budget} excluded at {blocks} blocks', flush=True)
+        for blocks in range(CERTIFIED_LAST, CERTIFIED_FIRST - 1, -1):
+            check_projected_case(blocks)
+            print(f'Projected obstruction at budget {BUDGET} excluded at {blocks} blocks', flush=True)
