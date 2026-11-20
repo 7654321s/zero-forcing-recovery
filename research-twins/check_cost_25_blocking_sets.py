@@ -23,8 +23,11 @@ EXPECTED_SPANS = {
 }
 EXPECTED_SIZE_26_SPANS = {
     4: {7: 4, 8: 25, 9: 42, 10: 23, 11: 10},
-    **dict.fromkeys(range(5, 14), {7: 4, 8: 25, 9: 42, 10: 23, 11: 3}),
+    **dict.fromkeys(range(5, LOCALITY_REPRESENTATIVE + 1), {7: 4, 8: 25, 9: 42, 10: 23, 11: 3}),
 }
+
+
+EXPECTED_SIZE_27_SPANS = {5: {7: 5, 8: 64, 9: 109, 10: 66, 11: 14}}
 
 
 def minimum_seed_sets(blocks):
@@ -83,11 +86,11 @@ def verify_inherited_patterns(blocks, smaller, templates, *, budget=25):
     return patterns
 
 
-def check_template_stages(templates):
+def check_template_stages(templates, expected):
     opening = SPAN['BAND']['stage_start'](1)
     stages = Counter(tuple(sorted({0 if v < opening else (v - opening) // 16 + 1
                                    for v, _ in template})) for template in templates)
-    if stages != {(0, 1, 2): 16, (3, 4): 4}:
+    if stages != expected:
         raise AssertionError(('Unexpected occupied stages at five blocks', stages))
 
 
@@ -177,7 +180,7 @@ def known_union_coefficients(blocks, minimum, near_minimum, size_26=None):
     return dict(sorted(coefficients.items()))
 
 
-def check_size_26(blocks):
+def check_size_26(blocks, *, size_27=False):
     base = min(blocks, 5)
     minimum = minimum_seed_sets(base)
     near = enumerate_blockers(base, minimum)
@@ -186,17 +189,27 @@ def check_size_26(blocks):
     patterns = enumerate_blockers(base, (*minimum, *sorted(near)), budget=26)
     if Counter(max(s for _, s in p) for p in patterns) != EXPECTED_SIZE_26_SPANS[base]:
         raise AssertionError(('Unexpected base size-26 seed catalogue', base))
+    if base == 5:
+        check_template_stages(patterns, {(0, 1, 2): 88, (3, 4): 9})
     if blocks > base:
         minimum = minimum_seed_sets(blocks)
         near = verify_inherited_patterns(blocks, minimum, near)
         smaller = (*minimum, *sorted(near))
         known = verify_inherited_patterns(blocks, smaller, patterns, budget=26)
-        patterns = enumerate_blockers(blocks, smaller, known, budget=26)
+        patterns = enumerate_blockers(blocks, smaller, known, budget=26) if blocks <= DIRECT_LAST else known
     spans = Counter(max(s for _, s in p) for p in patterns)
     if spans != EXPECTED_SIZE_26_SPANS[blocks]:
         raise AssertionError(('Unexpected size-26 seed catalogue', blocks, spans))
     coefficients = known_union_coefficients(blocks, minimum, near, patterns)
-    print(json.dumps({'blocks': blocks, 'size': 26, 'count': len(patterns),
+    size = 26
+    if size_27:
+        size = 27
+        patterns = enumerate_blockers(blocks, (*minimum, *sorted(near), *sorted(patterns)), budget=size)
+        spans = Counter(max(s for _, s in p) for p in patterns)
+        if spans != EXPECTED_SIZE_27_SPANS[blocks]:
+            raise AssertionError(('Unexpected size-27 seed catalogue', blocks, spans))
+        coefficients[27] += len(patterns)
+    print(json.dumps({'blocks': blocks, 'size': size, 'count': len(patterns),
                       'spans': dict(sorted(spans.items())), 'losses': sorted(patterns),
                       'known_union_coefficients': coefficients}),
           flush=True)
@@ -208,14 +221,19 @@ def main():
     mode.add_argument('--blocks', choices=EXPECTED_SPANS, type=int, nargs='+',
                       default=tuple(EXPECTED_SPANS))
     mode.add_argument('--size-26', choices=EXPECTED_SIZE_26_SPANS, type=int, metavar='BLOCKS',
-                      help='enumerate size-26 losses after excluding sizes 24 and 25')
+                      help='enumerate size-26 losses through 14 blocks and verify inherited patterns through 20')
+    mode.add_argument('--size-27', choices=EXPECTED_SIZE_27_SPANS, type=int, metavar='BLOCKS',
+                      help='enumerate size-27 losses at five blocks')
     args = parser.parse_args()
     if args.size_26 is not None:
         check_size_26(args.size_26)
         return
+    if args.size_27 is not None:
+        check_size_26(args.size_27, size_27=True)
+        return
     templates = enumerate_blockers(5, minimum_seed_sets(5)) if any(k >= 5 for k in args.blocks) else ()
     if templates:
-        check_template_stages(templates)
+        check_template_stages(templates, {(0, 1, 2): 16, (3, 4): 4})
     for blocks in args.blocks:
         minimum = minimum_seed_sets(blocks)
         check_overlap(minimum)

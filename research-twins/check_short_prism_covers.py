@@ -37,10 +37,11 @@ def wrapped_formula(graph, blue, sheets, budget, *, band_through=BAND_WIDTH,
     bounds = residual_bounds(sheets, budget, band_through)
     if bounds is None:
         return None
-    cap = budget - bounds.get(sheets - 1, 0)
+    # Rotate the strongest band so its complement contains the chosen sheet.
+    cap = budget - max(bounds.values(), default=0)
     if sheet_cap is not None:
         cap = min(cap, sheet_cap)
-    if cap < 1:
+    if cap < 1 or cap * sheets < budget:
         return None
     order = len(graph)
     clauses = list(WRAPPED['BLOCK']['fort_clauses'](graph, range(order)))
