@@ -17,7 +17,7 @@ COVER = SPAN['COVER']
 mask, members = SPAN['mask'], SPAN['members']
 EXPECTED_SPANS = {
     4: {7: 1, 8: 7, 9: 8, 10: 4, 11: 2},
-    **dict.fromkeys(range(5, 9), {7: 1, 8: 7, 9: 8, 10: 4}),
+    **dict.fromkeys(range(5, 11), {7: 1, 8: 7, 9: 8, 10: 4}),
 }
 
 
