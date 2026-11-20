@@ -27,7 +27,7 @@ EXPECTED_SIZE_26_SPANS = {
 }
 
 
-EXPECTED_SIZE_27_SPANS = dict.fromkeys((5, 6), {7: 5, 8: 64, 9: 109, 10: 66, 11: 14})
+EXPECTED_SIZE_27_SPANS = dict.fromkeys((5, 6, 7), {7: 5, 8: 64, 9: 109, 10: 66, 11: 14})
 
 
 def minimum_seed_sets(blocks):
@@ -223,7 +223,7 @@ def main():
     mode.add_argument('--size-26', choices=EXPECTED_SIZE_26_SPANS, type=int, metavar='BLOCKS',
                       help='enumerate size-26 losses through 14 blocks and verify inherited patterns through 20')
     mode.add_argument('--size-27', choices=EXPECTED_SIZE_27_SPANS, type=int, metavar='BLOCKS',
-                      help='enumerate size-27 losses at five or six blocks')
+                      help='enumerate size-27 losses at five through seven blocks')
     args = parser.parse_args()
     if args.size_26 is not None:
         check_size_26(args.size_26)
