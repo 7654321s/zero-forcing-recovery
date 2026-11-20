@@ -156,7 +156,7 @@ if __name__ == '__main__':
     mode.add_argument('--wrapped', type=int, nargs=4, action='append',
                       metavar=('BLOCKS', 'SHEETS', 'BUDGET', 'BAND_WIDTH'),
                       help='exclude a wrapped fort using the specified certified sheet bands')
-    mode.add_argument('--insertion-obstruction', type=int, nargs='+', choices=range(25, 29),
+    mode.add_argument('--insertion-obstruction', type=int, nargs='+', choices=range(24, 29),
                       metavar='SHEETS',
                       help='exclude wrapping at cost 24 when insertion is blocked at 24 blocks')
     args = parser.parse_args()
