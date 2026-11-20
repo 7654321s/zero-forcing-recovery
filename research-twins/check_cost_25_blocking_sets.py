@@ -302,7 +302,7 @@ def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_2
 
 
 def check_size_30_boundary(catalogues):
-    blocks = 27
+    blocks = 14
     smaller = tuple(minimum_seed_sets(blocks))
     for budget, catalogue in enumerate(catalogues, start=25):
         inherited = verify_inherited_patterns(blocks, smaller, catalogue, budget=budget)
@@ -503,7 +503,7 @@ def main():
     mode.add_argument('--size-29', choices=EXPECTED_SIZE_29_SPANS, type=int, metavar='BLOCKS',
                       help='verify size-29 losses from five blocks through the locality representative')
     mode.add_argument('--size-30-boundary', action='store_true',
-                      help='enumerate the 27-block representative for the size-30 boundary term')
+                      help='enumerate the 14-block representative for the size-30 boundary term')
     mode.add_argument('--ordinary-threshold', action='store_true',
                       help='certify the absence of ordinary interior forts of cost up to 29')
     args = parser.parse_args()

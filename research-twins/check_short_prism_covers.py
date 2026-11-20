@@ -216,9 +216,9 @@ def check_insertion_obstruction(sheets):
     print(f'24 blocks, {sheets} sheets: no cost-24 wrapped fort prevents insertion', flush=True)
 
 
-def check_four_sheet_barrier():
+def check_four_sheet_barrier(blocks):
     """Check separation at the center of four intact sheets by round five."""
-    blocks, sheets, cut = 27, 31, 15
+    sheets, cut = 31, 15
     graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
     intact = mask(v for v in members(blue) if cut - 2 <= v % sheets < cut + 2)
     _, arrivals = CHECKS['MODEL']['trace'](graph, intact)
@@ -235,8 +235,26 @@ def check_four_sheet_barrier():
         for u in members(graph[v]):
             neighborhood |= graph[u]
         if neighborhood & right:
-            raise AssertionError(('Two late white vertices cross the cut', v))
-    print('Four intact sheets separate the remaining whites at round five', flush=True)
+            raise AssertionError(('Two late white vertices cross the cut', blocks, v))
+
+
+def check_stage_ancestry():
+    """Check that a vertex needs seeds only in its own stage and its successor."""
+    blocks, sheets = 14, 13
+    graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
+    arrivals, supporters, _ = WRAPPED['LOSS']['nominal_cones'](graph, blue)
+    if max(arrivals) != 2:
+        raise AssertionError('Unexpected intact completion time')
+    opening = WRAPPED['BLOCK']['stage_start'](1)
+
+    def stage(vertex):
+        label = vertex // sheets
+        return 0 if label < opening else 1 + (label - opening) // 16
+
+    for v, seeds in enumerate(supporters):
+        if any((stage(u) - stage(v)) % blocks not in (0, 1) for u in members(seeds)):
+            raise AssertionError(('Unexpected stage ancestry', v))
+    print('Nominal two-round proofs use seeds only in the same or next stage', flush=True)
 
 
 if __name__ == '__main__':
@@ -256,6 +274,8 @@ if __name__ == '__main__':
                       help='exclude wrapping at cost 24 when insertion is blocked at 24 blocks')
     mode.add_argument('--four-sheet-barrier', action='store_true',
                       help='check the round-five separation across four intact sheets')
+    mode.add_argument('--stage-ancestry', action='store_true',
+                      help='check the one-sided stage support of two-round forcing proofs')
     args = parser.parse_args()
     if args.wrapped:
         for case in args.wrapped:
@@ -270,7 +290,12 @@ if __name__ == '__main__':
         for sheets in args.insertion_obstruction:
             check_insertion_obstruction(sheets)
     elif args.four_sheet_barrier:
-        check_four_sheet_barrier()
+        for blocks in range(14, 28):
+            check_four_sheet_barrier(blocks)
+            print(f'{blocks} blocks: four intact sheets separate remaining whites at round five',
+                  flush=True)
+    elif args.stage_ancestry:
+        check_stage_ancestry()
     else:
         for blocks, cases in CASES.items():
             for sheets, expected in cases:
