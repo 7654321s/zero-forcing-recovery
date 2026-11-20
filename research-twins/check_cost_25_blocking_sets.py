@@ -23,7 +23,7 @@ EXPECTED_SPANS = {
 }
 EXPECTED_SIZE_26_SPANS = {
     4: {7: 4, 8: 25, 9: 42, 10: 23, 11: 10},
-    **dict.fromkeys(range(5, 9), {7: 4, 8: 25, 9: 42, 10: 23, 11: 3}),
+    **dict.fromkeys(range(5, 13), {7: 4, 8: 25, 9: 42, 10: 23, 11: 3}),
 }
 
 
