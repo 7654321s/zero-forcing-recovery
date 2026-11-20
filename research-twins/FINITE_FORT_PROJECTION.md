@@ -343,7 +343,7 @@ The five-block catalogue uses the same opening and terminal intervals as at size
 
 At twelve through 31 blocks the projected-support checks force an empty adjacent pair at cost at most 29, and the 31-stage bands at 32 and 33 blocks give the same conclusion at every longer length. Contraction to eleven blocks gives completeness. To extend the verified twelve-block witnesses to every larger length, insert an empty stage into a certified empty pair of the witness fort. The new stage and its adjacent stages are still empty. Any smaller pattern contained in the extended loss would avoid these empty stages and lift back to a contained pattern before insertion, with the same anchored intervals. Iterating the insertion preserves each witness and its minimality.
 
-For every $k\geq5$ and $m\geq34$, cyclic forts of cost at most 29 unroll. Width 28 suffices at five through 24 blocks and at 26 blocks from 34 sheets since $24m>28\cdot29$. Width 25 suffices at 25 and 27 through 30 blocks from 35 sheets, and the direct wrapped checks cover these lengths at 34 sheets. At 31 blocks width 24 suffices from 35 sheets since $20m>24\cdot29$. At 34 sheets an empty adjacent appended stage pair would contract any wrapped fort to the excluded 30-block case. The wrapped verifier with width-24 bounds and every appended stage pair occupied excludes the remaining case. Every longer chain contracts to 31 blocks at these costs.
+For every $k\geq5$ and $m\geq33$, cyclic forts of cost at most 29 unroll. Width 28 suffices at five through 24 blocks and at 26 blocks from 34 sheets since $24m>28\cdot29$. Width 25 suffices at 25 and 27 through 30 blocks from 35 sheets, and the direct wrapped checks cover these lengths at 34 sheets. At 31 blocks width 24 suffices from 35 sheets since $20m>24\cdot29$. At 34 sheets an empty adjacent appended stage pair would contract any wrapped fort to the excluded 30-block case. The wrapped verifier with width-24 bounds and every appended stage pair occupied excludes the remaining case. At 33 sheets and 31 blocks, contraction again excludes a wrapped fort with an empty appended pair. The width-25 check excludes the remaining case in which every appended pair meets the fort. Every longer chain contracts to 31 blocks at these costs.
 
 The 35-sheet exclusion at 31 blocks also has a certificate using the narrower width-23 band. The 35 windows of width 23 contain at least 19 seeds each, with total $23\cdot29=35\cdot19+2$. The two surplus units therefore determine each possible window profile. Consecutive window counts differ by the incoming minus the outgoing sheet count, and $\gcd(35,23)=1$ determines the sheet counts up to the constant fixed by their sum. Enumerating the surplus profiles with the other band bounds gives at most one seed per sheet. The wrapped formula with this cap and every appended pair occupied is unsatisfiable.
 
@@ -411,7 +411,7 @@ $$
 \Pr(\text{blocking})=1-\exp\bigl(-m(A_k(p)+138p^{27}+342p^{28})\bigr)+O(kmp^{29}).
 $$
 
-For $m\geq34$ the error improves to $O(mp^{29}+kmp^{30})$. Minimal losses of size 29 at these periods must meet the vicinity of an exceptional stage by the ordinary exclusion, so their total probability is $O(mp^{29})$. Larger losses give the second term of the error by the connected loss bound.
+For $m\geq33$ the error improves to $O(mp^{29}+kmp^{30})$. The complete size-29 catalogue has $1982m$ events, so their total probability is at most $1982mp^{29}$. Larger losses give the second term of the error by the connected loss bound.
 
 ### Separate loss components
 
@@ -571,7 +571,13 @@ Among the ordered pairs in $b_2$, there are $O(m)$ with at least one member smal
 
 ### Refined two-intensity approximation through order 29
 
-Put $B(p)=A_k(p)+138p^{27}+342p^{28}+397p^{29}$ for $k\geq5$, so $B$ is the same at all these lengths. For all $k\geq5$, $m\geq34$ and $0\leq p\leq1$,
+Put $B(p)=A_k(p)+138p^{27}+342p^{28}+397p^{29}$ for $k\geq5$, so $B$ is the same at all these lengths. The complete catalogue through size 29 gives, for $k\geq5$, $m\geq33$ and $0\leq p\leq1$,
+
+$$
+\Pr(\text{blocking})=1-\exp(-mB(p))+O(kmp^{30}).
+$$
+
+For all $k\geq5$, $m\geq34$ and $0\leq p\leq1$, the ordinary classification further gives
 
 $$
 \Pr(\text{blocking})=
@@ -602,7 +608,7 @@ $$
 \qquad (a)_d=a(a-1)\cdots(a-d+1).
 $$
 
-To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities through loss size 27 for $m\geq30$, and at every length of at least five blocks through size 28 for $m\geq30$ and size 29 for $m\geq34$. The smaller verified cyclic ranges also apply. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
+To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities through loss size 27 for $m\geq30$, and at every length of at least five blocks through size 28 for $m\geq30$ and size 29 for $m\geq33$. The smaller verified cyclic ranges also apply. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
 
 The joint component law also extends to a uniform loss of size $\ell$. Set $p=\ell/N$ and let $\Lambda=mp^{24}+kmp^{30}$. For $k\geq4$, $m\geq34$ and $\ell\geq1$, the total variation error is
 
@@ -808,6 +814,7 @@ python -B research-twins/check_short_prism_covers.py --wrapped-with-occupied-pai
 python -B research-twins/check_short_prism_covers.py --wrapped 25 34 29 26 --wrapped 27 34 29 25 --wrapped 28 34 29 25 --wrapped 29 34 29 26 --wrapped 30 34 29 25
 python -B research-twins/check_short_prism_covers.py --wrapped-with-occupied-pairs 31 34 29 24
 python -B research-twins/check_short_prism_covers.py --wrapped-with-occupied-pairs 31 34 29 25
+python -B research-twins/check_short_prism_covers.py --wrapped-with-occupied-pairs 31 33 29 25
 for blocks in 5 6 7 8 9 10
 do
     for sheets in 28 29 30 31 32
