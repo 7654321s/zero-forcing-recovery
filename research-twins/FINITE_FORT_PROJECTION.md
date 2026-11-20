@@ -48,7 +48,7 @@ For the four-cycle example above, the integer lift has no finite fort. In the cy
 
 ## Application to shorter prism chains
 
-For the [signed unpadded prism chain](BLOCK_STABILIZATION.md), the finite blocking numbers at two and three blocks are 16 and 21. Every chain with at least four blocks has finite blocking number 24. The cyclic blocking numbers equal their finite values from eight sheets at two blocks, 22 sheets at three blocks, and 25 sheets at every length of at least four blocks. Chains with at least 24 blocks reach that value by 24 sheets.
+For the [signed unpadded prism chain](BLOCK_STABILIZATION.md), the finite blocking numbers at two and three blocks are 16 and 21. Every chain with at least four blocks has finite blocking number 24. The cyclic blocking numbers equal their finite values from eight sheets at two blocks, 22 sheets at three blocks, and 24 sheets at every length of at least four blocks.
 
 The finite result for at least 24 blocks follows from [block and sheet stabilization](BLOCK_STABILIZATION.md). To descend from $k+1$ blocks to $k$, consider a hypothetical finite fort of cost at most 23. If the fort has two successive empty appended stages, insert a new empty stage between them to preserve the cost. If the fort avoids all opening seeds, the opening fills from its own seeds in two rounds. The fort then avoids the opening and the old stage ports adjacent to it, so the opening insertion preserves its cost. Each insertion would produce a finite fort at the excluded budget on $k+1$ blocks.
 
@@ -69,6 +69,8 @@ At every length from four through 23 blocks, the sheet-band verifier checks widt
 At 26 sheets and every length from four through 23 blocks, a 27-sheet band counts the full budget plus the seeds on one extra sheet. At $b\leq22$ each sheet would need a seed, contradicting $b\leq22<26$. At $b=23$, a 25-sheet band contains at least 21 seeds, so any single sheet contains at most two. The wrapped verifier excludes this remaining budget using the periodic band inequalities, the exact total of 23 seeds and the requirement that every adjacent pair of sheets meets the fort. For every window spanning more than half a period it encodes the equivalent upper bound on the complementary window. These checks cover all forts at that budget. A fort with two consecutive empty sheets unrolls, where the finite lower bound applies. The inherited 24-seed witness supplies the matching upper bound.
 
 At 25 sheets, the width-26 band requires at least 22 seeds. Below budget 22 each sheet would again need a seed, which is impossible. At budgets 22 and 23 the width-24 band leaves respective caps of two and three seeds on each sheet. The same wrapped verifier excludes both budgets at every length from four through 23 blocks. Together with the finite lower bound, the common witness and the [long-chain result](BLOCK_STABILIZATION.md#the-25-sheet-case), this proves $\kappa_{k,m}=24$ for every $k\geq4$ and $m\geq25$.
+
+At 24 sheets, the width-25 band requires at least 21 seeds. Below budget 21 this would force at least one seed on each sheet. At budgets 21, 22 and 23 the width-23 band leaves respective caps of two, three and four on a single sheet. The wrapped verifier excludes all three budgets at every length from four through 23 blocks. The [long-chain result at 24 sheets](BLOCK_STABILIZATION.md#the-24-sheet-case) then gives $\kappa_{k,m}=24$ for every $k\geq4$ and $m\geq24$.
 
 ## Cyclic thresholds at two and three blocks
 
@@ -167,6 +169,38 @@ The [restoration verifier](check_finite_fort_span.py) also lists a 25-seed loss 
 
 The verifier checks the 25 restorations at each length from four through 20 blocks. The same stage and sheet locality argument extends the example to every length of at least four blocks, in the integer lift and in cyclic covers with at least 19 sheets. The seed set meets both extreme sheets of its span, so it gives $m$ distinct inclusion-minimal blocking sets of size 25 in each of those cyclic covers.
 
+## All inclusion-minimal 25-seed losses at four through eight blocks
+
+At four blocks there are exactly 22 inclusion-minimal blockers of size 25 up to sheet translation. At five through eight blocks there are exactly 20 at each length. The span of a seed set is the number of sheets from its first occupied sheet to its last, inclusive.
+
+| Blocks | Span 7 | Span 8 | Span 9 | Span 10 | Span 11 | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 4 | 1 | 7 | 8 | 4 | 2 | 22 |
+| 5–8 | 1 | 7 | 8 | 4 | 0 | 20 |
+
+Any fort of cost at most 25 has no internal pair of empty sheets, since such a gap would split it into two forts of cost at least 24 each. A span of at least 34 would contain two disjoint 17-sheet bands, requiring at least 26 seeds. There are therefore at most 33 interior sheets, with one empty guard at each end. The [enumerator](check_cost_25_blocking_sets.py) searches the resulting 35-sheet strip and excludes every translate of each of the five minimum seed sets. A remaining fort has cost 25, and its seed set is inclusion-minimal because each proper blocking subset would have to be one of the excluded 24-seed sets. Conversely, any inclusion-minimal 25-seed loss contains the seed intersection of a fort, which must equal the loss. After finding one seed set, the enumerator excludes all its translates in the strip. Unsatisfiability after the last exclusion proves the count. The output gives the seed coordinates with the first occupied sheet normalized to one.
+
+The enumeration at five blocks supplies four patterns supported in the last two stages and 16 in opening coordinates. At six through eight blocks the verifier moves the four terminal patterns to the last two stages, checks all 20 patterns by forcing closure with empty sheet guards, and excludes any additional set in the 35-sheet formula.
+
+At $m\geq30$, the 28-sheet band gives $24m>28\cdot25$, ruling out all wrapped forts of cost at most 25. Every inclusion-minimal 25-seed loss then lifts to one of the listed finite patterns. Each listed finite loss also projects to an inclusion-minimal loss. It occupies at most 11 sheets, and any contained cost-24 pattern has span at most nine, so it can be lifted into the same interval. The cyclic count is $22m$ at four blocks and $20m$ at five through eight blocks.
+
+## The first two terms of the independent-loss probability
+
+For each length from four through eight blocks, the enumerator also checks the unions of pairs of distinct translated 24-seed patterns. Exactly two unions of size 25 occur up to sheet translation, each containing two minimum patterns. Only relative shifts of magnitude at most eight can give such a union, since the two patterns must share a seed and each spans at most nine sheets. For $m\geq30$, these unions and their overlaps have the same counts per translation in the cyclic cover. In particular, each union of overlapping patterns occupies an interval of at most 17 sheets. Its outer gap is longer than every interior gap and determines the lift.
+
+Write $n=10km$ for the number of lifted seeds, with $q_4=22$ and $q_k=20$ for $5\leq k\leq8$. The number of 25-element losses that block recovery is
+
+$$
+5m(n-24)+(q_k-2)m.
+$$
+
+The first summand counts single extensions of the minimum losses. The overlap subtraction removes the $2m$ double counts, and the $q_km$ inclusion-minimal losses contribute separately. For independent seed losses with probability $p$, the first two nonzero terms at fixed $k,m$ are consequently
+
+$$
+\Pr(\text{blocking})=5m p^{24}+(q_k-2)m p^{25}+O(p^{26})
+\qquad (4\leq k\leq8,\ m\geq30).
+$$
+
 ## Complete classification of minimum-cost finite forts
 
 At four through 17 blocks and at 26 blocks, the width-16 and width-17 band checks give a span bound for every cost-24 fort. Any pair of empty interior sheets would split it into two nonempty finite forts, each of cost at least 24. A span of at least 33 would contain disjoint bands of widths 16 and 17. They would require at least 12 and 13 lost seeds respectively. A cost-24 fort thus fits inside the 32 interior sheets of a 34-sheet guarded strip.
@@ -186,6 +220,8 @@ The 26-stage contraction preserves the occupied sheets in a cyclic cover, so the
 At 24 blocks, a wrapped fort at 25 through 28 sheets would have to contain an opening seed and meet every consecutive pair of appended stages. Otherwise either insertion would give a wrapped fort at 25 blocks. The base budget-23 check at 24 blocks then forces at least 24 distinct projected seed labels. The lifted cost is 24, so each label has one selected copy. The insertion-obstruction verifier imposes these conditions. At 25 sheets it uses the width-24 band to cap each sheet at four seeds. At 26 through 28 sheets it partitions the complement of one sheet into two bands whose lengths differ by at most one and are both at least ten. The two bands require at least $m-9$ seeds, leaving a cap of $33-m$ on the omitted sheet. All four formulas are unsatisfiable.
 
 For every $k\geq4$ and $m\geq25$, every minimum-cost cyclic fort therefore unrolls to one of the listed finite forts, and each listed fort projects to the cycle. Its span is at most nine, so the outer run of at least $m-9$ empty sheets is strictly longer than any interior run. The first occupied sheet after this unique longest run determines the translation. The same argument applies to the seed sets, as each meets both extreme sheets of its fort. The exact numbers are $54m$ minimum-cost cyclic forts and $5m$ minimum blocking sets. Their cyclic fort-size polynomial is $mP(x)$. For a minimum blocking set the final white fort contains all its lost seeds, since any smaller seed intersection would contradict minimal cost.
+
+At four through nine blocks, the wrapped verifier at 24 sheets also excludes cost 24 itself, using the same bands with a cap of five seeds per sheet. The same exact counts and polynomial therefore hold at 24 sheets for these lengths.
 
 The chain has $10k$ seed labels. Among uniform 24-element losses from the $10km$ lifted seeds, the exact probability of blocking recovery is $5m/\binom{10km}{24}$. For independent losses with probability $p$ per seed, the blocking probability at fixed $k,m$ is $5m p^{24}+O(p^{25})$ as $p\to0$.
 
@@ -213,7 +249,7 @@ do
 done
 ```
 
-The sheet-band checks for the shorter chains can be replayed with the same verifier as at 26 blocks. The 25-sheet guarantee uses the following runs.
+The sheet-band checks for the shorter chains can be replayed with the same verifier as at 26 blocks. The 24-sheet guarantee uses the following runs.
 
 ```sh
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 28 --band-blocks 4 5 6 7 8 9 10
@@ -221,6 +257,7 @@ python -B research-twins/check_block_stabilization.py --subbands-from 17 --band-
 for blocks in 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 25 22 28 --wrapped "$blocks" 25 23 28 --wrapped "$blocks" 26 23 28 || exit 1
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 24 21 28 --wrapped "$blocks" 24 22 28 --wrapped "$blocks" 24 23 28 || exit 1
 done
 ```
 
@@ -243,6 +280,12 @@ The restoration-time table and the inclusion-minimal 25-seed loss are checked wi
 python -B research-twins/check_finite_fort_span.py --restoration-times
 ```
 
+The complete four- through eight-block enumeration emits a JSON record per chain length.
+
+```sh
+python -B research-twins/check_cost_25_blocking_sets.py --blocks 4 5 6 7 8
+```
+
 The complete counts use the band checks above and these additional checks. At 26 blocks the long-chain verification supplies the bands through width 25 and the nine- and ten-sheet costs.
 
 ```sh
@@ -256,4 +299,8 @@ do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 25 24 28 --wrapped "$blocks" 26 24 28 --wrapped "$blocks" 27 24 28 --wrapped "$blocks" 28 24 28 || exit 1
 done
 python -B research-twins/check_short_prism_covers.py --insertion-obstruction 25 26 27 28
+for blocks in 4 5 6 7 8 9
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 24 24 28 || exit 1
+done
 ```
