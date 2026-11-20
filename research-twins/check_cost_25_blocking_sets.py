@@ -27,7 +27,10 @@ EXPECTED_SIZE_26_SPANS = {
 }
 
 
-EXPECTED_SIZE_27_SPANS = dict.fromkeys(range(5, 11), {7: 5, 8: 64, 9: 109, 10: 66, 11: 14})
+EXPECTED_SIZE_27_SPANS = {
+    4: {7: 5, 8: 64, 9: 110, 10: 68, 11: 28, 12: 1, 13: 1},
+    **dict.fromkeys(range(5, 12), {7: 5, 8: 64, 9: 109, 10: 66, 11: 14}),
+}
 
 
 def minimum_seed_sets(blocks):
@@ -167,9 +170,10 @@ def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_2
 
     weights = {}
     coefficients = Counter()
+    maximum_span = 13 if blocks == 4 and size_27 is not None else 11
     for union in sorted(unions, key=lambda sites: (len(sites), tuple(sorted(sites)))):
         last_sheet = max(s for _, s in union)
-        if last_sheet > 11:
+        if last_sheet > maximum_span:
             raise AssertionError(('Unexpected span for a small union', blocks, last_sheet))
         coefficient = 1
         for smaller, weight in weights.items():
@@ -187,9 +191,12 @@ def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_2
         expected[27] = -127 if blocks == 4 else -120
     if size_27 is not None:
         expected[27] += len(size_27)
-        expected[28] = -399
+        expected[28] = -417 if blocks == 4 else -399
         profile = Counter(weight for union, weight in weights.items() if len(union) == 28)
-        if profile != {-2: 3, -1: 443, 0: 35, 1: 50}:
+        expected_profile = {-2: 3, -1: 463, 0: 35, 1: 52} if blocks == 4 else {
+            -2: 3, -1: 443, 0: 35, 1: 50,
+        }
+        if profile != expected_profile:
             raise AssertionError(('Unexpected order-28 weight distribution', blocks, profile))
     if coefficients != expected:
         raise AssertionError(('Unexpected union coefficients', blocks, coefficients))
@@ -210,7 +217,8 @@ def check_size_26(blocks, *, size_27=False):
     templates_27 = None
     if size_27:
         templates_27 = enumerate_blockers(base, (*minimum, *sorted(near), *sorted(patterns)), budget=27)
-        check_template_stages(templates_27, {(0, 1, 2): 251, (3, 4): 5, (0, 3, 4): 2})
+        if base == 5:
+            check_template_stages(templates_27, {(0, 1, 2): 251, (3, 4): 5, (0, 3, 4): 2})
     if blocks > base:
         minimum = minimum_seed_sets(blocks)
         near = verify_inherited_patterns(blocks, minimum, near)
@@ -250,7 +258,7 @@ def main():
     mode.add_argument('--size-26', choices=EXPECTED_SIZE_26_SPANS, type=int, metavar='BLOCKS',
                       help='enumerate size-26 losses through 14 blocks and verify inherited patterns through 20')
     mode.add_argument('--size-27', choices=EXPECTED_SIZE_27_SPANS, type=int, metavar='BLOCKS',
-                      help='enumerate size-27 losses at five through ten blocks')
+                      help='enumerate size-27 losses at four through eleven blocks')
     args = parser.parse_args()
     if args.size_26 is not None:
         check_size_26(args.size_26)
