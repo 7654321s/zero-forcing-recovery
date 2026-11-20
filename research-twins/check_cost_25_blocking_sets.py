@@ -16,6 +16,7 @@ STRIP = runpy.run_path(str(HERE / 'check_finite_fort_strip.py'))
 COVER = SPAN['COVER']
 mask, members = SPAN['mask'], SPAN['members']
 DIRECT_LAST = 14
+DIRECT_SIZE_27_LAST = 13
 LOCALITY_REPRESENTATIVE = 20
 EXPECTED_SPANS = {
     4: {7: 1, 8: 7, 9: 8, 10: 4, 11: 2},
@@ -29,7 +30,7 @@ EXPECTED_SIZE_26_SPANS = {
 
 EXPECTED_SIZE_27_SPANS = {
     4: {7: 5, 8: 64, 9: 110, 10: 68, 11: 28, 12: 1, 13: 1},
-    **dict.fromkeys(range(5, 14), {7: 5, 8: 64, 9: 109, 10: 66, 11: 14}),
+    **dict.fromkeys(range(5, LOCALITY_REPRESENTATIVE + 1), {7: 5, 8: 64, 9: 109, 10: 66, 11: 14}),
 }
 
 
@@ -109,7 +110,8 @@ def check_template_stages(templates, expected):
         raise AssertionError(('Unexpected occupied stages at five blocks', stages))
 
 
-def enumerate_blockers(blocks, smaller, known=(), *, budget=25, ordinary_stages=None):
+def enumerate_blockers(blocks, smaller, known=(), *, budget=25, ordinary_stages=None,
+                       first_ordinary_stage=False):
     sheets = budget + 10
     graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
     clauses, seeds, top = STRIP['strip_formula'](
@@ -119,6 +121,8 @@ def enumerate_blockers(blocks, smaller, known=(), *, budget=25, ordinary_stages=
         lower, upper = stage_start(2) * sheets, stage_start(2 + ordinary_stages) * sheets
         clauses.extend([-(v + 1)] for v in range(len(graph)) if not lower <= v < upper)
         seeds = [v for v in seeds if lower <= v - 1 < upper]
+        if first_ordinary_stage:
+            clauses.append(list(range(lower + 1, stage_start(3) * sheets + 1)))
     for pattern in (*smaller, *sorted(known)):
         clauses.extend(block_translations(pattern, sheets))
 
@@ -254,7 +258,9 @@ def check_size_26(blocks, *, size_27=False, size_28=False):
         all_26 = (*minimum, *sorted(near), *sorted(patterns))
         if blocks > base:
             inherited = verify_inherited_patterns(blocks, all_26, templates_27, budget=size)
-            exact_27 = enumerate_blockers(blocks, all_26, inherited, budget=size)
+            exact_27 = inherited
+            if blocks <= DIRECT_SIZE_27_LAST:
+                exact_27 = enumerate_blockers(blocks, all_26, inherited, budget=size)
         else:
             exact_27 = templates_27
         spans = Counter(max(s for _, s in p) for p in exact_27)
@@ -278,7 +284,7 @@ def check_size_26(blocks, *, size_27=False, size_28=False):
           flush=True)
 
 
-def check_ordinary_size_30():
+def check_ordinary_size_30(*, exhaustive=False):
     if enumerate_blockers(13, (), budget=29, ordinary_stages=8):
         raise AssertionError('A cost-29 fort fits in eight ordinary stages')
     catalogue = enumerate_blockers(8, (), budget=30, ordinary_stages=3)
@@ -306,12 +312,34 @@ def check_ordinary_size_30():
         spans[max(s for _, s in pattern)] += 1
         residual_sizes[fort.bit_count()] += 1
         restoration_rounds.update(dict(SPAN['restoration_profile'](graph, blue, lost)))
+    if exhaustive:
+        check_ordinary_size_30_window(catalogue)
     print(json.dumps({
         'size': 30, 'ordinary_stages': 3, 'count': len(catalogue),
         'spans': dict(sorted(spans.items())), 'residual_sizes': dict(sorted(residual_sizes.items())),
         'restoration_rounds': dict(sorted(restoration_rounds.items())),
         'losses': [[(v - original, s) for v, s in pattern] for pattern in sorted(catalogue)],
     }), flush=True)
+
+
+def check_ordinary_size_30_window(catalogue):
+    band = SPAN['BAND']
+    band['check_band'](34, stages=32, budget=30)
+    print('A 32-stage ordinary band forces an empty pair at budget 30', flush=True)
+    for width in range(10, 21):
+        band['check_sheet_band'](width, width - 5, pin_ends=width > 10,
+                                 blocks=36, subband_constraints=width >= 13)
+    stage_start = band['stage_start']
+    stop = stage_start(33)
+    placements = {
+        tuple((v + shift, sheet) for v, sheet in pattern)
+        for pattern in catalogue
+        for shift in range(0, stop - max(v for v, _ in pattern), 16)
+    }
+    if enumerate_blockers(36, (), placements, budget=30, ordinary_stages=31,
+                          first_ordinary_stage=True) != placements:
+        raise AssertionError('Unexpected cost-30 seed loss in the ordinary interior')
+    print('The ten cost-30 losses exhaust the ordinary interior', flush=True)
 
 
 def check_ordinary_threshold():
@@ -335,9 +363,11 @@ def main():
     mode.add_argument('--size-26', choices=EXPECTED_SIZE_26_SPANS, type=int, metavar='BLOCKS',
                       help='enumerate size-26 losses through 14 blocks and verify inherited patterns through 20')
     mode.add_argument('--size-27', choices=EXPECTED_SIZE_27_SPANS, type=int, metavar='BLOCKS',
-                      help='enumerate size-27 losses at four through thirteen blocks')
+                      help='enumerate size-27 losses through 13 blocks and verify inherited patterns through 20')
     mode.add_argument('--ordinary-size-30', action='store_true',
                       help='classify cost-30 forts confined to three ordinary stages by seed loss')
+    mode.add_argument('--ordinary-size-30-exact', action='store_true',
+                      help='verify the complete cost-30 ordinary interior catalogue')
     mode.add_argument('--size-28', choices=EXPECTED_SIZE_28_SPANS, type=int, metavar='BLOCKS',
                       help='enumerate size-28 losses at five blocks')
     mode.add_argument('--ordinary-threshold', action='store_true',
@@ -346,8 +376,8 @@ def main():
     if args.ordinary_threshold:
         check_ordinary_threshold()
         return
-    if args.ordinary_size_30:
-        check_ordinary_size_30()
+    if args.ordinary_size_30 or args.ordinary_size_30_exact:
+        check_ordinary_size_30(exhaustive=args.ordinary_size_30_exact)
         return
     if args.size_26 is not None:
         check_size_26(args.size_26)

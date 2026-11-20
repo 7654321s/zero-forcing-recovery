@@ -137,19 +137,20 @@ if __name__ == '__main__':
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--minimum-forts', action='store_true',
                       help='replay the budget-24 insertion checks for minimum forts')
-    mode.add_argument('--cost-25-stage-pairs', action='store_true',
-                      help='certify the empty stage pairs for finite forts of cost at most 25')
-    mode.add_argument('--cost-26-stage-pairs', action='store_true',
-                      help='certify the empty stage pairs for finite forts of cost at most 26')
+    for budget in (25, 26, 27):
+        mode.add_argument(f'--cost-{budget}-stage-pairs', action='store_const', const=budget,
+                          dest='stage_pair_budget',
+                          help=f'certify empty stage pairs at cost up to {budget}')
     args = parser.parse_args()
     check_comparators()
-    if args.cost_25_stage_pairs or args.cost_26_stage_pairs:
-        budget = 26 if args.cost_26_stage_pairs else 25
+    if args.stage_pair_budget is not None:
+        budget = args.stage_pair_budget
         stages = budget + 2
         for blocks in (stages + 1, stages + 2):
             BLOCK['check_band'](blocks, stages=stages, budget=budget)
             print(f'{blocks} blocks: the {stages}-stage band forces an empty pair', flush=True)
-        for blocks in range(stages, 14, -1):
+        direct_last = 13 if budget == 27 else 14
+        for blocks in range(stages, direct_last, -1):
             check_projected_case(blocks, budget, require_opening=False)
             print(f'{blocks} blocks: every finite fort of cost at most {budget} has an empty stage pair',
                   flush=True)
