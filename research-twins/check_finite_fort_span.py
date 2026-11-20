@@ -125,7 +125,15 @@ def check_seed_families(blocks, span, shapes, expected):
                    if all(other == fort or (other & fort) != other for other in family)]
         if len(minimal) != 1:
             raise AssertionError(('Unexpected inclusion-minimal forts', blocks, span))
-        observed.append((len(family), minimal[0].bit_count(), maximal.bit_count()))
+        least = minimal[0]
+        groups = {}
+        for v in members(maximal ^ least):
+            signature = tuple(bool(fort & (1 << v)) for fort in family)
+            groups[signature] = groups.get(signature, 0) + 1
+        sizes = tuple(sorted(groups.values()))
+        if len(family) != 2 ** len(sizes):
+            raise AssertionError(('Missing a combination of optional groups', blocks, span))
+        observed.append((len(family), least.bit_count(), maximal.bit_count(), sizes))
     if tuple(sorted(observed)) != expected:
         raise AssertionError(('Unexpected seed-family statistics', blocks, span, observed))
 
@@ -169,7 +177,7 @@ def check_shortest_minimum_cost_forts():
         raise AssertionError('Unexpected common fort')
     shapes = (common ^ removed, common)
     for blocks in range(4, 28):
-        check_guarded_shapes(blocks, 7, shapes, ((2, 44, 46),))
+        check_guarded_shapes(blocks, 7, shapes, ((2, 44, 46, (2,)),))
     print('Exactly two cost-24 forts of span seven at every length from four blocks')
 
 
@@ -215,7 +223,8 @@ def check_eight_sheet_forts():
     for blocks in range(4, 28):
         start = BAND['stage_start'](blocks - 2)
         shapes = [mask((v + start) * 10 + s for v, s in pattern) for pattern in patterns]
-        check_guarded_shapes(blocks, 8, shapes, ((8, 44, 47), (32, 42, 47)))
+        check_guarded_shapes(blocks, 8, shapes, ((8, 44, 47, (1, 1, 1)),
+                                                (32, 42, 47, (1, 1, 1, 1, 1))))
     print('Exactly 40 cost-24 forts of span eight, with two seed sets, at every length from four blocks')
 
 
@@ -240,7 +249,8 @@ def check_nine_sheet_forts():
 
     shapes = [mask(v * 11 + s for v, s in pattern) for pattern in patterns]
     for blocks in range(4, 28):
-        check_guarded_shapes(blocks, 9, shapes, ((4, 51, 53), (8, 50, 54)))
+        check_guarded_shapes(blocks, 9, shapes, ((4, 51, 53, (1, 1)),
+                                                (8, 50, 54, (1, 1, 2))))
     print('Exactly 12 cost-24 forts of span nine, with two seed sets, at every length from four blocks')
 
 
@@ -271,6 +281,6 @@ if __name__ == '__main__':
     check_shortest_minimum_cost_forts()
     check_eight_sheet_forts()
     check_nine_sheet_forts()
-    print('Checked the five seed families with their unique minimal forts and forced closures')
+    print('Checked the five seed families, their forcing closures and all optional-group combinations')
     if args.longer:
         check_larger_optimal_spans(args.longer)

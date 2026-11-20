@@ -129,13 +129,19 @@ After the intact two rounds, any vertex whose radius-four neighborhood misses th
 
 The 26-stage band extends this statement to every greater length. A finite fort on one of these seed sets has cost 24, so an empty pair may be contracted. Each seed set meets both stages of its occupied end of the chain. The contraction preserves their coordinates relative to that end, as well as the sheet coordinates. Hence any fort with one of the five seed sets retains its known span and belongs to its listed family. The family counts and their inclusion-minimal and maximal fort sizes are as follows.
 
-| Span | Forts with that seed set | Vertices in its unique inclusion-minimal fort | Vertices in its largest fort |
-| --- | --- | --- | --- |
-| 7 | 2 | 44 | 46 |
-| 8 | 8 | 44 | 47 |
-| 8 | 32 | 42 | 47 |
-| 9 | 4 | 51 | 53 |
-| 9 | 8 | 50 | 54 |
+| Span | Forts with that seed set | Vertices in its unique inclusion-minimal fort | Vertices in its largest fort | Sizes of independent optional groups |
+| --- | --- | --- | --- | --- |
+| 7 | 2 | 44 | 46 | 2 |
+| 8 | 8 | 44 | 47 | 1, 1, 1 |
+| 8 | 32 | 42 | 47 | 1, 1, 1, 1, 1 |
+| 9 | 4 | 51 | 53 | 1, 1 |
+| 9 | 8 | 50 | 54 | 1, 1, 2 |
+
+In each row, start with the inclusion-minimal fort and add any subset of the listed groups. Within a group, all vertices are included together. The verifier groups optional vertices by the list of forts in which they occur. Each group has a binary choice. Since a family with $r$ groups has exactly $2^r$ distinct forts, every combination of choices occurs. The inclusion order within each family is therefore the Boolean lattice on its groups. Its fort-size polynomial is $x^a\prod_i(1+x^{d_i})$, where $a$ is the size of the least fort and $d_i$ are the group sizes. Summing over the five seed families gives
+
+$$
+P(x)=x^{44}(1+x^2)+x^{44}(1+x)^3+x^{42}(1+x)^5+x^{51}(1+x)^2+x^{50}(1+x)^2(1+x^2).
+$$
 
 ## Complete classification of minimum-cost finite forts
 
@@ -153,7 +159,7 @@ For $m\geq29$, the width-25 band rules out wrapped forts of cost 24 at four thro
 
 The 26-stage contraction preserves the occupied sheets in a cyclic cover, so the absence of wrapping at 26 blocks extends to every greater length. At 25 blocks the base check at budget 24 already excludes a fort containing an opening seed and meeting every consecutive pair of appended stages. This version of the check uses the ordinary fort clauses on the base graph. Hence a cyclic fort at 25 blocks allows one of the two insertions that leave the occupied sheets unchanged, giving the same exclusion as at 26 blocks.
 
-Thus every minimum-cost cyclic fort unrolls to one of the listed finite forts for $m\geq25$ when $4\leq k\leq17$ or $k\geq25$. Each listed fort projects to the cycle. Its span is at most nine, so the outer run of at least $m-9$ empty sheets is strictly longer than any interior run. The first occupied sheet after this unique longest run determines the translation. The same argument applies to the seed sets, as each meets both extreme sheets of its fort. The exact numbers are $54m$ minimum-cost cyclic forts and $5m$ minimum blocking sets. For a minimum blocking set the final white fort contains all its lost seeds, since any smaller seed intersection would contradict minimal cost.
+Thus every minimum-cost cyclic fort unrolls to one of the listed finite forts for $m\geq25$ when $4\leq k\leq17$ or $k\geq25$. Each listed fort projects to the cycle. Its span is at most nine, so the outer run of at least $m-9$ empty sheets is strictly longer than any interior run. The first occupied sheet after this unique longest run determines the translation. The same argument applies to the seed sets, as each meets both extreme sheets of its fort. The exact numbers are $54m$ minimum-cost cyclic forts and $5m$ minimum blocking sets. Their cyclic fort-size polynomial is $mP(x)$. For a minimum blocking set the final white fort contains all its lost seeds, since any smaller seed intersection would contradict minimal cost.
 
 ## Reproduction
 
