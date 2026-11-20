@@ -278,7 +278,24 @@ def known_union_coefficients(blocks, minimum, near_minimum, size_26=None, size_2
     return dict(sorted(coefficients.items()))
 
 
-def check_size_26(blocks, *, size_27=False, size_28=False, size_29=False):
+def check_size_30_boundary(catalogues):
+    blocks = 28
+    smaller = tuple(minimum_seed_sets(blocks))
+    for budget, catalogue in enumerate(catalogues, start=25):
+        inherited = verify_inherited_patterns(blocks, smaller, catalogue, budget=budget)
+        smaller += tuple(sorted(inherited))
+    if len(smaller) != 3103:
+        raise AssertionError(('Incomplete lower-order catalogue', len(smaller)))
+    patterns = enumerate_blockers(blocks, smaller, budget=30)
+    print(json.dumps({
+        'blocks': blocks, 'size': 30, 'count': len(patterns),
+        'boundary_coefficient': len(patterns) - 10 * blocks,
+        'losses': sorted(patterns),
+    }), flush=True)
+
+
+def check_size_26(blocks, *, size_27=False, size_28=False, size_29=False, size_30_boundary=False):
+    size_29 = size_29 or size_30_boundary
     size_28 = size_28 or size_29
     size_27 = size_27 or size_28
     base = min(blocks, 5)
@@ -361,6 +378,9 @@ def check_size_26(blocks, *, size_27=False, size_28=False, size_29=False):
             spans = Counter(max(s for _, s in p) for p in patterns)
             if spans != EXPECTED_SIZE_29_SPANS[blocks]:
                 raise AssertionError(('Unexpected size-29 seed catalogue', blocks, spans))
+            if size_30_boundary:
+                check_size_30_boundary((near, exact_26, exact_27, exact_28, patterns))
+                return
         coefficients = known_union_coefficients(blocks, minimum, near, exact_26, exact_27, exact_28,
                                                 patterns if size_29 else None)
     else:
@@ -459,6 +479,8 @@ def main():
                       help='verify size-28 losses from five blocks through the locality representative')
     mode.add_argument('--size-29', choices=EXPECTED_SIZE_29_SPANS, type=int, metavar='BLOCKS',
                       help='verify size-29 losses from five blocks through the locality representative')
+    mode.add_argument('--size-30-boundary', action='store_true',
+                      help='enumerate the 28-block representative for the size-30 boundary term')
     mode.add_argument('--ordinary-threshold', action='store_true',
                       help='certify the absence of ordinary interior forts of cost up to 29')
     args = parser.parse_args()
@@ -479,6 +501,9 @@ def main():
         return
     if args.size_29 is not None:
         check_size_26(args.size_29, size_29=True)
+        return
+    if args.size_30_boundary:
+        check_size_26(5, size_30_boundary=True)
         return
     templates = enumerate_blockers(5, minimum_seed_sets(5)) if any(k >= 5 for k in args.blocks) else ()
     if templates:

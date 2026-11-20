@@ -353,6 +353,27 @@ Direct wrapped checks also give the smaller sufficient period 28 at five through
 
 The signed unions of size 30 from the catalogues through size 29 have weights $-2,-1,0,1,2$ with respective counts 73, 5536, 723, 1743 and 39 up to translation. The overlapping-union profile is checked directly at five, six and seven blocks, and the disjoint opening and terminal label intervals preserve it at every greater length. The same cyclic lifting argument applies since the union span is at most twelve sheets and any three constituents have at least $3\cdot24-2\cdot30=12$ shared seeds. Writing $N_{30}(k,m)$ for the number of inclusion-minimal 30-seed losses, the degree-30 coefficient at these periods is $N_{30}(k,m)-3861m$.
 
+## A finite representative for the degree-30 boundary term
+
+Let $A_{30}(28)$ count the inclusion-minimal 30-seed blocking losses on the 28-block integer lift, up to sheet translation. One guarded search on this length determines the degree-30 coefficient for every $k\geq28$ and $m\geq49$. Put $\beta_{30}=A_{30}(28)-280$. Then
+
+$$
+M_{30}(k,m)=m(10k+\beta_{30}),\qquad
+[p^{30}]\Pr(\text{blocking})=m(10k+\beta_{30}-3861).
+$$
+
+The coefficient $[p^{30}]\log R_{k,m}(p)$ is the negative of the second expression because blocking starts in degree 24. The numeric value of $A_{30}(28)$ remains to be enumerated.
+
+The projected-support checks give two consecutive empty appended stages in every finite fort of cost at most 30 at lengths 13 through 32. For every larger length the first 32 appended stages give an empty pair by the terminal and nonterminal band checks at 33 and 34 blocks. A fort cannot have two distinct runs of at least two empty stages in the cyclic stage order. The occupied portions between two such runs would each be nonempty finite forts, because every edge changes the stage by at most one and an outside vertex cannot see both portions. Each portion costs at least 24 seeds. Contracting an empty appended pair therefore shortens the unique run of at least two empty stages. It preserves the length of the occupied arc complementary to this run. Repeated contraction reaches 12 blocks with at least one empty stage remaining, so the original occupied arc spans at most 11 stages.
+
+Contraction preserves the sheet support. Stop at 13 blocks to apply the sheet-band checks. A finite fort has no internal pair of empty sheets by the same splitting argument. At 13 blocks a 19-sheet band meeting every consecutive pair costs at least 15 seeds, and a 20-sheet band costs at least 16. Disjoint bands of these widths exclude a span of 39 or more sheets. Thus for $k\geq13$ every finite fort of cost at most 30 fits into 38 consecutive sheets. In an inclusion-minimal loss the selected seeds are exactly the seed intersection of its final white fort. The guarded strip enumerator can therefore compute $A_{30}(28)$ with 38 interior sheets and two guards by excluding every translate of the complete catalogues through size 29 before running the cost-30 search.
+
+In the stage coordinate, every such loss has a unique longest outer gap at $k\geq28$, because it fits into at most 11 consecutive stages. For each normalized template its radius-eight data span at most $11+16=27$ stages. The ordinary placements and the fixed offsets from the exceptional stages therefore give the affine template count from the [fixed-order argument](#eventual-counts-at-every-fixed-loss-order) already at $k=28$. This argument applies directly to finite losses normalized in the integer sheet coordinate. The [ordinary classification](#blocking-losses-in-ordinary-stages) gives slope ten, so the normalized finite count is $10k+\beta_{30}$.
+
+To compare with cyclic covers, the same 32-stage bands contract a cyclic fort of cost at most 30 down to 32 blocks when necessary. The contraction preserves cost and the set of occupied sheets. At each of 28 through 32 blocks, an 11-sheet band meeting every consecutive pair costs at least seven seeds. If a cyclic fort met every pair, the sum of the band counts would give $7m\leq 11\cdot30$, which is impossible for $m\geq49$. Thus every cyclic fort at these costs unrolls. A cyclic inclusion-minimal loss has a finite lift that is also minimal, since a smaller finite blocking subset would project to a smaller cyclic blocking subset.
+
+Conversely, the projection of a finite inclusion-minimal loss of size 30 is blocking and injective. If it contained a smaller cyclic minimal loss, unroll that smaller loss and align one shared seed. Its span is at most 12 sheets by the lower-order catalogues, whereas the finite size-30 loss spans at most 38. For each site the two sheet differences from the shared seed have magnitudes at most 11 and 37. Congruence modulo $m\geq49$ forces equality, so the smaller loss would be contained in the original finite loss. This proves cyclic minimality. Finally, any internal run of ten seed-free sheets in a finite size-30 loss would contain two middle sheets at distance more than four from every lost seed. They would be empty in its final fort, since the intact time is two. The outer gap after projection has length at least $49-38=11$, and is therefore unique. The finite template can be recovered from this gap and has $m$ distinct translates. The signed correction $-3861m$ from losses of smaller size gives the probability coefficient above.
+
 ## Independent losses on growing covers
 
 Let $p$ be the independent loss probability of each designated seed. Define
@@ -702,6 +723,10 @@ python -B research-twins/check_prism_projected_support.py --cost-26-stage-pairs
 python -B research-twins/check_prism_projected_support.py --cost-27-stage-pairs
 python -B research-twins/check_prism_projected_support.py --cost-28-stage-pairs
 python -B research-twins/check_prism_projected_support.py --cost-29-stage-pairs
+python -B research-twins/check_prism_projected_support.py --cost-30-stage-pairs
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 20 --band-blocks 13
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 13 --band-blocks 28 29 30 31 32
+python -B research-twins/check_cost_25_blocking_sets.py --size-30-boundary
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 25 27 28 29
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 26 --band-blocks 25 29
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 30
