@@ -281,12 +281,12 @@ For $m\geq32$, the width-28 band gives $24m>28\cdot27$. The wrapped verifier at 
 
 | Blocks | Verified from this many sheets |
 | --- | ---: |
-| 5–7 | 26 |
+| 5 | 25 |
+| 6–7 | 26 |
 | 8 | 27 |
-| 9 | 29 |
-| 10 | 31 |
+| 9–10 | 28 |
 
-Each of the 258 losses occupies at most 11 sheets, so $N_{27}(k,m)=258m$ in these ranges. The complete catalogues through size 26 lift and their unions have the same spans, giving the fourth coefficient $(258-120)m=138m$. The cost-26 tests also lower the third-term threshold to 25 sheets at five and six blocks and to 26 sheets at eight blocks.
+Each of the 258 losses occupies at most 11 sheets, so $N_{27}(k,m)=258m$ in these ranges. The complete catalogues through size 26 lift and their unions have the same spans, giving the fourth coefficient $(258-120)m=138m$. The cost-26 tests also lower the third-term threshold to 25 sheets at six blocks, 26 sheets at eight blocks, and 27 sheets at nine blocks.
 
 ## Overlap correction at order 28
 
@@ -378,6 +378,24 @@ $$
 
 In particular, blocking tends to one if $kmp^{30}\to\infty$ in this parameter range. The minimum-cost assertion above concerns forts confined to three ordinary stages.
 
+## Failure from the ends and the interior
+
+Let $d_*=\min\{d:\alpha_d>0\}$ and $\alpha=\alpha_{d_*}$, using the coefficients of the eventual minimal-loss count. The complete catalogues through order 26 and the translated 30-seed witness give $27\leq d_*\leq30$. For all $k,m\geq20(d_*-1)+19$ and $0\leq p\leq1$ there is a uniform approximation
+
+$$
+\Pr(\text{blocking})=
+1-\exp\bigl(-5mp^{24}-\alpha kmp^{d_*}\bigr)
++O\bigl(mp^{25}+kmp^{d_*+1}\bigr).
+$$
+
+In particular, if $p\to0$, $mp^{24}\to\lambda<\infty$ and $kmp^{d_*}\to\mu<\infty$, the blocking probability tends to $1-\exp(-5\lambda-\alpha\mu)$ in this region. The coefficient of the first interior order enters the limit along with the five minimum patterns per sheet.
+
+For the proof, take the events that all seeds of an inclusion-minimal loss of size at most $d_*$ are deleted. Their expected count is $5mp^{24}+\alpha kmp^{d_*}+O(mp^{25})$. This follows from the eventual counts, because all sizes below $d_*$ have $\alpha_d=0$ and the exceptional part at size $d_*$ is $\beta_{d_*}m$. The higher-order events contribute to blocking with probability at most $O(kmp^{d_*+1})$ by the connected loss bound.
+
+Give each of the selected events a dependence neighborhood consisting of itself and the events sharing one of its seed sites. This neighborhood has bounded size. Indeed, connected sets of size at most $d_*$ containing a fixed seed can be counted by their spanning walks rooted at that seed in the bounded-degree auxiliary graph. The event is independent of the coins used by all events outside the neighborhood, so $b_3=0$ in the zero-event bound. Since there are $O(km)$ events, each of probability at most $p^{24}$, the term $b_1$ is $O(kmp^{48})$.
+
+Among the ordered pairs in $b_2$, there are $O(m)$ with at least one member smaller than $d_*$. The two distinct losses require at least 25 distinct deletions, so their contribution is $O(mp^{25})$. The remaining $O(km)$ ordered pairs each require at least $d_*+1$ distinct deletions, giving $O(kmp^{d_*+1})$. These bounds control the Poisson approximation error, and replacing its mean by $5mp^{24}+\alpha kmp^{d_*}$ changes the approximation by at most $O(mp^{25})$. Adding the probability of blocking through a larger loss proves the formula. [Arratia, Goldstein and Gordon, Theorem 1](https://doi.org/10.1214/aop/1176991491)
+
 ## Complete classification of minimum-cost finite forts
 
 At four through 17 blocks and at 26 blocks, the width-16 and width-17 band checks give a span bound for every cost-24 fort. Any pair of empty interior sheets would split it into two nonempty finite forts, each of cost at least 24. A span of at least 33 would contain disjoint bands of widths 16 and 17. They would require at least 12 and 13 lost seeds respectively. A cost-24 fort thus fits inside the 32 interior sheets of a 34-sheet guarded strip.
@@ -398,7 +416,7 @@ At 24 blocks, a wrapped fort at 23 through 28 sheets would have to contain an op
 
 For every $k\geq4$ and $m\geq24$, every minimum-cost cyclic fort therefore unrolls to one of the listed finite forts, and each listed fort projects to the cycle. Its span is at most nine, so the outer run of at least $m-9$ empty sheets is strictly longer than any interior run. The first occupied sheet after this unique longest run determines the translation. The same argument applies to the seed sets, as each meets both extreme sheets of its fort. The exact numbers are $54m$ minimum-cost cyclic forts and $5m$ minimum blocking sets. Their cyclic fort-size polynomial is $mP(x)$. For a minimum blocking set the final white fort contains all its lost seeds, since any smaller seed intersection would contradict minimal cost.
 
-At 24 sheets the direct verifier excludes wrapped forts of cost 24 at four through 23 blocks and at 26 blocks. The cap is five seeds per sheet. At 23 sheets the width-22 band gives a cap of six, and the direct verifier excludes cost 24 at four through seventeen blocks and at 26 blocks. Contraction and insertion give the same exclusion at 23 and 24 sheets for every chain of at least 24 blocks. Thus the exact counts and polynomial also hold at 23 sheets for four through seventeen blocks and for at least 24 blocks. The direct test also excludes wrapped cost-24 forts at four through seven blocks and 22 sheets, where the width-21 band gives a sheet cap of seven. This gives 1,188 minimum-cost forts and 110 minimum blocking sets at each of those four lengths.
+At 24 sheets the direct verifier excludes wrapped forts of cost 24 at four through 23 blocks and at 26 blocks. The cap is five seeds per sheet. At 23 sheets the width-22 band gives a cap of six, and the direct verifier excludes cost 24 at four through eighteen blocks and at 26 blocks. Contraction and insertion give the same exclusion at 23 and 24 sheets for every chain of at least 24 blocks. Thus the exact counts and polynomial also hold at 23 sheets for four through eighteen blocks and for at least 24 blocks. The direct test also excludes wrapped cost-24 forts at four through seven blocks and 22 sheets, where the width-21 band gives a sheet cap of seven. This gives 1,188 minimum-cost forts and 110 minimum blocking sets at each of those four lengths.
 
 The chain has $10k$ seed labels. Among uniform 24-element losses from the $10km$ lifted seeds, the exact probability of blocking recovery is $5m/\binom{10km}{24}$. For independent losses with probability $p$ per seed, the blocking probability at fixed $k,m$ is $5m p^{24}+O(p^{25})$ as $p\to0$.
 
@@ -486,22 +504,18 @@ do
     python -B research-twins/check_cost_25_blocking_sets.py --size-27 "$blocks" || exit 1
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 31 27 28 || exit 1
 done
-for blocks in 5 6 7 8 9
+for blocks in 5 6 7 8 9 10
 do
-    for sheets in 29 30
+    for sheets in 28 29 30
     do
         python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" "$sheets" 26 28 --wrapped "$blocks" "$sheets" 27 28 || exit 1
     done
 done
 for blocks in 5 6 7 8
 do
-    for sheets in 27 28
-    do
-        python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" "$sheets" 26 28 --wrapped "$blocks" "$sheets" 27 28 || exit 1
-    done
-    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 26 26 28 || exit 1
+    python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 27 26 28 --wrapped "$blocks" 27 27 28 --wrapped "$blocks" 26 26 28 || exit 1
 done
-python -B research-twins/check_short_prism_covers.py --wrapped 5 25 26 28 --wrapped 6 25 26 28 --wrapped 5 26 27 28 --wrapped 6 26 27 28 --wrapped 7 26 27 28
+python -B research-twins/check_short_prism_covers.py --wrapped 5 25 26 28 --wrapped 5 25 27 28 --wrapped 6 25 26 28 --wrapped 5 26 27 28 --wrapped 6 26 27 28 --wrapped 7 26 27 28 --wrapped 9 27 26 28
 for blocks in 4 5 6 7 8 9 10 11 12 13 14
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 25 25 28 --wrapped "$blocks" 26 25 28 --wrapped "$blocks" 27 25 28 --wrapped "$blocks" 28 25 28 --wrapped "$blocks" 29 25 28 || exit 1
@@ -525,5 +539,5 @@ for blocks in 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 26
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 24 24 28 || exit 1
 done
-python -B research-twins/check_short_prism_covers.py --wrapped 4 23 24 28 --wrapped 5 23 24 28 --wrapped 6 23 24 28 --wrapped 7 23 24 28 --wrapped 8 23 24 28 --wrapped 9 23 24 28 --wrapped 10 23 24 28 --wrapped 11 23 24 28 --wrapped 12 23 24 28 --wrapped 13 23 24 28 --wrapped 14 23 24 28 --wrapped 15 23 24 28 --wrapped 16 23 24 28 --wrapped 17 23 24 28 --wrapped 26 23 24 28 --wrapped 4 22 24 28 --wrapped 5 22 24 28 --wrapped 6 22 24 28 --wrapped 7 22 24 28
+python -B research-twins/check_short_prism_covers.py --wrapped 4 23 24 28 --wrapped 5 23 24 28 --wrapped 6 23 24 28 --wrapped 7 23 24 28 --wrapped 8 23 24 28 --wrapped 9 23 24 28 --wrapped 10 23 24 28 --wrapped 11 23 24 28 --wrapped 12 23 24 28 --wrapped 13 23 24 28 --wrapped 14 23 24 28 --wrapped 15 23 24 28 --wrapped 16 23 24 28 --wrapped 17 23 24 28 --wrapped 18 23 24 28 --wrapped 26 23 24 28 --wrapped 4 22 24 28 --wrapped 5 22 24 28 --wrapped 6 22 24 28 --wrapped 7 22 24 28
 ```
