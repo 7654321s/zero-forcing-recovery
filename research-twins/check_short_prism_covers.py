@@ -66,12 +66,17 @@ def wrapped_formula(graph, blue, sheets, budget, *, band_through=BAND_WIDTH,
     bounds = residual_bounds(sheets, budget, band_through)
     if bounds is None or any(width * budget < sheets * lower for width, lower in bounds.items()):
         return None
-    # Combine disjoint certified windows in the complement of the chosen sheet.
+    # Pack disjoint certified windows to bound both individual sheets and longer windows.
     required = [0] * sheets
+    stronger = {}
+    best_single = 0
     for length in range(1, sheets):
         packed = max((required[length - width] + bound for width, bound in bounds.items()
                       if width <= length), default=0)
         required[length] = max(required[length - 1], packed)
+        best_single = max(best_single, bounds.get(length, 0))
+        if required[length] > best_single:
+            stronger[length] = required[length]
     cap = tight_sheet_cap(sheets, budget, bounds, budget - required[-1])
     if sheet_cap is not None:
         cap = min(cap, sheet_cap)
@@ -103,7 +108,7 @@ def wrapped_formula(graph, blue, sheets, budget, *, band_through=BAND_WIDTH,
     clauses.extend(total.clauses)
     top = total.nv
 
-    for width, lower in sorted(bounds.items()):
+    for width, lower in sorted((bounds | stronger).items()):
         if compact_bands and width == sheets - 1:
             continue  # The per-sheet counters already impose this complement bound.
         complement = compact_bands and 2 * width > sheets
@@ -223,7 +228,7 @@ if __name__ == '__main__':
     mode.add_argument('--ordinary-wrapped', type=int, nargs=2, action='append',
                       metavar=('SHEETS', 'BUDGET'),
                       help='exclude wrapping in the ordinary stage window at budget 28, 29 or 30')
-    mode.add_argument('--insertion-obstruction', type=int, nargs='+', choices=range(23, 29),
+    mode.add_argument('--insertion-obstruction', type=int, nargs='+', choices=range(22, 29),
                       metavar='SHEETS',
                       help='exclude wrapping at cost 24 when insertion is blocked at 24 blocks')
     args = parser.parse_args()

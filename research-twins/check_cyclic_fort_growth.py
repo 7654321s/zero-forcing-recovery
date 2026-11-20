@@ -4,7 +4,7 @@ from collections import Counter, defaultdict
 from functools import lru_cache
 from heapq import heappop, heappush
 from itertools import combinations, product
-from math import gcd
+from math import comb, gcd
 from pathlib import Path
 import runpy
 
@@ -254,17 +254,25 @@ def main():
             period = sheets // d
             if sum(counts.values()) != (4**period - 3**period)**d:
                 raise AssertionError(('shifted cycle recovery probability', sheets, q, counts))
+            if 2 * sheets - max(counts) != 2 * d:
+                raise AssertionError(('shifted cycle minimum survivor count', sheets, q, counts))
         for sheets, value in enumerate(cyclic_costs(edges, zero, 7), 1):
             expected = sheets // gcd(sheets, q)
             if value != expected or deletion_cost(graph, 0b0011, sheets) != expected:
                 raise AssertionError(('shifted cycle', sheets, q))
         if finite_cost(edges, zero) < float('inf'):
             raise AssertionError(('shifted cycle has a finite fort', q))
+    lifted_edge = neighborhoods(2, ((0, 1, 1),))
+    for sheets, counts in enumerate(recovery_polynomials(lifted_edge, 0b11, 5), 1):
+        expected = Counter({count: comb(sheets, count) * 2**count for count in range(sheets + 1)})
+        if counts != expected or 2 * sheets - max(counts) != sheets:
+            raise AssertionError(('lifted-edge minimum survivor count', sheets, counts))
     print(f'{tested} cyclic transfer costs checked by deletion, {by_finite} finite existence comparisons')
     print('Shifted four-cycle formula verified on 21 cyclic covers')
     print(f'{by_reduction} closed-walk reductions verified by deletion')
     print(f'{polynomials} recovery polynomials verified by exhaustive deletion')
     print(f'{by_finite} guarded-interval factorizations and coefficient bounds checked')
+    print('Minimum survivor counts checked on 12 shifted cycles and 5 lifted-edge covers')
 
 
 if __name__ == '__main__':

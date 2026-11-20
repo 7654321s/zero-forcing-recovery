@@ -127,10 +127,40 @@ $$
 
 by testing disjoint potential buffers. For the shifted four-cycle with $q=2$, the exact formula above gives blocking exponents $\log(2p-p^2)$ on odd sheet counts and $\tfrac12\log(2p-p^2)$ on even sheet counts.
 
+## Minimum surviving seeds and the high-loss limit
+
+Let $s_m=ms-\deg Z_m(z)$ be the fewest designated seeds that must survive to force the $m$-sheet cover. There are a rational number $\sigma\geq0$, a positive integer $P$, and rational constants $\tau_0,\ldots,\tau_{P-1}$ such that
+
+$$
+s_m=\sigma m+\tau_{m\bmod P}
+$$
+
+for all sufficiently large $m$. The slope $\sigma$ is the minimum mean cycle cost in the relation-pair graph restricted to states reachable from the start and able to reach a recovery state, using edge cost $s-|L|$ for loss letter $L$. Moreover,
+
+$$
+\lim_{p\uparrow1}\frac{\lambda(p)}{\log(1-p)}=\sigma.
+$$
+
+For the slope, remove cycles from any accepting walk. The remaining simple path has bounded length, and each removed cycle has cost at least $\sigma$ times its length. This gives $s_m\geq\sigma m-O(1)$. A fixed prefix and suffix through a minimum-mean cycle of length $\ell$ give accepting words of lengths $a+j\ell$ at cost $\sigma(a+j\ell)+O(1)$. For each large $m$, choose the largest such length at most $m-b$. Isolate its successful loss word and pad the remaining sheets with intact seeds. The guarded-interval result gives recovery and the padding has length between $b$ and $b+\ell-1$. Thus $s_m\leq\sigma m+O(1)$.
+
+For eventual periodicity, subtract $\sigma$ from every edge cost and clear denominators. These integer costs give every cycle nonnegative weight. Every path has weight bounded below by a common constant $-C$, by deleting cycles. An optimal accepted path has total adjusted weight at most a common $C'$ for all large $m$. Its prefix weights therefore stay in $[-C,C+C']$, since any suffix has weight at least $-C$. Track the current state and adjusted weight within this finite interval. Sets of reachable pairs after each step evolve by a fixed map on a finite set, so they eventually repeat periodically. For large $m$ the least accepting weight in this finite construction equals the unrestricted optimum. Undoing the cost scaling gives the stated intercepts.
+
+Disjoint translates of a finite fort can be placed at positive density. At least one seed in each such support must survive, so $\sigma>0$. If the integer lift has no finite fort, keeping one intact buffer of $b$ sheets suffices, giving $\sigma=0$. For the shifted four-cycle, there must be one surviving adjacent pair in each component and each such pair suffices there. Hence $s_m=2\gcd(m,q)$. A lifted edge with both endpoints designated gives $m$ disjoint edges and $s_m=m$.
+
+For the probability limit, an optimal survivor set contributes $p^{ms-s_m}(1-p)^{s_m}$, and there are at most $2^{ms}$ successful loss sets, each of probability at most $(1-p)^{s_m}$. Taking the established exponential rate gives
+
+$$
+\sigma\log(1-p)+(s-\sigma)\log p
+\ \leq\ \lambda(p)\ \leq\
+\sigma\log(1-p)+s\log 2 .
+$$
+
+Dividing by $\log(1-p)$ and letting $p$ tend to one gives the claim.
+
 ## Reproduction
 
 ```sh
 python -B research-twins/check_cyclic_fort_growth.py
 ```
 
-The checker compares 1,192 transfer costs to exhaustive seed deletion on small cyclic covers and compares 298 all-empty round-trip existence tests with the endpoint criterion. It verifies the shifted four-cycle blocking number on 21 moduli and shift choices with both direct forcing and the transfer graph. It checks the closed-walk reduction on the connected three-vertex cases. The relation-pair algorithm also reproduces 894 complete recovery polynomials by exhaustive seed deletion and checks the shifted-cycle recovery formula at $p=1/2$ on twelve cases. For the 298 base instances it checks guarded-interval factorization and the coefficient bounds from isolating losses.
+The checker compares 1,192 transfer costs to exhaustive seed deletion on small cyclic covers and compares 298 all-empty round-trip existence tests with the endpoint criterion. It verifies the shifted four-cycle blocking number on 21 moduli and shift choices with both direct forcing and the transfer graph. It checks the closed-walk reduction on the connected three-vertex cases. The relation-pair algorithm also reproduces 894 complete recovery polynomials by exhaustive seed deletion and checks the shifted-cycle recovery probability and minimum survivor count on twelve cases. It checks the positive survivor slope on five lifted-edge covers. For the 298 base instances it checks guarded-interval factorization and the coefficient bounds from isolating losses.
