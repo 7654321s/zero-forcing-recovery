@@ -1,5 +1,6 @@
 """Exclude projected supports of low-cost finite forts in shorter prism chains."""
 
+import argparse
 from itertools import product
 from pathlib import Path
 import runpy
@@ -120,17 +121,27 @@ def projected_formula(blocks):
     return formula, [v + 1 for v in members(blue)]
 
 
-def check_projected_case(blocks):
+def check_projected_case(blocks, budget=BUDGET):
     OPENING['check_insertion'](blocks)
     formula, seeds = projected_formula(blocks)
-    with ITotalizer(lits=seeds, ubound=BUDGET, top_id=formula.top) as counter:
+    with ITotalizer(lits=seeds, ubound=budget, top_id=formula.top) as counter:
         with Solver(name='cadical195', bootstrap_with=formula.clauses + counter.cnf.clauses) as solver:
-            if solver.solve(assumptions=[-counter.rhs[BUDGET]]):
-                raise AssertionError(('a projected support survives', blocks))
+            if solver.solve(assumptions=[-counter.rhs[budget]]):
+                raise AssertionError(('a projected support survives', blocks, budget))
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--minimum-forts', action='store_true',
+                        help='replay the budget-24 insertion checks for minimum forts')
+    args = parser.parse_args()
     check_comparators()
-    for blocks in range(CERTIFIED_LAST, CERTIFIED_FIRST - 1, -1):
-        check_projected_case(blocks)
-        print(f'Projected obstruction excluded at {blocks} blocks', flush=True)
+    if args.minimum_forts:
+        OPENING['check_base_budget'](25, 24)
+        print('Base obstruction at budget 24 excluded at 25 blocks', flush=True)
+        lengths, budget = range(25, 17, -1), 24
+    else:
+        lengths, budget = range(CERTIFIED_LAST, CERTIFIED_FIRST - 1, -1), BUDGET
+    for blocks in lengths:
+        check_projected_case(blocks, budget)
+        print(f'Projected obstruction at budget {budget} excluded at {blocks} blocks', flush=True)

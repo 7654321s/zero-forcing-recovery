@@ -4,7 +4,7 @@ Let $\kappa_{k,m}$ be the minimum number of seeds whose loss blocks recovery in 
 $$
 \kappa_{k,m}=\kappa_{26,m} \qquad (k\geq26).
 $$
-The common value is exactly 24 when $k\geq24$ and $m\geq25$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 25 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
+The common value is exactly 24 when $k\geq24$ and $m\geq24$. The sheet-band refinement reduces the lower bound to a finite strip for at least 34 sheets, and the cyclic checks cover 24 through 33 sheets. An opening insertion argument extends the result to 24 and 25 blocks. The common 24-seed fort gives the upper bound.
 
 ## The prism stage labels
 
@@ -126,6 +126,10 @@ The width-21 inequality $17m\leq21b$ excludes wrapping at budget 20 because $17\
 
 The first two wrapped formulas use the band bounds through width 25 and the maximum-count rotation. At budget 23, the verifier encodes a band longer than half the period by an upper bound of $b-w+4$ on the complement of the band. The total cost is exactly $b$, so this is equivalent to the band lower bound $w-4$. Redundant complement bounds can be omitted. The compact formula has 348,856 clauses and is unsatisfiable, as are the two lower-budget formulas. The common witness gives $\kappa_{k,25}=24$ for at least 24 blocks by stage reduction and opening insertion.
 
+## The 24-sheet case
+
+At 26 blocks, a wrapped fort on 24 sheets gives at least 21 seeds in every width-25 band of its periodic lift. The count in such a band is the total cost plus the seeds on the single repeat sheet. At cost at most 20 each sheet would require a seed, contradicting the cost bound. At budgets 21, 22 and 23, the width-23 band leaves respective caps of two, three and four seeds on the omitted sheet. The [periodic-band verifier](check_short_prism_covers.py) excludes all three budgets using the bands through width 28. The same finite exclusion, cost-24 witness, stage reduction and opening insertion give $\kappa_{k,24}=24$ for every $k\geq24$.
+
 ## Reproduction
 
 ```sh
@@ -144,6 +148,8 @@ python -B research-twins/check_32_sheet_cover.py --sheets 27
 python -B research-twins/check_32_sheet_cover.py --sheets 26
 python -B research-twins/check_32_sheet_cover.py --sheets 25
 python -B research-twins/check_prism_opening_insertion.py
+python -B research-twins/check_block_stabilization.py --band-through 28
+python -B research-twins/check_short_prism_covers.py --wrapped 26 24 21 28 --wrapped 26 24 22 28 --wrapped 26 24 23 28
 ```
 
 The script checks both stage band types and the sheet bands with PySAT and the normalized seed and edge identifications in 120 interior contractions, including splices next to the first or terminal stage.

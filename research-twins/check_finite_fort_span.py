@@ -251,7 +251,8 @@ def check_larger_optimal_spans(lengths):
     for blocks in lengths:
         graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
         clauses, seeds, top = strip['strip_formula'](graph, blue, budget, sheets=sheets,
-                                                    quotient_bounds=False, require_minimal=False)
+                                                    quotient_bounds=blocks == 26,
+                                                    require_minimal=False)
         clauses.append([v + 1 for v in range(len(graph)) if 10 <= v % sheets < sheets - 1])
         with ITotalizer(lits=seeds, ubound=budget, top_id=top) as counter:
             with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
@@ -262,7 +263,7 @@ def check_larger_optimal_spans(lengths):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--longer', type=int, nargs='+', choices=range(4, 16), default=(),
+    parser.add_argument('--longer', type=int, nargs='+', choices=(*range(4, 18), 26), default=(),
                         help='also replay the exclusions at spans ten through thirty-two')
     args = parser.parse_args()
     check_minimum_spans()

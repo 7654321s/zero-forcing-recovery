@@ -45,7 +45,7 @@ def check_insertion(blocks):
         raise AssertionError(('opening insertion changes old seeds', blocks))
 
 
-def check_base_budget(blocks):
+def check_base_budget(blocks, budget=23):
     graph, blue, _, _ = BLOCK['chain'](blocks)
     clauses = list(BLOCK['fort_clauses'](graph, range(len(graph))))
     clauses.append([v + 1 for v in members(blue) if v < OPENING])
@@ -53,11 +53,10 @@ def check_base_budget(blocks):
         first = BLOCK['stage_start'](stage)
         clauses.append(list(range(first + 1, first + 2 * STAGE + 1)))
     seeds = [v + 1 for v in members(blue)]
-    budget = 23
     with ITotalizer(lits=seeds, ubound=budget, top_id=len(graph)) as counter:
         with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
             if solver.solve(assumptions=[-counter.rhs[budget]]):
-                raise AssertionError(('base obstruction at budget 23', blocks))
+                raise AssertionError(('base obstruction', blocks, budget))
 
 
 if __name__ == '__main__':
