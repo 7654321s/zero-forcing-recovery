@@ -240,7 +240,7 @@ def check_four_sheet_barrier(blocks):
 
 def check_stage_ancestry():
     """Check that a vertex needs seeds only in its own stage and its successor."""
-    blocks, sheets = 13, 13
+    blocks, sheets = 11, 13
     graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
     arrivals, supporters, _ = WRAPPED['LOSS']['nominal_cones'](graph, blue)
     if max(arrivals) != 2:

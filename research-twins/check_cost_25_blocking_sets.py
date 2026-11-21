@@ -393,12 +393,24 @@ def check_boundary_catalogue(*, exhaustive=False):
     spans = Counter(max(s for _, s in row) for row in patterns)
     if spans != EXPECTED_BOUNDARY_SPANS:
         raise AssertionError(('Unexpected boundary seed spans', spans))
+    opening = SPAN['BAND']['stage_start'](1)
+    joint_spans = Counter()
+    for row in patterns:
+        stages = sorted({0 if v < opening else 1 + (v - opening) // 16 for v, _ in row})
+        gaps = (b - a - 1 for a, b in zip(stages, stages[1:] + [stages[0] + blocks]))
+        joint_spans[blocks - max(gaps), max(s for _, s in row)] += 1
+    expected_joint = {2: {9: 19, 10: 40, 11: 5},
+                      3: {7: 47, 8: 679, 9: 1982, 10: 2111, 11: 1032, 12: 110},
+                      4: {10: 1, 11: 25, 12: 4}}
+    if joint_spans != {(a, b): count for a, row in expected_joint.items() for b, count in row.items()}:
+        raise AssertionError(('Unexpected joint stage and sheet spans', joint_spans))
     verified = verify_inherited_patterns(blocks, smaller, patterns, budget=30, already_lifted=True)
     if verified != set(patterns):
         raise AssertionError('Boundary catalogue changed during replay')
     if exhaustive and enumerate_blockers(blocks, smaller, verified, budget=30) != verified:
         raise AssertionError('Unlisted boundary blocking loss')
     print(json.dumps({'blocks': blocks, 'count': len(verified), 'spans': dict(sorted(spans.items())),
+                      'joint_spans': expected_joint,
                       'boundary_coefficient': len(verified) - 10 * blocks,
                       'exhaustive': exhaustive}), flush=True)
 
