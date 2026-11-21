@@ -78,6 +78,11 @@ def wrapped_formula(graph, blue, sheets, budget, *, band_through=BAND_WIDTH,
         if required[length] > best_single:
             stronger[length] = required[length]
     cap = tight_sheet_cap(sheets, budget, bounds, budget - required[-1])
+    saturated = [width for width, lower in bounds.items() if width * budget == sheets * lower]
+    for width in saturated:
+        if width - 1 in bounds:
+            cap = min(cap, bounds[width] - bounds[width - 1])
+    repeat = gcd(sheets, *saturated)
     if sheet_cap is not None:
         cap = min(cap, sheet_cap)
     if cap < 1 or cap * sheets < budget:
@@ -103,6 +108,10 @@ def wrapped_formula(graph, blue, sheets, budget, *, band_through=BAND_WIDTH,
     clauses.append([flags[0][0]])
     for row in flags[1:]:
         clauses.extend([-threshold, maximum] for threshold, maximum in zip(row, flags[0]))
+    # Equal consecutive saturated window counts force equal entering and leaving sheet counts.
+    for first in range(sheets - repeat):
+        for a, b in zip(flags[first], flags[first + repeat]):
+            clauses.extend(([-a, b], [a, -b]))
     total = CardEnc.equals(lits=[flag for row in flags for flag in row], bound=budget,
                            top_id=top, encoding=EncType.seqcounter)
     clauses.extend(total.clauses)
