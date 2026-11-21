@@ -439,10 +439,31 @@ def check_ordinary_packing():
 def check_ordinary_incidence():
     sites = [(label, sheet) for label, group in ORDINARY_INCIDENCE_LOSS for sheet in group]
     occurrences = Counter(label % 16 for label, _ in sites)
-    if max(occurrences.values()) != 5 or {label // 16 for label, _ in sites} != {0, 1, 2}:
+    if occurrences[5] != 5 or any(count > 4 for label, count in occurrences.items() if label != 5):
         raise AssertionError('Unexpected incidence counts of the ordinary loss')
+    if {label // 16 for label, _ in sites} != {0, 1, 2}:
+        raise AssertionError('Unexpected stages of the ordinary loss')
     check_guarded_ordinary_loss(sites)
     print('Every seed is in at most five translates of the verified ordinary loss', flush=True)
+
+    offsets = [(label // 16, sheet) for label, sheet in sites if label % 16 == 5]
+    variables = {}
+    window = []
+    for stage in range(8):
+        for sheet in range(20):
+            window.append([variables.setdefault((stage + dx, sheet + dy), len(variables) + 1)
+                           for dx, dy in offsets])
+    defects = tuple(range(len(variables) + 1, len(variables) + len(window) + 1))
+    clauses = []
+    for defect, row in zip(defects, window):
+        clauses.append([defect, *row])
+        clauses.extend([defect, -a, -b] for a, b in combinations(row, 2))
+    with ITotalizer(lits=list(defects), ubound=4, top_id=defects[-1]) as total:
+        with Solver(name='cadical195', bootstrap_with=clauses + total.cnf.clauses) as solver:
+            if solver.solve(assumptions=[-total.rhs[4]]):
+                raise AssertionError('An incidence window has fewer than five exceptions')
+    print('Every 8-by-20 window has at least five placements without exactly one label-5 survivor',
+          flush=True)
 
 
 def check_periodic_ordinary_survivors():

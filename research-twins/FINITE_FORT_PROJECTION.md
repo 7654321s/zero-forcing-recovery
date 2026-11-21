@@ -596,12 +596,22 @@ In particular, blocking tends to one if $kmp^{30}\to\infty$ in this parameter ra
 For every $0<p<1$,
 
 $$
-\frac15\leq \sigma_{\mathrm{prism}}\leq\frac{151}{128},
+\frac{129}{640}\leq \sigma_{\mathrm{prism}}\leq\frac{151}{128},
 \qquad
 \frac{151}{128}\log(1-p)\leq\Phi(p)\leq\frac15\log(1-p^{30}).
 $$
 
-For the lower survivor bound, use the ordinary 30-seed witness in the [density verifier](check_finite_fort_span.py). No within-stage seed label occurs more than five times in the witness. Take all $(k-20)m$ stage and sheet placements allowed by the ordinary locality range at $k\geq21$, $m\geq28$. For any given seed site and any occurrence of its label in the witness, at most one placement maps that occurrence to the site. Each surviving seed therefore meets at most five of the translated losses. Successful recovery requires a survivor in each translated loss. Consequently $s_{k,m}\geq\lceil(k-20)m/5\rceil$, which gives the density bound.
+For the lower survivor bound, use the ordinary 30-seed witness in the [density verifier](check_finite_fort_span.py). No within-stage seed label occurs more than five times in the witness. Take all $(k-20)m$ stage and sheet placements allowed by the ordinary locality range at $k\geq21$, $m\geq28$. For any given seed site and any occurrence of its label in the witness, at most one placement maps that occurrence to the site. Each surviving seed therefore meets at most five of the translated losses. Successful recovery requires a survivor in each translated loss. Write $P=(k-20)m$ for the placement count, $S$ for the number of survivors, and $L$ for survivors other than ordinary label 5. Label 5 appears five times, and every other label appears at most four times. The total number $H$ of survivor–placement incidences therefore satisfies $P\leq H\leq5S-L$.
+
+Call a placement exceptional for this count when it has zero or at least two surviving label-5 seeds. A placement with zero must have a different surviving label, so there are at most $4L$ such placements. A placement with at least two uses one of the $H-P$ surplus incidences. Thus the number $D$ of exceptions is at most $H-P+4L\leq4(5S-P)$.
+
+The verifier uses the five label-5 offsets $(0,2),(0,3),(1,3),(2,6),(2,9)$ to check an $8$-stage by $20$-sheet window of placement starts. It assigns a Boolean survivor variable to each referenced label-5 site, with translates sharing a variable when they refer to the same site. For each placement it imposes exactly one of its five variables unless an exception is declared. A cardinality constraint allowing at most four exceptions is unsatisfiable. Thus every such window contains at least five exceptions. For $k\geq28$ and $m\geq28$ there are $(k-27)m$ windows in the ordinary range, allowing cyclic sheet starts, and each exception belongs to at most 160 windows. Hence $D\geq (k-27)m/32$ and
+
+$$
+s_{k,m}\geq \frac{(k-20)m}{5}+\frac{(k-27)m}{640}.
+$$
+
+Taking the two-dimensional limit yields $129/640$ for the density lower bound.
 
 For the upper probability bound, let $f_i$ indicate that at least one seed survives in placement $i$. Successful recovery implies all $f_i=1$. Under independent losses, integrate their product one seed variable at a time. Each variable appears in at most five factors. Hölder's inequality over that variable bounds its integral by replacing each dependent factor $g$ with $(\mathbb E[g^5])^{1/5}$, taking expectation only in the current variable. Include constant factors equal to one if needed to use five factors. The replacement introduces no new variables, so repeating the argument gives $\mathbb E\prod_i f_i\leq\prod_i(\mathbb E f_i^5)^{1/5}$. Each expectation is $1-p^{30}$. Thus $R_{k,m}(p)\leq(1-p^{30})^{(k-20)m/5}$ and the logarithmic limit gives the upper rate bound.
 
