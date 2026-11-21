@@ -247,9 +247,9 @@ def check_four_sheet_barrier(blocks):
             raise AssertionError(('Two late white vertices cross the cut', blocks, v))
 
 
-def check_stage_ancestry():
+def check_stage_ancestry(blocks):
     """Check that a vertex needs seeds only in its own stage and its successor."""
-    blocks, sheets = 11, 13
+    sheets = 13
     graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
     arrivals, supporters, _ = WRAPPED['LOSS']['nominal_cones'](graph, blue)
     if max(arrivals) != 2:
@@ -263,7 +263,8 @@ def check_stage_ancestry():
     for v, seeds in enumerate(supporters):
         if any((stage(u) - stage(v)) % blocks not in (0, 1) for u in members(seeds)):
             raise AssertionError(('Unexpected stage ancestry', v))
-    print('Nominal two-round proofs use seeds only in the same or next stage', flush=True)
+    print(f'{blocks} blocks: nominal two-round proofs use seeds only in the same or next stage',
+          flush=True)
 
 
 def check_rectangle_separation():
@@ -342,7 +343,8 @@ if __name__ == '__main__':
             print(f'{blocks} blocks: four intact sheets separate remaining whites at round five',
                   flush=True)
     elif args.stage_ancestry:
-        check_stage_ancestry()
+        for blocks in (10, 11):
+            check_stage_ancestry(blocks)
     elif args.rectangle_separation:
         check_rectangle_separation()
     else:

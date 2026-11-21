@@ -375,12 +375,57 @@ def check_size_30_boundary(catalogues, *, blocks=13):
     print(json.dumps(result), flush=True)
 
 
-def check_boundary_catalogue(*, exhaustive=False):
+def boundary_stage_arc(pattern, blocks):
+    opening = SPAN['BAND']['stage_start'](1)
+    stages = sorted({0 if v < opening else 1 + (v - opening) // 16 for v, _ in pattern})
+    next_stages = stages[1:] + [stages[0] + blocks]
+    gap, first = max((b - a - 1, b % blocks) for a, b in zip(stages, next_stages))
+    return first, blocks - gap, len(stages)
+
+
+def boundary_window(first, span, blocks):
+    # The opening and terminal stages have distinct labels in the local window.
+    start = (first - 2) % blocks
+    offsets = ((stage - start) % blocks for stage in (0, blocks - 1))
+    return tuple(offset if offset < span + 3 else None for offset in offsets)
+
+
+def relocate_boundary_patterns(patterns, source_blocks, target_blocks):
+    stage_start = SPAN['BAND']['stage_start']
+    opening = stage_start(1)
+    for span in range(1, 5):
+        source_windows = {boundary_window(first, span, source_blocks)
+                          for first in range(source_blocks)}
+        target_windows = {boundary_window(first, span, target_blocks)
+                          for first in range(target_blocks)}
+        if not target_windows <= source_windows:
+            raise AssertionError(('Missing source window', span, target_windows - source_windows))
+    relocated = set()
+    for row in patterns:
+        first, span, _ = boundary_stage_arc(row, source_blocks)
+        if span > 4:
+            raise AssertionError(('Unexpected boundary stage span', span))
+        window = boundary_window(first, span, source_blocks)
+        entries = []
+        for vertex, sheet in row:
+            stage = 0 if vertex < opening else 1 + (vertex - opening) // 16
+            offset = vertex - (stage_start(stage) if stage else 0)
+            entries.append(((stage - first) % source_blocks, offset, sheet))
+        for new_first in range(target_blocks):
+            if boundary_window(new_first, span, target_blocks) != window:
+                continue
+            placed = []
+            for delta, offset, sheet in entries:
+                stage = (new_first + delta) % target_blocks
+                placed.append(((stage_start(stage) if stage else 0) + offset, sheet))
+            relocated.add(tuple(sorted(placed)))
+    return tuple(sorted(relocated))
+
+
+def check_boundary_catalogue(*, exhaustive=False, ten_blocks=False):
     with gzip.open(HERE / 'five-block-loss-catalogue.json.gz', 'rt', encoding='utf-8') as source:
         base = json.load(source)['losses_by_size']
     base = [tuple(tuple(map(tuple, row)) for row in base[str(size)]) for size in range(25, 30)]
-    blocks = 13
-    smaller = lower_order_catalogue(blocks, base)
     with gzip.open(HERE / 'thirteen-block-size-30-catalogue.json.gz', 'rt', encoding='utf-8') as source:
         archive = json.load(source)
     if (archive['schema_version'], archive['blocks'], archive['size'], archive['first_sheet']) != (1, 13, 30, 1):
@@ -393,26 +438,37 @@ def check_boundary_catalogue(*, exhaustive=False):
     spans = Counter(max(s for _, s in row) for row in patterns)
     if spans != EXPECTED_BOUNDARY_SPANS:
         raise AssertionError(('Unexpected boundary seed spans', spans))
-    opening = SPAN['BAND']['stage_start'](1)
-    joint_spans = Counter()
-    for row in patterns:
-        stages = sorted({0 if v < opening else 1 + (v - opening) // 16 for v, _ in row})
-        gaps = (b - a - 1 for a, b in zip(stages, stages[1:] + [stages[0] + blocks]))
-        joint_spans[blocks - max(gaps), max(s for _, s in row)] += 1
+    blocks = 10 if ten_blocks else 13
+    smaller = lower_order_catalogue(blocks, base)
+    if ten_blocks:
+        for row in smaller:
+            _, span, occupied = boundary_stage_arc(row, blocks)
+            if span != occupied:
+                raise AssertionError('A smaller pattern has a gap in its stage support')
+        patterns = relocate_boundary_patterns(patterns, 13, blocks)
+        spans = Counter(max(s for _, s in row) for row in patterns)
+    joint_spans = Counter((boundary_stage_arc(row, blocks)[1], max(s for _, s in row))
+                          for row in patterns)
     expected_joint = {2: {9: 19, 10: 40, 11: 5},
-                      3: {7: 47, 8: 679, 9: 1982, 10: 2111, 11: 1032, 12: 110},
+                      3: {7: 47, 8: 679, 9: 1982, 10: 2 * blocks + 2085,
+                          11: 8 * blocks + 928, 12: 110},
                       4: {10: 1, 11: 25, 12: 4}}
     if joint_spans != {(a, b): count for a, row in expected_joint.items() for b, count in row.items()}:
         raise AssertionError(('Unexpected joint stage and sheet spans', joint_spans))
     verified = verify_inherited_patterns(blocks, smaller, patterns, budget=30, already_lifted=True)
     if verified != set(patterns):
         raise AssertionError('Boundary catalogue changed during replay')
-    if exhaustive and enumerate_blockers(blocks, smaller, verified, budget=30) != verified:
-        raise AssertionError('Unlisted boundary blocking loss')
+    if ten_blocks:
+        print(f'{blocks} blocks: verified {len(verified)} witnesses; checking for additional losses',
+              flush=True)
+    if exhaustive or ten_blocks:
+        if enumerate_blockers(blocks, smaller, verified, budget=30,
+                              occupied_stage_pairs=ten_blocks) != verified:
+            raise AssertionError('Unlisted boundary blocking loss')
     print(json.dumps({'blocks': blocks, 'count': len(verified), 'spans': dict(sorted(spans.items())),
                       'joint_spans': expected_joint,
                       'boundary_coefficient': len(verified) - 10 * blocks,
-                      'exhaustive': exhaustive}), flush=True)
+                      'exhaustive': exhaustive or ten_blocks}), flush=True)
 
 
 def check_size_26(blocks, *, size_27=False, size_28=False, size_29=False, size_30_representative=None):
@@ -603,8 +659,8 @@ def main():
                       help='verify size-29 losses from five blocks through the locality representative')
     mode.add_argument('--size-30-boundary', action='store_true',
                       help='enumerate the 13-block representative for the size-30 boundary term')
-    mode.add_argument('--boundary-catalogue', choices=('witnesses', 'exhaustive'),
-                      help='replay the 13-block size-30 catalogue and optionally certify exhaustion')
+    mode.add_argument('--boundary-catalogue', choices=('witnesses', 'exhaustive', 'ten-blocks'),
+                      help='replay the 13-block size-30 catalogue or verify the 10-block extension')
     mode.add_argument('--size-30-five-blocks', action='store_true',
                       help='verify the 5975 size-30 seed loss types at five blocks')
     mode.add_argument('--five-block-catalogue', choices=('witnesses', 'exhaustive'),
@@ -637,7 +693,8 @@ def main():
         check_five_block_catalogue(exhaustive=args.five_block_catalogue == 'exhaustive')
         return
     if args.boundary_catalogue:
-        check_boundary_catalogue(exhaustive=args.boundary_catalogue == 'exhaustive')
+        check_boundary_catalogue(exhaustive=args.boundary_catalogue == 'exhaustive',
+                                 ten_blocks=args.boundary_catalogue == 'ten-blocks')
         return
     templates = enumerate_blockers(5, minimum_seed_sets(5)) if any(k >= 5 for k in args.blocks) else ()
     if templates:
