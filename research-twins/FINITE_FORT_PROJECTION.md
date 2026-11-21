@@ -378,14 +378,14 @@ The [compressed JSON catalogue](five-block-loss-catalogue.json.gz) contains the 
 
 ## A finite representative for the degree-30 boundary term
 
-Let $A_{30}(13)$ count the inclusion-minimal 30-seed blocking losses on the 13-block integer lift, up to sheet translation. One guarded search on this length determines the degree-30 coefficient for every $k\geq13$ and $m\geq42$. Put $\beta_{30}=A_{30}(13)-130$. Then
+Let $A_{30}(13)$ count the inclusion-minimal 30-seed blocking losses on the 13-block integer lift, up to sheet translation. The guarded search gives $A_{30}(13)=6055$, hence $\beta_{30}=A_{30}(13)-130=5925$. For every $k\geq13$ and $m\geq41$,
 
 $$
-M_{30}(k,m)=m(10k+\beta_{30}),\qquad
-[p^{30}]\Pr(\text{blocking})=m(10k+\beta_{30}-3861).
+M_{30}(k,m)=m(10k+5925),\qquad
+[p^{30}]\Pr(\text{blocking})=m(10k+2064).
 $$
 
-The coefficient $[p^{30}]\log R_{k,m}(p)$ is the negative of the second expression because blocking starts in degree 24. The numeric value of $A_{30}(13)$ remains to be enumerated.
+The coefficient $[p^{30}]\log R_{k,m}(p)$ is the negative of the second expression because blocking starts in degree 24. The thirteen-block catalogue records 47, 679, 2,001, 2,152, 1,062 and 114 types of sheet spans 7 through 12. Two enumerations at 14 blocks agree on all 6,065 types and give the same intercept. The [compressed thirteen-block catalogue](thirteen-block-size-30-catalogue.json.gz) supports direct witness replay and an exhaustive check for an unlisted loss.
 
 The projected-support checks give two consecutive empty appended stages in every finite fort of cost at most 30 at lengths 11 through 32. For every larger length the first 32 appended stages give an empty pair by the terminal and nonterminal band checks at 33 and 34 blocks. A fort cannot have two distinct runs of at least two empty stages in the cyclic stage order. The occupied portions between two such runs would each be nonempty finite forts, because every edge changes the stage by at most one and an outside vertex cannot see both portions. Each portion costs at least 24 seeds. Contracting an empty appended pair therefore shortens the unique run of at least two empty stages. It preserves the length of the occupied arc complementary to this run. Repeated contraction reaches 10 blocks with at least one empty stage remaining, so the original occupied arc spans at most nine stages.
 
@@ -399,9 +399,9 @@ For a template of span $s$, the possible fort occupies at most $s+1$ stages. Onl
 
 Four consecutive sheets with all of their seeds intact separate the remaining white vertices across the middle of the four sheets by round five. Specifically, there is no pair of white vertices at graph distance at most two across the cut. The verifier starts with just the seeds in the four sheets and checks every crossing pair on 31 sheets at lengths 13 through 27. For a pair at distance at most two, the two round-five decisions and the path between the pair are determined within radius twelve of either endpoint. The sheet windows are well inside the representative's 31 sheets. In the stage coordinate, the radius-twelve window spans at most 25 positions. At 27 blocks the window realizes all ordinary placements and all offsets from the adjacent exceptional stages that can occur in any longer chain. The certificate therefore applies to the integer lift at every $k\geq13$. If four seed-free sheets lay inside the seed support of a finite fort of cost at most 30, both sides would be nonempty. The certificate prevents any outside vertex from seeing both sides, so each side is itself a finite fort of cost at least 24. Thus every internal gap in the seed support has length at most three.
 
-To compare with cyclic covers, the same 32-stage bands contract a cyclic fort of cost at most 30 down to 32 blocks when necessary. The contraction preserves cost and the set of occupied sheets. Use the width-28 bands at 13 through 24 blocks and at 26, the width-25 band at 25, and the width-15 bands at 27 through 32. For a cyclic fort meeting every adjacent sheet pair, summing the width-$w$ window counts gives $(w-4)m\leq w\cdot30$. For each of these widths this is impossible at $m\geq42$. Thus every cyclic fort at these costs unrolls. A cyclic inclusion-minimal loss has a finite lift that is also minimal, since a smaller finite blocking subset would project to a smaller cyclic blocking subset.
+To compare with cyclic covers, the same 32-stage bands contract a cyclic fort of cost at most 30 down to 32 blocks when necessary. The contraction preserves cost and the set of occupied sheets. Use the width-28 bands at 13 through 24 blocks and at 26, the width-25 band at 25, and the width-15 bands at 27 through 32. For a cyclic fort meeting every adjacent sheet pair, summing the width-$w$ window counts gives $(w-4)m\leq w\cdot30$. For each of these widths this is impossible at $m\geq41$. The weakest inequality comes from width 15, since $11\cdot41>15\cdot30$. Thus every cyclic fort at these costs unrolls. A cyclic inclusion-minimal loss has a finite lift that is also minimal, since a smaller finite blocking subset would project to a smaller cyclic blocking subset.
 
-Conversely, the projection of a finite inclusion-minimal loss of size 30 is blocking and injective. Its outer gap has length at least $42-38=4$, strictly longer than any internal gap. If the projection contained a smaller cyclic minimal loss, unroll that smaller loss. Its finite seed support cannot cross the outer gap: crossing would give four consecutive seed-free sheets between two of its lost seeds. It therefore lies within one translated copy of the original finite loss, contradicting minimality. The unique outer gap recovers the finite template and gives $m$ distinct translates. The signed correction $-3861m$ from losses of smaller size gives the probability coefficient above.
+The thirteen-block catalogue gives sheet span at most 12. Near the exceptional stages the template transfer preserves sheet coordinates. In the ordinary interior the ten known templates also have sheet span at most 12. Thus the same bound holds throughout the affine range. At these periods any finite size-30 loss projects to a blocking loss with a unique outer gap. If its projection contained a smaller cyclic minimal loss, unroll that loss and align the two at a shared seed. Each pattern has sheet span at most 12, so each difference from the shared seed has magnitude at most 11. Congruence modulo $m\geq41$ then implies equality, which would put the smaller loss inside the original finite one. Hence the projections are minimal, and there are $m$ distinct translates of each type. The correction $-3861m$ from smaller losses gives the coefficient above.
 
 ## Independent losses on growing covers
 
@@ -645,6 +645,15 @@ $$
 
 Select the complete catalogue through size 29 and the ordinary size-30 placements. The omitted size-30 losses lie near an exceptional stage and together contribute $O(mp^{30})$. Larger losses contribute $O(kmp^{31})$. Mark the selected events as in the uniform exponential argument. Their neighborhoods have bounded size and the marked variables give an error $O(kmp^{48})$. The mean of the marked count agrees with the selected union probability through degree 30 because simultaneous marks have disjoint seed sets. The terms through degree 29 give $mB(p)$. At degree 30 each ordinary placement contributes its own monomial, since its union with any distinct minimal loss has degree at least 31. Their contribution is $10kmp^{30}+O(mp^{30})$. The size-30 overlap correction from the other selected events is $O(mp^{30})$, and the remaining Taylor tail of the marked mean is $O(kmp^{31})$ by bounded dependence. These bounds give the claimed error.
 
+For $k\geq13$ and $m\geq41$, the exact boundary coefficient further gives
+
+$$
+\Pr(\text{blocking})
+=1-\exp\!\left(-mB(p)-m(10k+2064)p^{30}\right)+O(kmp^{31}).
+$$
+
+The Taylor coefficients of $\log R_{k,m}$ through degree 30 are the negatives of the blocking coefficients because blocking starts in degree 24. The uniform analytic bound on $\log R_{k,m}$ gives a remainder of $O(kmp^{31})$ by Cauchy's estimate on $0\leq p\leq\rho/2$. Both exponents are nonpositive there, so exponentiation preserves the error bound. For $p\geq\rho/2$ the difference of the two probabilities is at most one, which gives the same bound with a larger constant.
+
 ### Joint counts and locations of blocking components
 
 On the auxiliary graph of seed sites defined above, call a connected component of the deleted seeds blocking when deleting that component alone prevents recovery. For $k\geq4$ and $m\geq33$, use the five size-24 templates, with $m$ placements each, and the ten ordinary size-30 templates, with $m(k-20)_+$ placements each, where $x_+=\max(x,0)$. The ordinary placements use three consecutive stages with eight ordinary stages of margin on both sides.
@@ -666,7 +675,7 @@ $$
 \qquad (a)_d=a(a-1)\cdots(a-d+1).
 $$
 
-To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities through loss size 27 for $m\geq30$, and at every length of at least five blocks through size 28 for $m\geq30$ and size 29 for $m\geq33$. The smaller verified cyclic ranges also apply. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
+To see this, write the blocking indicator as a multilinear polynomial in the Boolean loss indicators. Its monomial on a site set of size $d$ has expectation $p^d$ under independent losses and $(\ell)_d/(N)_d$ under a uniform loss of size $\ell$. The coefficient $c_d$ sums the monomial coefficients of degree $d$. Thus the cyclic coefficients above give exact probabilities through loss size 27 for $m\geq30$, and at every length of at least five blocks through size 28 for $m\geq30$ and size 29 for $m\geq33$. For $k\geq13$, $m\geq41$ the formula is exact through size 30. The smaller verified cyclic ranges also apply. The number of blocking $\ell$-sets is $\sum_{d=0}^{\ell}c_d\binom{N-d}{\ell-d}$.
 
 The joint component law also extends to a uniform loss of size $\ell$. Set $p=\ell/N$ and let $\Lambda=mp^{24}+kmp^{30}$. For $k\geq4$, $m\geq33$ and $\ell\geq1$, the total variation error is
 
@@ -807,6 +816,8 @@ python -B research-twins/check_short_prism_covers.py --rectangle-separation
 python -B research-twins/check_cost_25_blocking_sets.py --five-block-catalogue witnesses
 python -B research-twins/check_cost_25_blocking_sets.py --five-block-catalogue exhaustive
 python -B research-twins/check_cost_25_blocking_sets.py --size-30-five-blocks
+python -B research-twins/check_cost_25_blocking_sets.py --boundary-catalogue witnesses
+python -B research-twins/check_cost_25_blocking_sets.py --boundary-catalogue exhaustive
 python -B research-twins/check_cost_25_blocking_sets.py --size-30-boundary
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 25 27 28 29
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 26 --band-blocks 25 29

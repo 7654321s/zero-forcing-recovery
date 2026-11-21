@@ -42,6 +42,7 @@ EXPECTED_SIZE_28_SPANS = dict.fromkeys(
 EXPECTED_SIZE_29_SPANS = dict.fromkeys(
     range(5, LOCALITY_REPRESENTATIVE + 1), {7: 20, 8: 316, 9: 750, 10: 616, 11: 271, 12: 9})
 EXPECTED_SIZE_30_SPANS = dict(zip(range(7, 13), (47, 679, 2001, 2136, 998, 114)))
+EXPECTED_BOUNDARY_SPANS = dict(zip(range(7, 13), (47, 679, 2001, 2152, 1062, 114)))
 
 
 def minimum_seed_sets(blocks):
@@ -97,10 +98,10 @@ def remaining_white(neighbors, intact_white, lost):
     return mask(v for v, remains_white in enumerate(white) if remains_white)
 
 
-def verify_inherited_patterns(blocks, smaller, templates, *, budget=25):
+def verify_inherited_patterns(blocks, smaller, templates, *, budget=25, already_lifted=False):
     stage_start = SPAN['BAND']['stage_start']
     terminal = stage_start(3)
-    shift = stage_start(blocks - 2) - terminal
+    shift = 0 if already_lifted else stage_start(blocks - 2) - terminal
     opening = stage_start(1)
     smaller = tuple(smaller)
     covers = {}
@@ -343,7 +344,7 @@ def check_five_block_catalogue(*, exhaustive=False):
     }), flush=True)
 
 
-def check_size_30_boundary(catalogues, *, blocks=13):
+def lower_order_catalogue(blocks, catalogues):
     smaller = tuple(minimum_seed_sets(blocks))
     for budget, catalogue in enumerate(catalogues, start=25):
         if blocks > 5:
@@ -351,6 +352,11 @@ def check_size_30_boundary(catalogues, *, blocks=13):
         smaller += tuple(sorted(catalogue))
     if len(smaller) != 3103:
         raise AssertionError(('Incomplete lower-order catalogue', len(smaller)))
+    return smaller
+
+
+def check_size_30_boundary(catalogues, *, blocks=13):
+    smaller = lower_order_catalogue(blocks, catalogues)
     patterns = enumerate_blockers(blocks, smaller, budget=30)
     result = {
         'blocks': blocks, 'size': 30, 'count': len(patterns),
@@ -363,8 +369,38 @@ def check_size_30_boundary(catalogues, *, blocks=13):
         result['spans'] = dict(sorted(spans.items()))
         result['blocking_coefficient_per_sheet'] = len(patterns) - 3861
     else:
+        if blocks == 13 and Counter(max(s for _, s in row) for row in patterns) != EXPECTED_BOUNDARY_SPANS:
+            raise AssertionError('Unexpected representative size-30 seed catalogue')
         result['boundary_coefficient'] = len(patterns) - 10 * blocks
     print(json.dumps(result), flush=True)
+
+
+def check_boundary_catalogue(*, exhaustive=False):
+    with gzip.open(HERE / 'five-block-loss-catalogue.json.gz', 'rt', encoding='utf-8') as source:
+        base = json.load(source)['losses_by_size']
+    base = [tuple(tuple(map(tuple, row)) for row in base[str(size)]) for size in range(25, 30)]
+    blocks = 13
+    smaller = lower_order_catalogue(blocks, base)
+    with gzip.open(HERE / 'thirteen-block-size-30-catalogue.json.gz', 'rt', encoding='utf-8') as source:
+        archive = json.load(source)
+    if (archive['schema_version'], archive['blocks'], archive['size'], archive['first_sheet']) != (1, 13, 30, 1):
+        raise AssertionError('Unexpected boundary catalogue format')
+    patterns = tuple(tuple(map(tuple, row)) for row in archive['losses'])
+    if tuple(sorted(set(patterns))) != patterns or any(
+            len(set(row)) != 30 or len(row) != 30 or normalized(row) != row
+            for row in patterns):
+        raise AssertionError('Unnormalized boundary catalogue entry')
+    spans = Counter(max(s for _, s in row) for row in patterns)
+    if spans != EXPECTED_BOUNDARY_SPANS:
+        raise AssertionError(('Unexpected boundary seed spans', spans))
+    verified = verify_inherited_patterns(blocks, smaller, patterns, budget=30, already_lifted=True)
+    if verified != set(patterns):
+        raise AssertionError('Boundary catalogue changed during replay')
+    if exhaustive and enumerate_blockers(blocks, smaller, verified, budget=30) != verified:
+        raise AssertionError('Unlisted boundary blocking loss')
+    print(json.dumps({'blocks': blocks, 'count': len(verified), 'spans': dict(sorted(spans.items())),
+                      'boundary_coefficient': len(verified) - 10 * blocks,
+                      'exhaustive': exhaustive}), flush=True)
 
 
 def check_size_26(blocks, *, size_27=False, size_28=False, size_29=False, size_30_representative=None):
@@ -555,6 +591,8 @@ def main():
                       help='verify size-29 losses from five blocks through the locality representative')
     mode.add_argument('--size-30-boundary', action='store_true',
                       help='enumerate the 13-block representative for the size-30 boundary term')
+    mode.add_argument('--boundary-catalogue', choices=('witnesses', 'exhaustive'),
+                      help='replay the 13-block size-30 catalogue and optionally certify exhaustion')
     mode.add_argument('--size-30-five-blocks', action='store_true',
                       help='verify the 5975 size-30 seed loss types at five blocks')
     mode.add_argument('--five-block-catalogue', choices=('witnesses', 'exhaustive'),
@@ -585,6 +623,9 @@ def main():
         return
     if args.five_block_catalogue:
         check_five_block_catalogue(exhaustive=args.five_block_catalogue == 'exhaustive')
+        return
+    if args.boundary_catalogue:
+        check_boundary_catalogue(exhaustive=args.boundary_catalogue == 'exhaustive')
         return
     templates = enumerate_blockers(5, minimum_seed_sets(5)) if any(k >= 5 for k in args.blocks) else ()
     if templates:
