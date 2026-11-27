@@ -2,6 +2,7 @@
 
 import argparse
 from collections import Counter, defaultdict, deque
+from itertools import combinations
 import gzip
 import json
 from pathlib import Path
@@ -208,53 +209,69 @@ def signed_union_weights(losses, budget):
     label_count = 1 + max(v for pattern in losses for v, _ in pattern)
     # At these budgets any two contributing losses intersect, so two spans bound the union span.
     margin = 2 * max(s for pattern in losses for _, s in normalized(pattern))
-    pivot_count = budget - min(map(len, losses)) + 1
-    events = {mask((s - 1) * label_count + v for v, s in normalized(pattern)) for pattern in losses}
+    margin_bits = margin * label_count
+    unions = defaultdict(set)
+    for row in losses:
+        event = mask((s - 1) * label_count + v for v, s in normalized(row))
+        unions[event.bit_count()].add(event)
+
+    def normalize_bits(pattern):
+        origin = ((pattern & -pattern).bit_length() - 1) // label_count * label_count
+        return pattern >> origin
 
     def record(index, pattern):
         for site in members(pattern):
-            sheet, v = divmod(site, label_count)
-            index[v].append((pattern, sheet))
+            sheet, label = divmod(site, label_count)
+            index[label].append((pattern, sheet))
 
-    def translated_candidates(union, index):
-        sites = sorted((divmod(site, label_count) for site in members(union)),
-                       key=lambda site: len(index[site[1]]))
-        # A feasible union leaves at most pivot_count - 1 sites outside the candidate.
+    def translated_candidates(sites, index, pivot_count):
+        ordered = sorted(sites, key=lambda site: len(index[site[1]]))
         return {(pattern, margin + sheet - origin)
-                for sheet, v in sites[:pivot_count] for pattern, origin in index[v]}
+                for sheet, label in ordered[:pivot_count] for pattern, origin in index[label]}
 
-    by_label = defaultdict(list)
-    unions = defaultdict(set)
-    for event in events:
-        record(by_label, event)
-        unions[event.bit_count()].add(event)
+    by_size = defaultdict(lambda: defaultdict(list))
+    for size, events in unions.items():
+        for event in events:
+            record(by_size[size], event)
     for degree in range(min(unions), budget):
         for union in unions[degree]:
-            padded = union << (margin * label_count)
-            for event, offset in translated_candidates(union, by_label):
-                joined = padded | (event << (offset * label_count))
-                size = joined.bit_count()
-                if degree < size <= budget:
-                    origin = ((joined & -joined).bit_length() - 1) // label_count
-                    unions[size].add(joined >> (origin * label_count))
+            sites = [divmod(site, label_count) for site in members(union)]
+            padded = union << margin_bits
+            for size, index in by_size.items():
+                # A fitting union leaves at most budget - size sites outside this event.
+                for event, offset in translated_candidates(sites, index, budget - size + 1):
+                    joined = padded | (event << (offset * label_count))
+                    joined_size = joined.bit_count()
+                    if degree < joined_size <= budget:
+                        unions[joined_size].add(normalize_bits(joined))
 
-    by_label.clear()
+    by_size.clear()
     weights = {}
     profiles = defaultdict(Counter)
     for degree in sorted(unions):
         for union in unions[degree]:
-            padded = union << (margin * label_count)
-            coefficient = 1
-            for smaller, offset in translated_candidates(union, by_label):
-                shifted = smaller << (offset * label_count)
-                if shifted & padded == shifted:
-                    coefficient -= weights[smaller]
-            weights[union] = coefficient
-            profiles[degree][coefficient] += 1
+            positions = list(members(union))
+            sites = [divmod(site, label_count) for site in positions]
+            bits = [1 << site for site in positions]
+            padded = union << margin_bits
+            weight = 1
+            for size, index in by_size.items():
+                omitted = degree - size
+                if omitted <= 2:
+                    for removed in combinations(bits, omitted):
+                        smaller = normalize_bits(union ^ sum(removed))
+                        weight -= weights.get(smaller, 0)
+                    continue
+                for smaller, offset in translated_candidates(sites, index, omitted + 1):
+                    shifted = smaller << (offset * label_count)
+                    if shifted & padded == shifted:
+                        weight -= weights[smaller]
+            weights[union] = weight
+            profiles[degree][weight] += 1
         for union in unions[degree]:
             if weights[union]:
-                record(by_label, union)
-    largest_span = max((union.bit_length() - 1) // label_count + 1 for union in weights)
+                record(by_size[degree], union)
+    largest_span = max((row.bit_length() - 1) // label_count + 1 for row in weights)
     return profiles, largest_span
 
 
@@ -354,6 +371,27 @@ def lower_order_catalogue(blocks, catalogues):
     if len(smaller) != 3103:
         raise AssertionError(('Incomplete lower-order catalogue', len(smaller)))
     return smaller
+
+
+def check_degree_31_overlap(blocks):
+    with gzip.open(HERE / 'five-block-loss-catalogue.json.gz', 'rt', encoding='utf-8') as source:
+        base = json.load(source)['losses_by_size']
+    base = [tuple(tuple(map(tuple, row)) for row in base[str(size)]) for size in range(25, 30)]
+    smaller = lower_order_catalogue(blocks, base)
+    with gzip.open(HERE / 'thirteen-block-size-30-catalogue.json.gz', 'rt', encoding='utf-8') as source:
+        archive = json.load(source)
+    size_30 = tuple(tuple(map(tuple, row)) for row in archive['losses'])
+    if blocks != 13:
+        size_30 = relocate_boundary_patterns(size_30, 13, blocks)
+    check_boundary_joint_spans(blocks, size_30)
+    profile, span = signed_union_weights((*smaller, *size_30), 31)
+    expected = {-2: 344, -1: 19417 + 8 * blocks, 0: 2882, 1: 6502, 2: 233, 3: 1}
+    if span != 12 or profile[31] != expected:
+        raise AssertionError(('Unexpected degree-31 union weights', blocks, span, profile[31]))
+    correction = sum(weight * count for weight, count in profile[31].items())
+    print(json.dumps({'blocks': blocks, 'degree': 31, 'maximum_span': span,
+                      'weights': dict(sorted(profile[31].items())),
+                      'overlap_per_sheet': correction}), flush=True)
 
 
 def check_size_30_boundary(catalogues, *, blocks=13):
@@ -814,6 +852,8 @@ def main():
                       help='verify the complete ordinary size-31 loss catalogue')
     mode.add_argument('--ordinary-size-31-restoration', action='store_true',
                       help='check the single-seed restoration times of ordinary size-31 losses')
+    mode.add_argument('--degree-31-overlap', type=int, choices=(13, 14), metavar='BLOCKS',
+                      help='verify the degree-31 overlap correction from the smaller losses')
     mode.add_argument('--size-28', choices=EXPECTED_SIZE_28_SPANS, type=int, metavar='BLOCKS',
                       help='verify size-28 losses from five blocks through the locality representative')
     mode.add_argument('--size-29', choices=EXPECTED_SIZE_29_SPANS, type=int, metavar='BLOCKS',
@@ -833,6 +873,9 @@ def main():
     args = parser.parse_args()
     if args.ordinary_threshold:
         check_ordinary_threshold()
+        return
+    if args.degree_31_overlap is not None:
+        check_degree_31_overlap(args.degree_31_overlap)
         return
     if args.ordinary_size_31 or args.ordinary_size_31_exact or args.ordinary_size_31_restoration:
         check_ordinary_size_31(exhaustive=args.ordinary_size_31_exact,
