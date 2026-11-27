@@ -1023,6 +1023,14 @@ M_{36}(k,m)=m(2505k+\beta_{36}),\qquad k\geq41,\ m\geq44,
 $$
 where $\beta_{36}$ is the normalized size-36 count at 41 blocks minus $2505\cdot41$.
 
+### Short size-37 losses in ordinary stages
+
+The guarded three- and four-stage windows give **5,832** types using three consecutive seed stages and **77** using four. The latter span twelve through fifteen sheets. The [short catalogue](ordinary-size-37-short-catalogue.json.gz) holds all 5,909 types found in these windows. A separate queue-based replay verifies all 218,633 single-seed restorations. The [verifier](check_degree_37_ordinary.py) replays the catalogue and checks both windows for additional types.
+
+The 5,303 lower-order ordinary types have no union of size at most 37 involving different starts. Two three-stage templates at different starts can fit the budget only at consecutive starts and with both sizes at most 31. A shorter template paired with a four-stage template at a different start must occupy its last three stages. Two four-stage templates can intersect at start distances one through three. The distinct-start verifier aligns all three classes at every shared seed and excludes every joining union.
+
+At cost at most 37, 39-stage bands at 40 and 41 blocks force an empty adjacent appended pair. Contraction bounds the ordinary fort arc by 38 stages. The width-21 sheet band at 39 blocks requires 17 losses, and $17\cdot46>21\cdot37$. Thus the finite fort span is at most 44 sheets. These bounds limit the remaining search to seed spans through 38.
+
 ### A packing of disjoint ordinary blocking losses
 
 One of the ordinary size-30 templates spans ten sheets. Translate its seed support by the lattice
@@ -1327,6 +1335,10 @@ python -B research-twins/check_degree_36_ordinary.py --window 5
 python -B research-twins/check_degree_36_ordinary.py --seed-arcs
 python -B research-twins/check_degree_36_ordinary.py --overlap
 python -B research-twins/check_degree_36_ordinary.py --bands
+python -B research-twins/check_degree_37_ordinary.py
+python -B research-twins/check_degree_37_ordinary.py --window 4
+python -B research-twins/check_degree_37_ordinary.py --different-starts
+python -B research-twins/check_degree_37_ordinary.py --bands
 python -B research-twins/check_short_prism_covers.py --degree-33-period-39
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 26 --band-blocks 36
 python -B research-twins/check_short_prism_covers.py --degree-33-saturated-period-39

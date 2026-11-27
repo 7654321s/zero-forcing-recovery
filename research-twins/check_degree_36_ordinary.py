@@ -37,40 +37,44 @@ def read_catalogue():
     return rows
 
 
-def check_no_overlaps_at_different_starts(families):
+def check_no_overlaps_at_different_starts(families, *, budget=36):
     three_stage, four_stage = [], []
     for family in families:
         for row in family:
             loads = Counter(v // 16 for v, _ in row)
             if set(loads) == {0, 1, 2} and min(loads.values()) >= 6:
                 three_stage.append(row)
-            elif set(loads) == {0, 1, 2, 3} and min(loads[0], loads[3]) >= 2 and len(row) == 35:
+            elif set(loads) == {0, 1, 2, 3} and min(loads[0], loads[3]) >= 2 and len(row) in (35, 36):
                 four_stage.append(row)
             else:
                 raise AssertionError(('The stage-count lower bounds do not apply', row))
-    if len(four_stage) != 4:
-        raise AssertionError('Unexpected number of four-stage lower-order types')
+    if (budget, len(four_stage)) not in ((36, 4), (37, 23)):
+        raise AssertionError(('Unexpected scope for the distinct-start check', budget, len(four_stage)))
 
-    # Two three-stage events can join only at adjacent starts and both
-    # of size 30. Two four-stage events add at least two sites to 35.
-    # A shorter event with a different start must lie at the last three
-    # stages of the longer one, or it contributes at least six new sites.
-    minimum = families[0]
-    pairs = ((minimum, minimum), (four_stage, three_stage))
-    for left_rows, right_rows in pairs:
+    # Two three-stage events at different starts of distance at least two
+    # have at least twelve unshared losses. Adjacent starts add at least
+    # six losses to either event. A three-stage event paired with a longer
+    # event must fit inside that longer stage arc, since any unshared stage
+    # adds at least six losses to a four-stage event of size at least 35.
+    short = [row for row in three_stage if len(row) <= budget - 6]
+    pairs = ((short, short, (1,)), (four_stage, three_stage, (1,)),
+             (four_stage, four_stage, (1, 2, 3)))
+    for left_rows, right_rows, offsets in pairs:
         for left in left_rows:
             left_set = set(left)
             by_label = {}
             for v, s in left:
                 by_label.setdefault(v, []).append(s)
             for row in right_rows:
-                right = tuple((v + 16, s) for v, s in row)
-                shifts = {a - s for v, s in right for a in by_label.get(v, ())}
-                for offset in shifts:
-                    union = left_set | {(v, s + offset) for v, s in right}
-                    if len(union) <= 36:
-                        raise AssertionError(('Unexpected overlap at adjacent starts', left, row, offset))
-    print(json.dumps({'degree': 36, 'unions_at_different_starts': 0}), flush=True)
+                for start in offsets:
+                    right = tuple((v + 16 * start, s) for v, s in row)
+                    shifts = {a - s for v, s in right for a in by_label.get(v, ())}
+                    for offset in shifts:
+                        union = left_set | {(v, s + offset) for v, s in right}
+                        if len(union) <= budget:
+                            raise AssertionError(('Unexpected overlap at distinct starts',
+                                                  left, row, start, offset))
+    print(json.dumps({'degree': budget, 'unions_at_different_starts': 0}), flush=True)
 
 
 def check_overlap(families):
