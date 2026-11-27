@@ -146,7 +146,7 @@ def check_template_stages(templates, expected):
     stages = Counter(tuple(sorted({0 if v < opening else (v - opening) // 16 + 1
                                    for v, _ in template})) for template in templates)
     if stages != expected:
-        raise AssertionError(('Unexpected occupied stages at five blocks', stages))
+        raise AssertionError(('Unexpected occupied stages', stages))
 
 
 def enumerate_blockers(blocks, smaller, known=(), *, budget=25, ordinary_stages=None,
@@ -641,6 +641,43 @@ def check_ordinary_size_30_window(catalogue):
     print('The ten cost-30 losses exhaust the ordinary interior', flush=True)
 
 
+def check_ordinary_size_31():
+    """Classify cost-31 losses with a fort confined to at most four ordinary stages."""
+    stage_start = SPAN['BAND']['stage_start']
+    with gzip.open(HERE / 'thirteen-block-size-30-catalogue.json.gz', 'rt', encoding='utf-8') as source:
+        archive = json.load(source)
+    ordinary = [
+        tuple((v - stage_start(5), sheet) for v, sheet in row)
+        for row in archive['losses'] if boundary_stage_arc(row, 13)[:2] == (5, 3)
+    ]
+    if len(ordinary) != 10:
+        raise AssertionError(('Unexpected number of ordinary size-30 types', len(ordinary)))
+
+    three_stages = None
+    for width in (3, 4):
+        smaller = [
+            tuple((v + stage_start(start), sheet) for v, sheet in row)
+            for start in range(2, width) for row in ordinary
+        ]
+        patterns = enumerate_blockers(width + 5, smaller, budget=31, ordinary_stages=width,
+                                      first_ordinary_stage=True)
+        if width == 3:
+            three_stages = patterns
+        elif patterns != three_stages:
+            raise AssertionError('The three-stage and four-stage size-31 catalogues differ')
+
+    check_template_stages(three_stages, {(2, 3, 4): 97})
+    spans = Counter(max(sheet for _, sheet in row) for row in three_stages)
+    if spans != {10: 4, 11: 93}:
+        raise AssertionError(('Unexpected ordinary size-31 sheet spans', spans))
+    print(json.dumps({
+        'size': 31, 'ordinary_stage_window': 4, 'count': len(three_stages),
+        'spans': dict(sorted(spans.items())),
+        'losses': [[(v - stage_start(2), sheet) for v, sheet in row]
+                   for row in sorted(three_stages)],
+    }), flush=True)
+
+
 def check_ordinary_threshold():
     band = SPAN['BAND']
     band['check_band'](33, stages=31, budget=29)
@@ -667,6 +704,8 @@ def main():
                       help='classify cost-30 forts confined to three ordinary stages by seed loss')
     mode.add_argument('--ordinary-size-30-exact', action='store_true',
                       help='verify the complete cost-30 ordinary interior catalogue')
+    mode.add_argument('--ordinary-size-31', action='store_true',
+                      help='verify size-31 losses within four ordinary stages')
     mode.add_argument('--size-28', choices=EXPECTED_SIZE_28_SPANS, type=int, metavar='BLOCKS',
                       help='verify size-28 losses from five blocks through the locality representative')
     mode.add_argument('--size-29', choices=EXPECTED_SIZE_29_SPANS, type=int, metavar='BLOCKS',
@@ -686,6 +725,9 @@ def main():
     args = parser.parse_args()
     if args.ordinary_threshold:
         check_ordinary_threshold()
+        return
+    if args.ordinary_size_31:
+        check_ordinary_size_31()
         return
     if args.ordinary_size_30 or args.ordinary_size_30_exact:
         check_ordinary_size_30(exhaustive=args.ordinary_size_30_exact)
