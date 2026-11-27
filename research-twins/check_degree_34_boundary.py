@@ -83,7 +83,29 @@ def check_overlap_input():
                       'small_component_correction': -4330}), flush=True)
 
 
-def check_terminal_witnesses(patterns):
+def read_short_near_catalogue():
+    with gzip.open(HERE / 'degree-34-short-near-catalogue.json.gz',
+                   'rt', encoding='utf-8') as source:
+        data = json.load(source)
+    if (data['schema_version'], data['blocks'], data['size']) != (1, BLOCKS, 34):
+        raise AssertionError('Unexpected short near size-34 catalogue format')
+    windows = {}
+    for entry in data['windows']:
+        key = entry['start'], entry['span']
+        rows = tuple(tuple(map(tuple, row)) for row in entry['losses'])
+        if key in windows or rows != tuple(sorted(set(rows))) or any(
+                len(row) != 34 or len(set(row)) != 34 or CHECK['normalized'](row) != row
+                or CHECK['boundary_stage_arc'](row, BLOCKS)[:2] != key
+                or not BOUNDARY['anchored'](row, BLOCKS) for row in rows):
+            raise AssertionError(('Unexpected short near size-34 coordinates', key))
+        windows[key] = rows
+    counts = {key: len(rows) for key, rows in windows.items()}
+    if counts != {(11, 2): 1305, (10, 3): 3893, (11, 3): 16481, (1, 3): 685, (10, 4): 74}:
+        raise AssertionError(('Unexpected short near size-34 counts', counts))
+    return windows
+
+
+def replay_witnesses(patterns):
     graph, blue, *_ = CHECK['COVER']['signed_prism_cover'](BLOCKS, SHEETS)
     _, _, cones = CHECK['LOSS_COMPONENTS']['nominal_cones'](graph, blue)
     for row in patterns:
@@ -96,33 +118,54 @@ def check_terminal_witnesses(patterns):
         for seed in CHECK['members'](loss):
             if CHECK['remaining_white'](graph, cones, loss ^ (1 << seed)):
                 raise AssertionError(('A proper subset blocks recovery', row, seed))
-    print(json.dumps({'terminal_types': len(patterns), 'restorations': 34 * len(patterns)}), flush=True)
+    print(json.dumps({'types': len(patterns), 'restorations': 34 * len(patterns)}), flush=True)
 
 
-def check_short_outer_windows():
-    patterns = read_terminal_catalogue()
+def check_short_windows(cases, *, extra_groups=()):
     by_stage = [(row, set(DEGREE_33['NEAR']['support'](row))) for row in smaller_losses(BLOCKS)]
-    ordinary = {tuple((v + STAGE_START(9), s) for v, s in row) for row in DEGREE_34['read_catalogue']()}
     stage = BOUNDARY['stage']
-    for first, span, known in ((9, 3, ordinary), (8, 4, set()), (9, 4, set(patterns))):
-        allowed = set(range(first, first + span))
+    for arc, known in cases:
+        allowed = set(arc)
         smaller = [row for row, stages in by_stage if stages <= allowed]
-        last = first + span - 1
+        required = ({arc[0]}, {arc[-1]}, *extra_groups)
 
         def restrict(clauses, seeds, order, period):
             selected = BOUNDARY['restrict_stages'](
-                clauses, seeds, order, period, allowed, ({first}, {last}), blocks=BLOCKS)
-            if span == 4:
-                clauses.append([v + 1 for v in range(order)
-                                if stage(v // period) in {first + 1, first + 2}])
+                clauses, seeds, order, period, allowed, required, blocks=BLOCKS)
+            if len(arc) == 4:
+                middle = set(arc[1:3])
+                clauses.append([v + 1 for v in range(order) if stage(v // period) in middle])
             return selected
 
         found = CHECK['enumerate_blockers'](
             BLOCKS, smaller, known, budget=34, strip_sheets=SHEETS, require_minimal_fort=True,
             restrict=restrict, stream_blockers=True)
         if found != known:
-            raise AssertionError(('Additional short outer losses', first, span, len(found - known)))
-        print(json.dumps({'start': first, 'span': span, 'types': len(found)}), flush=True)
+            raise AssertionError(('Additional short losses', arc, len(found - known)))
+        print(json.dumps({'start': arc[0], 'span': len(arc), 'types': len(found)}), flush=True)
+
+
+def ordinary_at(start):
+    offset = STAGE_START(start)
+    return {tuple((v + offset, s) for v, s in row) for row in DEGREE_34['read_catalogue']()}
+
+
+def check_short_outer_windows():
+    check_short_windows([([9, 10, 11], ordinary_at(9)), ([8, 9, 10, 11], set()),
+                         ([9, 10, 11, 12], set(read_terminal_catalogue()))])
+
+
+def check_short_near_windows(*, exhaustive):
+    windows = read_short_near_catalogue()
+    if not exhaustive:
+        replay_witnesses(tuple(row for group in windows.values() for row in group))
+        return
+    cases = []
+    for arc in DEGREE_33['short_near_windows'](BLOCKS):
+        known = (ordinary_at(2) if arc == [2, 3, 4]
+                 else set(windows.get((arc[0], len(arc)), ())))
+        cases.append((arc, known))
+    check_short_windows(cases, extra_groups=(BOUNDARY['anchor_stages'](BLOCKS),))
 
 
 if __name__ == '__main__':
@@ -130,10 +173,14 @@ if __name__ == '__main__':
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument('--short-outer', action='store_true', help='exhaust the three short outer arcs')
     modes.add_argument('--overlap-input', action='store_true', help='check the lower-order partition')
+    modes.add_argument('--short-near', choices=('witnesses', 'exhaustive'),
+                       help='check the short near-boundary catalogue or exhaust all its windows')
     args = parser.parse_args()
     if args.overlap_input:
         check_overlap_input()
     elif args.short_outer:
         check_short_outer_windows()
+    elif args.short_near:
+        check_short_near_windows(exhaustive=args.short_near == 'exhaustive')
     else:
-        check_terminal_witnesses(read_terminal_catalogue())
+        replay_witnesses(read_terminal_catalogue())

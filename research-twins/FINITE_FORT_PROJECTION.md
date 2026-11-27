@@ -943,6 +943,23 @@ where $\beta_{34}$ is the normalized size-34 count at 39 blocks minus $685\cdot3
 
 At 39 blocks, the anchored outer seed arcs of span at most four have starts and spans $(35,3)$, $(34,4)$, and $(35,4)$. These windows transfer to starts 9, 8 and 9, respectively, in a 13-block cover. After excluding the contained losses through size 33, the guarded checks give counts **685, 0, and 8**. The 685 types at the first start are the translated ordinary catalogue. The [terminal four-stage catalogue](degree-34-terminal-span-four-catalogue.json.gz) contains the eight types at the last start. The [verifier](check_degree_34_boundary.py) checks all eight witnesses and all 272 single-seed restorations, and replays the exhaustive search of the three windows.
 
+### Short degree-34 near-boundary windows omitting an opening stage
+
+The 20 near-boundary windows of span at most four that omit at least one of stages 0, 1 and 2 can be exhausted at 13 blocks. The guarded checks exclude all contained smaller losses and separate out the 685 ordinary types at start 2. The [short near catalogue](degree-34-short-near-catalogue.json.gz) contains these additional types, up to sheet translation.
+
+| First stage | Span | Types |
+| ---: | ---: | ---: |
+| 11 | 2 | 1,305 |
+| 10 | 3 | 3,893 |
+| 11 | 3 | 16,481 |
+| 1 | 3 | 685 |
+| 10 | 4 | 74 |
+
+The total is **22,438**, with all 762,892 single-seed restorations verified by a separate queue-based forcing replay. These types and the eight terminal span-four types are disjoint from the $685(k-5)$ translated ordinary types at starts 2 through $k-4$. In particular,
+$$
+M_{34}(k,m)\geq m(685k+19021),\qquad k\geq39,\ m\geq40.
+$$
+
 ### A finite representative for the degree-34 overlap correction
 
 Through degree 33, every template occupies an arc of at most four seed stages and spans at most fourteen sheets. Two contributing events in a union of size at most 34 share a seed, and three have at least $3\cdot24-2\cdot34=4$ common seeds. This aligns the constituents as at degree 33. Their union spans at most seven stages and 27 sheets. With $m\geq40$, the gap outside this sheet arc has length at least 13, while the internal gaps have length at most twelve. The same argument identifies the stage origin at $k\geq39$.
@@ -1292,6 +1309,8 @@ python -B research-twins/check_degree_35_ordinary.py --seed-arcs
 python -B research-twins/check_degree_35_ordinary.py --bounds
 python -B research-twins/check_degree_34_boundary.py
 python -B research-twins/check_degree_34_boundary.py --short-outer
+python -B research-twins/check_degree_34_boundary.py --short-near witnesses
+python -B research-twins/check_degree_34_boundary.py --short-near exhaustive
 python -B research-twins/check_degree_34_boundary.py --overlap-input
 python -B research-twins/check_degree_36_ordinary.py
 python -B research-twins/check_degree_36_ordinary.py --window 4
