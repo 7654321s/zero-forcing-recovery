@@ -873,8 +873,13 @@ def ordinary_degree_32_overlap(older, size_31):
 
 def ordinary_placements(templates, width):
     stage_start = SPAN['BAND']['stage_start']
-    return {tuple((v + stage_start(start), sheet) for v, sheet in row)
-            for start in range(2, width) for row in templates}
+    placements = set()
+    for row in templates:
+        span = 1 + max(v // 16 for v, _ in row)
+        for start in range(2, width + 3 - span):
+            offset = stage_start(start)
+            placements.add(tuple((v + offset, sheet) for v, sheet in row))
+    return placements
 
 
 def ordinary_size_31_catalogue():

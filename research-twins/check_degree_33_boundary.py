@@ -231,6 +231,98 @@ def check_opening_four_catalogue(*, exhaustive=False):
     print(json.dumps({'start': 0, 'span': 4, 'catalogued': len(known)}), flush=True)
 
 
+def read_opening_three_catalogue():
+    with gzip.open(HERE / 'degree-33-opening-span-three-catalogue.json.gz', 'rt',
+                   encoding='utf-8') as src:
+        archive = json.load(src)
+    if (archive['schema_version'], archive['blocks'], archive['size']) != (1, 13, 33):
+        raise AssertionError('Unexpected three-stage opening catalogue format')
+    rows = tuple(tuple(map(tuple, row)) for row in archive['losses'])
+    if len(rows) != 127407 or rows != tuple(sorted(set(rows))):
+        raise AssertionError('Unexpected number of three-stage opening losses')
+    observed = Counter()
+    stage = BOUNDARY['stage']
+    for row in rows:
+        support = Counter(stage(v) for v, _ in row)
+        if (len(row) != 33 or len(set(row)) != 33 or CHECK['normalized'](row) != row
+                or set(support) != {0, 1, 2}):
+            raise AssertionError('Unexpected three-stage opening coordinates')
+        observed[tuple(support[i] for i in range(3))] += 1
+    expected = {(a, b, 33-a-b) for a in range(1, 32) for b in range(1, 33-a)}
+    profiles = {tuple(item['counts']): item['types'] for item in archive['profiles']}
+    if (len(archive['profiles']) != 496 or profiles.keys() != expected
+            or any(observed[key] != n for key, n in profiles.items())):
+        raise AssertionError('Unexpected counts of the three-stage opening profiles')
+    return rows
+
+
+def check_opening_triple_geometry():
+    cover = CHECK['COVER']['signed_prism_cover']
+    full, full_blue, *_ = cover(13, 5)
+    compact, compact_blue, *_ = cover(6, 5)
+    stage = BOUNDARY['stage']
+    mapping = {}
+    for old, new in ((11, 4), (12, 5), (0, 0), (1, 1), (2, 2), (3, 3)):
+        source = [v for v in range(len(full) // 5) if stage(v) == old]
+        target = [v for v in range(len(compact) // 5) if stage(v) == new]
+        if len(source) != len(target):
+            raise AssertionError('Different sizes of corresponding opening stages')
+        mapping.update(zip(source, target))
+    for v, image in mapping.items():
+        if stage(v) not in {12, 0, 1, 2}:
+            continue
+        for s in range(5):
+            u, w = 5 * v + s, 5 * image + s
+            neighbors = {(mapping[neighbor], sheet)
+                         for site in CHECK['members'](full[u])
+                         for neighbor, sheet in (divmod(site, 5),)}
+            if (neighbors != {divmod(site, 5) for site in CHECK['members'](compact[w])}
+                    or bool(full_blue & (1 << u)) != bool(compact_blue & (1 << w))):
+                raise AssertionError('The compact opening window changes an incident edge or seed')
+
+
+def check_opening_three_catalogue(*, exhaustive=False):
+    rows = read_opening_three_catalogue()
+    if not exhaustive:
+        replay_near_witnesses(rows, 13, 40)
+        return
+
+    from pysat.card import ITotalizer
+    from pysat.solvers import Solver
+
+    check_opening_triple_geometry()
+    blocks, sheets, budget, seed_anchor = 6, 44, 33, 5
+    stages = {0, 1, 2}
+    graph, blue, *_ = CHECK['COVER']['signed_prism_cover'](blocks, sheets)
+    clauses, seeds, top = CHECK['STRIP']['strip_formula'](
+        graph, blue, budget, sheets=sheets, quotient_bounds=False, require_minimal=True,
+        anchor_fort=False)
+    seeds = BOUNDARY['restrict_stages'](
+        clauses, seeds, len(graph), sheets, stages, ({0}, {1}, {2}), blocks=blocks)
+    clauses.extend([-u] for u in seeds if (u - 1) % sheets < seed_anchor)
+    seeds = [u for u in seeds if (u - 1) % sheets >= seed_anchor]
+    clauses.append([u for u in seeds if (u - 1) % sheets == seed_anchor])
+    smaller = [row for row in transferred_smaller_losses(13, ORDINARY['read_catalogues']()[2])
+               if stages.issuperset(NEAR['support'](row))]
+    if len(smaller) != 71003:
+        raise AssertionError('Unexpected lower-order opening catalogue')
+    print(f'Excluding {len(smaller)} smaller types and {len(rows)} anchored size-33 types',
+          flush=True)
+    with ITotalizer(lits=seeds, ubound=budget, top_id=top) as counter:
+        with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
+            for row in smaller:
+                last = max(s for _, s in row)
+                for shift in range(seed_anchor - 1, sheets - 1 - last):
+                    solver.add_clause([-(v * sheets + s + shift + 1) for v, s in row])
+            for row in rows:
+                solver.add_clause([-(v * sheets + s + seed_anchor) for v, s in row])
+            if solver.solve(assumptions=[-counter.rhs[budget]]):
+                chosen = {v for v in solver.get_model() if v > 0}
+                loss = CHECK['normalized'](divmod(v - 1, sheets) for v in seeds if v in chosen)
+                raise AssertionError(('Additional three-stage opening loss', loss))
+    print(json.dumps({'start': 0, 'span': 3, 'catalogued': len(rows)}), flush=True)
+
+
 def check_short_near_catalogue(*, exhaustive=False):
     blocks, sheets = 13, 40
     grouped = read_short_near_catalogue()
@@ -315,6 +407,66 @@ def check_far_outer_windows():
     NEAR['check_far_outer_windows'](blocks=blocks, sheets=39, budget=33, smaller=smaller)
 
 
+def check_middle_outer_windows():
+    from pysat.card import CardEnc, EncType, ITotalizer
+    from pysat.solvers import Solver
+
+    blocks, sheets, budget = 38, 39, 33
+    stage = BOUNDARY['stage']
+    graph, blue, *_ = CHECK['COVER']['signed_prism_cover'](blocks, sheets)
+    clauses, seeds, top = CHECK['STRIP']['strip_formula'](
+        graph, blue, budget, sheets=sheets, quotient_bounds=False, require_minimal=True)
+    seed_groups = [[] for _ in range(blocks)]
+    fort_groups = [[] for _ in range(blocks)]
+    for seed in seeds:
+        seed_groups[stage((seed - 1) // sheets)].append(seed)
+    for vertex in range(len(graph)):
+        if 0 < vertex % sheets < sheets - 1:
+            fort_groups[stage(vertex // sheets)].append(vertex + 1)
+    anchors = BOUNDARY['anchor_stages'](blocks)
+    outside = set(range(blocks)) - BOUNDARY['near_seed_stages'](blocks)
+    for stages in (anchors, outside):
+        clauses.append([u for i in stages for u in seed_groups[i]])
+
+    inside, occupied, fort, starts = [
+        list(range(top + i * blocks + 1, top + (i + 1) * blocks + 1)) for i in range(4)]
+    top = starts[-1]
+    for i in range(blocks):
+        prev, following, third = (i - 1) % blocks, (i + 1) % blocks, (i + 2) % blocks
+        clauses.extend(([-occupied[i], *seed_groups[i]], [-fort[i], *fort_groups[i]]))
+        clauses.extend([-seed, occupied[i]] for seed in seed_groups[i])
+        clauses.extend([-vertex, fort[i]] for vertex in fort_groups[i])
+        clauses.extend(([-occupied[i], inside[i]], [-fort[i], inside[i], inside[following]]))
+        # A single cyclic 0-to-1 transition determines the arc start.
+        clauses.extend(([-starts[i], inside[i]], [-starts[i], -inside[prev]],
+                        [starts[i], -inside[i], inside[prev]], [-starts[i], occupied[i]],
+                        [-inside[i], inside[following], occupied[i]]))
+        clauses.append([-inside[i], -inside[following], fort[i], fort[following]])
+        clauses.append([-inside[i], -inside[following], -inside[third],
+                        occupied[i], occupied[following], occupied[third]])
+
+    for encode, variables, bound in ((CardEnc.equals, starts, 1),
+                                     (CardEnc.atleast, inside, 14),
+                                     (CardEnc.atmost, inside, 22)):
+        requirement = encode(variables, bound=bound, top_id=top, encoding=EncType.seqcounter)
+        clauses.extend(requirement.clauses)
+        top = requirement.nv
+    smaller = transferred_smaller_losses(blocks, ORDINARY['read_catalogues']()[2])
+    if len(smaller) != 90507:
+        raise AssertionError('Unexpected lower-order archive size at 38 blocks')
+    print('Checking anchored outer arcs of spans 14 through 22', flush=True)
+    with ITotalizer(lits=seeds, ubound=budget, top_id=top) as counter:
+        with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
+            for row in smaller:
+                for clause in CHECK['block_translations'](row, sheets):
+                    solver.add_clause(clause)
+            if solver.solve(assumptions=[-counter.rhs[budget]]):
+                chosen = {v for v in solver.get_model() if v > 0}
+                loss = CHECK['normalized'](divmod(v - 1, sheets) for v in seeds if v in chosen)
+                raise AssertionError(('Unexpected middle outer loss', loss))
+    print(json.dumps({'blocks': blocks, 'spans': [14, 22], 'outer_losses': 0}), flush=True)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
@@ -326,19 +478,27 @@ if __name__ == '__main__':
                       help='exclude longer near arcs and the terminal opening window')
     mode.add_argument('--outer-far', action='store_true',
                       help='exclude anchored outer arcs of span at least 23')
-    mode.add_argument('--outer-through', type=int, choices=range(5, 12),
+    mode.add_argument('--outer-through', type=int, choices=range(5, 15),
                       metavar='SPAN', help='exclude anchored outer arcs from span five')
     mode.add_argument('--opening-four', choices=('witnesses', 'exhaustive'),
                       help='check the size-33 opening window of span four')
+    mode.add_argument('--outer-middle', action='store_true',
+                      help='exclude anchored outer arcs of spans 14 through 22 together')
+    mode.add_argument('--opening-three', choices=('witnesses', 'exhaustive'),
+                      help='replay the complete three-stage opening catalogue')
     args = parser.parse_args()
     if args.overlap:
         check_overlap_representative()
+    elif args.outer_middle:
+        check_middle_outer_windows()
     elif args.outer_through:
         check_outer_windows(args.outer_through)
     elif args.outer_far:
         check_far_outer_windows()
     elif args.near_empty:
         check_empty_near_windows()
+    elif args.opening_three:
+        check_opening_three_catalogue(exhaustive=args.opening_three == 'exhaustive')
     elif args.opening_four:
         check_opening_four_catalogue(exhaustive=args.opening_four == 'exhaustive')
     elif args.near_short:

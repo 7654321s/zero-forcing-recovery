@@ -44,16 +44,16 @@ def read_catalogues():
     return families
 
 
-def replay_witnesses(families):
-    graph, blue, *_ = CHECK['COVER']['signed_prism_cover'](8, SHEETS)
+def replay_witnesses(families, *, blocks=8, sheets=SHEETS):
+    graph, blue, *_ = CHECK['COVER']['signed_prism_cover'](blocks, sheets)
     _, _, cones = CHECK['LOSS_COMPONENTS']['nominal_cones'](graph, blue)
     for degree, rows in families:
         for row in rows:
-            lost = CHECK['mask']((v + STAGE_START(2)) * SHEETS + s + 4 for v, s in row)
+            lost = CHECK['mask']((v + STAGE_START(2)) * sheets + s + 4 for v, s in row)
             if lost & blue != lost or lost.bit_count() != degree:
                 raise AssertionError(('Wrong initial seed sites', degree, row))
             white = CHECK['remaining_white'](graph, cones, lost)
-            if white & blue != lost or any(v % SHEETS in (0, SHEETS - 1)
+            if white & blue != lost or any(v % sheets in (0, sheets - 1)
                                           for v in CHECK['members'](white)):
                 raise AssertionError(('No guarded fort for witness', degree, row))
             for seed in CHECK['members'](lost):
@@ -73,13 +73,13 @@ def check_overlap(families):
                       'signed_correction': sum(w * n for w, n in profile[33].items())}), flush=True)
 
 
-def check_complete_window(families, width, *, budget=33):
+def check_complete_window(families, width, *, budget=33, sheets=SHEETS):
     smaller = tuple(row for family in families[:-1] for row in family)
     known = CHECK['ordinary_placements'](families[-1], width)
     blocks = width + (4 if width == budget + 1 else 5)
     result = CHECK['enumerate_blockers'](
         blocks, CHECK['ordinary_placements'](smaller, width), known,
-        budget=budget, ordinary_stages=width, first_ordinary_stage=True, strip_sheets=SHEETS,
+        budget=budget, ordinary_stages=width, first_ordinary_stage=True, strip_sheets=sheets,
         require_minimal_fort=True, stream_blockers=True)
     if result != known:
         raise AssertionError(('Unexpected additional ordinary losses', budget, width, sorted(result - known)))
@@ -96,7 +96,7 @@ def check_finite_representative():
     print('38 blocks: the width-21 sheet band requires 17 losses', flush=True)
 
 
-def check_wider_seed_arcs(families, *, budget=33, maximum_span=34):
+def check_wider_seed_arcs(families, *, budget=33, maximum_span=34, sheets=SHEETS):
     smaller_templates = tuple(row for family in families[:-1] for row in family)
     stage = BOUNDARY['stage']
     for span in range(4, maximum_span + 1):
@@ -119,12 +119,15 @@ def check_wider_seed_arcs(families, *, budget=33, maximum_span=34):
                                 if stage(v // sheets) in {left, right}])
             return selected
 
+        known = {tuple((v + STAGE_START(3), s) for v, s in row)
+                 for row in families[-1] if 1 + max(v // 16 for v, _ in row) == span}
         result = CHECK['enumerate_blockers'](
-            blocks, smaller, budget=budget, strip_sheets=SHEETS, require_minimal_fort=True,
+            blocks, smaller, known, budget=budget, strip_sheets=sheets, require_minimal_fort=True,
             restrict=restrict, stream_blockers=True)
-        if result:
-            raise AssertionError(('Unexpected wider ordinary loss', span, sorted(result)))
-        print(json.dumps({'seed_span': span, 'size': budget, 'additional_losses': 0}), flush=True)
+        if result != known:
+            raise AssertionError(('Unexpected wider ordinary loss', span, sorted(result - known)))
+        print(json.dumps({'seed_span': span, 'size': budget, 'catalogued': len(known),
+                          'additional_losses': 0}), flush=True)
 
 
 if __name__ == '__main__':

@@ -61,7 +61,8 @@ def add_projection_bound(clauses, seed_vars, budget, period, quotient_cost, top,
     return bound.nv
 
 
-def strip_formula(graph, blue, budget, *, sheets=SHEETS, quotient_bounds=True, require_minimal=True):
+def strip_formula(graph, blue, budget, *, sheets=SHEETS, quotient_bounds=True,
+                  require_minimal=True, anchor_fort=True):
     order = len(graph)
     _, arrival = MODEL['trace'](graph, blue)
     if None in arrival or max(arrival) != 2:
@@ -78,7 +79,13 @@ def strip_formula(graph, blue, budget, *, sheets=SHEETS, quotient_bounds=True, r
     occupied = range(top + 1, top + 1 + sheets)
     suffix = range(top + 1 + sheets, top + 2 + 2 * sheets)
     top = suffix[-1]
-    clauses.extend(([-suffix[-1]], [occupied[1]]))
+    clauses.append([-suffix[-1]])
+    if anchor_fort:
+        clauses.append([occupied[1]])
+    else:
+        prefix = range(top + 1, top + 1 + sheets)
+        top = prefix[-1]
+        clauses.append([-prefix[0]])
     for sheet in range(sheets):
         layer = list(range(sheet + 1, order + 1, sheets)) if 0 < sheet < sheets - 1 else []
         clauses.append([-occupied[sheet], *layer])
@@ -86,8 +93,15 @@ def strip_formula(graph, blue, budget, *, sheets=SHEETS, quotient_bounds=True, r
         clauses.extend(([-occupied[sheet], suffix[sheet]],
                         [-suffix[sheet + 1], suffix[sheet]],
                         [-suffix[sheet], occupied[sheet], suffix[sheet + 1]]))
+        if not anchor_fort and sheet > 0:
+            clauses.extend(([-prefix[sheet - 1], prefix[sheet]],
+                            [-occupied[sheet], prefix[sheet]],
+                            [-prefix[sheet], prefix[sheet - 1], occupied[sheet]]))
         if 1 <= sheet < sheets - 1:
-            clauses.append([occupied[sheet], occupied[sheet + 1], -suffix[sheet + 2]])
+            no_gap = [occupied[sheet], occupied[sheet + 1], -suffix[sheet + 2]]
+            if not anchor_fort:
+                no_gap.insert(0, -prefix[sheet - 1])
+            clauses.append(no_gap)
 
     roots = [0] * order
     for v in sorted(range(order), key=arrival.__getitem__):

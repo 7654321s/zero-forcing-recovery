@@ -521,7 +521,7 @@ $$
 \log R_{k,m}(p)=km F(p)+mG(p)+O\left(km(|p|/\rho)^{r+1}\right).
 $$
 
-In particular $F(p)$ is the limit of $(km)^{-1}\log R_{k,m}(p)$ when both dimensions tend to infinity. An ordinary support first blocks at size 30 and contributes the negative of its minimum-loss count to the logarithmic coefficient at that order. The classification below therefore gives $F(p)=-10p^{30}+O(p^{31})$. The cyclic coefficients through order 29 give $G(p)=-5p^{24}-18p^{25}-82p^{26}-138p^{27}-342p^{28}-397p^{29}+O(p^{30})$.
+In particular $F(p)$ is the limit of $(km)^{-1}\log R_{k,m}(p)$ when both dimensions tend to infinity. An ordinary support first blocks at size 30 and contributes the negative of its minimum-loss count to the logarithmic coefficient at that order. The ordinary classifications below give $F(p)=-10p^{30}-89p^{31}-71p^{32}+560p^{33}-144p^{34}-1931p^{35}+O(p^{36})$. The cyclic coefficients through order 29 give $G(p)=-5p^{24}-18p^{25}-82p^{26}-138p^{27}-342p^{28}-397p^{29}+O(p^{30})$.
 
 For the uniform analytic bound, let $H$ be the auxiliary graph on the seed sites and let $U$ be any subset of those sites. Write $Z_U(z)=\sum_L z^{|L|}$, summing over losses $L\subseteq U$ that allow recovery. The component decomposition says that such a loss is exactly a collection of connected, individually recoverable sets that are pairwise disjoint and nonadjacent in $H$. This gives a compatible-polymer partition function. [Kotecký and Preiss](https://doi.org/10.1007/BF01211762)
 
@@ -686,7 +686,7 @@ M_{31}(k,m)=m(97k+17372),
 \qquad
 [p^{31}]\log R_{k,m}(p)=-m(89k+4238).
 $$
-The formulas also hold at $m=36$ for $6\leq k\leq24$ and for $k=26$, and from $m=30$ for $k=6,7$. The normalized finite size-31 count is 20,864 at 36 blocks, by the [partition below](#the-complete-size-31-boundary-catalogue). The intercepts in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order) are $\beta_{31}=20864-97\cdot36=17372$ and $\delta_{31}=13134-\beta_{31}=-4238$. The [shorter-chain extension](#extending-the-degree-31-formula-to-shorter-chains) and the [six-block catalogue](#the-complete-six-block-size-31-catalogue) give the formulas below 36 blocks.
+The formulas also hold at $m=36$ for $6\leq k\leq24$ and for $k=26$, and from $m=29$ at six and seven blocks. The normalized finite size-31 count is 20,864 at 36 blocks, by the [partition below](#the-complete-size-31-boundary-catalogue). The intercepts in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order) are $\beta_{31}=20864-97\cdot36=17372$ and $\delta_{31}=13134-\beta_{31}=-4238$. The [shorter-chain extension](#extending-the-degree-31-formula-to-shorter-chains) and the [six-block catalogue](#the-complete-six-block-size-31-catalogue) give the formulas below 36 blocks.
 
 The 33-stage band forces an empty appended pair at cost at most 31. The terminal and nonterminal checks use 34 and 35 blocks. The latter band is unchanged at every greater length. This holds on the integer lift and on cyclic covers, by projecting the lost seeds to base labels and lifting the restricted forcing process back. For a finite fort there cannot be two separated empty stage pairs with occupied stages on both sides, as the two parts would have combined cost at least 48. Contracting an empty appended pair preserves the occupied stage arc and retains at least one empty stage in its complement. Repeating down to 33 blocks confines the occupied stage arc to at most 32 stages.
 
@@ -730,7 +730,7 @@ For sheets, at lengths seven through 24 and at 26 use the width-28 band. At 25 a
 
 At lengths seven through 24 and period 36 the degree-30 checks already exclude lower-cost wrapping. For cost 31 let $a_i$ be the loss count on sheet $i$ and $e_i$ the surplus over 24 in the width-28 band starting there. Then $\sum_i e_i=28\cdot31-24\cdot36=4$ and $a_{i+28}-a_i=e_{i+1}-e_i$ modulo 36. The step 28 has four orbits, each of length nine. Summing this identity on each orbit shows that all four residue classes of $e_i$ have the same total, hence one surplus incidence each. Rotate a surplus to zero, choose the three remaining positions, and recover the relative sheet counts on each orbit. The remaining freedom is a nonnegative offset on each orbit, with their sum fixed by the total 31. The certified width-10 through width-28 bands leave 45 profiles up to rotation. The wrapped verifier excludes all 45 at each length from seven through 24. At 26 blocks the width-34 band already excludes wrapping at period 36 because $30\cdot36>34\cdot31$.
 
-At six and seven blocks the periodic-band verifier through width 28 excludes the remaining cost-31 case at each period from 30 through 35 sheets. The 45-profile check at period 36 also holds at six blocks. Width 28 excludes wrapping at both lengths for $m\geq37$.
+At six and seven blocks the periodic-band verifier through width 28 excludes the remaining cost-31 case at each period from 30 through 35 sheets. The test also excludes cost 31 at period 29 at both lengths. The 45-profile check at period 36 also holds at six blocks. Width 28 excludes wrapping at both lengths for $m\geq37$.
 
 ### The complete six-block size-31 catalogue
 
@@ -869,7 +869,7 @@ M_{33}(k,m)=m(420k+\beta_{33}),
 $$
 It suffices to compute the normalized count at 38 blocks and subtract $420\cdot38$.
 
-For an anchored outer seed arc of span at most four, the only starts and spans at 38 blocks are $(34,3)$, $(33,4)$, and $(34,4)$. Transfer their windows to 13 blocks and exclude every contained loss through size 32. The three guarded searches give **420, 0, and 0** types, respectively. The 420 types at start 34 are precisely the translated ordinary catalogue. An anchored outer arc of span at least 23 has four seed-free predecessors at its start. Apply the degree-32 selector construction at 38 blocks and 39 sheets, now excluding all 90,507 smaller normalized losses. The formula is unsatisfiable. The separate guarded-window search has also excluded every anchored outer arc of spans five through eleven, using the same local-window alignment as at degree 32. There are 69 cases in this range. The remaining outer spans for the boundary count are 12 through 22.
+For an anchored outer seed arc of span at most four, the only starts and spans at 38 blocks are $(34,3)$, $(33,4)$, and $(34,4)$. Transfer their windows to 13 blocks and exclude every contained loss through size 32. The three guarded searches give **420, 0, and 0** types, respectively. The 420 types at start 34 are precisely the translated ordinary catalogue. An anchored outer arc of span at least 23 has four seed-free predecessors at its start. Apply the degree-32 selector construction at 38 blocks and 39 sheets, now excluding all 90,507 smaller normalized losses. The formula is unsatisfiable. The separate guarded-window search has also excluded every anchored outer arc of spans five through fourteen, using the same local-window alignment as at degree 32. There are 120 cases in this range. The middle-span check covers spans 14 through 22 in a single formula. Its stage flags mark a cyclic interval with exactly one start, contain every seed stage, and require lost seeds at both endpoints. An inside triple must contain a lost seed, each inside pair must meet the fort, and the fort is confined to this arc and its predecessor. With the anchor and outside conditions and every smaller loss excluded, the formula is unsatisfiable. Thus the whole outer catalogue consists of the 420 ordinary types at start 34.
 
 ### Short degree-33 near-boundary windows omitting an opening stage
 
@@ -887,10 +887,13 @@ Each other short candidate that omits an opening stage has zero new types. Fifte
 
 The four-stage window from stage 0 through stage 3 has **847** additional types, up to sheet translation. The local test includes the predecessor and its two guard stages. Its seven-stage window agrees with the seven-block cover at all vertices incident to the possible fort. Guard-to-guard edges have both endpoints outside it. The guarded search excludes 71,810 smaller types in these stages. The [opening catalogue](degree-33-opening-span-four-catalogue.json.gz) records the 847 witnesses.
 
-The two near-boundary catalogues together account for 10,384 types. The three-stage opening window has no size-33 type supported on stages 0 and 2 alone, by a separate guarded search. Let $T$ be the number of normalized size-33 losses using all three opening stages, and $B$ the nonordinary outer count from spans 12 through 22. The ordinary starts run from stage 2 through stage $k-4$, so their count is $420(k-5)$ per sheet. This gives
+The two near-boundary catalogues together account for 10,384 types. A separate guarded search excludes size-33 types supported on stages 0 and 2 alone. With all three opening stages occupied, the [three-stage opening catalogue](degree-33-opening-span-three-catalogue.json.gz) gives **127,407** size-33 types up to sheet translation. These are grouped by the 496 positive triples of stage counts summing to 33. The first lost seed sheet is fixed at sheet 5. By two-round ancestry every fort vertex is within four sheet steps of a lost seed, and the finite fort span is at most 37 sheets. The anchoring therefore fits every candidate between the two guards on the 44-sheet strip. The six-block window has the same edges incident to the possible fort as the window at the opening of the thirteen-block cover. After excluding 71,003 eligible smaller losses and the catalogued types, the guarded search checks completeness. An independent parallel-forcing replay verifies all 127,407 witnesses and 4,204,431 single-seed restorations.
+
+The near-boundary total is $10384+127407=137791$. Counting the ordinary starts from stage 2 through stage $k-4$ gives $420(k-5)$ per sheet. Hence
 $$
-\beta_{33}=8284+T+B.
+M_{33}(k,m)=m(420k+135691),\qquad k\geq38,\ m\geq39.
 $$
+There are 151,651 normalized types in the 38-block representative.
 
 ### A finite representative for the degree-33 overlap correction
 
@@ -907,7 +910,7 @@ Group these input events by their vectors of stage seed counts. Two vectors can 
 
 Together with the boundary count representative, this gives
 $$
-[p^{33}]\log R_{k,m}(p)=m\bigl(560k-\beta_{33}-C_{12}-11760\bigr),
+[p^{33}]\log R_{k,m}(p)=m\bigl(560k-147451-C_{12}\bigr),
 \qquad k\geq38,\ m\geq39.
 $$
 
@@ -935,6 +938,31 @@ M_{34}(k,m)=m(685k+\beta_{34}),
 \qquad k\geq39,\ m\geq40,
 $$
 where $\beta_{34}$ is the normalized size-34 count at 39 blocks minus $685\cdot39$.
+
+### All size-35 losses in ordinary stages
+
+The [ordinary catalogue](ordinary-size-35-catalogue.json.gz) has **1,310** normalized types. Of these, 1,306 use three consecutive seed stages. The other four use four consecutive stages and fourteen sheets. The [verifier](check_degree_35_ordinary.py) checks each witness and all 45,850 single-seed restorations.
+
+At cost at most 35, the terminal and nonterminal 37-stage band tests at 38 and 39 blocks force an empty adjacent appended pair. An internal empty pair separating two nonempty ordinary parts would require at least 48 losses. Contracting the empty pairs to 37 blocks bounds the occupied ordinary fort arc by 36 stages and preserves its occupied sheets. The width-21 sheet band at 37 blocks requires 17 lost seeds whenever every adjacent sheet pair meets the fort. Since $17\cdot44>21\cdot35$, at period 44 the cyclic fort has an empty adjacent sheet pair and its finite span is at most 42 sheets. The classification uses the resulting 44-sheet strip with two guards.
+
+The guarded three-stage search gives the 1,306 short types. The four-stage search adds the four longer types, and the five-stage search has the same catalogue. Testing each seed arc of span four through 36 with both endpoints lost, no internal three-stage seed gap and every internal adjacent fort-stage pair occupied gives the same four longer types and no others. The span-36 test excludes the predecessor since including it would exceed the fort span bound.
+
+The lower ordinary catalogue has 1,488 types through size 34. Each occupies three stages and has at least six lost seeds in each. Two starts differ in at least one occupied stage and have union size at least $30+6$, so a degree-35 ordinary overlap involves a single start. The observed signed counts up to sheet translation are
+
+| Weight | $-2$ | $-1$ | $0$ | $+1$ | $+2$ |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Unions of size 35 | 34 | 4,922 | 2,911 | 5,567 | 22 |
+
+The signed correction to blocking is $+621$ per start and sheet, and the largest union spans twelve sheets. An independent inclusion-exclusion computation organized by the earliest event gives the same signed total. Thus the ordinary slopes are
+$$
+\alpha_{35}=1310,\qquad \gamma_{35}=-621-1310=-1931.
+$$
+
+At $k\geq40$ the largest seed test window spans at most 39 stages, so every exceptional offset already occurs at 40 blocks. A window of this maximum length that becomes ordinary on a longer chain would require a span-36 ordinary seed arc, which the guarded search excludes. Each ordinary type gains one placement per additional block. It follows that
+$$
+M_{35}(k,m)=m(1310k+\beta_{35}),\qquad k\geq40,\ m\geq44,
+$$
+where $\beta_{35}$ is the normalized size-35 count at 40 blocks minus $1310\cdot40$.
 
 ### A packing of disjoint ordinary blocking losses
 
@@ -1215,18 +1243,26 @@ python -B research-twins/check_degree_33_boundary.py --near-short exhaustive
 python -B research-twins/check_degree_33_boundary.py --near-empty
 python -B research-twins/check_degree_33_boundary.py --opening-four witnesses
 python -B research-twins/check_degree_33_boundary.py --opening-four exhaustive
+python -B research-twins/check_degree_33_boundary.py --opening-three witnesses
+python -B research-twins/check_degree_33_boundary.py --opening-three exhaustive
 python -B research-twins/check_degree_33_boundary.py --outer-far
-python -B research-twins/check_degree_33_boundary.py --outer-through 11
+python -B research-twins/check_degree_33_boundary.py --outer-through 14
+python -B research-twins/check_degree_33_boundary.py --outer-middle
 python -B research-twins/check_degree_34_ordinary.py
 python -B research-twins/check_degree_34_ordinary.py --window 4
 python -B research-twins/check_degree_34_ordinary.py --seed-arcs
 python -B research-twins/check_degree_34_ordinary.py --bounds
+python -B research-twins/check_degree_35_ordinary.py
+python -B research-twins/check_degree_35_ordinary.py --window 4
+python -B research-twins/check_degree_35_ordinary.py --seed-arcs
+python -B research-twins/check_degree_35_ordinary.py --bounds
 python -B research-twins/check_short_prism_covers.py --degree-33-period-39
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 26 --band-blocks 36
 python -B research-twins/check_short_prism_covers.py --degree-33-saturated-period-39
 python -B research-twins/check_prism_projected_support.py --cost-31-stage-pairs
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 24 --band-blocks 33
 python -B research-twins/check_short_prism_covers.py --degree-31-period-37 33
+python -B research-twins/check_short_prism_covers.py --wrapped 6 29 31 28 --wrapped 7 29 31 28
 for sheets in 30 31 32 33 34 35
 do
     python -B research-twins/check_short_prism_covers.py --wrapped 6 "$sheets" 31 28 --wrapped 7 "$sheets" 31 28 || exit 1
