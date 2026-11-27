@@ -376,13 +376,17 @@ def lower_order_catalogue(blocks, catalogues):
 def check_degree_31_overlap(blocks):
     with gzip.open(HERE / 'five-block-loss-catalogue.json.gz', 'rt', encoding='utf-8') as source:
         base = json.load(source)['losses_by_size']
-    base = [tuple(tuple(map(tuple, row)) for row in base[str(size)]) for size in range(25, 30)]
-    smaller = lower_order_catalogue(blocks, base)
-    with gzip.open(HERE / 'thirteen-block-size-30-catalogue.json.gz', 'rt', encoding='utf-8') as source:
-        archive = json.load(source)
-    size_30 = tuple(tuple(map(tuple, row)) for row in archive['losses'])
-    if blocks != 13:
-        size_30 = relocate_boundary_patterns(size_30, 13, blocks)
+    catalogues = [tuple(tuple(map(tuple, row)) for row in base[str(size)])
+                  for size in range(25, 30)]
+    smaller = lower_order_catalogue(blocks, catalogues)
+    if blocks == 5:
+        size_30 = tuple(tuple(map(tuple, row)) for row in base['30'])
+    else:
+        with gzip.open(HERE / 'thirteen-block-size-30-catalogue.json.gz', 'rt', encoding='utf-8') as source:
+            archive = json.load(source)
+        size_30 = tuple(tuple(map(tuple, row)) for row in archive['losses'])
+        if blocks != 13:
+            size_30 = relocate_boundary_patterns(size_30, 13, blocks)
     check_boundary_joint_spans(blocks, size_30)
     profile, span = signed_union_weights((*smaller, *size_30), 31)
     expected = {-2: 344, -1: 19417 + 8 * blocks, 0: 2882, 1: 6502, 2: 233, 3: 1}
@@ -852,7 +856,7 @@ def main():
                       help='verify the complete ordinary size-31 loss catalogue')
     mode.add_argument('--ordinary-size-31-restoration', action='store_true',
                       help='check the single-seed restoration times of ordinary size-31 losses')
-    mode.add_argument('--degree-31-overlap', type=int, choices=(13, 14), metavar='BLOCKS',
+    mode.add_argument('--degree-31-overlap', type=int, choices=(5, 13, 14), metavar='BLOCKS',
                       help='verify the degree-31 overlap correction from the smaller losses')
     mode.add_argument('--size-28', choices=EXPECTED_SIZE_28_SPANS, type=int, metavar='BLOCKS',
                       help='verify size-28 losses from five blocks through the locality representative')

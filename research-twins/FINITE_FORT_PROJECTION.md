@@ -382,9 +382,9 @@ Let $A_{30}(13)$ count the inclusion-minimal 30-seed blocking losses on the 13-b
 $$
 m_0(k)=
 \begin{cases}
-28 & k\in\{5,6\},\\
-29 & k=7,\\
-32 & k=8,\\
+28 & 5\leq k\leq7,\\
+30 & k=8,\\
+33 & k=9,\\
 35 & \text{otherwise}.
 \end{cases}
 $$
@@ -433,7 +433,7 @@ The five-block catalogue above has 5,975 types and the same joint span profile. 
 
 Four consecutive sheets with all of their seeds intact separate the remaining white vertices across the middle of the four sheets by round five. Specifically, there is no pair of white vertices at graph distance at most two across the cut. The verifier starts with just the seeds in the four sheets and checks every crossing pair on 31 sheets at lengths 13 through 27. For a pair at distance at most two, the two round-five decisions and the path between the pair are determined within radius twelve of either endpoint. The sheet windows are well inside the representative's 31 sheets. In the stage coordinate, the radius-twelve window spans at most 25 positions. At 27 blocks the window realizes all ordinary placements and all offsets from the adjacent exceptional stages that can occur in any longer chain. The certificate therefore applies to the integer lift at every $k\geq13$. If four seed-free sheets lay inside the seed support of a finite fort of cost at most 30, both sides would be nonempty. The certificate prevents any outside vertex from seeing both sides, so each side is itself a finite fort of cost at least 24. Thus every internal gap in the seed support has length at most three.
 
-To compare with cyclic covers, the same 32-stage bands contract a cyclic fort of cost at most 30 down to 32 blocks when necessary. The contraction preserves cost and the set of occupied sheets. Use the width-28 bands at five through 24 blocks and at 26, and the width-25 bands at 25 and 27 through 32. For a cyclic fort meeting every adjacent sheet pair, summing the width-$w$ window counts gives $(w-4)m\leq wb$ for seed cost $b$. Widths 25 and 28 exclude wrapping at $m\geq36$ for $b\leq30$, since $21\cdot36>25\cdot30$ and $24\cdot36>28\cdot30$. At 35 sheets the width-28 bound forces $b=30$ and equality in every window. Taking differences of consecutive counts makes the sheet counts periodic modulo seven. The width-27 bound caps each sheet at one seed. The wrapped checks exclude cost 30 at the lengths through 24 blocks. At 25 and at 27 through 32 blocks the width-25 bound excludes $b\leq29$, since $21\cdot35>25\cdot29$. The full wrapped tests there exclude $b=30$. The 32-block test also applies to every larger length by contraction, which preserves the sheet support. At 26 blocks the width-34 band gives $30\cdot35>34\cdot30$. The direct tests also exclude wrapped cost 30 down to 28 sheets at five and six blocks, 29 sheets at seven blocks, and 32 sheets at eight blocks. Costs through 29 already unroll from 28 sheets at all four lengths. Thus every cyclic fort at these costs unrolls at the claimed periods. A cyclic inclusion-minimal loss has a finite lift that is also minimal, since a smaller finite blocking subset would project to a smaller cyclic blocking subset.
+To compare with cyclic covers, the same 32-stage bands contract a cyclic fort of cost at most 30 down to 32 blocks when necessary. The contraction preserves cost and the set of occupied sheets. Use the width-28 bands at five through 24 blocks and at 26, and the width-25 bands at 25 and 27 through 32. For a cyclic fort meeting every adjacent sheet pair, summing the width-$w$ window counts gives $(w-4)m\leq wb$ for seed cost $b$. Widths 25 and 28 exclude wrapping at $m\geq36$ for $b\leq30$, since $21\cdot36>25\cdot30$ and $24\cdot36>28\cdot30$. At 35 sheets the width-28 bound forces $b=30$ and equality in every window. Taking differences of consecutive counts makes the sheet counts periodic modulo seven. The width-27 bound caps each sheet at one seed. The wrapped checks exclude cost 30 at the lengths through 24 blocks. At 25 and at 27 through 32 blocks the width-25 bound excludes $b\leq29$, since $21\cdot35>25\cdot29$. The full wrapped tests there exclude $b=30$. The 32-block test also applies to every larger length by contraction, which preserves the sheet support. At 26 blocks the width-34 band gives $30\cdot35>34\cdot30$. The direct tests also exclude wrapped cost 30 down to 28 sheets at five through seven blocks, 30 sheets at eight blocks, and 33 sheets at nine blocks. Costs through 29 already unroll from 28 sheets at five through eight blocks and from 33 sheets at nine blocks. Thus every cyclic fort at these costs unrolls at the claimed periods. A cyclic inclusion-minimal loss has a finite lift that is also minimal, since a smaller finite blocking subset would project to a smaller cyclic blocking subset.
 
 The thirteen-block catalogue gives sheet span at most 12. Near the exceptional stages the template transfer preserves sheet coordinates. In the ordinary interior the ten known templates also have sheet span at most 12. The six-block catalogue has the same maximum span. At these periods any finite size-30 loss projects to a blocking loss with a unique outer gap. If its projection contained a smaller cyclic minimal loss, unroll that loss and align the two at a shared seed. Each pattern has sheet span at most 12, so each difference from the shared seed has magnitude at most 11. Congruence modulo $m\geq m_0(k)$ then implies equality, which would put the smaller loss inside the original finite one. Hence the projections are minimal, and there are $m$ distinct translates of each type. The correction $-3861m$ from smaller losses gives the coefficient above.
 
@@ -636,7 +636,7 @@ Use only minimal losses of size at most 30 in the blocking event. For $k\geq14$ 
 $$
 V_{31}(k,m)=-m(8k+13134)
 $$
-to the degree-31 blocking coefficient. This contribution excludes the individual minimal losses of size 31.
+to the degree-31 blocking coefficient. The same expression gives $V_{31}(5,m)=-13174m$ at five blocks for $m\geq28$. These contributions exclude the individual minimal losses of size 31.
 
 The normalized finite union calculation at 14 blocks gives the following signed weights. All unions through degree 31 span at most twelve sheets.
 
@@ -644,11 +644,13 @@ The normalized finite union calculation at 14 blocks gives the following signed 
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Degree-31 unions at 14 blocks | 344 | 19529 | 2882 | 6502 | 233 | 1 |
 
-Their sum with signs is $-13246$. The 13-block calculation independently gives $-13238$, with eight fewer weight-$-1$ unions and the other counts unchanged. The verifier builds unions using translated copies of the complete catalogues through size 30. For a union $U$ it assigns weight one minus the sum of the weights of all distinct proper subunions of $U$. Grouping the indices by cardinality reduces the number of candidate translations. When a proper subunion has just one or two fewer sites, the verifier checks containment by deleting those sites and normalizing the resulting subset.
+Their sum with signs is $-13246$. The 13-block calculation independently gives $-13238$, with eight fewer weight-$-1$ unions and the other counts unchanged. At five blocks the weight-$-1$ count is 19,457 and the other five counts are the same. The sum is $-13174$, and the maximum span is again twelve sheets. The verifier builds unions using translated copies of the complete catalogues through size 30. For a union $U$ it assigns weight one minus the sum of the weights of all distinct proper subunions of $U$. Grouping the indices by cardinality reduces the number of candidate translations. When a proper subunion has just one or two fewer sites, the verifier checks containment by deleting those sites and normalizing the resulting subset.
 
 Any two constituents of a degree-31 union meet because the smallest has size 24. Each spans at most four stages and twelve sheets, so after aligning all constituents to one of them the full union spans at most ten stages and 34 sheets. The internal seed gaps in the stage coordinate have length at most two, since the stage arcs of all constituents intersect the reference arc. The outer gap at $k\geq14$ has at least four stages. Any contained smaller pattern uses at most four stages and cannot straddle this gap. The union weight therefore depends only on a stage window of length at most thirteen, including the extra stages used to determine the constituents. All exceptional offsets of such a window occur at 14 blocks. Ordinary unions come from the ten size-30 types at a common start and contribute $-8$ per ordinary starting stage. The ordinary union window is already strictly shorter than 14 stages. Thus every stage window type relevant to the union weight occurs at 14 blocks, and the signed count has slope $-8$ from that length onward. The sheet span bound of twelve transfers with the finite types.
 
-For $m\geq35$ all constituent losses unroll. Lift one constituent, then align every other one at a shared seed of the first. The common 34-sheet interval has injective sheet coordinates modulo $m$, so the resulting union and all of its constituent coincidences are the finite ones. The actual finite span is at most twelve, giving a unique outer gap and $m$ distinct sheet translations. The finite correction therefore multiplies by $m$ on the cyclic cover.
+All constituent losses unroll at the periods in the formula. In a cyclic union of at most 31 sites, any three constituents have at least $31-3(31-24)=10$ common sites. Lift one constituent and align every other one at a seed shared with it. Any two shared sites give the same alignment, because all relative sheet coordinates have magnitude at most eleven and $m>22$. For any two of the other constituents, a seed common to all three aligns both with the first in the same lift. Every coincidence between the two then holds in integer sheets by the same $m>22$ comparison. Thus the cyclic union lifts with unchanged size and constituent relations. Its finite span is at most twelve, giving a unique outer gap and $m$ distinct sheet translations. The finite correction therefore multiplies by $m$ on the cyclic cover, including at five blocks from 28 sheets.
+
+At five blocks every cyclic fort of cost at most 31 unrolls from 30 sheets. The smaller costs already unroll from 28 sheets and the wrapped verifier excludes cost 31 at 30 through 36 sheets. At $m\geq37$ the width-28 bound excludes wrapped cost 31 because $24m>28\cdot31$.
 
 ### A finite representative for the degree-31 boundary terms
 
@@ -904,6 +906,7 @@ python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-30-exact
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-31
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-31-exact
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-31-restoration
+python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 5
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 13
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 14
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-threshold
@@ -930,8 +933,16 @@ do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 35 30 28 || exit 1
 done
 python -B research-twins/check_short_prism_covers.py --wrapped 25 35 30 25 --wrapped 27 35 30 25 --wrapped 28 35 30 25 --wrapped 29 35 30 25 --wrapped 30 35 30 25 --wrapped 31 35 30 25 --wrapped 32 35 30 25
-python -B research-twins/check_short_prism_covers.py --wrapped 6 28 30 28
-python -B research-twins/check_short_prism_covers.py --wrapped 8 32 30 28 --wrapped 8 33 30 28 --wrapped 8 34 30 28
+python -B research-twins/check_short_prism_covers.py --wrapped 6 28 30 28 --wrapped 7 28 30 28
+for sheets in 30 31 32 33 34
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped 8 "$sheets" 30 28 || exit 1
+done
+python -B research-twins/check_short_prism_covers.py --wrapped 9 33 30 28 --wrapped 9 34 30 28
+for sheets in 30 31 32 33 34 35 36
+do
+    python -B research-twins/check_short_prism_covers.py --wrapped 5 "$sheets" 31 28 || exit 1
+done
 for sheets in 29 30 31 32 33 34
 do
     python -B research-twins/check_short_prism_covers.py --wrapped 6 "$sheets" 30 28 --wrapped 7 "$sheets" 30 28 || exit 1
