@@ -730,7 +730,7 @@ For sheets, at lengths seven through 24 and at 26 use the width-28 band. At 25 a
 
 At lengths seven through 24 and period 36 the degree-30 checks already exclude lower-cost wrapping. For cost 31 let $a_i$ be the loss count on sheet $i$ and $e_i$ the surplus over 24 in the width-28 band starting there. Then $\sum_i e_i=28\cdot31-24\cdot36=4$ and $a_{i+28}-a_i=e_{i+1}-e_i$ modulo 36. The step 28 has four orbits, each of length nine. Summing this identity on each orbit shows that all four residue classes of $e_i$ have the same total, hence one surplus incidence each. Rotate a surplus to zero, choose the three remaining positions, and recover the relative sheet counts on each orbit. The remaining freedom is a nonnegative offset on each orbit, with their sum fixed by the total 31. The certified width-10 through width-28 bands leave 45 profiles up to rotation. The wrapped verifier excludes all 45 at each length from seven through 24. At 26 blocks the width-34 band already excludes wrapping at period 36 because $30\cdot36>34\cdot31$.
 
-At six and seven blocks the periodic-band verifier through width 28 excludes the remaining cost-31 case at each period from 32 through 35 sheets. The 45-profile check at period 36 also holds at six blocks. Width 28 excludes wrapping at both lengths for $m\geq37$.
+At six and seven blocks the periodic-band verifier through width 28 excludes the remaining cost-31 case at each period from 31 through 35 sheets. The 45-profile check at period 36 also holds at six blocks. Width 28 excludes wrapping at both lengths for $m\geq37$.
 
 ### The complete six-block size-31 catalogue
 
@@ -742,7 +742,7 @@ The verifier exhausts the other 62 nonempty seed stage supports in the guarded s
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Loss types | 134 | 803 | 97 | 97 | 321 | 86 |
 
-The [six-block extension](six-block-size-31-extension.json.gz) stores those 1,538 types. Together with the 16,416 inherited types, the count is **17,954**. The degree-31 overlap contribution is $-13182m$, giving $[p^{31}]\log R_{6,m}(p)=-4772m$ for $m\geq32$.
+The [six-block extension](six-block-size-31-extension.json.gz) stores those 1,538 types. Together with the 16,416 inherited types, the count is **17,954**. The degree-31 overlap contribution is $-13182m$, giving $[p^{31}]\log R_{6,m}(p)=-4772m$ for $m\geq31$.
 
 Thus every $k\geq5$ and $m\geq37$ satisfies
 $$
@@ -798,7 +798,9 @@ The guarded search at 13 blocks excludes 27,149 smaller types restricted to $N_{
 
 The witness verifier computes the final white fort and checks that restoring any one lost seed gives full recovery. The exhaustive mode excludes the archived catalogue and the ordinary types before searching again for any remaining near-boundary loss.
 
-Let $\ell$ denote the number of normalized size-32 losses at 37 blocks that meet $A_{37}$, have a seed outside $N_{37}$ and have a seed arc of span at least five. There are $31\cdot276$ ordinary placements without an anchor at 37 blocks, and the short outer count adds 276 ordinary placements at the terminal side. With the five-stage reduction in the resulting ordinary count relative to $276k$, the full formula is
+For anchored outer seed arcs of spans five through ten, the numbers of candidate starts at 37 blocks are respectively 4, 6, 8, 10, 12 and 14. For a span $s$, align the $s+3$ guard window by its exceptional stage in a representative with $\max(13,s+4)$ blocks. This retains both the seed labels and all fort clauses that can depend on the occupied region. The two endpoints must contain lost seeds. Every internal triple of seed stages must contain a loss, and every internal adjacent pair must meet the fort. Otherwise the one-sided ancestry rule or the empty-pair cut would split the fort into two, with combined seed cost at least 48. With the lower-order catalogue excluded, each of these 54 guarded searches is unsatisfiable.
+
+Let $\ell$ denote the number of normalized size-32 losses at 37 blocks that meet $A_{37}$, have a seed outside $N_{37}$ and have a seed arc of span at least eleven. There are $31\cdot276$ ordinary placements without an anchor at 37 blocks, and the short outer count adds 276 ordinary placements at the terminal side. With the five-stage reduction in the resulting ordinary count relative to $276k$, the full formula is
 $$
 M_{32}(k,m)=m(276k+49553+\ell),
 \qquad
@@ -1093,10 +1095,11 @@ python -B research-twins/check_degree_31_boundary.py --degree-32-overlap
 python -B research-twins/check_degree_31_boundary.py --degree-32-outer-windows
 python -B research-twins/check_degree_32_boundary.py
 python -B research-twins/check_degree_32_boundary.py --exhaustive
+python -B research-twins/check_degree_32_boundary.py --outer-through 10
 python -B research-twins/check_prism_projected_support.py --cost-31-stage-pairs
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 24 --band-blocks 33
 python -B research-twins/check_short_prism_covers.py --degree-31-period-37 33
-for sheets in 32 33 34 35
+for sheets in 31 32 33 34 35
 do
     python -B research-twins/check_short_prism_covers.py --wrapped 6 "$sheets" 31 28 --wrapped 7 "$sheets" 31 28 || exit 1
 done

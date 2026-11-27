@@ -1,4 +1,4 @@
-"""Replay and exhaust the nonordinary size-32 losses near the exceptional stages."""
+"""Replay the size-32 near boundary and check short outer windows."""
 
 import argparse
 from collections import Counter
@@ -85,13 +85,67 @@ def check_exhaustive(rows):
     print(json.dumps({'blocks': BLOCKS, 'size': SIZE, 'additional_near_losses': 0}), flush=True)
 
 
+def check_outer_windows(last_span):
+    representative = 37
+    anchors = BOUNDARY['anchor_stages'](representative)
+    near = BOUNDARY['near_seed_stages'](representative)
+    counts = {}
+    for span in range(5, last_span + 1):
+        blocks = max(BLOCKS, span + 4)
+        lower, size_30 = CHECK['catalogues_through_size_30'](blocks)
+        lower = [(row, set(support(row)))
+                 for row in (*lower, *size_30, *BOUNDARY['transferred_catalogue'](blocks))]
+        checked = 0
+        for first in range(representative):
+            window = [(first + offset) % representative for offset in range(-2, span + 1)]
+            arc = set(window[2:-1])
+            if not (arc & anchors and arc - near):
+                continue
+            exceptional = 0 if 0 in window else representative - 1
+            local_exceptional = 0 if exceptional == 0 else blocks - 1
+            offset = window.index(exceptional)
+            mapped = [(local_exceptional + i - offset) % blocks for i in range(len(window))]
+            local_arc = mapped[2:-1]
+            allowed = set(local_arc)
+            required = [{local_arc[0]}, {local_arc[-1]},
+                        {local for remote, local in zip(window, mapped) if remote in anchors},
+                        {local for remote, local in zip(window, mapped) if remote not in near}]
+            required.extend(set(local_arc[i:i + 3]) for i in range(1, span - 3))
+            smaller = [row for row, stages in lower if stages <= allowed]
+
+            def restrict(clauses, seeds, order, sheets):
+                selected = BOUNDARY['restrict_stages'](
+                    clauses, seeds, order, sheets, allowed, required, blocks=blocks)
+                for left, right in zip(local_arc[1:-1], local_arc[2:-1]):
+                    clauses.append([v + 1 for v in range(order)
+                                    if BOUNDARY['stage'](v // sheets) in {left, right}])
+                return selected
+
+            result = CHECK['enumerate_blockers'](
+                blocks, smaller, budget=SIZE, strip_sheets=SHEETS, require_minimal_fort=True,
+                restrict=restrict, stream_blockers=True)
+            if result:
+                raise AssertionError(('Unexpected outer losses', first, span, sorted(result)))
+            checked += 1
+            print(json.dumps({'blocks': representative, 'first_stage': first, 'stage_span': span,
+                              'outer_losses': 0}), flush=True)
+        if checked != 2 * span - 6:
+            raise AssertionError(('Unexpected outer window count', span, checked))
+        counts[span] = checked
+    print(json.dumps({'outer_window_counts': counts, 'total': sum(counts.values())}), flush=True)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--exhaustive', action='store_true',
-                        help='exclude every further loss in the guarded near-boundary strip')
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument('--exhaustive', action='store_true',
+                       help='exclude every further loss in the guarded near-boundary strip')
+    modes.add_argument('--outer-through', type=int, choices=range(5, 11), metavar='SPAN',
+                       help='exclude outer losses of lengths five through SPAN')
     args = parser.parse_args()
-    rows = read_catalogue()
-    if args.exhaustive:
-        check_exhaustive(rows)
+    if args.outer_through:
+        check_outer_windows(args.outer_through)
+    elif args.exhaustive:
+        check_exhaustive(read_catalogue())
     else:
-        check_witnesses(rows)
+        check_witnesses(read_catalogue())
