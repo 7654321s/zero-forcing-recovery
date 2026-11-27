@@ -688,8 +688,10 @@ def check_ordinary_size_31(*, exhaustive=False):
     templates = [tuple((v - stage_start(2), sheet) for v, sheet in row)
                  for row in sorted(three_stages)]
     if exhaustive:
-        SPAN['BAND']['check_band'](35, stages=33, budget=31)
-        print('A 33-stage ordinary band forces an empty pair at budget 31', flush=True)
+        for blocks in (34, 35):
+            SPAN['BAND']['check_band'](blocks, stages=33, budget=31)
+            print(f'{blocks} blocks: a 33-stage band forces an empty pair at budget 31',
+                  flush=True)
         check_ordinary_sheet_bands()
         known = placements(templates, 32)
         if enumerate_blockers(36, placements(ordinary, 32), known, budget=31,
