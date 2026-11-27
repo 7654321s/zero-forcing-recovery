@@ -655,7 +655,82 @@ def check_ordinary_sheet_bands():
                                  blocks=36, subband_constraints=width >= 13)
 
 
-def check_ordinary_size_31(*, exhaustive=False):
+def ordinary_size_31_restoration(templates):
+    sheets, anchor = 32, 9
+    graph, seeds, *_ = COVER['signed_prism_cover'](21, sheets)
+    stage_start = SPAN['BAND']['stage_start']
+    neighbors = tuple(tuple(members(row)) for row in graph)
+    trace = COVER['MODEL']['trace']
+    intact = trace(graph, seeds)[1]
+    if None in intact or max(intact) != 2:
+        raise AssertionError('Unexpected intact closure in the restoration representative')
+    intact_white = [{v for v, t in enumerate(intact) if t > r} for r in range(3)]
+
+    def recover(lost):
+        region = set(lost)
+        added_white = set(lost)
+        # At round r any change from the intact run is within distance 2r of a loss.
+        for round_number in (1, 2):
+            for _ in range(2):
+                region.update(u for v in tuple(region) for u in neighbors[v])
+            white = intact_white[round_number - 1] | added_white
+            added_white = {
+                v for v in (region & white) - intact_white[round_number]
+                if not any(u not in white and all(w == v or w not in white for w in neighbors[u])
+                           for u in neighbors[v])
+            }
+        white = added_white
+        round_number = 2
+        while white:
+            sources = {u for v in white for u in neighbors[v] if u not in white}
+            forced = set()
+            for source in sources:
+                targets = [v for v in neighbors[source] if v in white]
+                if len(targets) == 1:
+                    forced.add(targets[0])
+            if not forced:
+                return None, white
+            white.difference_update(forced)
+            round_number += 1
+        return round_number, white
+
+    residual, rounds, worst = Counter(), Counter(), Counter()
+    for index, template in enumerate(templates):
+        lost = {(v + stage_start(anchor)) * sheets + sheet + 7 for v, sheet in template}
+        completion, fort = recover(lost)
+        if completion is not None or {u for u in fort if (seeds >> u) & 1} != lost:
+            raise AssertionError(('Unexpected surviving fort', template))
+        if any(not stage_start(anchor - 1) <= v // sheets < stage_start(anchor + 3)
+               or v % sheets in (0, sheets - 1) for v in fort):
+            raise AssertionError(('Unguarded surviving fort', template))
+        profile = Counter()
+        for restored in sorted(lost):
+            time, _ = recover(lost - {restored})
+            if time is None:
+                raise AssertionError(('A single restoration still blocks', template, restored))
+            profile[time] += 1
+        if index in (0, 11, 48, 96):
+            direct = trace(graph, seeds & ~mask(lost))[1]
+            if fort != {v for v, t in enumerate(direct) if t is None} or profile != dict(
+                    SPAN['restoration_profile'](graph, seeds, mask(lost))):
+                raise AssertionError(('Local and full forcing traces differ', template))
+        residual[len(fort)] += 1
+        rounds.update(profile)
+        worst[max(profile)] += 1
+    if residual != {64: 1, 66: 2, 67: 5, 68: 3, 69: 5, 70: 4, 71: 14, 72: 13,
+                    73: 17, 74: 11, 75: 13, 76: 6, 77: 2, 78: 1}:
+        raise AssertionError(('Unexpected ordinary fort sizes at cost 31', residual))
+    if rounds != {7: 7, 8: 58, 9: 230, 10: 432, 11: 558, 12: 596, 13: 457, 14: 347,
+                  15: 206, 16: 79, 17: 32, 18: 4, 20: 1}:
+        raise AssertionError(('Unexpected ordinary restoration times at cost 31', rounds))
+    if worst != {14: 17, 15: 28, 16: 26, 17: 22, 18: 3, 20: 1}:
+        raise AssertionError(('Unexpected worst restoration times by template', worst))
+    return {'residual_sizes': dict(sorted(residual.items())),
+            'restoration_rounds': dict(sorted(rounds.items())),
+            'worst_restoration_rounds': dict(sorted(worst.items()))}
+
+
+def check_ordinary_size_31(*, exhaustive=False, restoration=False):
     """Classify ordinary cost-31 losses, with an optional full-interior search."""
     stage_start = SPAN['BAND']['stage_start']
     with gzip.open(HERE / 'thirteen-block-size-30-catalogue.json.gz', 'rt', encoding='utf-8') as source:
@@ -697,11 +772,14 @@ def check_ordinary_size_31(*, exhaustive=False):
         if enumerate_blockers(36, placements(ordinary, 32), known, budget=31,
                               ordinary_stages=32, first_ordinary_stage=True) != known:
             raise AssertionError('An additional size-31 loss survives in the ordinary interior')
-    print(json.dumps({
+    result = {
         'size': 31, 'ordinary_stage_window': 32 if exhaustive else 4,
         'exhaustive': exhaustive, 'count': len(templates),
         'spans': dict(sorted(spans.items())), 'losses': templates,
-    }), flush=True)
+    }
+    if restoration:
+        result.update(ordinary_size_31_restoration(templates))
+    print(json.dumps(result), flush=True)
 
 
 def check_ordinary_threshold():
@@ -734,6 +812,8 @@ def main():
                       help='verify size-31 losses within four ordinary stages')
     mode.add_argument('--ordinary-size-31-exact', action='store_true',
                       help='verify the complete ordinary size-31 loss catalogue')
+    mode.add_argument('--ordinary-size-31-restoration', action='store_true',
+                      help='check the single-seed restoration times of ordinary size-31 losses')
     mode.add_argument('--size-28', choices=EXPECTED_SIZE_28_SPANS, type=int, metavar='BLOCKS',
                       help='verify size-28 losses from five blocks through the locality representative')
     mode.add_argument('--size-29', choices=EXPECTED_SIZE_29_SPANS, type=int, metavar='BLOCKS',
@@ -754,8 +834,9 @@ def main():
     if args.ordinary_threshold:
         check_ordinary_threshold()
         return
-    if args.ordinary_size_31 or args.ordinary_size_31_exact:
-        check_ordinary_size_31(exhaustive=args.ordinary_size_31_exact)
+    if args.ordinary_size_31 or args.ordinary_size_31_exact or args.ordinary_size_31_restoration:
+        check_ordinary_size_31(exhaustive=args.ordinary_size_31_exact,
+                               restoration=args.ordinary_size_31_restoration)
         return
     if args.ordinary_size_30 or args.ordinary_size_30_exact:
         check_ordinary_size_30(exhaustive=args.ordinary_size_30_exact)
