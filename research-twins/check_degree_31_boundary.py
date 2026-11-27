@@ -1,8 +1,9 @@
 """Replay the complete size-31 catalogue and verify its boundary partition."""
 
 import argparse
-from collections import Counter
+from collections import Counter, defaultdict
 import gzip
+from itertools import combinations
 import json
 from pathlib import Path
 import runpy
@@ -50,8 +51,9 @@ def ordinary_placements(templates, blocks):
     return CHECK['ordinary_placements'](templates, blocks - 4)
 
 
-def restrict_stages(clauses, seeds, order, sheets, allowed_seeds, required_groups):
-    allowed_fort = allowed_seeds | {(i - 1) % near_blocks for i in allowed_seeds}
+def restrict_stages(clauses, seeds, order, sheets, allowed_seeds, required_groups, *,
+                    blocks=near_blocks):
+    allowed_fort = allowed_seeds | {(i - 1) % blocks for i in allowed_seeds}
     seed_stages = [(u, stage((u - 1) // sheets)) for u in seeds]
     clauses.extend([u for u, i in seed_stages if i in group] for group in required_groups)
     clauses.extend([-(v + 1)] for v in range(order) if stage(v // sheets) not in allowed_fort)
@@ -224,6 +226,63 @@ def check_short_catalogue(blocks):
           flush=True)
 
 
+def check_five_blocks(*, exhaustive=False):
+    blocks = 5
+    with gzip.open(HERE / 'five-block-size-31-catalogue.json.gz', 'rt', encoding='utf-8') as src:
+        archive = json.load(src)
+    if (archive['schema_version'], archive['blocks'], archive['size'],
+            archive['first_sheet']) != (1, blocks, size, 1):
+        raise AssertionError('Unexpected five-block size-31 catalogue metadata')
+    known = read_patterns(archive['losses'])
+    by_stage = defaultdict(set)
+    for row in known:
+        by_stage[tuple(sorted({stage(v) for v, _ in row}))].add(row)
+    support_counts = {''.join(map(str, stages)): len(rows) for stages, rows in by_stage.items()}
+    spans = Counter(max(sheet for _, sheet in row) for row in known)
+    if (len(known) != 17858 or support_counts != archive['stage_support_counts']
+            or {str(k): v for k, v in spans.items()} != archive['sheet_spans']):
+        raise AssertionError('Unexpected five-block size-31 catalogue counts')
+
+    sheets = 28
+    graph, blue, *_ = CHECK['COVER']['signed_prism_cover'](blocks, sheets)
+    _, _, cones = CHECK['LOSS_COMPONENTS']['nominal_cones'](graph, blue)
+    print(f'{blocks} blocks: checking {len(known)} witnesses and their one-seed restorations',
+          flush=True)
+    for row in sorted(known):
+        lost = CHECK['mask'](v * sheets + sheet + 4 for v, sheet in row)
+        if lost & blue != lost or lost.bit_count() != size:
+            raise AssertionError(('Invalid five-block seed coordinates', row))
+        fort = CHECK['remaining_white'](graph, cones, lost)
+        if fort & blue != lost or any(v % sheets in (0, sheets - 1) for v in CHECK['members'](fort)):
+            raise AssertionError(('Five-block witness lacks a guarded fort', row))
+        for seed in CHECK['members'](lost):
+            if CHECK['remaining_white'](graph, cones, lost ^ (1 << seed)):
+                raise AssertionError(('Five-block witness has a blocking proper subset', row, seed))
+    if exhaustive:
+        lower, size_30 = CHECK['catalogues_through_size_30'](blocks)
+        smaller = (*lower, *size_30)
+        for width in range(1, blocks + 1):
+            for stages in combinations(range(blocks), width):
+                permitted = set(stages)
+                contained = tuple(row for row in smaller if all(stage(v) in permitted for v, _ in row))
+                expected = by_stage.get(stages, set())
+
+                def restrict_mask(clauses, seeds, order, sheets):
+                    return restrict_stages(clauses, seeds, order, sheets, permitted,
+                                           tuple({i} for i in stages), blocks=blocks)
+
+                result = CHECK['enumerate_blockers'](blocks, contained, expected, budget=size,
+                                                     strip_sheets=sheets, require_minimal_fort=True,
+                                                     restrict=restrict_mask)
+                if result != expected:
+                    raise AssertionError(('Unlisted five-block size-31 loss', stages))
+                print(f'Stage support {stages}: {len(result)}', flush=True)
+    print(json.dumps({'blocks': blocks, 'size': size, 'count': len(known),
+                      'exhaustive': exhaustive, 'blocking_coefficient_per_sheet': len(known) - 13174,
+                      'single_restorations': size * len(known),
+                      'sheet_spans': dict(sorted(spans.items()))}), flush=True)
+
+
 def check_degree_32_overlap_representative():
     blocks = 12
     size_31 = transferred_catalogue(blocks)
@@ -275,8 +334,10 @@ if __name__ == '__main__':
                        help='also exhaust the boundary windows of span at most four')
     modes.add_argument('--long-stage-span', action='store_true',
                        help='exclude all anchored losses of stage span at least five')
-    modes.add_argument('--short-catalogue', type=int, choices=range(8, 14), metavar='BLOCKS',
+    modes.add_argument('--short-catalogue', type=int, choices=range(7, 14), metavar='BLOCKS',
                        help='verify a complete shorter-chain size-31 catalogue')
+    modes.add_argument('--five-blocks', choices=('witnesses', 'exhaustive'),
+                       help='replay the five-block size-31 catalogue and optionally exhaust its stage supports')
     modes.add_argument('--degree-32-overlap', action='store_true',
                        help='count degree-32 overlaps in the transferred 12-block catalogue')
     modes.add_argument('--degree-32-outer-windows', action='store_true',
@@ -286,6 +347,8 @@ if __name__ == '__main__':
         check_long_stage_span()
     elif args.short_catalogue:
         check_short_catalogue(args.short_catalogue)
+    elif args.five_blocks:
+        check_five_blocks(exhaustive=args.five_blocks == 'exhaustive')
     elif args.degree_32_overlap:
         check_degree_32_overlap_representative()
     elif args.degree_32_outer_windows:
