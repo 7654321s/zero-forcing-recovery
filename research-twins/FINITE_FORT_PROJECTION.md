@@ -1015,21 +1015,44 @@ At a common start, the input consists of all 2,798 ordinary lower-order types. T
 
 The signed correction to blocking is **$-5271$** per start and sheet. The largest union spans fourteen sheets. A separate enumeration using the lower-order losses at two neighboring starts gives exactly twice each multiplicity in the table.
 
-The terminal and nonterminal 38-stage band checks at 39 and 40 blocks force an empty adjacent appended pair at cost at most 36. Contracting empty pairs to 38 blocks bounds the occupied ordinary fort arc by 37 stages. The contraction preserves the occupied sheets. At 38 blocks the width-23 sheet band requires 19 losses whenever every adjacent sheet pair meets the fort. Since $19\cdot44>23\cdot36$, the finite fort span is at most 42 sheets. The 45-sheet strip contains the fort and both guards. For seed arcs of spans four through 37, the guarded searches require lost seeds at both endpoints, exclude internal three-stage seed gaps, and require every internal adjacent stage pair to meet the fort. The span-37 case excludes the predecessor because including it would exceed the fort bound. The span-four case gives the same 19 types, and every case of span five through 37 is empty. A guarded five-stage window independently gives the same 2,505 types.
+The terminal and nonterminal 38-stage band checks at 39 and 40 blocks force an empty adjacent appended pair at cost at most 36. Contracting empty pairs to 38 blocks bounds the occupied ordinary fort arc by 37 stages. The contraction preserves the occupied sheets. At 38 blocks the width-25 sheet band requires 21 losses whenever every adjacent sheet pair meets the fort. Since $21\cdot43>25\cdot36$, the finite fort span is at most 41 sheets. The 45-sheet strip contains the fort and both guards. For seed arcs of spans four through 37, the guarded searches require lost seeds at both endpoints, exclude internal three-stage seed gaps, and require every internal adjacent stage pair to meet the fort. The span-37 case excludes the predecessor because including it would exceed the fort bound. The span-four case gives the same 19 types, and every case of span five through 37 is empty. A guarded five-stage window independently gives the same 2,505 types.
 
 Thus $\alpha_{36}=2505$ and $\gamma_{36}=2766$. A seed arc of span at most 37 uses a stage test window of at most 40. Every exceptional offset occurs at 41 blocks. A window of length 40 that acquires an ordinary placement only on a longer chain would require a span-37 seed arc, which the ordinary search excludes. Each ordinary type gains one stage placement per additional block. Hence
 $$
-M_{36}(k,m)=m(2505k+\beta_{36}),\qquad k\geq41,\ m\geq44,
+M_{36}(k,m)=m(2505k+\beta_{36}),\qquad k\geq41,\ m\geq43,
 $$
 where $\beta_{36}$ is the normalized size-36 count at 41 blocks minus $2505\cdot41$.
 
 ### Short size-37 losses in ordinary stages
 
-The guarded three- and four-stage windows give **5,832** types using three consecutive seed stages and **77** using four. The latter span twelve through fifteen sheets. The [short catalogue](ordinary-size-37-short-catalogue.json.gz) holds all 5,909 types found in these windows. A separate queue-based replay verifies all 218,633 single-seed restorations. The [verifier](check_degree_37_ordinary.py) replays the catalogue and checks both windows for additional types.
+The guarded three- and four-stage windows give **5,832** types using three consecutive seed stages and **77** using four. The latter span twelve through fifteen sheets. A guarded five-stage search excludes further types. The [short catalogue](ordinary-size-37-short-catalogue.json.gz) holds all 5,909 types found in these windows. A separate queue-based replay verifies all 218,633 single-seed restorations. The [verifier](check_degree_37_ordinary.py) replays the catalogue and checks the guarded windows for additional types.
 
 The 5,303 lower-order ordinary types have no union of size at most 37 involving different starts. Two three-stage templates at different starts can fit the budget only at consecutive starts and with both sizes at most 31. A shorter template paired with a four-stage template at a different start must occupy its last three stages. Two four-stage templates can intersect at start distances one through three. The distinct-start verifier aligns all three classes at every shared seed and excludes every joining union.
 
-At cost at most 37, 39-stage bands at 40 and 41 blocks force an empty adjacent appended pair. Contraction bounds the ordinary fort arc by 38 stages. The width-21 sheet band at 39 blocks requires 17 losses, and $17\cdot46>21\cdot37$. Thus the finite fort span is at most 44 sheets. These bounds limit the remaining search to seed spans through 38.
+At cost at most 37, 39-stage bands at 40 and 41 blocks force an empty adjacent appended pair. Contraction bounds the ordinary fort arc by 38 stages. The width-23 sheet band at 39 blocks requires 19 losses, and $19\cdot45>23\cdot37$. Thus the finite fort span is at most 43 sheets. These bounds limit the remaining search to seed spans through 38.
+
+The signed degree-37 union weights of these 5,303 lower types at a common start have the following multiplicities, up to sheet translation.
+
+| Weight | $-3$ | $-2$ | $-1$ | $0$ | $+1$ | $+2$ | $+3$ |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Unions of size 37 | 1 | 222 | 28,286 | 29,749 | 24,414 | 412 | 2 |
+
+Their sum is **$-3489$** per starting stage and sheet. The largest union spans fourteen sheets. The interior logarithmic coefficient satisfies $\gamma_{37}=3489-\alpha_{37}\leq-2420$, since the short catalogue has 5,909 types.
+
+### First intersections between distinct ordinary starts
+
+The ordinary loss catalogues through sizes 34, 35 and 36 are complete. Adding the 5,909 short size-37 types gives a fourth nested input. For each input the table records the minimum size of a union containing two events at different starts, the number of such unions of minimum size up to both translations, and their signed contribution to the blocking probability of the input catalogue.
+
+| Input catalogue | Minimum union size | Normalized unions | Signed contribution per starting stage and sheet |
+| --- | ---: | ---: | ---: |
+| Through size 34 | 50 | 3 | $-3$ |
+| Through size 35 | 47 | 14 | $-14$ |
+| Through size 36 | 46 | 6 | $-6$ |
+| Through size 36 and short size 37 | 45 | 3 | $-3$ |
+
+Each catalogue has stage span at most four and minimum event size 30. Starts four or more stages apart require at least 60 losses. For start distances one through three, sum the larger of the two aligned seed counts in each stage to lower-bound the size of the union. For the compatible pairs, align every possible shared seed and count distinct normalized unions. The [verifier](check_degree_37_ordinary.py) excludes every smaller union and reproduces the four counts.
+
+At the first mixed size of an input no union can contain events at three different starts. The events at the two later starts would omit the earliest stage and form a smaller mixed union. Hence each minimum mixed union $U$ contains events at exactly two starts. Any nonempty choice from each start already covers $U$, by minimality of the mixed size. At either start the alternating sum over the nonempty choices is $-1$. Including the sign in the blocking expansion gives weight $-1$ to each mixed union.
 
 ### A packing of disjoint ordinary blocking losses
 
@@ -1336,8 +1359,10 @@ python -B research-twins/check_degree_36_ordinary.py --seed-arcs
 python -B research-twins/check_degree_36_ordinary.py --overlap
 python -B research-twins/check_degree_36_ordinary.py --bands
 python -B research-twins/check_degree_37_ordinary.py
-python -B research-twins/check_degree_37_ordinary.py --window 4
+python -B research-twins/check_degree_37_ordinary.py --window 5
 python -B research-twins/check_degree_37_ordinary.py --different-starts
+python -B research-twins/check_degree_37_ordinary.py --overlap
+python -B research-twins/check_degree_37_ordinary.py --first-mixed
 python -B research-twins/check_degree_37_ordinary.py --bands
 python -B research-twins/check_short_prism_covers.py --degree-33-period-39
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 26 --band-blocks 36
