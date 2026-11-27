@@ -341,6 +341,7 @@ def check_five_block_catalogue(*, exhaustive=False):
         'blocks': 5, 'exhaustive': exhaustive,
         'counts': {cost: len(group) for cost, group in enumerate(verified, start=24)},
         'blocking_coefficients_per_sheet': coefficients,
+        'size_30_joint_spans': check_boundary_joint_spans(5, verified[-1]),
     }), flush=True)
 
 
@@ -398,8 +399,11 @@ def relocate_boundary_patterns(patterns, source_blocks, target_blocks):
                           for first in range(source_blocks)}
         target_windows = {boundary_window(first, span, target_blocks)
                           for first in range(target_blocks)}
-        if not target_windows <= source_windows:
-            raise AssertionError(('Missing source window', span, target_windows - source_windows))
+        missing = target_windows - source_windows
+        # At seven blocks this window can only occur in the occupied-pair case.
+        covered_by_search = {(0, 6)} if target_blocks == 7 and span == 4 else set()
+        if missing != covered_by_search:
+            raise AssertionError(('Unexpected unmatched source windows', span, missing))
     relocated = set()
     for row in patterns:
         first, span, _ = boundary_stage_arc(row, source_blocks)
@@ -420,6 +424,18 @@ def relocate_boundary_patterns(patterns, source_blocks, target_blocks):
                 placed.append(((stage_start(stage) if stage else 0) + offset, sheet))
             relocated.add(tuple(sorted(placed)))
     return tuple(sorted(relocated))
+
+
+def check_boundary_joint_spans(blocks, patterns):
+    spans = Counter((boundary_stage_arc(row, blocks)[1], max(s for _, s in row))
+                    for row in patterns)
+    expected = {2: {9: 19, 10: 40, 11: 5},
+                3: {7: 47, 8: 679, 9: 1982, 10: 2 * blocks + 2085,
+                    11: 8 * blocks + 928, 12: 110},
+                4: {10: 1, 11: 25, 12: 4}}
+    if spans != {(a, b): count for a, row in expected.items() for b, count in row.items()}:
+        raise AssertionError(('Unexpected joint stage and sheet spans', blocks, spans))
+    return expected
 
 
 def check_boundary_catalogue(*, blocks=13, exhaustive=False):
@@ -452,14 +468,7 @@ def check_boundary_catalogue(*, blocks=13, exhaustive=False):
                 raise AssertionError('A smaller pattern has a gap in its stage support')
         patterns = relocate_boundary_patterns(patterns, archive_blocks, blocks)
     spans = Counter(max(s for _, s in row) for row in patterns)
-    joint_spans = Counter((boundary_stage_arc(row, blocks)[1], max(s for _, s in row))
-                          for row in patterns)
-    expected_joint = {2: {9: 19, 10: 40, 11: 5},
-                      3: {7: 47, 8: 679, 9: 1982, 10: 2 * blocks + 2085,
-                          11: 8 * blocks + 928, 12: 110},
-                      4: {10: 1, 11: 25, 12: 4}}
-    if joint_spans != {(a, b): count for a, row in expected_joint.items() for b, count in row.items()}:
-        raise AssertionError(('Unexpected joint stage and sheet spans', joint_spans))
+    expected_joint = check_boundary_joint_spans(blocks, patterns)
     verified = verify_inherited_patterns(blocks, smaller, patterns, budget=30, already_lifted=True)
     if verified != set(patterns):
         raise AssertionError('Boundary catalogue changed during replay')
@@ -625,9 +634,7 @@ def check_ordinary_size_30_window(catalogue):
     band = SPAN['BAND']
     band['check_band'](34, stages=32, budget=30)
     print('A 32-stage ordinary band forces an empty pair at budget 30', flush=True)
-    for width in range(10, 21):
-        band['check_sheet_band'](width, width - 5, pin_ends=width > 10,
-                                 blocks=36, subband_constraints=width >= 13)
+    check_ordinary_sheet_bands()
     stage_start = band['stage_start']
     stop = stage_start(33)
     placements = {
@@ -641,8 +648,15 @@ def check_ordinary_size_30_window(catalogue):
     print('The ten cost-30 losses exhaust the ordinary interior', flush=True)
 
 
-def check_ordinary_size_31():
-    """Classify cost-31 losses with a fort confined to at most four ordinary stages."""
+def check_ordinary_sheet_bands():
+    band = SPAN['BAND']
+    for width in range(10, 21):
+        band['check_sheet_band'](width, width - 5, pin_ends=width > 10,
+                                 blocks=36, subband_constraints=width >= 13)
+
+
+def check_ordinary_size_31(*, exhaustive=False):
+    """Classify ordinary cost-31 losses, with an optional full-interior search."""
     stage_start = SPAN['BAND']['stage_start']
     with gzip.open(HERE / 'thirteen-block-size-30-catalogue.json.gz', 'rt', encoding='utf-8') as source:
         archive = json.load(source)
@@ -653,13 +667,14 @@ def check_ordinary_size_31():
     if len(ordinary) != 10:
         raise AssertionError(('Unexpected number of ordinary size-30 types', len(ordinary)))
 
+    def placements(templates, width):
+        return {tuple((v + stage_start(start), sheet) for v, sheet in row)
+                for start in range(2, width) for row in templates}
+
     three_stages = None
     for width in (3, 4):
-        smaller = [
-            tuple((v + stage_start(start), sheet) for v, sheet in row)
-            for start in range(2, width) for row in ordinary
-        ]
-        patterns = enumerate_blockers(width + 5, smaller, budget=31, ordinary_stages=width,
+        patterns = enumerate_blockers(width + 5, placements(ordinary, width), budget=31,
+                                      ordinary_stages=width,
                                       first_ordinary_stage=True)
         if width == 3:
             three_stages = patterns
@@ -670,11 +685,20 @@ def check_ordinary_size_31():
     spans = Counter(max(sheet for _, sheet in row) for row in three_stages)
     if spans != {10: 4, 11: 93}:
         raise AssertionError(('Unexpected ordinary size-31 sheet spans', spans))
+    templates = [tuple((v - stage_start(2), sheet) for v, sheet in row)
+                 for row in sorted(three_stages)]
+    if exhaustive:
+        SPAN['BAND']['check_band'](35, stages=33, budget=31)
+        print('A 33-stage ordinary band forces an empty pair at budget 31', flush=True)
+        check_ordinary_sheet_bands()
+        known = placements(templates, 32)
+        if enumerate_blockers(36, placements(ordinary, 32), known, budget=31,
+                              ordinary_stages=32, first_ordinary_stage=True) != known:
+            raise AssertionError('An additional size-31 loss survives in the ordinary interior')
     print(json.dumps({
-        'size': 31, 'ordinary_stage_window': 4, 'count': len(three_stages),
-        'spans': dict(sorted(spans.items())),
-        'losses': [[(v - stage_start(2), sheet) for v, sheet in row]
-                   for row in sorted(three_stages)],
+        'size': 31, 'ordinary_stage_window': 32 if exhaustive else 4,
+        'exhaustive': exhaustive, 'count': len(templates),
+        'spans': dict(sorted(spans.items())), 'losses': templates,
     }), flush=True)
 
 
@@ -706,6 +730,8 @@ def main():
                       help='verify the complete cost-30 ordinary interior catalogue')
     mode.add_argument('--ordinary-size-31', action='store_true',
                       help='verify size-31 losses within four ordinary stages')
+    mode.add_argument('--ordinary-size-31-exact', action='store_true',
+                      help='verify the complete ordinary size-31 loss catalogue')
     mode.add_argument('--size-28', choices=EXPECTED_SIZE_28_SPANS, type=int, metavar='BLOCKS',
                       help='verify size-28 losses from five blocks through the locality representative')
     mode.add_argument('--size-29', choices=EXPECTED_SIZE_29_SPANS, type=int, metavar='BLOCKS',
@@ -714,7 +740,7 @@ def main():
                       help='enumerate the 13-block representative for the size-30 boundary term')
     mode.add_argument('--boundary-catalogue',
                       choices=('witnesses', 'exhaustive', 'ten-blocks', 'nine-blocks', 'eight-blocks',
-                               'six-blocks', 'six-blocks-witnesses'),
+                               'seven-blocks', 'six-blocks', 'six-blocks-witnesses'),
                       help='replay or exhaust the size-30 boundary catalogues')
     mode.add_argument('--size-30-five-blocks', action='store_true',
                       help='verify the 5975 size-30 seed loss types at five blocks')
@@ -726,8 +752,8 @@ def main():
     if args.ordinary_threshold:
         check_ordinary_threshold()
         return
-    if args.ordinary_size_31:
-        check_ordinary_size_31()
+    if args.ordinary_size_31 or args.ordinary_size_31_exact:
+        check_ordinary_size_31(exhaustive=args.ordinary_size_31_exact)
         return
     if args.ordinary_size_30 or args.ordinary_size_30_exact:
         check_ordinary_size_30(exhaustive=args.ordinary_size_30_exact)
@@ -751,8 +777,8 @@ def main():
         check_five_block_catalogue(exhaustive=args.five_block_catalogue == 'exhaustive')
         return
     if args.boundary_catalogue:
-        blocks = {'six-blocks': 6, 'six-blocks-witnesses': 6, 'eight-blocks': 8, 'nine-blocks': 9,
-                  'ten-blocks': 10}.get(args.boundary_catalogue, 13)
+        blocks = {'six-blocks': 6, 'six-blocks-witnesses': 6, 'seven-blocks': 7,
+                  'eight-blocks': 8, 'nine-blocks': 9, 'ten-blocks': 10}.get(args.boundary_catalogue, 13)
         check_boundary_catalogue(blocks=blocks, exhaustive=not args.boundary_catalogue.endswith('witnesses'))
         return
     templates = enumerate_blockers(5, minimum_seed_sets(5)) if any(k >= 5 for k in args.blocks) else ()

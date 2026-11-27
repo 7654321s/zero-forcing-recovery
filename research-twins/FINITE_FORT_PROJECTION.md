@@ -378,12 +378,14 @@ The [compressed JSON catalogue](five-block-loss-catalogue.json.gz) contains the 
 
 ## A finite representative for the degree-30 boundary term
 
-Let $A_{30}(13)$ count the inclusion-minimal 30-seed blocking losses on the 13-block integer lift, up to sheet translation. The guarded search gives $A_{30}(13)=6055$, hence $\beta_{30}=A_{30}(13)-130=5925$. For $k=6$ or $k\geq8$, define the sufficient sheet count by
+Let $A_{30}(13)$ count the inclusion-minimal 30-seed blocking losses on the 13-block integer lift, up to sheet translation. The guarded search gives $A_{30}(13)=6055$, hence $\beta_{30}=A_{30}(13)-130=5925$. For every $k\geq5$, define the sufficient sheet count by
 $$
 m_0(k)=
 \begin{cases}
-30 & k=6,\\
-36 & 28\leq k\leq31,\\
+28 & k=5,\\
+29 & k=6,\\
+30 & k=7,\\
+36 & 29\leq k\leq31,\\
 35 & \text{otherwise}.
 \end{cases}
 $$
@@ -414,13 +416,15 @@ At 11 and 12 blocks the projected-support checks also give an empty pair of appe
 
 The $s+3$ window for a loss of stage span $s\leq4$ now uses at most seven stages. All exceptional placements and ordinary placements fit at 11 blocks, and the same window weights apply there. This extends the affine count to 11 and 12 blocks.
 
-At eight through ten blocks the width-19 and width-20 checks give the same 38-sheet fort bound as at 13 blocks. Work downward from 11 blocks. If the final white fort of a minimal loss leaves an empty adjacent appended pair, insert one empty stage there. Every smaller classified loss occupies every stage of its anchored arc, so a contained smaller loss after insertion would contract back inside the original loss. The resulting size-30 minimal loss in the next length has stage span at most four. The enlarged empty run of length at least three lies in its outer gap, so removing the inserted stage preserves that bound.
+At seven through ten blocks the width-19 and width-20 checks give the same 38-sheet fort bound as at 13 blocks. Work downward from 11 blocks. If the final white fort of a minimal loss leaves an empty adjacent appended pair, insert one empty stage there. Every smaller classified loss occupies every stage of its anchored arc, so a contained smaller loss after insertion would contract back inside the original loss. The resulting size-30 minimal loss in the next length has stage span at most four. The enlarged empty run of length at least three lies in its outer gap, so removing the inserted stage preserves that bound.
 
-The ancestry checks at eight through ten blocks confine the fort of any of these short losses to the same local window as at 13 blocks. Every window at these lengths occurs at 13 blocks with the opening and terminal stages at the same offsets whenever they appear. A smaller loss uses a contiguous anchored arc, so containment also depends on that window. Every loss from the empty-pair case therefore appears in the relocated catalogue. The replay checks 6,005, 6,015 and 6,025 candidates at eight, nine and ten blocks, respectively. At each length it then excludes the candidates and all smaller losses in the guarded search with every adjacent appended pair occupied. All three remaining searches are unsatisfiable.
+The ancestry checks at seven through ten blocks confine the fort of any of these short losses to a window of at most seven stages. At eight through ten blocks every such window occurs at 13 blocks with the same offsets for the opening and terminal stages. At seven blocks the only unmatched window is the span-four seed arc from stage 2 to stage 5. Its window begins at the opening and ends at the terminal stage. Stages 6 and 0 are empty in the final fort by the ancestry check, since stage 1 and both of these stages lack lost seeds. The only possible empty appended pair would be stages 3 and 4, since stages 2 and 5 each contain lost seeds. Together with stages 6 and 0 this would split the fort into two of cost at least 24 each. Thus this unmatched window cannot occur in the empty appended pair case.
+
+A smaller loss uses a contiguous anchored arc, so containment also depends on the window. Every loss from the empty appended pair case therefore appears in the relocated catalogue. The replay checks 5,995, 6,005, 6,015 and 6,025 candidates at seven through ten blocks. At each length it excludes the candidates and all smaller losses in the guarded search with every adjacent appended pair occupied. All four remaining searches are unsatisfiable.
 
 At six blocks the width-19 and width-20 checks again give a 38-sheet fort bound. A full guarded search with every translate of the complete smaller catalogues excluded gives 5,985 types. The [compressed six-block catalogue](six-block-size-30-catalogue.json.gz) supplies the complete witness list. The exhaustive replay excludes those witnesses and searches the full strip for an extra type without imposing occupied stage pairs.
 
-The following joint refinement holds for six blocks and from eight blocks onward, with sheet translations identified. The two affine entries use the respective slopes two and eight from the ordinary templates of sheet span ten and eleven.
+The five-block catalogue above has 5,975 types and the same joint span profile. The following refinement holds for every length of at least five blocks, with sheet translations identified. The two affine entries use the respective slopes two and eight from the ordinary templates of sheet span ten and eleven.
 
 | Stage span | Sheet span 7 | 8 | 9 | 10 | 11 | 12 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -430,7 +434,7 @@ The following joint refinement holds for six blocks and from eight blocks onward
 
 Four consecutive sheets with all of their seeds intact separate the remaining white vertices across the middle of the four sheets by round five. Specifically, there is no pair of white vertices at graph distance at most two across the cut. The verifier starts with just the seeds in the four sheets and checks every crossing pair on 31 sheets at lengths 13 through 27. For a pair at distance at most two, the two round-five decisions and the path between the pair are determined within radius twelve of either endpoint. The sheet windows are well inside the representative's 31 sheets. In the stage coordinate, the radius-twelve window spans at most 25 positions. At 27 blocks the window realizes all ordinary placements and all offsets from the adjacent exceptional stages that can occur in any longer chain. The certificate therefore applies to the integer lift at every $k\geq13$. If four seed-free sheets lay inside the seed support of a finite fort of cost at most 30, both sides would be nonempty. The certificate prevents any outside vertex from seeing both sides, so each side is itself a finite fort of cost at least 24. Thus every internal gap in the seed support has length at most three.
 
-To compare with cyclic covers, the same 32-stage bands contract a cyclic fort of cost at most 30 down to 32 blocks when necessary. The contraction preserves cost and the set of occupied sheets. Use the width-28 bands at six blocks, at eight through 24 blocks and at 26, the width-25 bands at 25 and 27 through 31, and the width-25 band at 32. For a cyclic fort meeting every adjacent sheet pair, summing the width-$w$ window counts gives $(w-4)m\leq wb$ for seed cost $b$. Widths 25 and 28 exclude wrapping at $m\geq36$ for $b\leq30$, since $21\cdot36>25\cdot30$ and $24\cdot36>28\cdot30$. At 35 sheets the width-28 bound forces $b=30$ and equality in every window. Taking differences of consecutive counts makes the sheet counts periodic modulo seven. The width-27 bound caps each sheet at one seed. The wrapped checks exclude cost 30 at the lengths through 24 blocks. At 25, 27 and 32 blocks the width-25 bound excludes $b\leq29$, since $21\cdot35>25\cdot29$. The full wrapped tests there exclude $b=30$. The 32-block test also applies to every larger length by contraction, which preserves the sheet support. At 26 blocks the width-34 band gives $30\cdot35>34\cdot30$. At six blocks the direct tests also exclude wrapped cost 30 for 30 through 34 sheets, and costs through 29 already unroll from 28 sheets. Thus every cyclic fort at these costs unrolls at the claimed periods. A cyclic inclusion-minimal loss has a finite lift that is also minimal, since a smaller finite blocking subset would project to a smaller cyclic blocking subset.
+To compare with cyclic covers, the same 32-stage bands contract a cyclic fort of cost at most 30 down to 32 blocks when necessary. The contraction preserves cost and the set of occupied sheets. Use the width-28 bands at five through 24 blocks and at 26, and the width-25 bands at 25 and 27 through 32. For a cyclic fort meeting every adjacent sheet pair, summing the width-$w$ window counts gives $(w-4)m\leq wb$ for seed cost $b$. Widths 25 and 28 exclude wrapping at $m\geq36$ for $b\leq30$, since $21\cdot36>25\cdot30$ and $24\cdot36>28\cdot30$. At 35 sheets the width-28 bound forces $b=30$ and equality in every window. Taking differences of consecutive counts makes the sheet counts periodic modulo seven. The width-27 bound caps each sheet at one seed. The wrapped checks exclude cost 30 at the lengths through 24 blocks. At 25, 27, 28 and 32 blocks the width-25 bound excludes $b\leq29$, since $21\cdot35>25\cdot29$. The full wrapped tests there exclude $b=30$. The 32-block test also applies to every larger length by contraction, which preserves the sheet support. At 26 blocks the width-34 band gives $30\cdot35>34\cdot30$. At six and seven blocks the direct tests also exclude wrapped cost 30 for 29 through 34 and 30 through 34 sheets, respectively. At five blocks the earlier direct tests go down to 28 sheets. Costs through 29 already unroll from 28 sheets at these lengths. Thus every cyclic fort at these costs unrolls at the claimed periods. A cyclic inclusion-minimal loss has a finite lift that is also minimal, since a smaller finite blocking subset would project to a smaller cyclic blocking subset.
 
 The thirteen-block catalogue gives sheet span at most 12. Near the exceptional stages the template transfer preserves sheet coordinates. In the ordinary interior the ten known templates also have sheet span at most 12. The six-block catalogue has the same maximum span. At these periods any finite size-30 loss projects to a blocking loss with a unique outer gap. If its projection contained a smaller cyclic minimal loss, unroll that loss and align the two at a shared seed. Each pattern has sheet span at most 12, so each difference from the shared seed has magnitude at most 11. Congruence modulo $m\geq m_0(k)$ then implies equality, which would put the smaller loss inside the original finite one. Hence the projections are minimal, and there are $m$ distinct translates of each type. The correction $-3861m$ from smaller losses gives the coefficient above.
 
@@ -599,13 +603,15 @@ Radius-eight locality transfers each of the ten seed sets and its restoration ou
 
 The ordinary exclusions also apply to cyclic forts at smaller periods than the general eventual-count bound. In the ordinary region, an empty stage pair between nonempty parts would split a cyclic fort into two of cost at least 24 each, since the cyclic minimum at these periods is 24. The same stage-band caps therefore fit an ordinary cyclic fort of cost at most 29 into the 35-block window, where the width-19 band excludes sheet wrapping at $m\geq37$ by $15m>19\cdot29$. At cost 30 the 36-block window and the width-20 band exclude wrapping at $m\geq38$ by $16m>20\cdot30$. At 37 sheets the wrapped verifier excludes cost 30 in the same stage window. At 36 sheets width 20 excludes costs up to 28, and the complement of any single sheet splits into bands of widths 17 and 18, containing at least $13+14=27$ seeds in total. Each sheet then has at most two seeds at cost 29 and three at cost 30. The wrapped verifier with the same ordinary stage windows excludes both budgets. At 35 and 34 sheets the complement bounds are 26 and 25 respectively, obtained from widths 17 and 17 or 16 and 17. The corresponding wrapped checks exclude costs 28 through 30 at both periods, and all smaller budgets already unroll by the general 27-seed classification. At 33 sheets the smaller costs already unroll, and the wrapped test excludes cost 30 in the ordinary window. The complete ordinary classification therefore holds from 33 sheets.
 
-### Size-31 losses in three and four ordinary stages
+### All size-31 losses in ordinary stages
 
-There are 97 inclusion-minimal size-31 losses, up to sheet and stage translation, whose final white set contains a fort confined to at most four consecutive ordinary stages with ordinary neighbors. Each uses exactly three consecutive stages, and a three-stage window already realizes all 97. Four patterns have sheet span ten and the other 93 have span eleven. In particular the ordinary slope in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order) satisfies $\alpha_{31}\geq97$. The overlap identity below then gives $\gamma_{31}\leq-89$ for the ordinary slope of the logarithmic recovery probability.
+There are exactly 97 inclusion-minimal size-31 losses, up to sheet and stage translation, supported by finite forts in the ordinary interior. Each uses exactly three consecutive stages. Four patterns have sheet span ten and the other 93 have span eleven. The ordinary slope in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order) is $\alpha_{31}=97$. The overlap identity below gives the logarithmic recovery slope $\gamma_{31}=-89$.
 
 There are no ordinary losses below size 30, and the ten known size-30 types are the only smaller ones to exclude. The width-20 sheet band costs at least 16 seeds in the absence of an empty pair. Two disjoint such bands require 32 seeds, so any finite fort of cost 31 fits within 39 interior sheets. An internal pair of empty sheets would split it into two forts of cost at least 24 each. The guarded search fixes the first ordinary stage to meet the fort and excludes all placements of the size-30 types in the window. The three- and four-stage searches give identical normalized seed catalogues. Any smaller loss contained in a selected 31-seed loss would have to be an ordinary 30-seed type placed on its three occupied stages. The verifier has excluded those types.
 
-Every listed pattern can therefore be placed away from the exceptional stages with the same seed coordinates. For sufficiently large sheet periods, smaller cyclic losses unroll and their bounded sheet spans identify any coincident placement with an integer-sheet placement. This gives 97 types at each eligible starting stage and each sheet translation, which proves the slope bound.
+The 33-stage band at 35 blocks forces an empty adjacent pair at budget 31. This applies to every band of 33 ordinary stages in a longer ordinary run. Any pair strictly inside a fort would split it into two parts, each of cost at least 24. Thus the occupied interval of an ordinary finite fort at these costs spans at most 32 stages. It can be placed in the 36-block representative with ordinary neighbors at both ends. There are 30 possible starts for each known three-stage template in that window. The exhaustive verifier excludes all 300 placements of the size-30 types and all 2,910 placements of the 97 size-31 types. The remaining formula, with the first stage occupied and 39 interior sheets, is unsatisfiable.
+
+The same stage bound applies to ordinary cyclic forts when $m\geq39$, since the cyclic minimum cost is 24 in this range. In the 36-block representative a wrapped fort of cost at most 31 would satisfy $16m\leq20\cdot31$ by the width-20 band. Therefore it unrolls at these periods. The finite witnesses project with distinct sheet translations, and a contained smaller cyclic loss would also unroll. Its sheet span is at most twelve, so aligning at a shared seed gives a contained smaller integer-sheet loss, which the known catalogues exclude. This proves the ordinary classification at these cyclic periods as well.
 
 ### The degree-31 overlap correction in ordinary stages
 
@@ -847,6 +853,7 @@ python -B research-twins/check_finite_fort_span.py --ordinary-packing
 python -B research-twins/check_finite_fort_span.py --ordinary-density
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-30-exact
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-31
+python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-31-exact
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-threshold
 python -B research-twins/check_short_prism_covers.py --ordinary-wrapped 37 30 --ordinary-wrapped 36 29 --ordinary-wrapped 36 30
 python -B research-twins/check_short_prism_covers.py --ordinary-wrapped 35 28 --ordinary-wrapped 35 29 --ordinary-wrapped 35 30
@@ -864,16 +871,17 @@ python -B research-twins/check_prism_projected_support.py --cost-27-stage-pairs
 python -B research-twins/check_prism_projected_support.py --cost-28-stage-pairs
 python -B research-twins/check_prism_projected_support.py --cost-29-stage-pairs
 python -B research-twins/check_prism_projected_support.py --cost-30-stage-pairs
-python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 20 --band-blocks 6 8 9 10 13
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 20 --band-blocks 6 7 8 9 10 13
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 32
-for blocks in 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+for blocks in 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 do
     python -B research-twins/check_short_prism_covers.py --wrapped "$blocks" 35 30 28 || exit 1
 done
-python -B research-twins/check_short_prism_covers.py --wrapped 25 35 30 25 --wrapped 27 35 30 25 --wrapped 32 35 30 25
+python -B research-twins/check_short_prism_covers.py --wrapped 25 35 30 25 --wrapped 27 35 30 25 --wrapped 28 35 30 25 --wrapped 32 35 30 25
+python -B research-twins/check_short_prism_covers.py --wrapped 6 29 30 28
 for sheets in 30 31 32 33 34
 do
-    python -B research-twins/check_short_prism_covers.py --wrapped 6 "$sheets" 30 28 || exit 1
+    python -B research-twins/check_short_prism_covers.py --wrapped 6 "$sheets" 30 28 --wrapped 7 "$sheets" 30 28 || exit 1
 done
 python -B research-twins/check_short_prism_covers.py --four-sheet-barrier
 python -B research-twins/check_short_prism_covers.py --stage-ancestry
@@ -885,6 +893,7 @@ python -B research-twins/check_cost_25_blocking_sets.py --boundary-catalogue wit
 python -B research-twins/check_cost_25_blocking_sets.py --boundary-catalogue ten-blocks
 python -B research-twins/check_cost_25_blocking_sets.py --boundary-catalogue nine-blocks
 python -B research-twins/check_cost_25_blocking_sets.py --boundary-catalogue eight-blocks
+python -B research-twins/check_cost_25_blocking_sets.py --boundary-catalogue seven-blocks
 python -B research-twins/check_cost_25_blocking_sets.py --boundary-catalogue six-blocks
 python -B research-twins/check_cost_25_blocking_sets.py --boundary-catalogue exhaustive
 python -B research-twins/check_cost_25_blocking_sets.py --size-30-boundary
