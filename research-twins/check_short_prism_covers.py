@@ -189,21 +189,15 @@ def check_wrapped_budget(blocks, sheets, budget, band_through, *, occupied_stage
     print(f'{blocks} blocks, {sheets} sheets: no wrapped fort of cost {budget}{scope}', flush=True)
 
 
-def check_degree_31_period_37(blocks=36):
-    sheets, budget, width = 37, 31, 24
-    bounds = residual_bounds(sheets, budget, width)
-    surplus = width * budget - sheets * bounds[width]
-    profiles = set(sparse_sheet_profiles(sheets, budget, bounds, width, surplus))
-    if len(profiles) != 130 or max(map(max, profiles)) != 2:
-        raise AssertionError('Unexpected sheet counts at period 37')
-
+def exclude_sheet_profiles(blocks, sheets, budget, width, profiles):
+    cap = max(map(max, profiles))
     graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
     flags = []
     clauses = wrapped_formula(graph, blue, sheets, budget, band_through=width,
-                              require_minimal=False, compact_bands=True, sheet_cap=2,
+                              require_minimal=False, compact_bands=True, sheet_cap=cap,
                               sheet_count_flags=flags)
-    if clauses is None or len(flags) != sheets or any(len(row) != 2 for row in flags):
-        raise AssertionError('Unexpected wrapped formula at period 37')
+    if clauses is None or len(flags) != sheets or any(len(row) != cap for row in flags):
+        raise AssertionError(('Unexpected wrapped profile formula', blocks, sheets))
     with Solver(name='cadical195', bootstrap_with=clauses) as solver:
         for profile in sorted(profiles):
             assumptions = [flag if count >= threshold else -flag
@@ -213,6 +207,50 @@ def check_degree_31_period_37(blocks=36):
                 raise AssertionError(('A wrapped fort exists', blocks, sheets, budget, profile))
     print(f'{blocks} blocks, {sheets} sheets: all {len(profiles)} cost-{budget} profiles excluded',
           flush=True)
+
+
+def check_degree_31_period_37(blocks=36):
+    sheets, budget, width = 37, 31, 24
+    bounds = residual_bounds(sheets, budget, width)
+    surplus = width * budget - sheets * bounds[width]
+    profiles = set(sparse_sheet_profiles(sheets, budget, bounds, width, surplus))
+    if len(profiles) != 130 or max(map(max, profiles)) != 2:
+        raise AssertionError('Unexpected sheet counts at period 37')
+    exclude_sheet_profiles(blocks, sheets, budget, width, profiles)
+
+
+def check_degree_31_period_36(blocks=13):
+    sheets, budget, width = 36, 31, 28
+    bounds = residual_bounds(sheets, budget, width)
+    # Each of the four orbits must contain one surplus window. Rotate the
+    # position in the zero residue class to zero before choosing the others.
+    orbits = [[(r + j * width) % sheets for j in range(9)] for r in range(4)]
+    profiles = set()
+    for positions in product(*(range(r, sheets, 4) for r in (1, 2, 3))):
+        surplus = {0, *positions}
+        offsets = [0] * sheets
+        for orbit in orbits:
+            for i, j in zip(orbit, orbit[1:]):
+                offsets[j] = offsets[i] + ((i + 1) % sheets in surplus) - (i in surplus)
+            minimum = min(offsets[i] for i in orbit)
+            for i in orbit:
+                offsets[i] -= minimum
+        units, remainder = divmod(budget - sum(offsets), 9)
+        if remainder or units < 0:
+            continue
+        for extra in combinations_with_replacement(range(4), units):
+            levels = [extra.count(r) for r in range(4)]
+            counts = tuple(n + levels[i % 4] for i, n in enumerate(offsets))
+            repeated = counts + counts
+            prefix = list(accumulate(repeated, initial=0))
+            if any(prefix[i + length] - prefix[i] < lower
+                   for length, lower in bounds.items() for i in range(sheets)):
+                continue
+            peak = max(counts)
+            profiles.add(min(repeated[i:i + sheets] for i, n in enumerate(counts) if n == peak))
+    if len(profiles) != 45 or max(map(max, profiles)) != 2:
+        raise AssertionError('Unexpected sheet counts at period 36')
+    exclude_sheet_profiles(blocks, sheets, budget, width, profiles)
 
 
 def check_ordinary_wrapping(sheets, budget):
@@ -358,6 +396,8 @@ if __name__ == '__main__':
                       help='exclude wrapping at cost 24 when insertion is blocked at 24 blocks')
     mode.add_argument('--degree-31-period-37', nargs='?', type=int, choices=(33, 36), const=36,
                       metavar='BLOCKS', help='exclude all cost-31 wrapped profiles at 37 sheets')
+    mode.add_argument('--degree-31-period-36', nargs='?', type=int, choices=range(9, 25), const=13,
+                      metavar='BLOCKS', help='exclude all cost-31 wrapped profiles at 36 sheets')
     mode.add_argument('--four-sheet-barrier', action='store_true',
                       help='check the round-five separation across four intact sheets')
     mode.add_argument('--stage-ancestry', action='store_true',
@@ -379,6 +419,8 @@ if __name__ == '__main__':
             check_insertion_obstruction(sheets)
     elif args.degree_31_period_37:
         check_degree_31_period_37(args.degree_31_period_37)
+    elif args.degree_31_period_36:
+        check_degree_31_period_36(args.degree_31_period_36)
     elif args.four_sheet_barrier:
         for blocks in range(13, 28):
             check_four_sheet_barrier(blocks)

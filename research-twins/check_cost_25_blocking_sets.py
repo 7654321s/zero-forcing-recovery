@@ -1,7 +1,7 @@
 """Enumerate small inclusion-minimal seed losses in the integer prism lift."""
 
 import argparse
-from collections import Counter, defaultdict, deque
+from collections import Counter, defaultdict
 from itertools import combinations
 import gzip
 import json
@@ -16,6 +16,7 @@ HERE = Path(__file__).resolve().parent
 SPAN = runpy.run_path(str(HERE / 'check_finite_fort_span.py'))
 STRIP = runpy.run_path(str(HERE / 'check_finite_fort_strip.py'))
 COVER = SPAN['COVER']
+LOSS_COMPONENTS = runpy.run_path(str(HERE / 'check_loss_components.py'))
 mask, members = SPAN['mask'], SPAN['members']
 DIRECT_LAST = 14
 DIRECT_SIZE_27_LAST = 13
@@ -77,26 +78,24 @@ def block_translations(pattern, sheets):
         yield [-(v * sheets + s + shift + 1) for v, s in pattern]
 
 
-def remaining_white(neighbors, intact_white, lost):
-    """Compute the final white set by updating only neighbors of each force."""
-    white = intact_white.copy()
-    for vertex in members(lost):
-        white[vertex] = 1
-    counts = bytearray(sum(white[v] for v in row) for row in neighbors)
-    sources = deque(u for u, count in enumerate(counts) if count == 1 and not white[u])
+def remaining_white(graph, cones, lost):
+    """Start from the vertices still white after applying the intact seed proofs."""
+    # Each proof avoiding the lost seeds is still legal in nominal arrival order.
+    # Completing forcing from that reachable partial coloring preserves its closure.
+    white = 0
+    for seed in members(lost):
+        white |= cones[seed]
+    sources = {v for u in members(white) for v in members(graph[u] & ~white)}
     while sources:
-        source = sources.popleft()
-        if counts[source] != 1:
+        source = sources.pop()
+        targets = graph[source] & white
+        if targets.bit_count() != 1:
             continue
-        target = next(v for v in neighbors[source] if white[v])
-        white[target] = 0
-        if counts[target] == 1:
-            sources.append(target)
-        for neighbor in neighbors[target]:
-            counts[neighbor] -= 1
-            if counts[neighbor] == 1 and not white[neighbor]:
-                sources.append(neighbor)
-    return mask(v for v, remains_white in enumerate(white) if remains_white)
+        target = targets.bit_length() - 1
+        white ^= targets
+        sources.add(target)
+        sources.update(members(graph[target] & ~white))
+    return white
 
 
 def verify_inherited_patterns(blocks, smaller, templates, *, budget=25, already_lifted=False):
@@ -124,14 +123,13 @@ def verify_inherited_patterns(blocks, smaller, templates, *, budget=25, already_
                 for delta in range(sheets):
                     translated = mask(v * sheets + (s + delta) % sheets for v, s in smaller_pattern)
                     smaller_translates[translated & -translated].add(translated)
-            neighbors = tuple(tuple(members(row)) for row in graph)
-            white = bytearray(not (blue >> v) & 1 for v in range(len(graph)))
-            covers[sheets] = (graph, blue, smaller_translates, neighbors, white)
-        graph, blue, smaller_translates, neighbors, white = covers[sheets]
+            _, _, cones = LOSS_COMPONENTS['nominal_cones'](graph, blue)
+            covers[sheets] = (graph, blue, smaller_translates, cones)
+        graph, blue, smaller_translates, cones = covers[sheets]
         lost = mask(v * sheets + s + 4 for v, s in pattern)
         if lost & blue != lost or lost.bit_count() != budget:
             raise AssertionError(('Unexpected inherited seeds', blocks, pattern))
-        fort = remaining_white(neighbors, white, lost)
+        fort = remaining_white(graph, cones, lost)
         if COVER['fort_cost'](graph, blue, fort) != budget or any(
                 v % sheets in (0, sheets - 1) for v in members(fort)):
             raise AssertionError(('Inherited loss has no finite fort', blocks, pattern))
@@ -904,7 +902,7 @@ def check_ordinary_size_31(*, exhaustive=False, restoration=False, overlap_32=Fa
     print(json.dumps(result), flush=True)
 
 
-def check_ordinary_size_32(*, exhaustive=False):
+def ordinary_size_32_catalogue():
     ordinary, size_31, _ = ordinary_size_31_catalogue()
     smaller = (*ordinary, *size_31)
     patterns = enumerate_blockers(8, ordinary_placements(smaller, 3), budget=32, ordinary_stages=3,
@@ -917,6 +915,11 @@ def check_ordinary_size_32(*, exhaustive=False):
     stage_start = SPAN['BAND']['stage_start']
     templates = [tuple((v - stage_start(2), sheet) for v, sheet in row)
                  for row in sorted(patterns)]
+    return smaller, templates, spans
+
+
+def check_ordinary_size_32(*, exhaustive=False):
+    smaller, templates, spans = ordinary_size_32_catalogue()
     if exhaustive:
         SPAN['BAND']['check_band'](36, stages=34, budget=32)
         check_ordinary_sheet_bands(through=21, blocks=37)

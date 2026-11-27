@@ -197,25 +197,75 @@ def check_boundary_catalogue(*, partitions=False):
           flush=True)
 
 
-def check_degree_32_overlap_representative():
-    blocks = 12
+def transferred_catalogue(blocks):
     near, outside = read_boundary_catalogue()
     ordinary = [tuple((v - stage_start(32), sheet) for v, sheet in row) for row in outside]
     source, _ = long_catalogue(near, outside, ordinary)
-    size_31 = CHECK['relocate_boundary_patterns'](source, long_blocks, blocks)
-    if len(size_31) != 97 * blocks + 17372:
-        raise AssertionError('Unexpected size-31 count in the overlap representative')
+    transferred = CHECK['relocate_boundary_patterns'](source, long_blocks, blocks)
+    if len(transferred) != 97 * blocks + 17372:
+        raise AssertionError(('Unexpected transferred size-31 count', blocks))
+    return transferred
+
+
+def check_short_catalogue(blocks):
+    known = set(transferred_catalogue(blocks))
+    lower, size_30 = CHECK['catalogues_through_size_30'](blocks)
+    smaller = (*lower, *size_30)
+    print(f'{blocks} blocks: checking {len(known)} size-31 witnesses', flush=True)
+    verified = CHECK['verify_inherited_patterns'](
+        blocks, smaller, sorted(known), budget=size, already_lifted=True)
+    if verified != known:
+        raise AssertionError(('The short witness catalogue changed during replay', blocks))
+    if CHECK['enumerate_blockers'](blocks, smaller, known, budget=size, strip_sheets=37,
+                                  require_minimal_fort=True,
+                                  occupied_stage_pairs=blocks < 13) != known:
+        raise AssertionError(('An unlisted size-31 loss survives', blocks))
+    print(json.dumps({'blocks': blocks, 'size': size, 'count': len(known), 'exhaustive': True}),
+          flush=True)
+
+
+def check_degree_32_overlap_representative():
+    blocks = 12
+    size_31 = transferred_catalogue(blocks)
     lower, size_30 = CHECK['catalogues_through_size_30'](blocks)
     losses = (*lower, *size_30, *size_31)
     print(f'{blocks} blocks: counting order-32 unions of {len(losses)} smaller losses', flush=True)
     weights, span = CHECK['signed_union_weights'](losses, 32)
     summed = {degree: sum(w * n for w, n in profile.items())
               for degree, profile in weights.items()}
-    if span > 25 or summed[31] != 89 * blocks + 4238:
+    expected = {-4: 8, -3: 1, -2: 1451, -1: 69612, 0: 11764,
+                1: 25206, 2: 771, 3: 15, 4: 3}
+    if span != 13 or summed[31] != 89 * blocks + 4238 or weights[32] != expected:
         raise AssertionError(('Unexpected overlaps in the degree-32 representative', span, summed))
     print(json.dumps({'blocks': blocks, 'maximum_sheet_span': span, 'weights': weights[32],
                       'overlap_per_sheet': summed[32], 'boundary_intercept': summed[32] + 205 * blocks}),
           flush=True)
+
+
+def check_degree_32_outer_windows():
+    blocks = 13
+    representative = 37
+    lower, size_30 = CHECK['catalogues_through_size_30'](blocks)
+    smaller = (*lower, *size_30, *transferred_catalogue(blocks))
+    _, ordinary, _ = CHECK['ordinary_size_32_catalogue']()
+    counts = []
+    for first, span in ((33, 3), (32, 4), (33, 4)):
+        local = first - (representative - blocks)
+        last = local + span - 1
+        allowed = set(range(local, last + 1))
+        contained = tuple(row for row in smaller if all(stage(v) in allowed for v, _ in row))
+
+        def restrict_window(clauses, seeds, order, sheets):
+            return restrict_stages(clauses, seeds, order, sheets, allowed, ({local}, {last}))
+
+        result = CHECK['enumerate_blockers'](blocks, contained, budget=32, strip_sheets=38,
+                                             require_minimal_fort=True, restrict=restrict_window)
+        expected = {tuple((v + stage_start(local), sheet) for v, sheet in row)
+                    for row in ordinary} if span == 3 else set()
+        if result != expected:
+            raise AssertionError(('Unexpected size-32 outer catalogue', first, span, len(result)))
+        counts.append((first, span, len(result)))
+    print(json.dumps({'blocks': representative, 'outside_windows': counts}), flush=True)
 
 
 if __name__ == '__main__':
@@ -225,12 +275,20 @@ if __name__ == '__main__':
                        help='also exhaust the boundary windows of span at most four')
     modes.add_argument('--long-stage-span', action='store_true',
                        help='exclude all anchored losses of stage span at least five')
+    modes.add_argument('--short-catalogue', type=int, choices=range(9, 14), metavar='BLOCKS',
+                       help='verify a complete shorter-chain size-31 catalogue')
     modes.add_argument('--degree-32-overlap', action='store_true',
                        help='count degree-32 overlaps in the transferred 12-block catalogue')
+    modes.add_argument('--degree-32-outer-windows', action='store_true',
+                       help='verify the three short outer windows at size 32')
     args = parser.parse_args()
     if args.long_stage_span:
         check_long_stage_span()
+    elif args.short_catalogue:
+        check_short_catalogue(args.short_catalogue)
     elif args.degree_32_overlap:
         check_degree_32_overlap_representative()
+    elif args.degree_32_outer_windows:
+        check_degree_32_outer_windows()
     else:
         check_boundary_catalogue(partitions=args.partitions)
