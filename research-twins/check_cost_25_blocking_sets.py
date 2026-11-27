@@ -587,9 +587,12 @@ def check_ordinary_size_30(*, exhaustive=False):
     spans = Counter()
     residual_sizes = Counter()
     restoration_rounds = Counter()
+    least_stage_seeds = 30
     for pattern in sorted(catalogue):
-        if {(v - original) // 16 for v, _ in pattern} != {0, 1, 2}:
+        stage_counts = Counter((v - original) // 16 for v, _ in pattern)
+        if stage_counts.keys() != {0, 1, 2}:
             raise AssertionError(('Ordinary loss misses a stage', pattern))
+        least_stage_seeds = min(least_stage_seeds, min(stage_counts.values()))
         lost = mask((start + v - original) * sheets + s + 7 for v, s in pattern)
         if lost & blue != lost or lost.bit_count() != 30:
             raise AssertionError(('Invalid ordinary seed coordinates', pattern))
@@ -601,12 +604,19 @@ def check_ordinary_size_30(*, exhaustive=False):
         spans[max(s for _, s in pattern)] += 1
         residual_sizes[fort.bit_count()] += 1
         restoration_rounds.update(dict(SPAN['restoration_profile'](graph, blue, lost)))
+    if least_stage_seeds != 6:
+        raise AssertionError(('Unexpected minimum stage seed count', least_stage_seeds))
+    overlap_profile, union_span = signed_union_weights(catalogue, 31)
+    if overlap_profile[31] != {-1: 8} or union_span != 11:
+        raise AssertionError(('Unexpected ordinary degree-31 overlaps', overlap_profile, union_span))
     if exhaustive:
         check_ordinary_size_30_window(catalogue)
     print(json.dumps({
         'size': 30, 'ordinary_stages': 3, 'count': len(catalogue),
         'spans': dict(sorted(spans.items())), 'residual_sizes': dict(sorted(residual_sizes.items())),
         'restoration_rounds': dict(sorted(restoration_rounds.items())),
+        'degree_31_overlap_weights': dict(overlap_profile[31]),
+        'degree_31_union_span': union_span,
         'losses': [[(v - original, s) for v, s in pattern] for pattern in sorted(catalogue)],
     }), flush=True)
 
