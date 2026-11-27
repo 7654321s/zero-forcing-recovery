@@ -678,6 +678,8 @@ When $k\geq36$, a size-31 seed template therefore fits into an arc of at most 32
 
 For sheet support, contract only to 36 blocks. The width-22 band excludes cyclic wrapping at $m\geq38$ because $18m>22\cdot31$. At $m=37$ the width-24 band requires at least 20 lost seeds in every window and excludes cost 30 and below since $20\cdot37>24\cdot30$. At cost 31, let $a_i$ be the lost seed count in sheet $i$ and let $e_i$ be the surplus over 20 in the width-24 window that starts there. Then $\sum_i e_i=24\cdot31-37\cdot20=4$ and $a_{i+24}-a_i=e_{i+1}-e_i$, with subscripts modulo 37. Since 24 and 37 are coprime, the surplus vector and the total seed count determine the sheet counts uniquely. The verifier rotates a positive surplus to position zero, distributes the three remaining units, and discards count vectors that are nonintegral, negative or violate any certified width-10 through width-24 bound. There are 130 remaining vectors up to rotation, each with at most two lost seeds per sheet. The wrapped-fort SAT formula excludes all 130 on the 36-block representative.
 
+The width-25 band at 36 blocks gives a second verification of sufficiency from 37 sheets. It requires 21 lost seeds in each window and therefore excludes wrapping by $21m>25\cdot31$ for every $m\geq37$.
+
 Two nonempty pieces of a finite fort separated by two empty sheets would cost at least 48 in total. The [final-white-fort transfer](#transferring-losses-by-the-final-white-fort) therefore identifies the finite and cyclic loss types from 37 sheets. In particular, taking period 37 bounds every finite cost-31 fort at $k\geq36$ by 35 sheets.
 
 For the coefficient, each minimal size-31 loss contributes once and cannot lie in a degree-31 union with another minimal loss. All other terms have the [signed overlap correction](#the-complete-degree-31-overlap-correction). Blocking starts in degree 24, so the logarithmic recovery coefficient in degree 31 is the negative of the total blocking coefficient. Substituting the corrected count gives $m(-89k+13134-\beta_{31})$.
@@ -688,13 +690,13 @@ Fix an ordinary starting stage and use only the ten size-30 and 97 size-31 types
 
 Every type occupies three consecutive ordinary stages with at least six lost seeds in each. Two different starting stages give some occupied stage of one type outside the other, so the union has at least $30+6>32$ seeds. All ordinary overlaps at this degree therefore come from a single common start. A degree-32 term involving a boundary type stays a bounded distance from an exceptional stage, because its members have bounded span and intersect. Such terms together contribute only $O(m)$ in the fixed-order formula. Each new minimal loss of size 32 contributes once, since taking its union with any other minimal loss would have size greater than 32. The blocking coefficient is the negative of the logarithmic recovery coefficient at this order. Consequently the [ordinary slopes](#eventual-counts-at-every-fixed-loss-order) satisfy $\gamma_{32}=205-\alpha_{32}$.
 
-### Size-32 losses within five ordinary stages
+### All size-32 losses in ordinary stages
 
-Exactly 276 inclusion-minimal size-32 losses have a fort confined to at most five consecutive ordinary stages with ordinary neighbors, up to sheet and stage translation. All 276 use all three stages. Eight span ten sheets and 268 span eleven.
+There are exactly 276 inclusion-minimal size-32 losses supported by finite forts in ordinary stages with ordinary neighbors, up to sheet and stage translation. Every type uses exactly three stages. Eight span ten sheets and 268 span eleven.
 
 The width-21 check at 36 blocks supplies a compact guarded strip. An ordinary fort on those stages has the same local graph when placed in this representative. If a cyclic fort of cost at most 32 met every adjacent sheet pair at period 40, the window count would give $17\cdot40\leq21\cdot32$, which is false. A finite fort cannot have an internal empty pair because its two parts would cost at least 48. By the [final-white-fort transfer](#transferring-losses-by-the-final-white-fort), the finite fort span is at most 38. The exhaustive search uses 38 interior sheets and excludes all placements of the ten size-30 and 97 size-31 types. They are the only possible smaller losses contained in the selected seeds, since all smaller ordinary types occupy three stages. The three-stage search gives all 276 templates. The four- and five-stage searches exclude their 552 and 828 placements, respectively, and find no additional loss.
 
-Every listed type has ordinary placements in the fixed-order regime. This proves $\alpha_{32}\geq276$, and the overlap correction gives $\gamma_{32}\leq-71$. The 34-stage band at cost 32 forces an empty pair. Since such a pair cannot separate occupied stages inside a finite fort at this cost, a remaining ordinary type must have a fort spanning six through 33 stages.
+The 34-stage nonterminal band at cost 32 forces an empty adjacent pair. No such pair can separate occupied stages inside a finite fort at this cost, since the two parts would require at least 48 lost seeds. Every ordinary finite fort fits within 33 stages. Translate its first occupied stage to stage two of a 37-block chain, leaving ordinary neighbors at both ends. At 37 blocks the width-21 sheet band again requires at least 17 lost seeds, giving the same 38-sheet interior bound. In this window the exhaustive formula excludes all 3,317 placements of the smaller types and all 8,556 placements of the 276 size-32 types. It is unsatisfiable. Thus the ordinary slopes are exactly $\alpha_{32}=276$ and $\gamma_{32}=205-276=-71$.
 
 ### A packing of disjoint ordinary blocking losses
 
@@ -933,10 +935,10 @@ python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-31
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-31-exact
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-31-restoration
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-degree-32-overlap
-python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 24 --band-blocks 36
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 25 --band-blocks 36
 python -B research-twins/check_short_prism_covers.py --degree-31-period-37
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-32
-python -B -c "import runpy; runpy.run_path('research-twins/check_block_stabilization.py')['check_band'](36, stages=34, budget=32)"
+python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-32-exact
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 5
 python -B research-twins/check_cost_25_blocking_sets.py --size-31-five-blocks
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 6

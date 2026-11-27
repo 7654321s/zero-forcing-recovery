@@ -710,11 +710,11 @@ def check_ordinary_size_30_window(catalogue):
     print('The ten cost-30 losses exhaust the ordinary interior', flush=True)
 
 
-def check_ordinary_sheet_bands(*, through=20):
+def check_ordinary_sheet_bands(*, through=20, blocks=36):
     band = SPAN['BAND']
     for width in range(10, through + 1):
         band['check_sheet_band'](width, width - 5, pin_ends=width > 10,
-                                 blocks=36, subband_constraints=width >= 13)
+                                 blocks=blocks, subband_constraints=width >= 13)
 
 
 def ordinary_size_31_restoration(templates):
@@ -867,7 +867,7 @@ def check_ordinary_size_31(*, exhaustive=False, restoration=False, overlap_32=Fa
     print(json.dumps(result), flush=True)
 
 
-def check_ordinary_size_32():
+def check_ordinary_size_32(*, exhaustive=False):
     ordinary, size_31, _ = ordinary_size_31_catalogue()
     smaller = (*ordinary, *size_31)
     patterns = enumerate_blockers(8, ordinary_placements(smaller, 3), budget=32, ordinary_stages=3,
@@ -880,14 +880,20 @@ def check_ordinary_size_32():
     stage_start = SPAN['BAND']['stage_start']
     templates = [tuple((v - stage_start(2), sheet) for v, sheet in row)
                  for row in sorted(patterns)]
-    for width in (4, 5):
+    if exhaustive:
+        SPAN['BAND']['check_band'](36, stages=34, budget=32)
+        check_ordinary_sheet_bands(through=21, blocks=37)
+        print('Certified a 33-stage and 38-sheet ordinary interior at cost 32', flush=True)
+    for width in (33,) if exhaustive else (4, 5):
+        blocks = 37 if exhaustive else width + 5
         known = ordinary_placements(templates, width)
-        wider = enumerate_blockers(width + 5, ordinary_placements(smaller, width), known,
+        wider = enumerate_blockers(blocks, ordinary_placements(smaller, width), known,
                                     budget=32, ordinary_stages=width, first_ordinary_stage=True,
                                     strip_sheets=40, require_minimal_fort=True)
         if wider != known:
             raise AssertionError(('A new size-32 type survives', width))
-    print(json.dumps({'size': 32, 'ordinary_stage_window': 5, 'count': len(templates),
+    print(json.dumps({'size': 32, 'ordinary_stage_window': 33 if exhaustive else 5,
+                      'exhaustive': exhaustive, 'count': len(templates),
                       'spans': dict(sorted(spans.items())), 'losses': templates}), flush=True)
 
 
@@ -925,6 +931,8 @@ def main():
                       help='check the single-seed restoration times of ordinary size-31 losses')
     mode.add_argument('--ordinary-size-32', action='store_true',
                       help='verify size-32 losses within five ordinary stages')
+    mode.add_argument('--ordinary-size-32-exact', action='store_true',
+                      help='verify the complete ordinary size-32 loss catalogue')
     mode.add_argument('--ordinary-degree-32-overlap', action='store_true',
                       help='verify degree-32 ordinary overlaps of smaller losses')
     mode.add_argument('--degree-31-overlap', type=int, choices=range(5, 15), metavar='BLOCKS',
@@ -951,8 +959,8 @@ def main():
     if args.ordinary_threshold:
         check_ordinary_threshold()
         return
-    if args.ordinary_size_32:
-        check_ordinary_size_32()
+    if args.ordinary_size_32 or args.ordinary_size_32_exact:
+        check_ordinary_size_32(exhaustive=args.ordinary_size_32_exact)
         return
     if args.degree_31_overlap is not None:
         check_degree_31_overlap(args.degree_31_overlap)
