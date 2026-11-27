@@ -86,14 +86,64 @@ def check_complete_window(families, width):
                       'excluded_size_33': len(known)}), flush=True)
 
 
+def check_finite_representative():
+    band = CHECK['SPAN']['BAND']
+    for blocks in (36, 37):
+        band['check_band'](blocks, stages=35, budget=33)
+        print(f'{blocks} blocks: the 35-stage band forces an empty adjacent pair', flush=True)
+    CHECK['check_ordinary_sheet_bands'](through=21, blocks=38)
+    print('38 blocks: the width-21 sheet band requires 17 losses', flush=True)
+
+
+def check_wider_seed_arcs(families):
+    smaller_templates = tuple(row for family in families[:3] for row in family)
+    stage = BOUNDARY['stage']
+    for span in range(4, 35):
+        blocks = span + 6
+        arc = list(range(3, 3 + span))
+        allowed = set(arc)
+        required = [{arc[0]}, {arc[-1]},
+                    *(set(arc[i:i + 3]) for i in range(1, span - 3))]
+        smaller = [tuple((v + 16, sheet) for v, sheet in row)
+                   for row in CHECK['ordinary_placements'](smaller_templates, span)]
+
+        def restrict(clauses, seeds, order, sheets):
+            selected = BOUNDARY['restrict_stages'](
+                clauses, seeds, order, sheets, allowed, required, blocks=blocks)
+            if span == 34:
+                # Including the predecessor would exceed the 34-stage fort bound.
+                clauses.extend([-(v + 1)] for v in range(order) if stage(v // sheets) == 2)
+            for left, right in zip(arc[1:-1], arc[2:-1]):
+                clauses.append([v + 1 for v in range(order)
+                                if stage(v // sheets) in {left, right}])
+            return selected
+
+        result = CHECK['enumerate_blockers'](
+            blocks, smaller, budget=33, strip_sheets=SHEETS, require_minimal_fort=True,
+            restrict=restrict, stream_blockers=True)
+        if result:
+            raise AssertionError(('Unexpected wider ordinary loss', span, sorted(result)))
+        print(json.dumps({'seed_span': span, 'size': 33, 'additional_losses': 0}), flush=True)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--window', type=int, choices=(3, 4, 5, 34),
-                        help='check for additional losses in the given finite stage window')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--window', type=int, choices=(3, 4, 5, 34),
+                      help='check for additional losses in the given finite stage window')
+    mode.add_argument('--seed-arcs', action='store_true',
+                      help='exclude each wider ordinary seed arc of length four through 34')
+    mode.add_argument('--bounds', action='store_true',
+                      help='certify the ordinary stage and sheet bounds')
     args = parser.parse_args()
-    families = read_catalogues()
-    if args.window:
-        check_complete_window(families, args.window)
+    if args.bounds:
+        check_finite_representative()
     else:
-        replay_witnesses(families)
-        check_overlap(families)
+        families = read_catalogues()
+        if args.window:
+            check_complete_window(families, args.window)
+        elif args.seed_arcs:
+            check_wider_seed_arcs(families)
+        else:
+            replay_witnesses(families)
+            check_overlap(families)

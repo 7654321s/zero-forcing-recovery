@@ -798,9 +798,9 @@ The guarded search at 13 blocks excludes 27,149 smaller types restricted to $N_{
 
 The witness verifier computes the final white fort and checks that restoring any one lost seed gives full recovery. The exhaustive mode excludes the archived catalogue and the ordinary types before searching again for any remaining near-boundary loss.
 
-For anchored outer seed arcs of spans five through ten, the numbers of candidate starts at 37 blocks are respectively 4, 6, 8, 10, 12 and 14. At spans $11\leq s\leq18$, a seed arc meeting the five consecutive anchor stages must extend outside the nine-stage near region. There are $s+4$ candidate starts. For a span $s$, align the $s+3$ guard window by its exceptional stage in a representative with $\max(13,s+4)$ blocks. This retains both the seed labels and all fort clauses that can depend on the occupied region. The two endpoints must contain lost seeds. Every internal triple of seed stages must contain a loss, and every internal adjacent pair must meet the fort. Otherwise the one-sided ancestry rule or the empty-pair cut would split the fort into two, with combined seed cost at least 48. With the lower-order catalogue excluded, each of these 202 guarded searches is unsatisfiable.
+For anchored outer seed arcs of spans five through ten, the numbers of candidate starts at 37 blocks are respectively 4, 6, 8, 10, 12 and 14. At spans $11\leq s\leq23$, a seed arc meeting the five consecutive anchor stages must extend outside the nine-stage near region. There are $s+4$ candidate starts. For a span $s$, align the $s+3$ guard window by its exceptional stage in a representative with $\max(13,s+4)$ blocks. This retains both the seed labels and all fort clauses that can depend on the occupied region. The two endpoints must contain lost seeds. Every internal triple of seed stages must contain a loss, and every internal adjacent pair must meet the fort. Otherwise the one-sided ancestry rule or the empty-pair cut would split the fort into two, with combined seed cost at least 48. With the lower-order catalogue excluded, each of these 327 guarded searches is unsatisfiable.
 
-Let $\ell$ denote the number of normalized size-32 losses at 37 blocks that meet $A_{37}$, have a seed outside $N_{37}$ and have a seed arc of span at least nineteen. There are $31\cdot276$ ordinary placements without an anchor at 37 blocks, and the short outer count adds 276 ordinary placements at the terminal side. With the five-stage reduction in the resulting ordinary count relative to $276k$, the full formula is
+Let $\ell$ denote the number of normalized size-32 losses at 37 blocks that meet $A_{37}$, have a seed outside $N_{37}$ and have a seed arc of span at least twenty-four. At 37 blocks the ordinary placements without an anchor start at stages 3 through 32. The ordinary types at start 2 were excluded from the near-boundary catalogue, and those at start 33 appear in the short outer count. The total ordinary count is $32\cdot276$. With the five-stage reduction in the resulting ordinary count relative to $276k$, the full formula is
 $$
 M_{32}(k,m)=m(276k+49553+\ell),
 \qquad
@@ -840,6 +840,17 @@ The ten size-30, 97 size-31 and 276 size-32 ordinary types all use three consecu
 The signed sum is **$-980$** per stage start and sheet. The largest union span is eleven sheets. An independent count grouping the inclusion-exclusion terms by their earliest constituent event gives the same profile. If $\alpha_{33}$ is the number of ordinary size-33 types, the slope of $[p^{33}]\log R$ is $\gamma_{33}=980-\alpha_{33}$, since the overlap correction enters the blocking probability and each new size-33 event contributes once.
 
 The three-stage ordinary guarded search gives **420** size-33 types. Three span ten sheets, 382 span eleven, and 35 span twelve. Searches with four and five ordinary stages exclude the translated catalogue and find no additional types. The [ordinary catalogue](ordinary-size-32-and-33-catalogue.json.gz) stores both size-32 and size-33 witnesses. The [verifier](check_degree_33_ordinary.py) checks the final white forts, every single-seed restoration, and the signed overlaps.
+
+### All size-33 losses in ordinary stages
+
+The terminal and nonterminal 35-stage band tests at 36 and 37 blocks force an empty adjacent appended pair at cost at most 33. An internal empty pair would split the fort into two parts of combined seed cost at least 48. Contracting empty pairs to 35 blocks leaves a gap, so a finite ordinary fort occupies an arc of at most 34 stages. Place the arc in stages 2 through 35 at 38 blocks, with an ordinary guard stage on each side. The width-21 sheet band requires at least 17 lost seeds whenever every adjacent pair in the band meets the fort. Since $17\cdot41>21\cdot33$, at period 41 there is an empty adjacent sheet pair. The [final-white-fort transfer](#transferring-losses-by-the-final-white-fort) bounds the finite sheet span by 39.
+
+A seed arc of span at most three has its fort contained in at most four stages by one-sided ancestry, so the three- and four-stage searches already cover that case. For each seed arc of span $s$ from 4 through 34, the fort is confined to the arc and its predecessor. If $s=34$, the fort bound excludes the predecessor. Every internal triple of seed stages must contain a loss and every internal adjacent pair must meet the fort. The two endpoints contain losses. The 31 guarded searches with these conditions and all smaller ordinary losses excluded find no new types. The exact ordinary slopes are therefore
+$$
+\alpha_{33}=420,
+\qquad
+\gamma_{33}=980-420=560.
+$$
 
 ### A packing of disjoint ordinary blocking losses
 
@@ -1107,9 +1118,11 @@ python -B research-twins/check_degree_31_boundary.py --degree-32-overlap
 python -B research-twins/check_degree_31_boundary.py --degree-32-outer-windows
 python -B research-twins/check_degree_32_boundary.py
 python -B research-twins/check_degree_32_boundary.py --exhaustive
-python -B research-twins/check_degree_32_boundary.py --outer-through 18
+python -B research-twins/check_degree_32_boundary.py --outer-through 23
 python -B research-twins/check_degree_33_ordinary.py
 python -B research-twins/check_degree_33_ordinary.py --window 5
+python -B research-twins/check_degree_33_ordinary.py --bounds
+python -B research-twins/check_degree_33_ordinary.py --seed-arcs
 python -B research-twins/check_prism_projected_support.py --cost-31-stage-pairs
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 24 --band-blocks 33
 python -B research-twins/check_short_prism_covers.py --degree-31-period-37 33
