@@ -275,7 +275,7 @@ if __name__ == '__main__':
                        help='also exhaust the boundary windows of span at most four')
     modes.add_argument('--long-stage-span', action='store_true',
                        help='exclude all anchored losses of stage span at least five')
-    modes.add_argument('--short-catalogue', type=int, choices=range(9, 14), metavar='BLOCKS',
+    modes.add_argument('--short-catalogue', type=int, choices=range(8, 14), metavar='BLOCKS',
                        help='verify a complete shorter-chain size-31 catalogue')
     modes.add_argument('--degree-32-overlap', action='store_true',
                        help='count degree-32 overlaps in the transferred 12-block catalogue')

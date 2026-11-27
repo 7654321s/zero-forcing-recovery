@@ -396,7 +396,7 @@ if __name__ == '__main__':
                       help='exclude wrapping at cost 24 when insertion is blocked at 24 blocks')
     mode.add_argument('--degree-31-period-37', nargs='?', type=int, choices=(33, 36), const=36,
                       metavar='BLOCKS', help='exclude all cost-31 wrapped profiles at 37 sheets')
-    mode.add_argument('--degree-31-period-36', nargs='?', type=int, choices=range(9, 25), const=13,
+    mode.add_argument('--degree-31-period-36', nargs='?', type=int, choices=range(8, 25), const=13,
                       metavar='BLOCKS', help='exclude all cost-31 wrapped profiles at 36 sheets')
     mode.add_argument('--four-sheet-barrier', action='store_true',
                       help='check the round-five separation across four intact sheets')

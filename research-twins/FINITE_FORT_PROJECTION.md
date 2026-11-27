@@ -664,13 +664,13 @@ At five blocks the hypotheses hold at cost 31 from 28 sheets. Taking period 28 b
 
 ### A finite representative for the degree-31 boundary terms
 
-For every $k\geq9$ and $m\geq37$, the degree-31 terms are
+For every $k\geq8$ and $m\geq37$, the degree-31 terms are
 $$
 M_{31}(k,m)=m(97k+17372),
 \qquad
 [p^{31}]\log R_{k,m}(p)=-m(89k+4238).
 $$
-The formulas also hold at $m=36$ for $9\leq k\leq24$ and for $k=26$. The normalized finite size-31 count is 20,864 at 36 blocks, by the [partition below](#the-complete-size-31-boundary-catalogue). The intercepts in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order) are $\beta_{31}=20864-97\cdot36=17372$ and $\delta_{31}=13134-\beta_{31}=-4238$. The [shorter-chain extension](#extending-the-degree-31-formula-to-shorter-chains) transfers the same catalogue below 36 blocks.
+The formulas also hold at $m=36$ for $8\leq k\leq24$ and for $k=26$. The normalized finite size-31 count is 20,864 at 36 blocks, by the [partition below](#the-complete-size-31-boundary-catalogue). The intercepts in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order) are $\beta_{31}=20864-97\cdot36=17372$ and $\delta_{31}=13134-\beta_{31}=-4238$. The [shorter-chain extension](#extending-the-degree-31-formula-to-shorter-chains) transfers the same catalogue below 36 blocks.
 
 The 33-stage band forces an empty appended pair at cost at most 31. The terminal and nonterminal checks use 34 and 35 blocks. The latter band is unchanged at every greater length. This holds on the integer lift and on cyclic covers, by projecting the lost seeds to base labels and lifting the restricted forcing process back. For a finite fort there cannot be two separated empty stage pairs with occupied stages on both sides, as the two parts would have combined cost at least 48. Contracting an empty appended pair preserves the occupied stage arc and retains at least one empty stage in its complement. Repeating down to 33 blocks confines the occupied stage arc to at most 32 stages.
 
@@ -706,11 +706,11 @@ Iterate to 36 blocks. If the original loss had seeds spanning more than four sta
 
 An independent guarded enumeration at 13 blocks exhausts exactly 18,633 size-31 losses. The normalized seed sets agree individually with the transferred catalogue. A separate verifier replays this catalogue and checks that forbidding all its placements leaves an unsatisfiable formula.
 
-At nine through twelve blocks every local window of at most seven stages still has the same boundary data. The transferred catalogues give 18,245, 18,342, 18,439 and 18,536 witnesses, respectively. At 12 blocks a minimal loss whose fort has an empty adjacent appended pair inserts into the 13-block chain and is already classified. For the remaining case, the guarded search requires a fort to meet every adjacent appended pair. After excluding the smaller-loss catalogue and the transferred losses the formula is unsatisfiable. Repeating the argument down to nine blocks and checking the remaining guarded formulas completes all four catalogues.
+At eight through twelve blocks the exceptional offsets of every local window of at most seven stages still occur. Eight blocks support the full six-stage window of every ordinary type. The transferred catalogues give 18,148, 18,245, 18,342, 18,439 and 18,536 witnesses, respectively. At 12 blocks a minimal loss whose fort has an empty adjacent appended pair inserts into the 13-block chain and is already classified. For the remaining case, the guarded search requires a fort to meet every adjacent appended pair. After excluding the smaller-loss catalogue and the transferred losses the formula is unsatisfiable. Repeating the argument down to eight blocks and checking the remaining guarded formulas completes all five catalogues.
 
-For sheets, at lengths nine through 24 and at 26 use the width-28 band. At 25 and 27 through 32 use the width-25 band. Both exclude wrapping at cost at most 31 from period 37. At 33 blocks the width-22 band excludes wrapping from period 38. The width-24 band excludes costs through 30 at period 37, and the same 130 cost-31 sheet profiles are all excluded on this representative. At 34 and 35 blocks the terminal and nonterminal stage bands contract a cyclic fort to 33 without changing its occupied sheets or cost. Thus final-white-fort transfer gives the stated cyclic counts from period 37 at all the new lengths.
+For sheets, at lengths eight through 24 and at 26 use the width-28 band. At 25 and 27 through 32 use the width-25 band. Both exclude wrapping at cost at most 31 from period 37. At 33 blocks the width-22 band excludes wrapping from period 38. The width-24 band excludes costs through 30 at period 37, and the same 130 cost-31 sheet profiles are all excluded on this representative. At 34 and 35 blocks the terminal and nonterminal stage bands contract a cyclic fort to 33 without changing its occupied sheets or cost. Thus final-white-fort transfer gives the stated cyclic counts from period 37 at all the new lengths.
 
-At lengths nine through 24 and period 36 the degree-30 checks already exclude lower-cost wrapping. For cost 31 let $a_i$ be the loss count on sheet $i$ and $e_i$ the surplus over 24 in the width-28 band starting there. Then $\sum_i e_i=28\cdot31-24\cdot36=4$ and $a_{i+28}-a_i=e_{i+1}-e_i$ modulo 36. The step 28 has four orbits, each of length nine. Summing this identity on each orbit shows that all four residue classes of $e_i$ have the same total, hence one surplus incidence each. Rotate a surplus to zero, choose the three remaining positions, and recover the relative sheet counts on each orbit. The remaining freedom is a nonnegative offset on each orbit, with their sum fixed by the total 31. The certified width-10 through width-28 bands leave 45 profiles up to rotation. The wrapped verifier excludes all 45 at each length from nine through 24. At 26 blocks the width-34 band already excludes wrapping at period 36 because $30\cdot36>34\cdot31$.
+At lengths eight through 24 and period 36 the degree-30 checks already exclude lower-cost wrapping. For cost 31 let $a_i$ be the loss count on sheet $i$ and $e_i$ the surplus over 24 in the width-28 band starting there. Then $\sum_i e_i=28\cdot31-24\cdot36=4$ and $a_{i+28}-a_i=e_{i+1}-e_i$ modulo 36. The step 28 has four orbits, each of length nine. Summing this identity on each orbit shows that all four residue classes of $e_i$ have the same total, hence one surplus incidence each. Rotate a surplus to zero, choose the three remaining positions, and recover the relative sheet counts on each orbit. The remaining freedom is a nonnegative offset on each orbit, with their sum fixed by the total 31. The certified width-10 through width-28 bands leave 45 profiles up to rotation. The wrapped verifier excludes all 45 at each length from eight through 24. At 26 blocks the width-34 band already excludes wrapping at period 36 because $30\cdot36>34\cdot31$.
 
 ### The degree-32 overlap correction in ordinary stages
 
@@ -1020,12 +1020,13 @@ python -B research-twins/check_degree_31_boundary.py --short-catalogue 12
 python -B research-twins/check_degree_31_boundary.py --short-catalogue 11
 python -B research-twins/check_degree_31_boundary.py --short-catalogue 10
 python -B research-twins/check_degree_31_boundary.py --short-catalogue 9
+python -B research-twins/check_degree_31_boundary.py --short-catalogue 8
 python -B research-twins/check_degree_31_boundary.py --degree-32-overlap
 python -B research-twins/check_degree_31_boundary.py --degree-32-outer-windows
 python -B research-twins/check_prism_projected_support.py --cost-31-stage-pairs
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 24 --band-blocks 33
 python -B research-twins/check_short_prism_covers.py --degree-31-period-37 33
-for blocks in 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+for blocks in 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 do
     python -B research-twins/check_short_prism_covers.py --degree-31-period-36 "$blocks"
 done
