@@ -664,7 +664,7 @@ def main():
     mode.add_argument('--size-30-boundary', action='store_true',
                       help='enumerate the 13-block representative for the size-30 boundary term')
     mode.add_argument('--boundary-catalogue',
-                      choices=('witnesses', 'exhaustive', 'ten-blocks', 'nine-blocks',
+                      choices=('witnesses', 'exhaustive', 'ten-blocks', 'nine-blocks', 'eight-blocks',
                                'six-blocks', 'six-blocks-witnesses'),
                       help='replay or exhaust the size-30 boundary catalogues')
     mode.add_argument('--size-30-five-blocks', action='store_true',
@@ -699,7 +699,7 @@ def main():
         check_five_block_catalogue(exhaustive=args.five_block_catalogue == 'exhaustive')
         return
     if args.boundary_catalogue:
-        blocks = {'six-blocks': 6, 'six-blocks-witnesses': 6, 'nine-blocks': 9,
+        blocks = {'six-blocks': 6, 'six-blocks-witnesses': 6, 'eight-blocks': 8, 'nine-blocks': 9,
                   'ten-blocks': 10}.get(args.boundary_catalogue, 13)
         check_boundary_catalogue(blocks=blocks, exhaustive=not args.boundary_catalogue.endswith('witnesses'))
         return

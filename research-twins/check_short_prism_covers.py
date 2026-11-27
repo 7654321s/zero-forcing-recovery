@@ -343,7 +343,7 @@ if __name__ == '__main__':
             print(f'{blocks} blocks: four intact sheets separate remaining whites at round five',
                   flush=True)
     elif args.stage_ancestry:
-        for blocks in (9, 10, 11):
+        for blocks in (8, 9, 10, 11):
             check_stage_ancestry(blocks)
     elif args.rectangle_separation:
         check_rectangle_separation()
