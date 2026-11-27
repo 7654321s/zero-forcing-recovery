@@ -129,7 +129,8 @@ def check_outer_windows(last_span):
             checked += 1
             print(json.dumps({'blocks': representative, 'first_stage': first, 'stage_span': span,
                               'outer_losses': 0}), flush=True)
-        if checked != 2 * span - 6:
+        expected = 2 * span - 6 if span <= 10 else span + 4
+        if checked != expected:
             raise AssertionError(('Unexpected outer window count', span, checked))
         counts[span] = checked
     print(json.dumps({'outer_window_counts': counts, 'total': sum(counts.values())}), flush=True)
@@ -140,7 +141,7 @@ if __name__ == '__main__':
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument('--exhaustive', action='store_true',
                        help='exclude every further loss in the guarded near-boundary strip')
-    modes.add_argument('--outer-through', type=int, choices=range(5, 11), metavar='SPAN',
+    modes.add_argument('--outer-through', type=int, choices=range(5, 19), metavar='SPAN',
                        help='exclude outer losses of lengths five through SPAN')
     args = parser.parse_args()
     if args.outer_through:

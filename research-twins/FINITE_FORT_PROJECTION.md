@@ -730,7 +730,7 @@ For sheets, at lengths seven through 24 and at 26 use the width-28 band. At 25 a
 
 At lengths seven through 24 and period 36 the degree-30 checks already exclude lower-cost wrapping. For cost 31 let $a_i$ be the loss count on sheet $i$ and $e_i$ the surplus over 24 in the width-28 band starting there. Then $\sum_i e_i=28\cdot31-24\cdot36=4$ and $a_{i+28}-a_i=e_{i+1}-e_i$ modulo 36. The step 28 has four orbits, each of length nine. Summing this identity on each orbit shows that all four residue classes of $e_i$ have the same total, hence one surplus incidence each. Rotate a surplus to zero, choose the three remaining positions, and recover the relative sheet counts on each orbit. The remaining freedom is a nonnegative offset on each orbit, with their sum fixed by the total 31. The certified width-10 through width-28 bands leave 45 profiles up to rotation. The wrapped verifier excludes all 45 at each length from seven through 24. At 26 blocks the width-34 band already excludes wrapping at period 36 because $30\cdot36>34\cdot31$.
 
-At six and seven blocks the periodic-band verifier through width 28 excludes the remaining cost-31 case at each period from 31 through 35 sheets. The 45-profile check at period 36 also holds at six blocks. Width 28 excludes wrapping at both lengths for $m\geq37$.
+At six and seven blocks the periodic-band verifier through width 28 excludes the remaining cost-31 case at each period from 31 through 35 sheets. The same direct verifier excludes the cost-31 case at six blocks and period 30. The 45-profile check at period 36 also holds at six blocks. Width 28 excludes wrapping at both lengths for $m\geq37$.
 
 ### The complete six-block size-31 catalogue
 
@@ -742,7 +742,7 @@ The verifier exhausts the other 62 nonempty seed stage supports in the guarded s
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Loss types | 134 | 803 | 97 | 97 | 321 | 86 |
 
-The [six-block extension](six-block-size-31-extension.json.gz) stores those 1,538 types. Together with the 16,416 inherited types, the count is **17,954**. The degree-31 overlap contribution is $-13182m$, giving $[p^{31}]\log R_{6,m}(p)=-4772m$ for $m\geq31$.
+The [six-block extension](six-block-size-31-extension.json.gz) stores those 1,538 types. Together with the 16,416 inherited types, the count is **17,954**. The degree-31 overlap contribution is $-13182m$, giving $[p^{31}]\log R_{6,m}(p)=-4772m$ for $m\geq30$.
 
 Thus every $k\geq5$ and $m\geq37$ satisfies
 $$
@@ -798,9 +798,9 @@ The guarded search at 13 blocks excludes 27,149 smaller types restricted to $N_{
 
 The witness verifier computes the final white fort and checks that restoring any one lost seed gives full recovery. The exhaustive mode excludes the archived catalogue and the ordinary types before searching again for any remaining near-boundary loss.
 
-For anchored outer seed arcs of spans five through ten, the numbers of candidate starts at 37 blocks are respectively 4, 6, 8, 10, 12 and 14. For a span $s$, align the $s+3$ guard window by its exceptional stage in a representative with $\max(13,s+4)$ blocks. This retains both the seed labels and all fort clauses that can depend on the occupied region. The two endpoints must contain lost seeds. Every internal triple of seed stages must contain a loss, and every internal adjacent pair must meet the fort. Otherwise the one-sided ancestry rule or the empty-pair cut would split the fort into two, with combined seed cost at least 48. With the lower-order catalogue excluded, each of these 54 guarded searches is unsatisfiable.
+For anchored outer seed arcs of spans five through ten, the numbers of candidate starts at 37 blocks are respectively 4, 6, 8, 10, 12 and 14. At spans $11\leq s\leq18$, a seed arc meeting the five consecutive anchor stages must extend outside the nine-stage near region. There are $s+4$ candidate starts. For a span $s$, align the $s+3$ guard window by its exceptional stage in a representative with $\max(13,s+4)$ blocks. This retains both the seed labels and all fort clauses that can depend on the occupied region. The two endpoints must contain lost seeds. Every internal triple of seed stages must contain a loss, and every internal adjacent pair must meet the fort. Otherwise the one-sided ancestry rule or the empty-pair cut would split the fort into two, with combined seed cost at least 48. With the lower-order catalogue excluded, each of these 202 guarded searches is unsatisfiable.
 
-Let $\ell$ denote the number of normalized size-32 losses at 37 blocks that meet $A_{37}$, have a seed outside $N_{37}$ and have a seed arc of span at least eleven. There are $31\cdot276$ ordinary placements without an anchor at 37 blocks, and the short outer count adds 276 ordinary placements at the terminal side. With the five-stage reduction in the resulting ordinary count relative to $276k$, the full formula is
+Let $\ell$ denote the number of normalized size-32 losses at 37 blocks that meet $A_{37}$, have a seed outside $N_{37}$ and have a seed arc of span at least nineteen. There are $31\cdot276$ ordinary placements without an anchor at 37 blocks, and the short outer count adds 276 ordinary placements at the terminal side. With the five-stage reduction in the resulting ordinary count relative to $276k$, the full formula is
 $$
 M_{32}(k,m)=m(276k+49553+\ell),
 \qquad
@@ -828,6 +828,18 @@ At 12 blocks the full signed degree-32 union count is as follows. Its largest sh
 | Number of unions | 8 | 1 | 1,451 | 69,612 | 11,764 | 25,206 | 771 | 15 | 3 |
 
 The signed sum is $-45744$, giving boundary contribution $-45744+205\cdot12=-43284$. Since no product of two blocking terms starts before degree 48, the logarithmic intercept at order 32 satisfies $\delta_{32}=43284-\beta_{32}$.
+
+### The degree-33 overlap correction in ordinary stages
+
+The ten size-30, 97 size-31 and 276 size-32 ordinary types all use three consecutive seed stages with at least six lost seeds per stage. Two types at different stage starts therefore have union size at least $30+6$. The degree-33 ordinary overlap correction comes entirely from unions at one stage start. Up to sheet translation, the signed counts are
+
+| Weight | $-2$ | $-1$ | $0$ | $+1$ |
+| --- | ---: | ---: | ---: | ---: |
+| Unions of size 33 | 2 | 1,144 | 89 | 168 |
+
+The signed sum is **$-980$** per stage start and sheet. The largest union span is eleven sheets. An independent count grouping the inclusion-exclusion terms by their earliest constituent event gives the same profile. If $\alpha_{33}$ is the number of ordinary size-33 types, the slope of $[p^{33}]\log R$ is $\gamma_{33}=980-\alpha_{33}$, since the overlap correction enters the blocking probability and each new size-33 event contributes once.
+
+The three-stage ordinary guarded search gives **420** size-33 types. Three span ten sheets, 382 span eleven, and 35 span twelve. Searches with four and five ordinary stages exclude the translated catalogue and find no additional types. The [ordinary catalogue](ordinary-size-32-and-33-catalogue.json.gz) stores both size-32 and size-33 witnesses. The [verifier](check_degree_33_ordinary.py) checks the final white forts, every single-seed restoration, and the signed overlaps.
 
 ### A packing of disjoint ordinary blocking losses
 
@@ -1095,10 +1107,13 @@ python -B research-twins/check_degree_31_boundary.py --degree-32-overlap
 python -B research-twins/check_degree_31_boundary.py --degree-32-outer-windows
 python -B research-twins/check_degree_32_boundary.py
 python -B research-twins/check_degree_32_boundary.py --exhaustive
-python -B research-twins/check_degree_32_boundary.py --outer-through 10
+python -B research-twins/check_degree_32_boundary.py --outer-through 18
+python -B research-twins/check_degree_33_ordinary.py
+python -B research-twins/check_degree_33_ordinary.py --window 5
 python -B research-twins/check_prism_projected_support.py --cost-31-stage-pairs
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 24 --band-blocks 33
 python -B research-twins/check_short_prism_covers.py --degree-31-period-37 33
+python -B research-twins/check_short_prism_covers.py --wrapped 6 30 31 28
 for sheets in 31 32 33 34 35
 do
     python -B research-twins/check_short_prism_covers.py --wrapped 6 "$sheets" 31 28 --wrapped 7 "$sheets" 31 28 || exit 1
