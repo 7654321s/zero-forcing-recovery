@@ -939,6 +939,24 @@ M_{34}(k,m)=m(685k+\beta_{34}),
 $$
 where $\beta_{34}$ is the normalized size-34 count at 39 blocks minus $685\cdot39$.
 
+### Short degree-34 outer windows
+
+At 39 blocks, the anchored outer seed arcs of span at most four have starts and spans $(35,3)$, $(34,4)$, and $(35,4)$. These windows transfer to starts 9, 8 and 9, respectively, in a 13-block cover. After excluding the contained losses through size 33, the guarded checks give counts **685, 0, and 8**. The 685 types at the first start are the translated ordinary catalogue. The [terminal four-stage catalogue](degree-34-terminal-span-four-catalogue.json.gz) contains the eight types at the last start. The [verifier](check_degree_34_boundary.py) checks all eight witnesses and all 272 single-seed restorations, and replays the exhaustive search of the three windows.
+
+### A finite representative for the degree-34 overlap correction
+
+Through degree 33, every template occupies an arc of at most four seed stages and spans at most fourteen sheets. Two contributing events in a union of size at most 34 share a seed, and three have at least $3\cdot24-2\cdot34=4$ common seeds. This aligns the constituents as at degree 33. Their union spans at most seven stages and 27 sheets. With $m\geq40$, the gap outside this sheet arc has length at least 13, while the internal gaps have length at most twelve. The same argument identifies the stage origin at $k\geq39$.
+
+The necessary stage test window has length at most ten, including the incident neighbors for the constituent forts. A 13-block cover realizes every exceptional offset and an ordinary placement of each such window. The lower-order catalogues transfer to this representative by keeping the opening coordinates, shifting the final three stages and inserting the ordinary placements in the intervening stages. There are 141,151 normalized size-33 types and 222,083 types through size 33. The stage-count compatibility graph at budget 34 splits this input into components of sizes 200,484, 15,171, eight of 803, and one of four. Each 803-type component is a translated ordinary catalogue and contributes $-541$. The four-type component contributes $-2$. These nine components contribute $-4330$ to the signed sum.
+
+Write $C_{13}^{(34)}$ for the signed degree-34 union sum in the representative. Each additional ordinary stage contributes $-541$ per sheet, so the transfer and the size-34 count representative give
+$$
+V_{34}(k,m)=m\bigl(-541(k-13)+C_{13}^{(34)}\bigr),
+\qquad
+[p^{34}]\log R_{k,m}(p)=m\bigl(-144k-\beta_{34}-7033-C_{13}^{(34)}\bigr)
+$$
+for $k\geq39$ and $m\geq40$.
+
 ### All size-35 losses in ordinary stages
 
 The [ordinary catalogue](ordinary-size-35-catalogue.json.gz) has **1,310** normalized types. Of these, 1,306 use three consecutive seed stages. The other four use four consecutive stages and fourteen sheets. The [verifier](check_degree_35_ordinary.py) checks each witness and all 45,850 single-seed restorations.
@@ -963,6 +981,22 @@ $$
 M_{35}(k,m)=m(1310k+\beta_{35}),\qquad k\geq40,\ m\geq44,
 $$
 where $\beta_{35}$ is the normalized size-35 count at 40 blocks minus $1310\cdot40$.
+
+### The short ordinary size-36 catalogue and signed overlaps
+
+The short guarded searches give **2,486** types using three consecutive seed stages and **19** using four. An independent search of span-four seed arcs allows the fort to occupy their predecessor and yields the same 19 types. The [catalogue](ordinary-size-36-short-catalogue.json.gz) records all 2,505 short types. The [verifier](check_degree_36_ordinary.py) replays all 90,180 single-seed restorations.
+
+Degree 36 is the first order at which the bound $30+6$ permits a union of two three-stage events at different starts. For adjacent starts both events would have to be of size 30, with six losses in each of the two unshared stages. Nonadjacent starts contribute at least twelve unshared losses to one event. Two distinct-start four-stage events each have size 35 and contribute at least two unshared losses at an outer endpoint. For a pair with one three-stage and one four-stage event, the shorter arc must fit inside the longer arc, since any unshared stage of the shorter arc would add at least six losses to the event of size 35. With distinct starts the shorter arc must therefore occupy the last three stages of the longer one. Testing every shared-seed alignment in the two remaining cases gives zero unions of size at most 36 at distinct starts.
+
+At a common start, the input consists of all 2,798 ordinary lower-order types. The signed degree-36 weights have the following multiplicities up to sheet translation.
+
+| Weight | $-2$ | $-1$ | $0$ | $+1$ | $+2$ | $+3$ |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Unions of size 36 | 95 | 14,658 | 10,154 | 9,376 | 99 | 1 |
+
+The signed correction to blocking is **$-5271$** per start and sheet. The largest union spans fourteen sheets. A separate enumeration using the lower-order losses at two neighboring starts gives exactly twice each multiplicity in the table. Consequently the ordinary logarithmic coefficient satisfies $\gamma_{36}=5271-\alpha_{36}$, where $\alpha_{36}$ counts all ordinary size-36 types. The short catalogue supplies 2,505 of these types.
+
+The terminal and nonterminal 38-stage band checks at 39 and 40 blocks force an empty adjacent appended pair at cost at most 36. Contracting empty pairs to 38 blocks bounds the occupied ordinary fort arc by 37 stages. The contraction preserves the occupied sheets. At 38 blocks the width-21 sheet band requires 17 losses whenever every adjacent sheet pair meets the fort. Since $17\cdot45>21\cdot36$, the finite fort span is at most 43 sheets, and the 45-sheet strip contains the fort and both guards. The remaining ordinary search thus needs seed arcs of span at most 37.
 
 ### A packing of disjoint ordinary blocking losses
 
@@ -1256,6 +1290,13 @@ python -B research-twins/check_degree_35_ordinary.py
 python -B research-twins/check_degree_35_ordinary.py --window 4
 python -B research-twins/check_degree_35_ordinary.py --seed-arcs
 python -B research-twins/check_degree_35_ordinary.py --bounds
+python -B research-twins/check_degree_34_boundary.py
+python -B research-twins/check_degree_34_boundary.py --short-outer
+python -B research-twins/check_degree_34_boundary.py --overlap-input
+python -B research-twins/check_degree_36_ordinary.py
+python -B research-twins/check_degree_36_ordinary.py --window 4
+python -B research-twins/check_degree_36_ordinary.py --overlap
+python -B research-twins/check_degree_36_ordinary.py --bands
 python -B research-twins/check_short_prism_covers.py --degree-33-period-39
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 26 --band-blocks 36
 python -B research-twins/check_short_prism_covers.py --degree-33-saturated-period-39

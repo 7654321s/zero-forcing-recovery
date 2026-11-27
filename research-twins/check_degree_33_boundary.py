@@ -197,7 +197,7 @@ def replay_near_witnesses(rows, blocks, sheets):
     print(json.dumps({'checked': len(rows), 'restorations': len(rows) * 33}), flush=True)
 
 
-def check_opening_four_catalogue(*, exhaustive=False):
+def read_opening_four_catalogue():
     blocks, sheets = 13, 40
     with gzip.open(HERE / 'degree-33-opening-span-four-catalogue.json.gz', 'rt',
                    encoding='utf-8') as src:
@@ -209,6 +209,12 @@ def check_opening_four_catalogue(*, exhaustive=False):
             any(len(row) != 33 or len(set(row)) != 33 or CHECK['normalized'](row) != row or
                 CHECK['boundary_stage_arc'](row, blocks)[:2] != (0, 4) for row in rows)):
         raise AssertionError('Unexpected size-33 opening-window losses')
+    return rows
+
+
+def check_opening_four_catalogue(*, exhaustive=False):
+    blocks, sheets = 13, 40
+    rows = read_opening_four_catalogue()
     if not exhaustive:
         replay_near_witnesses(rows, blocks, sheets)
         return
