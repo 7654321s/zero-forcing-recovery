@@ -152,7 +152,7 @@ def check_template_stages(templates, expected):
 
 def enumerate_blockers(blocks, smaller, known=(), *, budget=25, ordinary_stages=None,
                        first_ordinary_stage=False, occupied_stage_pairs=False, strip_sheets=None,
-                       require_minimal_fort=False):
+                       require_minimal_fort=False, restrict=None):
     sheets = budget + 10 if strip_sheets is None else strip_sheets
     graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
     clauses, seeds, top = STRIP['strip_formula'](
@@ -171,6 +171,8 @@ def enumerate_blockers(blocks, smaller, known=(), *, budget=25, ordinary_stages=
         seeds = [v for v in seeds if lower <= v - 1 < upper]
         if first_ordinary_stage:
             clauses.append(list(range(lower + 1, stage_start(3) * sheets + 1)))
+    if restrict is not None:
+        seeds = restrict(clauses, seeds, len(graph), sheets)
     for pattern in (*smaller, *sorted(known)):
         clauses.extend(block_translations(pattern, sheets))
 
@@ -381,8 +383,8 @@ def check_five_block_size_31():
     smaller = tuple(tuple(map(tuple, row)) for size in range(24, 31) for row in base[str(size)])
     if len(smaller) != 9078:
         raise AssertionError('Incomplete five-block lower-order catalogue')
-    print('Five blocks: enumerating size-31 losses in a 28-sheet guarded interior', flush=True)
-    patterns = enumerate_blockers(5, smaller, budget=31, strip_sheets=30,
+    print('Five blocks: enumerating size-31 losses in a 26-sheet guarded interior', flush=True)
+    patterns = enumerate_blockers(5, smaller, budget=31, strip_sheets=28,
                                   require_minimal_fort=True)
     spans = Counter(max(sheet for _, sheet in row) for row in patterns)
     print(json.dumps({'blocks': 5, 'size': 31, 'count': len(patterns),
@@ -391,7 +393,7 @@ def check_five_block_size_31():
                       'losses': sorted(patterns)}), flush=True)
 
 
-def check_degree_31_overlap(blocks):
+def catalogues_through_size_30(blocks):
     with gzip.open(HERE / 'five-block-loss-catalogue.json.gz', 'rt', encoding='utf-8') as source:
         base = json.load(source)['losses_by_size']
     catalogues = [tuple(tuple(map(tuple, row)) for row in base[str(size)])
@@ -407,6 +409,11 @@ def check_degree_31_overlap(blocks):
         size_30 = tuple(tuple(map(tuple, row)) for row in archive['losses'])
         if blocks not in (6, 13):
             size_30 = relocate_boundary_patterns(size_30, 13, blocks)
+    return smaller, size_30
+
+
+def check_degree_31_overlap(blocks):
+    smaller, size_30 = catalogues_through_size_30(blocks)
     check_boundary_joint_spans(blocks, size_30)
     profile, span = signed_union_weights((*smaller, *size_30), 31)
     expected = {-2: 344, -1: 19417 + 8 * blocks, 0: 2882, 1: 6502, 2: 233, 3: 1}

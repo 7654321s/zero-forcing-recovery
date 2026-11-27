@@ -650,7 +650,7 @@ Any two constituents of a degree-31 union meet because the smallest has size 24.
 
 All constituent losses unroll at the periods in the formula. In a cyclic union of at most 31 sites, any three constituents have at least $31-3(31-24)=10$ common sites. Lift one constituent and align every other one at a seed shared with it. Any two shared sites give the same alignment, because all relative sheet coordinates have magnitude at most eleven and $m>22$. For any two of the other constituents, a seed common to all three aligns both with the first in the same lift. Every coincidence between the two then holds in integer sheets by the same $m>22$ comparison. Thus the cyclic union lifts with unchanged size and constituent relations. Its finite span is at most twelve, giving a unique outer gap and $m$ distinct sheet translations. The finite correction therefore multiplies by $m$ on the cyclic cover, including at every shorter length from its listed period.
 
-At five blocks every cyclic fort of cost at most 31 unrolls from 30 sheets. The smaller costs already unroll from 28 sheets and the wrapped verifier excludes cost 31 at 30 through 36 sheets. At $m\geq37$ the width-28 bound excludes wrapped cost 31 because $24m>28\cdot31$.
+At five blocks every cyclic fort of cost at most 31 unrolls from 28 sheets. The smaller costs already unroll from that period and the wrapped verifier excludes cost 31 at 28 through 36 sheets. At $m\geq37$ the width-28 bound excludes wrapped cost 31 because $24m>28\cdot31$.
 
 ### Transferring losses by the final white fort
 
@@ -660,17 +660,17 @@ Let $H$ be a finite inclusion-minimal loss of size at most $b$ and let $F$ be it
 
 If a proper subset of the image of $H$ blocks, its final white fort lies in $Q$ by monotonicity. Unrolling with the same cut gives a finite fort whose seeds are in a proper subset of $H$, contradicting minimality. Conversely a cyclic minimal loss unrolls to a finite minimal loss, because a smaller finite blocking subset would project to a smaller cyclic one. Finally, the unique run of two or more empty sheets in $Q$ fixes the sheet origin. This identifies the finite loss type from the cyclic loss, with exactly $m$ translates for each type.
 
-At five blocks the hypotheses hold at cost 31 from 30 sheets. Taking period 30 bounds every finite cost-31 fort by 28 consecutive sheets, so the guarded search uses 28 interior sheets and two guards. For a minimal loss one may choose an inclusion-minimal fort from its final white set, with the same seed cost. Let $A_{31}(5)$ be the number of finite five-block size-31 loss types up to sheet translation. Then for $m\geq30$ the cyclic count is $mA_{31}(5)$ and the degree-31 blocking coefficient is $m(A_{31}(5)-13174)$.
+At five blocks the hypotheses hold at cost 31 from 28 sheets. Taking period 28 bounds every finite cost-31 fort by 26 consecutive sheets, so the guarded search uses 26 interior sheets and two guards. For a minimal loss one may choose an inclusion-minimal fort from its final white set, with the same seed cost. Let $A_{31}(5)$ be the number of finite five-block size-31 loss types up to sheet translation. Then for $m\geq28$ the cyclic count is $mA_{31}(5)$ and the degree-31 blocking coefficient is $m(A_{31}(5)-13174)$.
 
 ### A finite representative for the degree-31 boundary terms
 
-With $\beta_{31}$ and $\delta_{31}$ as in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order), for every $k\geq36$ and $m\geq37$,
+For every $k\geq36$ and $m\geq37$, the degree-31 terms are
 $$
-M_{31}(k,m)=m(97k+\beta_{31}),
+M_{31}(k,m)=m(97k+17372),
 \qquad
-[p^{31}]\log R_{k,m}(p)=m(-89k+\delta_{31}).
+[p^{31}]\log R_{k,m}(p)=-m(89k+4238).
 $$
-The normalized finite size-31 count at 36 blocks determines $\beta_{31}$. The overlap formula gives $\delta_{31}=13134-\beta_{31}$, so one boundary count determines both intercepts.
+The normalized finite size-31 count is 20,864 at 36 blocks, by the [partition below](#the-complete-size-31-boundary-catalogue). The intercepts in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order) are $\beta_{31}=20864-97\cdot36=17372$ and $\delta_{31}=13134-\beta_{31}=-4238$.
 
 The 33-stage band forces an empty appended pair at cost at most 31. The terminal and nonterminal checks use 34 and 35 blocks. The latter band is unchanged at every greater length. This holds on the integer lift and on cyclic covers, by projecting the lost seeds to base labels and lifting the restricted forcing process back. For a finite fort there cannot be two separated empty stage pairs with occupied stages on both sides, as the two parts would have combined cost at least 48. Contracting an empty appended pair preserves the occupied stage arc and retains at least one empty stage in its complement. Repeating down to 33 blocks confines the occupied stage arc to at most 32 stages.
 
@@ -683,6 +683,20 @@ The width-25 band at 36 blocks gives a second verification of sufficiency from 3
 Two nonempty pieces of a finite fort separated by two empty sheets would cost at least 48 in total. The [final-white-fort transfer](#transferring-losses-by-the-final-white-fort) therefore identifies the finite and cyclic loss types from 37 sheets. In particular, taking period 37 bounds every finite cost-31 fort at $k\geq36$ by 35 sheets.
 
 For the coefficient, each minimal size-31 loss contributes once and cannot lie in a degree-31 union with another minimal loss. All other terms have the [signed overlap correction](#the-complete-degree-31-overlap-correction). Blocking starts in degree 24, so the logarithmic recovery coefficient in degree 31 is the negative of the total blocking coefficient. Substituting the corrected count gives $m(-89k+13134-\beta_{31})$.
+
+### The complete size-31 boundary catalogue
+
+Number the opening stage zero and the terminal stage $k-1$. If a size-31 loss has no seed in $\{0,1,2,k-2,k-1\}$, its final fort lies in stages $2$ through $k-3$ by the two-round ancestry rule. These stages have ordinary neighbors at both ends, so the ordinary catalogue covers the loss. When counting the remaining types, exclude the ordinary catalogue even at starts whose seeds do meet this anchor set.
+
+Consider the anchored losses whose seeds all lie in $N_k=\{k-3,k-2,k-1,0,1,2,3,4,5\}$. A fort supported by these losses can extend one stage backward, to $k-4$. All fort clauses lie in the arc from $k-5$ through $6$. This arc and its labeled seed sites are the same at 13 and 36 blocks, with the terminal coordinate shifted. Consequently a set of lost seeds in this region is blocking in one lift exactly when the corresponding set is blocking in the other. The same argument applies to each subset of the lost seeds, so inclusion-minimality is preserved.
+
+At 13 blocks the width-28 sheet band requires 24 seeds in a wrapped window. At period 37 this excludes wrapping at cost at most 31, and the final-white-fort transfer bounds the span of the finite forts by 35. The guarded near-boundary enumeration uses 39 interior sheets and excludes the 9,098 smaller patterns and 194 ordinary size-31 placements whose seeds lie in $N_{13}$. After excluding all translations of the archived size-31 seed sets the formula is unsatisfiable. This region contributes **17,857** further loss types up to sheet translation.
+
+To count the complement, the 36-block search uses 37 interior sheets, two guards, and all 9,388 smaller loss types. It asks for an anchored size-31 loss with two occupied seed stages at cyclic distance at least four. A set with no such pair fits into four consecutive stages: relative to one occupied stage, every other lies within three positions, and in that unwrapped interval every pairwise distance is the ordinary integer distance. The search is unsatisfiable, so only seed arcs of span at most four remain.
+
+There are three such arcs meeting the anchor set and containing a stage outside $N_{36}$. Their starting stages and spans are $(32,3)$, $(31,4)$ and $(32,4)$. Each arc, its preceding stage where fort vertices may occur, and both neighboring stages fit in the 13-block representative after shifting the terminal coordinates. The three checks require lost seeds at both arc endpoints. They use 35 interior sheets and two guards, exclude every smaller pattern contained in each arc, and give counts **97, 0 and 0** respectively. The 97 sets at start 32 coincide with the ordinary templates translated to that start, where the terminal stage is a neighbor.
+
+The [compressed catalogue](degree-31-boundary-catalogue.json.gz) contains the two boundary classes. The [replay](check_degree_31_boundary.py) checks the finite forcing closures and the absence of a smaller blocking subset for all boundary and ordinary witnesses at 36 blocks. The three disjoint counts are 2,910 ordinary placements, 17,857 near-boundary types and 97 other boundary types. Their sum is **20,864**.
 
 ### The degree-32 overlap correction in ordinary stages
 
@@ -940,7 +954,11 @@ python -B research-twins/check_short_prism_covers.py --degree-31-period-37
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-32
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-32-exact
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 5
+python -B research-twins/check_short_prism_covers.py --wrapped 5 28 31 28 --wrapped 5 29 31 28 --wrapped 5 30 31 28 --wrapped 5 31 31 28 --wrapped 5 32 31 28 --wrapped 5 33 31 28 --wrapped 5 34 31 28 --wrapped 5 35 31 28 --wrapped 5 36 31 28
 python -B research-twins/check_cost_25_blocking_sets.py --size-31-five-blocks
+python -B research-twins/check_degree_31_boundary.py
+python -B research-twins/check_degree_31_boundary.py --partitions
+python -B research-twins/check_degree_31_boundary.py --long-stage-span
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 6
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 7
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 8
