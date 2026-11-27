@@ -680,13 +680,13 @@ The integer five-block count is one larger than the extrapolation of the longer-
 
 ### A finite representative for the degree-31 boundary terms
 
-For every $k\geq7$ and $m\geq37$, the degree-31 terms are
+For every $k\geq6$ and $m\geq37$, the degree-31 terms are
 $$
 M_{31}(k,m)=m(97k+17372),
 \qquad
 [p^{31}]\log R_{k,m}(p)=-m(89k+4238).
 $$
-The formulas also hold at $m=36$ for $7\leq k\leq24$ and for $k=26$, and at $m=35$ for $k=7$. The normalized finite size-31 count is 20,864 at 36 blocks, by the [partition below](#the-complete-size-31-boundary-catalogue). The intercepts in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order) are $\beta_{31}=20864-97\cdot36=17372$ and $\delta_{31}=13134-\beta_{31}=-4238$. The [shorter-chain extension](#extending-the-degree-31-formula-to-shorter-chains) transfers the same catalogue below 36 blocks.
+The formulas also hold at $m=36$ for $6\leq k\leq24$ and for $k=26$, and from $m=34$ for $k=6,7$. The normalized finite size-31 count is 20,864 at 36 blocks, by the [partition below](#the-complete-size-31-boundary-catalogue). The intercepts in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order) are $\beta_{31}=20864-97\cdot36=17372$ and $\delta_{31}=13134-\beta_{31}=-4238$. The [shorter-chain extension](#extending-the-degree-31-formula-to-shorter-chains) and the [six-block catalogue](#the-complete-six-block-size-31-catalogue) give the formulas below 36 blocks.
 
 The 33-stage band forces an empty appended pair at cost at most 31. The terminal and nonterminal checks use 34 and 35 blocks. The latter band is unchanged at every greater length. This holds on the integer lift and on cyclic covers, by projecting the lost seeds to base labels and lifting the restricted forcing process back. For a finite fort there cannot be two separated empty stage pairs with occupied stages on both sides, as the two parts would have combined cost at least 48. Contracting an empty appended pair preserves the occupied stage arc and retains at least one empty stage in its complement. Repeating down to 33 blocks confines the occupied stage arc to at most 32 stages.
 
@@ -730,7 +730,27 @@ For sheets, at lengths seven through 24 and at 26 use the width-28 band. At 25 a
 
 At lengths seven through 24 and period 36 the degree-30 checks already exclude lower-cost wrapping. For cost 31 let $a_i$ be the loss count on sheet $i$ and $e_i$ the surplus over 24 in the width-28 band starting there. Then $\sum_i e_i=28\cdot31-24\cdot36=4$ and $a_{i+28}-a_i=e_{i+1}-e_i$ modulo 36. The step 28 has four orbits, each of length nine. Summing this identity on each orbit shows that all four residue classes of $e_i$ have the same total, hence one surplus incidence each. Rotate a surplus to zero, choose the three remaining positions, and recover the relative sheet counts on each orbit. The remaining freedom is a nonnegative offset on each orbit, with their sum fixed by the total 31. The certified width-10 through width-28 bands leave 45 profiles up to rotation. The wrapped verifier excludes all 45 at each length from seven through 24. At 26 blocks the width-34 band already excludes wrapping at period 36 because $30\cdot36>34\cdot31$.
 
-At seven blocks and period 35, the wrapped verifier with bands through width 28 excludes the remaining cost-31 case. This gives the same count and coefficient from 35 sheets at this length.
+At six and seven blocks the periodic-band verifier through width 28 excludes the remaining cost-31 case at 34 and 35 sheets. The 45-profile check at period 36 also holds at six blocks. Width 28 excludes wrapping at both lengths for $m\geq37$.
+
+### The complete six-block size-31 catalogue
+
+When the occupied seed stages at six blocks are $\{0,1,2\}$, the one-sided ancestry rule fills stages 3 and 4 in two rounds. Contract that empty appended pair. The resulting fort blocks at five blocks with the same seed coordinates in stages 0 through 2. The five- and six-block catalogues through size 30 contain the same 8,553 smaller types supported there. Therefore a proper blocking subset after contraction would already block at six blocks. Every six-block minimal loss in this class belongs to the five-block list of 16,416 types. All 16,416 also pass direct forcing and inclusion-minimality checks at six blocks.
+
+The verifier exhausts the other 62 nonempty seed stage supports in the guarded strip. The six nonempty classes apart from $\{0,1,2\}$ are
+
+| Seed stages | 45 | 045 | 123 | 234 | 345 | 0123 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Loss types | 134 | 803 | 97 | 97 | 321 | 86 |
+
+The [six-block extension](six-block-size-31-extension.json.gz) stores those 1,538 types. Together with the 16,416 inherited types, the count is **17,954**. The degree-31 overlap contribution is $-13182m$, giving $[p^{31}]\log R_{6,m}(p)=-4772m$ for $m\geq34$.
+
+Thus every $k\geq5$ and $m\geq37$ satisfies
+$$
+M_{31}(k,m)=m(97k+17372+\mathbf 1_{\{k=5\}}),
+\qquad
+[p^{31}]\log R_{k,m}(p)=-m(89k+4238+\mathbf 1_{\{k=5\}}).
+$$
+The earlier sufficient periods are given above.
 
 ### The degree-32 overlap correction in ordinary stages
 
@@ -1035,6 +1055,9 @@ python -B research-twins/check_cost_25_blocking_sets.py --size-31-five-blocks
 python -B -c "import runpy; runpy.run_path('research-twins/check_short_prism_covers.py')['check_stage_ancestry'](5)"
 python -B research-twins/check_degree_31_boundary.py --five-blocks witnesses
 python -B research-twins/check_degree_31_boundary.py --five-blocks exhaustive
+python -B -c "import runpy; runpy.run_path('research-twins/check_short_prism_covers.py')['check_stage_ancestry'](6)"
+python -B research-twins/check_degree_31_boundary.py --six-blocks witnesses
+python -B research-twins/check_degree_31_boundary.py --six-blocks exhaustive
 python -B research-twins/check_degree_31_boundary.py
 python -B research-twins/check_degree_31_boundary.py --partitions
 python -B research-twins/check_degree_31_boundary.py --long-stage-span
@@ -1050,8 +1073,8 @@ python -B research-twins/check_degree_31_boundary.py --degree-32-outer-windows
 python -B research-twins/check_prism_projected_support.py --cost-31-stage-pairs
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 24 --band-blocks 33
 python -B research-twins/check_short_prism_covers.py --degree-31-period-37 33
-python -B research-twins/check_short_prism_covers.py --wrapped 7 35 31 28
-for blocks in 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+python -B research-twins/check_short_prism_covers.py --wrapped 6 34 31 28 --wrapped 6 35 31 28 --wrapped 7 34 31 28 --wrapped 7 35 31 28
+for blocks in 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 do
     python -B research-twins/check_short_prism_covers.py --degree-31-period-36 "$blocks"
 done

@@ -226,24 +226,40 @@ def check_short_catalogue(blocks):
           flush=True)
 
 
-def check_five_blocks(*, exhaustive=False):
-    blocks = 5
+def read_small_block_catalogue(blocks):
     with gzip.open(HERE / 'five-block-size-31-catalogue.json.gz', 'rt', encoding='utf-8') as src:
+        five = json.load(src)
+    if (five['schema_version'], five['blocks'], five['size'], five['first_sheet']) != (1, 5, size, 1):
+        raise AssertionError('Unexpected five-block size-31 catalogue metadata')
+    known = read_patterns(five['losses'])
+    if blocks == 5:
+        return five, known
+
+    with gzip.open(HERE / 'six-block-size-31-extension.json.gz', 'rt', encoding='utf-8') as src:
         archive = json.load(src)
     if (archive['schema_version'], archive['blocks'], archive['size'],
-            archive['first_sheet']) != (1, blocks, size, 1):
-        raise AssertionError('Unexpected five-block size-31 catalogue metadata')
-    known = read_patterns(archive['losses'])
+            archive['first_sheet'], archive['inherited_stages']) != (1, 6, size, 1, [0, 1, 2]):
+        raise AssertionError('Unexpected six-block size-31 catalogue metadata')
+    inherited = {row for row in known if {stage(v) for v, _ in row} == {0, 1, 2}}
+    extension = read_patterns(archive['losses'])
+    if len(inherited) != 16416 or len(extension) != 1538 or inherited & extension:
+        raise AssertionError('Unexpected six-block inherited or archived witnesses')
+    return archive, inherited | extension
+
+
+def check_small_blocks(blocks, *, exhaustive=False):
+    archive, known = read_small_block_catalogue(blocks)
     by_stage = defaultdict(set)
     for row in known:
         by_stage[tuple(sorted({stage(v) for v, _ in row}))].add(row)
     support_counts = {''.join(map(str, stages)): len(rows) for stages, rows in by_stage.items()}
     spans = Counter(max(sheet for _, sheet in row) for row in known)
-    if (len(known) != 17858 or support_counts != archive['stage_support_counts']
+    expected_count = 17858 if blocks == 5 else 17954
+    if (len(known) != expected_count or support_counts != archive['stage_support_counts']
             or {str(k): v for k, v in spans.items()} != archive['sheet_spans']):
-        raise AssertionError('Unexpected five-block size-31 catalogue counts')
+        raise AssertionError(('Unexpected size-31 catalogue counts', blocks))
 
-    sheets = 28
+    sheets = 28 if blocks == 5 else 34
     graph, blue, *_ = CHECK['COVER']['signed_prism_cover'](blocks, sheets)
     _, _, cones = CHECK['LOSS_COMPONENTS']['nominal_cones'](graph, blue)
     print(f'{blocks} blocks: checking {len(known)} witnesses and their one-seed restorations',
@@ -251,18 +267,28 @@ def check_five_blocks(*, exhaustive=False):
     for row in sorted(known):
         lost = CHECK['mask'](v * sheets + sheet + 4 for v, sheet in row)
         if lost & blue != lost or lost.bit_count() != size:
-            raise AssertionError(('Invalid five-block seed coordinates', row))
+            raise AssertionError(('Invalid seed coordinates', blocks, row))
         fort = CHECK['remaining_white'](graph, cones, lost)
         if fort & blue != lost or any(v % sheets in (0, sheets - 1) for v in CHECK['members'](fort)):
-            raise AssertionError(('Five-block witness lacks a guarded fort', row))
+            raise AssertionError(('Witness lacks a guarded fort', blocks, row))
         for seed in CHECK['members'](lost):
             if CHECK['remaining_white'](graph, cones, lost ^ (1 << seed)):
-                raise AssertionError(('Five-block witness has a blocking proper subset', row, seed))
+                raise AssertionError(('Witness has a blocking proper subset', blocks, row, seed))
     if exhaustive:
         lower, size_30 = CHECK['catalogues_through_size_30'](blocks)
         smaller = (*lower, *size_30)
+        if blocks == 6:
+            five_lower, five_size_30 = CHECK['catalogues_through_size_30'](5)
+            five_mask = {row for row in (*five_lower, *five_size_30)
+                         if all(stage(v) in (0, 1, 2) for v, _ in row)}
+            six_mask = {row for row in smaller if all(stage(v) in (0, 1, 2) for v, _ in row)}
+            if len(six_mask) != 8553 or six_mask != five_mask:
+                raise AssertionError('The smaller catalogues differ on stages zero through two')
         for width in range(1, blocks + 1):
             for stages in combinations(range(blocks), width):
+                if blocks == 6 and stages == (0, 1, 2):
+                    print('Stage support (0, 1, 2): 16416 by contraction', flush=True)
+                    continue
                 permitted = set(stages)
                 contained = tuple(row for row in smaller if all(stage(v) in permitted for v, _ in row))
                 expected = by_stage.get(stages, set())
@@ -275,10 +301,11 @@ def check_five_blocks(*, exhaustive=False):
                                                      strip_sheets=sheets, require_minimal_fort=True,
                                                      restrict=restrict_mask)
                 if result != expected:
-                    raise AssertionError(('Unlisted five-block size-31 loss', stages))
+                    raise AssertionError(('Unlisted size-31 loss', blocks, stages))
                 print(f'Stage support {stages}: {len(result)}', flush=True)
     print(json.dumps({'blocks': blocks, 'size': size, 'count': len(known),
-                      'exhaustive': exhaustive, 'blocking_coefficient_per_sheet': len(known) - 13174,
+                      'exhaustive': exhaustive,
+                      'blocking_coefficient_per_sheet': len(known) - (8 * blocks + 13134),
                       'single_restorations': size * len(known),
                       'sheet_spans': dict(sorted(spans.items()))}), flush=True)
 
@@ -338,6 +365,8 @@ if __name__ == '__main__':
                        help='verify a complete shorter-chain size-31 catalogue')
     modes.add_argument('--five-blocks', choices=('witnesses', 'exhaustive'),
                        help='replay the five-block size-31 catalogue and optionally exhaust its stage supports')
+    modes.add_argument('--six-blocks', choices=('witnesses', 'exhaustive'),
+                       help='replay the six-block size-31 catalogue and optionally exhaust its stage supports')
     modes.add_argument('--degree-32-overlap', action='store_true',
                        help='count degree-32 overlaps in the transferred 12-block catalogue')
     modes.add_argument('--degree-32-outer-windows', action='store_true',
@@ -348,7 +377,9 @@ if __name__ == '__main__':
     elif args.short_catalogue:
         check_short_catalogue(args.short_catalogue)
     elif args.five_blocks:
-        check_five_blocks(exhaustive=args.five_blocks == 'exhaustive')
+        check_small_blocks(5, exhaustive=args.five_blocks == 'exhaustive')
+    elif args.six_blocks:
+        check_small_blocks(6, exhaustive=args.six_blocks == 'exhaustive')
     elif args.degree_32_overlap:
         check_degree_32_overlap_representative()
     elif args.degree_32_outer_windows:
