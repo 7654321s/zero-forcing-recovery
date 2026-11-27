@@ -81,6 +81,21 @@ def check_overlap_input():
     print(json.dumps({'blocks': BLOCKS, 'lower_losses': len(rows), 'components': components,
                       'stage_span': stage_span, 'sheet_span': sheet_span,
                       'small_component_correction': -4330}), flush=True)
+    return groups
+
+
+def check_overlap_component(size):
+    groups = check_overlap_input()
+    group, = (rows for rows in groups if len(rows) == size)
+    labels = {v: i for i, v in enumerate(sorted({v for row in group for v, _ in row}))}
+    dense = [tuple((labels[v], s) for v, s in row) for row in group]
+    weights, span = CHECK['signed_union_weights'](dense, 34)
+    expected = {-2: 1105, -1: 44150, 0: 9143, 1: 25927, 2: 750, 3: 8}
+    if weights[34] != expected or span != 13:
+        raise AssertionError(('Unexpected degree-34 overlap component', size, weights[34], span))
+    total = sum(w * n for w, n in weights[34].items())
+    print(json.dumps({'component': size, 'overlap_weights': weights[34],
+                      'union_sheet_span': span, 'signed_correction': total}), flush=True)
 
 
 def read_short_near_catalogue():
@@ -155,6 +170,23 @@ def check_short_outer_windows():
                          ([9, 10, 11, 12], set(read_terminal_catalogue()))])
 
 
+def check_opening_gap():
+    allowed = {0, 2}
+    stage = BOUNDARY['stage']
+    smaller = [row for row in smaller_losses(BLOCKS) if all(stage(v) in allowed for v, _ in row)]
+
+    def restrict(clauses, seeds, order, period):
+        return BOUNDARY['restrict_stages'](
+            clauses, seeds, order, period, allowed, ({0}, {2}), blocks=BLOCKS)
+
+    found = CHECK['enumerate_blockers'](
+        BLOCKS, smaller, budget=34, strip_sheets=SHEETS, require_minimal_fort=True,
+        restrict=restrict, stream_blockers=True)
+    if found:
+        raise AssertionError(('Unexpected size-34 opening loss with an empty middle stage', found))
+    print(json.dumps({'opening_seed_stages': sorted(allowed), 'types': 0}), flush=True)
+
+
 def check_short_near_windows(*, exhaustive):
     windows = read_short_near_catalogue()
     if not exhaustive:
@@ -173,11 +205,19 @@ if __name__ == '__main__':
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument('--short-outer', action='store_true', help='exhaust the three short outer arcs')
     modes.add_argument('--overlap-input', action='store_true', help='check the lower-order partition')
+    modes.add_argument('--overlap-component', type=int, choices=(15171,),
+                       help='count signed unions for the specified component size')
+    modes.add_argument('--opening-gap', action='store_true',
+                       help='exclude three-stage opening losses with an empty middle stage')
     modes.add_argument('--short-near', choices=('witnesses', 'exhaustive'),
                        help='check the short near-boundary catalogue or exhaust all its windows')
     args = parser.parse_args()
     if args.overlap_input:
         check_overlap_input()
+    elif args.overlap_component:
+        check_overlap_component(args.overlap_component)
+    elif args.opening_gap:
+        check_opening_gap()
     elif args.short_outer:
         check_short_outer_windows()
     elif args.short_near:

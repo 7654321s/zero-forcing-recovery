@@ -53,8 +53,11 @@ def check_bounds():
     for blocks in (38, 39):
         band['check_band'](blocks, stages=37, budget=35)
         print(f'{blocks} blocks: the 37-stage band forces an empty adjacent pair', flush=True)
-    CHECK['check_ordinary_sheet_bands'](through=21, blocks=37)
-    print('37 blocks: the width-21 sheet band requires 17 losses', flush=True)
+    CHECK['check_ordinary_sheet_bands'](through=24, blocks=37)
+    print('37 blocks: the width-24 sheet band requires 20 losses', flush=True)
+    wrapped = runpy.run_path(str(HERE / 'check_short_prism_covers.py'))
+    profile = (1, 1, 1, 1, 1, 0) * 7
+    wrapped['exclude_sheet_profiles'](37, 42, 35, 24, {profile})
 
 
 if __name__ == '__main__':

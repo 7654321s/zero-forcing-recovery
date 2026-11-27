@@ -1,4 +1,4 @@
-"""Verify the short ordinary size-36 catalogue and the degree-36 overlap."""
+"""Verify the complete ordinary size-36 catalogue and degree-36 overlap."""
 import argparse
 from collections import Counter
 import gzip
@@ -89,8 +89,8 @@ def check_bands():
     for blocks in (39, 40):
         band['check_band'](blocks, stages=38, budget=36)
         print(f'{blocks} blocks: the 38-stage band forces an empty adjacent pair', flush=True)
-    CHECK['check_ordinary_sheet_bands'](through=21, blocks=38)
-    print('38 blocks: the width-21 sheet band requires 17 losses', flush=True)
+    CHECK['check_ordinary_sheet_bands'](through=23, blocks=38)
+    print('38 blocks: the width-23 sheet band requires 19 losses', flush=True)
 
 
 if __name__ == '__main__':
