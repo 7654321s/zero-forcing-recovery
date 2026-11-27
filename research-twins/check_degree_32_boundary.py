@@ -196,7 +196,7 @@ if __name__ == '__main__':
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument('--exhaustive', action='store_true',
                        help='exclude every further loss in the guarded near-boundary strip')
-    modes.add_argument('--outer-through', type=int, choices=range(5, 24), metavar='SPAN',
+    modes.add_argument('--outer-through', type=int, choices=range(5, 34), metavar='SPAN',
                        help='exclude outer losses of lengths five through SPAN')
     modes.add_argument('--far-outer', action='store_true',
                        help='exclude all anchored outer seed arcs of span at least 23')

@@ -158,6 +158,38 @@ def check_short_near_catalogue(*, exhaustive=False):
         print(json.dumps({'start': first, 'span': len(arc), 'catalogued': len(known)}), flush=True)
 
 
+def check_empty_near_windows():
+    blocks, sheets = 13, 39
+    region = [blocks - 3, blocks - 2, blocks - 1, *range(6)]
+    windows = [[blocks - 1, 0, 1, 2]]
+    windows.extend(region[i:i + span]
+                   for span in range(5, 10) for i in range(len(region) - span + 1))
+    families = ORDINARY['read_catalogues']()
+    stage = BOUNDARY['stage']
+    smaller = [(row, set(NEAR['support'](row)))
+               for row in transferred_smaller_losses(blocks, families[2])]
+    for arc in windows:
+        allowed = set(arc)
+        required = [{arc[0]}, {arc[-1]},
+                    *(set(arc[i:i + 3]) for i in range(1, len(arc) - 3))]
+        contained = [row for row, stages in smaller if stages <= allowed]
+
+        def restrict(clauses, seeds, order, period):
+            selected = BOUNDARY['restrict_stages'](
+                clauses, seeds, order, period, allowed, required, blocks=blocks)
+            for left, right in zip(arc[1:-1], arc[2:-1]):
+                clauses.append([v + 1 for v in range(order)
+                                if stage(v // period) in {left, right}])
+            return selected
+
+        result = CHECK['enumerate_blockers'](
+            blocks, contained, budget=33, strip_sheets=sheets, require_minimal_fort=True,
+            restrict=restrict, stream_blockers=True)
+        if result:
+            raise AssertionError(('Unexpected additional near-boundary losses', arc, len(result)))
+        print(json.dumps({'start': arc[0], 'span': len(arc), 'catalogued': 0}), flush=True)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
@@ -165,9 +197,13 @@ if __name__ == '__main__':
                       help='count the signed degree-33 unions in the twelve-block representative')
     mode.add_argument('--near-short', choices=('witnesses', 'exhaustive'),
                       help='replay the short near-boundary windows omitting an opening stage')
+    mode.add_argument('--near-empty', action='store_true',
+                      help='exclude longer near arcs and the terminal opening window')
     args = parser.parse_args()
     if args.overlap:
         check_overlap_representative()
+    elif args.near_empty:
+        check_empty_near_windows()
     elif args.near_short:
         check_short_near_catalogue(exhaustive=args.near_short == 'exhaustive')
     else:

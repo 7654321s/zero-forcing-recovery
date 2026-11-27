@@ -68,6 +68,7 @@ def minimum_seed_sets(blocks):
 
 def normalized(sites, first=None):
     if first is None:
+        sites = tuple(sites)
         first = min(s for _, s in sites)
     return tuple(sorted((v, s - first + 1) for v, s in sites))
 

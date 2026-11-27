@@ -686,7 +686,7 @@ M_{31}(k,m)=m(97k+17372),
 \qquad
 [p^{31}]\log R_{k,m}(p)=-m(89k+4238).
 $$
-The formulas also hold at $m=36$ for $6\leq k\leq24$ and for $k=26$, and from $m=34$ for $k=6,7$. The normalized finite size-31 count is 20,864 at 36 blocks, by the [partition below](#the-complete-size-31-boundary-catalogue). The intercepts in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order) are $\beta_{31}=20864-97\cdot36=17372$ and $\delta_{31}=13134-\beta_{31}=-4238$. The [shorter-chain extension](#extending-the-degree-31-formula-to-shorter-chains) and the [six-block catalogue](#the-complete-six-block-size-31-catalogue) give the formulas below 36 blocks.
+The formulas also hold at $m=36$ for $6\leq k\leq24$ and for $k=26$, and from $m=30$ for $k=6,7$. The normalized finite size-31 count is 20,864 at 36 blocks, by the [partition below](#the-complete-size-31-boundary-catalogue). The intercepts in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order) are $\beta_{31}=20864-97\cdot36=17372$ and $\delta_{31}=13134-\beta_{31}=-4238$. The [shorter-chain extension](#extending-the-degree-31-formula-to-shorter-chains) and the [six-block catalogue](#the-complete-six-block-size-31-catalogue) give the formulas below 36 blocks.
 
 The 33-stage band forces an empty appended pair at cost at most 31. The terminal and nonterminal checks use 34 and 35 blocks. The latter band is unchanged at every greater length. This holds on the integer lift and on cyclic covers, by projecting the lost seeds to base labels and lifting the restricted forcing process back. For a finite fort there cannot be two separated empty stage pairs with occupied stages on both sides, as the two parts would have combined cost at least 48. Contracting an empty appended pair preserves the occupied stage arc and retains at least one empty stage in its complement. Repeating down to 33 blocks confines the occupied stage arc to at most 32 stages.
 
@@ -798,11 +798,11 @@ The guarded search at 13 blocks excludes 27,149 smaller types restricted to $N_{
 
 The witness verifier computes the final white fort and checks that restoring any one lost seed gives full recovery. The exhaustive mode excludes the archived catalogue and the ordinary types before searching again for any remaining near-boundary loss.
 
-For anchored outer seed arcs of spans five through ten, the numbers of candidate starts at 37 blocks are respectively 4, 6, 8, 10, 12 and 14. At spans $11\leq s\leq23$, a seed arc meeting the five consecutive anchor stages must extend outside the nine-stage near region. There are $s+4$ candidate starts. For a span $s$, align the $s+3$ guard window by its exceptional stage in a representative with $\max(13,s+4)$ blocks. This retains both the seed labels and all fort clauses that can depend on the occupied region. The two endpoints must contain lost seeds. Every internal triple of seed stages must contain a loss, and every internal adjacent pair must meet the fort. Otherwise the one-sided ancestry rule or the empty-pair cut would split the fort into two, with combined seed cost at least 48. With the lower-order catalogue excluded, each of these 327 guarded searches is unsatisfiable.
+For anchored outer seed arcs of spans five through ten, the numbers of candidate starts at 37 blocks are respectively 4, 6, 8, 10, 12 and 14. At spans $11\leq s\leq33$, a seed arc meeting the five consecutive anchor stages must extend outside the nine-stage near region. There are $s+4$ candidate starts. For a span $s$, align the $s+3$ guard window by its exceptional stage in a representative with $\max(13,s+4)$ blocks. This retains both the seed labels and all fort clauses that can depend on the occupied region. The two endpoints must contain lost seeds. Every internal triple of seed stages must contain a loss, and every internal adjacent pair must meet the fort. Otherwise the one-sided ancestry rule or the empty-pair cut would split the fort into two, with combined seed cost at least 48. With the lower-order catalogue excluded, each of these 652 guarded searches is unsatisfiable.
 
 ### The complete degree-32 catalogue
 
-For a remaining anchored outer arc of span at least 23, its first seed stage follows at least four seed-free stages. Among the first 23 stages, every internal seed triple contains a loss and every internal adjacent pair meets the fort. At 37 blocks encode that first stage with a selector variable and require these conditions, at least one seed in $A_{37}$, and at least one seed outside $N_{37}$. The guarded 38-sheet formula excludes all translates of the 30,359 normalized lower-order losses. It is unsatisfiable. The tests up through span 23 and this last test cover all possible outer seed arcs.
+For an anchored outer arc of span at least 23, its first seed stage follows at least four seed-free stages. Among the first 23 stages, every internal seed triple contains a loss and every internal adjacent pair meets the fort. At 37 blocks encode that first stage with a selector variable and require these conditions, at least one seed in $A_{37}$, and at least one seed outside $N_{37}$. The guarded 38-sheet formula excludes all translates of the 30,359 normalized lower-order losses. It is unsatisfiable. The tests up through span 22 and this test also cover all possible outer seed arcs.
 
 At 37 blocks the ordinary placements without an anchor start at stages 3 through 32. The ordinary types at start 2 were excluded from the near-boundary catalogue, and those at start 33 appear in the short outer count. The remaining 50,933 types are exactly the near-boundary archive. Thus the representative has $32\cdot276+50933=59765$ normalized types, and the affine transfer gives
 $$
@@ -860,6 +860,8 @@ $$
 
 For $k\geq38$, apply the 35-stage band repeatedly to contract a cyclic fort of cost at most 33 to 36 blocks, preserving the cost and the occupied sheets. The previously certified width-25 band at 36 blocks rules out wrapping at $m\geq40$ because $21m>25\cdot33$. At period 39 the degree-32 result already excludes smaller wrapped costs. For cost 33, the total surplus above 21 in the width-25 windows is $25\cdot33-39\cdot21=6$. Since 25 and 39 are coprime, the sheet-count recurrence determines each count profile from the surplus and total cost. The certified widths 10 through 25 leave 967 profiles up to rotation, with peak sheet counts one, two, and three in 177, 789, and one profile, respectively. The wrapped verifier excludes every one. The final-white-fort transfer therefore applies for $m\geq39$ and bounds the finite fort span by 37 sheets. A guarded search at 38 blocks and 39 sheets can compute the degree-33 count.
 
+The width-26 band at 36 blocks gives a second period-39 check with six profiles. Its minimum of 22 seeds makes every width-26 window saturated at cost 33, since $26\cdot33=39\cdot22$. Consecutive window counts imply that the sheet counts repeat with period 13, with 11 seeds per repeated part. Each width-25 window then has 22 seeds minus the count on one omitted sheet. The width-25 lower bound forces every sheet count to be zero or one. The two zero sheets in a period of 13 have a cyclic separation from one through six, up to rotation. The wrapped verifier also excludes these six profiles.
+
 Any seed arc has length $s\leq34$, with at least four empty stages in its outer gap. The span of its local test is at most $s+3\leq37$, including the predecessor and the two neighbors used to test fort clauses. All exceptional offsets are realized at 38 blocks. A 37-stage window is the only such window that can acquire an ordinary placement at a larger length while having none at 38 blocks. Its seed arc would have length 34, which the ordinary classification excludes. Each of the 420 three-stage ordinary types acquires one stage placement per additional block. Thus there is a constant $\beta_{33}$ such that
 $$
 M_{33}(k,m)=m(420k+\beta_{33}),
@@ -881,7 +883,7 @@ Among near-boundary arcs of span at most four, 20 candidate windows omit at leas
 | 1 | 3 | 420 |
 | 10 | 4 | 4 |
 
-Each other candidate window has zero new types. The remaining short near-boundary windows contain all three opening stages.
+Each other short candidate that omits an opening stage has zero new types. Fifteen longer near-boundary windows have spans five through nine. The guarded searches for these windows require both seed endpoints, forbid an internal three-stage seed gap, and require each internal adjacent pair to meet the fort. With the smaller losses excluded, all fifteen formulas are unsatisfiable. The span-four window from stage 12 through stage 2 has no size-33 type either. The two remaining near windows start at stage zero and have spans three and four.
 
 ### A finite representative for the degree-33 overlap correction
 
@@ -1166,7 +1168,7 @@ python -B research-twins/check_degree_31_boundary.py --degree-32-overlap
 python -B research-twins/check_degree_31_boundary.py --degree-32-outer-windows
 python -B research-twins/check_degree_32_boundary.py
 python -B research-twins/check_degree_32_boundary.py --exhaustive
-python -B research-twins/check_degree_32_boundary.py --outer-through 23
+python -B research-twins/check_degree_32_boundary.py --outer-through 33
 python -B research-twins/check_degree_32_boundary.py --far-outer
 python -B research-twins/check_degree_33_ordinary.py
 python -B research-twins/check_degree_33_ordinary.py --window 5
@@ -1176,7 +1178,10 @@ python -B research-twins/check_degree_33_boundary.py
 python -B research-twins/check_degree_33_boundary.py --overlap
 python -B research-twins/check_degree_33_boundary.py --near-short witnesses
 python -B research-twins/check_degree_33_boundary.py --near-short exhaustive
+python -B research-twins/check_degree_33_boundary.py --near-empty
 python -B research-twins/check_short_prism_covers.py --degree-33-period-39
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 26 --band-blocks 36
+python -B research-twins/check_short_prism_covers.py --degree-33-saturated-period-39
 python -B research-twins/check_prism_projected_support.py --cost-31-stage-pairs
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 24 --band-blocks 33
 python -B research-twins/check_short_prism_covers.py --degree-31-period-37 33

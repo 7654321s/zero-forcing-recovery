@@ -221,6 +221,16 @@ def check_degree_33_period_39():
         exclude_sheet_profiles(blocks, sheets, budget, width, group)
 
 
+def check_degree_33_saturated_period_39():
+    profiles = set()
+    for gap in range(1, 7):
+        row = tuple(int(i not in (0, gap)) for i in range(13)) * 3
+        profiles.add(min(row[i:] + row[:i] for i, count in enumerate(row) if count))
+    if len(profiles) != 6:
+        raise AssertionError('Unexpected saturated sheet profiles')
+    exclude_sheet_profiles(36, 39, 33, 26, profiles)
+
+
 def check_degree_31_period_37(blocks=36):
     sheets, budget, width = 37, 31, 24
     bounds = residual_bounds(sheets, budget, width)
@@ -414,6 +424,8 @@ if __name__ == '__main__':
                       help='exclude all cost-33 wrapped profiles at 39 sheets')
     mode.add_argument('--four-sheet-barrier', action='store_true',
                       help='check the round-five separation across four intact sheets')
+    mode.add_argument('--degree-33-saturated-period-39', action='store_true',
+                      help='exclude the six profiles using the certified width-26 band')
     mode.add_argument('--stage-ancestry', action='store_true',
                       help='check the one-sided stage support of two-round forcing proofs')
     mode.add_argument('--rectangle-separation', action='store_true',
@@ -437,6 +449,8 @@ if __name__ == '__main__':
         check_degree_31_period_36(args.degree_31_period_36)
     elif args.degree_33_period_39:
         check_degree_33_period_39()
+    elif args.degree_33_saturated_period_39:
+        check_degree_33_saturated_period_39()
     elif args.four_sheet_barrier:
         for blocks in range(13, 28):
             check_four_sheet_barrier(blocks)
