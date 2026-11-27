@@ -150,7 +150,7 @@ def check_template_stages(templates, expected):
 
 def enumerate_blockers(blocks, smaller, known=(), *, budget=25, ordinary_stages=None,
                        first_ordinary_stage=False, occupied_stage_pairs=False, strip_sheets=None,
-                       require_minimal_fort=False, restrict=None):
+                       require_minimal_fort=False, restrict=None, stream_blockers=False):
     sheets = budget + 10 if strip_sheets is None else strip_sheets
     graph, blue, *_ = COVER['signed_prism_cover'](blocks, sheets)
     clauses, seeds, top = STRIP['strip_formula'](
@@ -171,12 +171,18 @@ def enumerate_blockers(blocks, smaller, known=(), *, budget=25, ordinary_stages=
             clauses.append(list(range(lower + 1, stage_start(3) * sheets + 1)))
     if restrict is not None:
         seeds = restrict(clauses, seeds, len(graph), sheets)
-    for pattern in (*smaller, *sorted(known)):
-        clauses.extend(block_translations(pattern, sheets))
+    exclusions = (*smaller, *sorted(known))
+    if not stream_blockers:
+        for pattern in exclusions:
+            clauses.extend(block_translations(pattern, sheets))
 
     patterns = set(known)
     with ITotalizer(lits=seeds, ubound=budget, top_id=top) as counter:
         with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
+            if stream_blockers:
+                for pattern in exclusions:
+                    for clause in block_translations(pattern, sheets):
+                        solver.add_clause(clause)
             while solver.solve(assumptions=[-counter.rhs[budget]]):
                 selected = {v for v in solver.get_model() if v > 0}
                 fort = mask(v - 1 for v in selected if v <= len(graph))
