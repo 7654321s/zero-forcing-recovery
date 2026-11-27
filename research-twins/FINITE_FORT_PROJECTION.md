@@ -610,7 +610,7 @@ There are no ordinary losses below size 30, and the ten known size-30 types are 
 
 The 33-stage band at 35 blocks forces an empty adjacent pair at budget 31. This applies to every band of 33 ordinary stages in a longer ordinary run. Any pair strictly inside a fort would split it into two parts, each of cost at least 24. Thus the occupied interval of an ordinary finite fort at these costs spans at most 32 stages. It can be placed in the 36-block representative with ordinary neighbors at both ends. There are 30 possible starts for each known three-stage template in that window. The exhaustive verifier excludes all 300 placements of the size-30 types and all 2,910 placements of the 97 size-31 types. The remaining formula, with the first stage occupied and 39 interior sheets, is unsatisfiable.
 
-The same stage bound applies to ordinary cyclic forts when $m\geq39$, since the cyclic minimum cost is 24 in this range. In the 36-block representative a wrapped fort of cost at most 31 would satisfy $16m\leq20\cdot31$ by the width-20 band. Therefore it unrolls at these periods. The finite witnesses project with distinct sheet translations, and a contained smaller cyclic loss would also unroll. Its sheet span is at most twelve, so aligning at a shared seed gives a contained smaller integer-sheet loss, which the known catalogues exclude. This proves the ordinary classification at these cyclic periods as well.
+The same stage bound applies to ordinary cyclic forts when $m\geq38$, since the cyclic minimum cost is 24 in this range. In the 36-block representative a wrapped fort of cost at most 31 would satisfy $18m\leq22\cdot31$ by the width-22 band. Therefore it unrolls at these periods. The finite witnesses project with distinct sheet translations, and a contained smaller cyclic loss would also unroll. Its sheet span is at most twelve, so aligning at a shared seed gives a contained smaller integer-sheet loss, which the known catalogues exclude. This proves the ordinary classification at these cyclic periods as well.
 
 ### Single-seed restoration of the ordinary size-31 losses
 
@@ -636,7 +636,7 @@ Use only minimal losses of size at most 30 in the blocking event. For $k\geq14$ 
 $$
 V_{31}(k,m)=-m(8k+13134)
 $$
-to the degree-31 blocking coefficient. The same expression holds at five and six blocks for $m\geq28$, giving $V_{31}(5,m)=-13174m$ and $V_{31}(6,m)=-13182m$. These contributions exclude the individual minimal losses of size 31.
+to the degree-31 blocking coefficient. The same expression holds at five through ten blocks for $m\geq m_0(k)$, with the sufficient periods from the degree-30 formula. These contributions exclude the individual minimal losses of size 31.
 
 The normalized finite union calculation at 14 blocks gives the following signed weights. All unions through degree 31 span at most twelve sheets.
 
@@ -644,11 +644,11 @@ The normalized finite union calculation at 14 blocks gives the following signed 
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Degree-31 unions at 14 blocks | 344 | 19529 | 2882 | 6502 | 233 | 1 |
 
-Their sum with signs is $-13246$. The 13-block calculation independently gives $-13238$, with eight fewer weight-$-1$ unions and the other counts unchanged. At five and six blocks the weight-$-1$ counts are 19,457 and 19,465, respectively. The other five counts are the same and the maximum span is again twelve sheets. The sums are $-13174$ and $-13182$. The verifier builds unions using translated copies of the complete catalogues through size 30. For a union $U$ it assigns weight one minus the sum of the weights of all distinct proper subunions of $U$. Grouping the indices by cardinality reduces the number of candidate translations. When a proper subunion has just one or two fewer sites, the verifier checks containment by deleting those sites and normalizing the resulting subset.
+Their sum with signs is $-13246$. The 13-block calculation independently gives $-13238$, with eight fewer weight-$-1$ unions and the other counts unchanged. At five through ten blocks the weight-$-1$ counts are 19,457, 19,465, 19,473, 19,481, 19,489 and 19,497. The other five counts are the same and the maximum span is again twelve sheets. The sums are $-13174$, $-13182$, $-13190$, $-13198$, $-13206$ and $-13214$. The verifier builds unions using translated copies of the complete catalogues through size 30. For a union $U$ it assigns weight one minus the sum of the weights of all distinct proper subunions of $U$. Grouping the indices by cardinality reduces the number of candidate translations. When a proper subunion has just one or two fewer sites, the verifier checks containment by deleting those sites and normalizing the resulting subset.
 
 Any two constituents of a degree-31 union meet because the smallest has size 24. Each spans at most four stages and twelve sheets, so after aligning all constituents to one of them the full union spans at most ten stages and 34 sheets. The internal seed gaps in the stage coordinate have length at most two, since the stage arcs of all constituents intersect the reference arc. The outer gap at $k\geq14$ has at least four stages. Any contained smaller pattern uses at most four stages and cannot straddle this gap. The union weight therefore depends only on a stage window of length at most thirteen, including the extra stages used to determine the constituents. All exceptional offsets of such a window occur at 14 blocks. Ordinary unions come from the ten size-30 types at a common start and contribute $-8$ per ordinary starting stage. The ordinary union window is already strictly shorter than 14 stages. Thus every stage window type relevant to the union weight occurs at 14 blocks, and the signed count has slope $-8$ from that length onward. The sheet span bound of twelve transfers with the finite types.
 
-All constituent losses unroll at the periods in the formula. In a cyclic union of at most 31 sites, any three constituents have at least $31-3(31-24)=10$ common sites. Lift one constituent and align every other one at a seed shared with it. Any two shared sites give the same alignment, because all relative sheet coordinates have magnitude at most eleven and $m>22$. For any two of the other constituents, a seed common to all three aligns both with the first in the same lift. Every coincidence between the two then holds in integer sheets by the same $m>22$ comparison. Thus the cyclic union lifts with unchanged size and constituent relations. Its finite span is at most twelve, giving a unique outer gap and $m$ distinct sheet translations. The finite correction therefore multiplies by $m$ on the cyclic cover, including at five and six blocks from 28 sheets.
+All constituent losses unroll at the periods in the formula. In a cyclic union of at most 31 sites, any three constituents have at least $31-3(31-24)=10$ common sites. Lift one constituent and align every other one at a seed shared with it. Any two shared sites give the same alignment, because all relative sheet coordinates have magnitude at most eleven and $m>22$. For any two of the other constituents, a seed common to all three aligns both with the first in the same lift. Every coincidence between the two then holds in integer sheets by the same $m>22$ comparison. Thus the cyclic union lifts with unchanged size and constituent relations. Its finite span is at most twelve, giving a unique outer gap and $m$ distinct sheet translations. The finite correction therefore multiplies by $m$ on the cyclic cover, including at all six short lengths from their listed periods.
 
 At five blocks every cyclic fort of cost at most 31 unrolls from 30 sheets. The smaller costs already unroll from 28 sheets and the wrapped verifier excludes cost 31 at 30 through 36 sheets. At $m\geq37$ the width-28 bound excludes wrapped cost 31 because $24m>28\cdot31$.
 
@@ -664,7 +664,7 @@ At five blocks the hypotheses hold at cost 31 from 30 sheets. Taking period 30 b
 
 ### A finite representative for the degree-31 boundary terms
 
-With $\beta_{31}$ and $\delta_{31}$ as in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order), for every $k\geq36$ and $m\geq39$,
+With $\beta_{31}$ and $\delta_{31}$ as in the [fixed-order formula](#eventual-counts-at-every-fixed-loss-order), for every $k\geq36$ and $m\geq38$,
 $$
 M_{31}(k,m)=m(97k+\beta_{31}),
 \qquad
@@ -676,9 +676,23 @@ The 33-stage band forces an empty appended pair at cost at most 31. The terminal
 
 When $k\geq36$, a size-31 seed template therefore fits into an arc of at most 32 stages with at least four empty stages in its outer gap. An internal gap of three seed-free stages would give another empty fort pair by the one-sided ancestry check. The associated split again costs at least 48. The outer gap is unique. If the seed arc has length $s$, possible fort vertices belong to the arc extended one stage backward and the fort clauses use a window of $s+3\leq35$ stages. Smaller losses span at most four stages and cannot cross the outer gap, so checking their containment is local to the same window. For each such window its ordinary placements and exceptional offsets have the fixed weights used at order 30. This makes the finite size-31 count affine from 36 blocks onward, with slope 97 from the ordinary catalogue.
 
-For sheet support, contract only to 36 blocks. The width-20 band excludes cyclic wrapping at $m\geq39$ because $16m>20\cdot31$. Two nonempty pieces of a finite fort separated by two empty sheets would cost at least 48 in total. The [final-white-fort transfer](#transferring-losses-by-the-final-white-fort) therefore identifies the finite and cyclic loss types from 39 sheets. In particular, taking period 39 bounds every finite cost-31 fort at $k\geq36$ by 37 sheets.
+For sheet support, contract only to 36 blocks. The width-22 band excludes cyclic wrapping at $m\geq38$ because $18m>22\cdot31$. Two nonempty pieces of a finite fort separated by two empty sheets would cost at least 48 in total. The [final-white-fort transfer](#transferring-losses-by-the-final-white-fort) therefore identifies the finite and cyclic loss types from 38 sheets. In particular, taking period 38 bounds every finite cost-31 fort at $k\geq36$ by 36 sheets.
 
 For the coefficient, each minimal size-31 loss contributes once and cannot lie in a degree-31 union with another minimal loss. All other terms have the [signed overlap correction](#the-complete-degree-31-overlap-correction). Blocking starts in degree 24, so the logarithmic recovery coefficient in degree 31 is the negative of the total blocking coefficient. Substituting the corrected count gives $m(-89k+13134-\beta_{31})$.
+
+### The degree-32 overlap correction in ordinary stages
+
+Fix an ordinary starting stage and use only the ten size-30 and 97 size-31 types. At degree 32 their signed union weights, up to sheet translation, have counts 206 of weight $-1$, three of weight zero, and one of weight $+1$. The sum is $-205$ per starting stage and sheet, and the maximum union span is eleven sheets. The verifier constructs every union of these smaller types through degree 32 before computing its signed weight.
+
+Every type occupies three consecutive ordinary stages with at least six lost seeds in each. Two different starting stages give some occupied stage of one type outside the other, so the union has at least $30+6>32$ seeds. All ordinary overlaps at this degree therefore come from a single common start. A degree-32 term involving a boundary type stays a bounded distance from an exceptional stage, because its members have bounded span and intersect. Such terms together contribute only $O(m)$ in the fixed-order formula. Each new minimal loss of size 32 contributes once, since taking its union with any other minimal loss would have size greater than 32. The blocking coefficient is the negative of the logarithmic recovery coefficient at this order. Consequently the [ordinary slopes](#eventual-counts-at-every-fixed-loss-order) satisfy $\gamma_{32}=205-\alpha_{32}$.
+
+### Size-32 losses within five ordinary stages
+
+Exactly 276 inclusion-minimal size-32 losses have a fort confined to at most five consecutive ordinary stages with ordinary neighbors, up to sheet and stage translation. All 276 use all three stages. Eight span ten sheets and 268 span eleven.
+
+The width-21 check at 36 blocks supplies a compact guarded strip. An ordinary fort on those stages has the same local graph when placed in this representative. If a cyclic fort of cost at most 32 met every adjacent sheet pair at period 40, the window count would give $17\cdot40\leq21\cdot32$, which is false. A finite fort cannot have an internal empty pair because its two parts would cost at least 48. By the [final-white-fort transfer](#transferring-losses-by-the-final-white-fort), the finite fort span is at most 38. The exhaustive search uses 38 interior sheets and excludes all placements of the ten size-30 and 97 size-31 types. They are the only possible smaller losses contained in the selected seeds, since all smaller ordinary types occupy three stages. The three-stage search gives all 276 templates. The four- and five-stage searches exclude their 552 and 828 placements, respectively, and find no additional loss.
+
+Every listed type has ordinary placements in the fixed-order regime. This proves $\alpha_{32}\geq276$, and the overlap correction gives $\gamma_{32}\leq-71$. The 34-stage band at cost 32 forces an empty pair. Since such a pair cannot separate occupied stages inside a finite fort at this cost, a remaining ordinary type must have a fort spanning six through 33 stages.
 
 ### A packing of disjoint ordinary blocking losses
 
@@ -916,9 +930,17 @@ python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-30-exact
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-31
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-31-exact
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-31-restoration
+python -B research-twins/check_cost_25_blocking_sets.py --ordinary-degree-32-overlap
+python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 22 --band-blocks 36
+python -B research-twins/check_cost_25_blocking_sets.py --ordinary-size-32
+python -B -c "import runpy; runpy.run_path('research-twins/check_block_stabilization.py')['check_band'](36, stages=34, budget=32)"
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 5
 python -B research-twins/check_cost_25_blocking_sets.py --size-31-five-blocks
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 6
+python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 7
+python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 8
+python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 9
+python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 10
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 13
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 14
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-threshold
