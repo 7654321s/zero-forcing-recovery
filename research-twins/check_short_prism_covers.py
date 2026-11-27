@@ -34,17 +34,14 @@ def residual_bounds(sheets, budget, band_through=BAND_WIDTH):
     return bounds
 
 
-def tight_sheet_cap(sheets, budget, bounds, cap):
-    bands = [(width * budget - sheets * lower, width) for width, lower in bounds.items()
-             if gcd(width, sheets) == 1]
-    surplus, width = min(bands, default=(3, 0))
-    # Sparse surplus profiles are cheap to enumerate. The complement bound handles the other cases.
-    if surplus > 2:
-        return cap
+def sparse_sheet_profiles(sheets, budget, bounds, width, surplus):
+    # When there is surplus, choose a rotation with a surplus window at zero.
+    if surplus < 0:
+        return
     orbit = [(j * width) % sheets for j in range(sheets)]
-    largest = 0
-    for positions in combinations_with_replacement(range(sheets), surplus):
+    for positions in combinations_with_replacement(range(sheets), max(surplus - 1, 0)):
         extras = [0] * sheets
+        extras[0] = int(surplus > 0)
         for position in positions:
             extras[position] += 1
         counts = [0] * sheets
@@ -53,16 +50,29 @@ def tight_sheet_cap(sheets, budget, bounds, cap):
         shift, remainder = divmod(budget - sum(counts), sheets)
         if remainder or min(counts) + shift < 0:
             continue
-        counts = [value + shift for value in counts]
-        prefix = list(accumulate(counts + counts, initial=0))
+        counts = tuple(value + shift for value in counts)
+        doubled = counts + counts
+        prefix = list(accumulate(doubled, initial=0))
         if all(prefix[start + length] - prefix[start] >= lower
                for length, lower in bounds.items() for start in range(sheets)):
-            largest = max(largest, max(counts))
-    return min(largest, cap)
+            maximum = max(counts)
+            yield min(doubled[start:start + sheets]
+                      for start, count in enumerate(counts) if count == maximum)
+
+
+def tight_sheet_cap(sheets, budget, bounds, cap):
+    bands = [(width * budget - sheets * lower, width) for width, lower in bounds.items()
+             if gcd(width, sheets) == 1]
+    surplus, width = min(bands, default=(3, 0))
+    # Sparse surplus profiles are cheap to enumerate. The complement bound handles the other cases.
+    if surplus > 2:
+        return cap
+    profiles = sparse_sheet_profiles(sheets, budget, bounds, width, surplus)
+    return min(max(map(max, profiles), default=0), cap)
 
 
 def wrapped_formula(graph, blue, sheets, budget, *, band_through=BAND_WIDTH,
-                    require_minimal=True, compact_bands=False, sheet_cap=None):
+                    require_minimal=True, compact_bands=False, sheet_cap=None, sheet_count_flags=None):
     bounds = residual_bounds(sheets, budget, band_through)
     if bounds is None or any(width * budget < sheets * lower for width, lower in bounds.items()):
         return None
@@ -105,6 +115,8 @@ def wrapped_formula(graph, blue, sheets, budget, *, band_through=BAND_WIDTH,
         flags.append(row)
         clauses.append([v + 1 for s in (sheet, (sheet + 1) % sheets)
                         for v in range(s, order, sheets)])
+    if sheet_count_flags is not None:
+        sheet_count_flags.extend(flags)
     clauses.append([flags[0][0]])
     for row in flags[1:]:
         clauses.extend([-threshold, maximum] for threshold, maximum in zip(row, flags[0]))
@@ -175,6 +187,32 @@ def check_wrapped_budget(blocks, sheets, budget, band_through, *, occupied_stage
                 raise AssertionError(('A wrapped fort exists', blocks, sheets, budget))
     scope = ' meeting every appended stage pair' if occupied_stage_pairs else ''
     print(f'{blocks} blocks, {sheets} sheets: no wrapped fort of cost {budget}{scope}', flush=True)
+
+
+def check_degree_31_period_37():
+    blocks, sheets, budget, width = 36, 37, 31, 24
+    bounds = residual_bounds(sheets, budget, width)
+    surplus = width * budget - sheets * bounds[width]
+    profiles = set(sparse_sheet_profiles(sheets, budget, bounds, width, surplus))
+    if len(profiles) != 130 or max(map(max, profiles)) != 2:
+        raise AssertionError('Unexpected sheet counts at period 37')
+
+    graph, blue, *_ = CHECKS['signed_prism_cover'](blocks, sheets)
+    flags = []
+    clauses = wrapped_formula(graph, blue, sheets, budget, band_through=width,
+                              require_minimal=False, compact_bands=True, sheet_cap=2,
+                              sheet_count_flags=flags)
+    if clauses is None or len(flags) != sheets or any(len(row) != 2 for row in flags):
+        raise AssertionError('Unexpected wrapped formula at period 37')
+    with Solver(name='cadical195', bootstrap_with=clauses) as solver:
+        for profile in sorted(profiles):
+            assumptions = [flag if count >= threshold else -flag
+                           for row, count in zip(flags, profile)
+                           for threshold, flag in enumerate(row, start=1)]
+            if solver.solve(assumptions=assumptions):
+                raise AssertionError(('A wrapped fort exists', blocks, sheets, budget, profile))
+    print(f'{blocks} blocks, {sheets} sheets: all {len(profiles)} cost-{budget} profiles excluded',
+          flush=True)
 
 
 def check_ordinary_wrapping(sheets, budget):
@@ -318,6 +356,8 @@ if __name__ == '__main__':
     mode.add_argument('--insertion-obstruction', type=int, nargs='+', choices=range(22, 29),
                       metavar='SHEETS',
                       help='exclude wrapping at cost 24 when insertion is blocked at 24 blocks')
+    mode.add_argument('--degree-31-period-37', action='store_true',
+                      help='exclude all cost-31 wrapped profiles at 36 blocks and 37 sheets')
     mode.add_argument('--four-sheet-barrier', action='store_true',
                       help='check the round-five separation across four intact sheets')
     mode.add_argument('--stage-ancestry', action='store_true',
@@ -337,6 +377,8 @@ if __name__ == '__main__':
     elif args.insertion_obstruction:
         for sheets in args.insertion_obstruction:
             check_insertion_obstruction(sheets)
+    elif args.degree_31_period_37:
+        check_degree_31_period_37()
     elif args.four_sheet_barrier:
         for blocks in range(13, 28):
             check_four_sheet_barrier(blocks)
