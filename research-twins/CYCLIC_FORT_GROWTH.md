@@ -8,6 +8,8 @@ $$
 $$
 The slopes come from minimum mean cycle weights in an explicit weighted directed graph. If a finite fort exists in the integer-sheet lift, all the affine functions are the same constant. If no finite fort exists, every slope is positive. The slopes can differ between residue classes.
 
+Kim, Kim and Lee use periodic covers and the commutation of forcing with preimages to prove stabilization of the ordinary zero forcing number. Here the designated seed set is fixed and the optimized cost counts how many of those seeds are lost. [Stabilization of zero forcing numbers of finite quotients of periodic graphs](https://arxiv.org/html/2611.13244v2)
+
 ## A directed graph of sheet windows
 
 Write $R=\max(1,\max_{uv}|\delta_{uv}|)$, using $R=1$ when there are no edges. A sheet pattern is a subset of $V(G)$ describing which vertices on that sheet belong to a candidate fort. A state is a tuple of $2R$ successive sheet patterns. A window $(X_{-R},\ldots,X_R)$ defines the edge
@@ -70,6 +72,8 @@ On a base four-cycle, put shift zero on three consecutive edges and shift $q>0$ 
 ## Exact recovery polynomials by the same sheet windows
 
 Fix the base graph, shifts and designated seed set $S$. Let $Z_m(z)$ count recoverable loss sets in the $m$-sheet cover by cardinality, with weight $z^j$ for a recoverable loss of size $j$. When every vertex is designated, complementing each loss in the full vertex set reverses the coefficients of the zero forcing polynomial. [Boyer and coauthors](https://arxiv.org/abs/1801.08910)
+
+Sidoine gives a fort-based splitting formula across arbitrary finite labelled separators and multivariate transfers for cacti and graphs with clique or cycle blocks. The designated-seed recovery probability is a specialization with initial selection probability $1-p$ on seeds and zero elsewhere. The sheet-window method below records circular closure, with a transfer matrix fixed as the cyclic period varies. [Separator algebras and transfer theory for the zero-forcing polynomial](https://github.com/gsidoine/zero-forcing-separator-algebras)
 
 For each possible loss mask $L\subseteq S$ on one sheet, keep the sheet-window edges with $S\cap X_0\subseteq L$. Mark the edge when its center pattern $X_0$ is nonempty. Let $A_L$ be the Boolean relation of all kept edges and let $B_L$ consist of the marked kept edges. A loss word $(L_1,\ldots,L_m)$ blocks precisely when the sheet-window graph has a closed walk following those edge relations and using at least one marked edge. Such a walk gives a nonempty initially white fort, and the pattern sequence of any such fort gives the walk.
 
