@@ -927,7 +927,7 @@ def main():
                       help='verify size-32 losses within five ordinary stages')
     mode.add_argument('--ordinary-degree-32-overlap', action='store_true',
                       help='verify degree-32 ordinary overlaps of smaller losses')
-    mode.add_argument('--degree-31-overlap', type=int, choices=(5, 6, 7, 8, 9, 10, 13, 14), metavar='BLOCKS',
+    mode.add_argument('--degree-31-overlap', type=int, choices=range(5, 15), metavar='BLOCKS',
                       help='verify the degree-31 overlap correction from the smaller losses')
     mode.add_argument('--size-28', choices=EXPECTED_SIZE_28_SPANS, type=int, metavar='BLOCKS',
                       help='verify size-28 losses from five blocks through the locality representative')

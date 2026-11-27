@@ -632,11 +632,11 @@ Thus known ordinary size-30 losses contribute $-8$ to the degree-31 blocking coe
 
 ### The complete degree-31 overlap correction
 
-Use only minimal losses of size at most 30 in the blocking event. For $k\geq14$ and $m\geq35$ their union contributes exactly
+Use only minimal losses of size at most 30 in the blocking event. For every $k\geq5$ and every $m\geq m_0(k)$ from the [degree-30 formula](#a-finite-representative-for-the-degree-30-boundary-term), their union contributes exactly
 $$
 V_{31}(k,m)=-m(8k+13134)
 $$
-to the degree-31 blocking coefficient. The same expression holds at five through ten blocks for $m\geq m_0(k)$, with the sufficient periods from the degree-30 formula. These contributions exclude the individual minimal losses of size 31.
+to the degree-31 blocking coefficient. These contributions exclude the individual minimal losses of size 31.
 
 The normalized finite union calculation at 14 blocks gives the following signed weights. All unions through degree 31 span at most twelve sheets.
 
@@ -644,11 +644,11 @@ The normalized finite union calculation at 14 blocks gives the following signed 
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Degree-31 unions at 14 blocks | 344 | 19529 | 2882 | 6502 | 233 | 1 |
 
-Their sum with signs is $-13246$. The 13-block calculation independently gives $-13238$, with eight fewer weight-$-1$ unions and the other counts unchanged. At five through ten blocks the weight-$-1$ counts are 19,457, 19,465, 19,473, 19,481, 19,489 and 19,497. The other five counts are the same and the maximum span is again twelve sheets. The sums are $-13174$, $-13182$, $-13190$, $-13198$, $-13206$ and $-13214$. The verifier builds unions using translated copies of the complete catalogues through size 30. For a union $U$ it assigns weight one minus the sum of the weights of all distinct proper subunions of $U$. Grouping the indices by cardinality reduces the number of candidate translations. When a proper subunion has just one or two fewer sites, the verifier checks containment by deleting those sites and normalizing the resulting subset.
+Their sum with signs is $-13246$. The 13-block calculation independently gives $-13238$, with eight fewer weight-$-1$ unions and the other counts unchanged. At each of the ten lengths from five through fourteen blocks the weight-$-1$ count is $19417+8k$. The other five counts are the same and the maximum span is twelve sheets. In particular, the eleven- and twelve-block signed sums are $-13222$ and $-13230$. The verifier builds unions using translated copies of the complete catalogues through size 30. For a union $U$ it assigns weight one minus the sum of the weights of all distinct proper subunions of $U$. Grouping the indices by cardinality reduces the number of candidate translations. When a proper subunion has just one or two fewer sites, the verifier checks containment by deleting those sites and normalizing the resulting subset.
 
 Any two constituents of a degree-31 union meet because the smallest has size 24. Each spans at most four stages and twelve sheets, so after aligning all constituents to one of them the full union spans at most ten stages and 34 sheets. The internal seed gaps in the stage coordinate have length at most two, since the stage arcs of all constituents intersect the reference arc. The outer gap at $k\geq14$ has at least four stages. Any contained smaller pattern uses at most four stages and cannot straddle this gap. The union weight therefore depends only on a stage window of length at most thirteen, including the extra stages used to determine the constituents. All exceptional offsets of such a window occur at 14 blocks. Ordinary unions come from the ten size-30 types at a common start and contribute $-8$ per ordinary starting stage. The ordinary union window is already strictly shorter than 14 stages. Thus every stage window type relevant to the union weight occurs at 14 blocks, and the signed count has slope $-8$ from that length onward. The sheet span bound of twelve transfers with the finite types.
 
-All constituent losses unroll at the periods in the formula. In a cyclic union of at most 31 sites, any three constituents have at least $31-3(31-24)=10$ common sites. Lift one constituent and align every other one at a seed shared with it. Any two shared sites give the same alignment, because all relative sheet coordinates have magnitude at most eleven and $m>22$. For any two of the other constituents, a seed common to all three aligns both with the first in the same lift. Every coincidence between the two then holds in integer sheets by the same $m>22$ comparison. Thus the cyclic union lifts with unchanged size and constituent relations. Its finite span is at most twelve, giving a unique outer gap and $m$ distinct sheet translations. The finite correction therefore multiplies by $m$ on the cyclic cover, including at all six short lengths from their listed periods.
+All constituent losses unroll at the periods in the formula. In a cyclic union of at most 31 sites, any three constituents have at least $31-3(31-24)=10$ common sites. Lift one constituent and align every other one at a seed shared with it. Any two shared sites give the same alignment, because all relative sheet coordinates have magnitude at most eleven and $m>22$. For any two of the other constituents, a seed common to all three aligns both with the first in the same lift. Every coincidence between the two then holds in integer sheets by the same $m>22$ comparison. Thus the cyclic union lifts with unchanged size and constituent relations. Its finite span is at most twelve, giving a unique outer gap and $m$ distinct sheet translations. The finite correction therefore multiplies by $m$ on the cyclic cover, including at every shorter length from its listed period.
 
 At five blocks every cyclic fort of cost at most 31 unrolls from 30 sheets. The smaller costs already unroll from 28 sheets and the wrapped verifier excludes cost 31 at 30 through 36 sheets. At $m\geq37$ the width-28 bound excludes wrapped cost 31 because $24m>28\cdot31$.
 
@@ -941,6 +941,8 @@ python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 7
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 8
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 9
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 10
+python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 11
+python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 12
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 13
 python -B research-twins/check_cost_25_blocking_sets.py --degree-31-overlap 14
 python -B research-twins/check_cost_25_blocking_sets.py --ordinary-threshold
