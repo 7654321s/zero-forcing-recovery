@@ -136,6 +136,60 @@ def check_outer_windows(last_span):
     print(json.dumps({'outer_window_counts': counts, 'total': sum(counts.values())}), flush=True)
 
 
+def check_far_outer_windows():
+    from pysat.card import ITotalizer
+    from pysat.solvers import Solver
+
+    blocks, minimum_span = 37, 23
+    stage = BOUNDARY['stage']
+    graph, blue, *_ = CHECK['COVER']['signed_prism_cover'](blocks, SHEETS)
+    clauses, seeds, top = CHECK['STRIP']['strip_formula'](
+        graph, blue, SIZE, sheets=SHEETS, quotient_bounds=False, require_minimal=True)
+    seed_groups = [[] for _ in range(blocks)]
+    fort_groups = [[] for _ in range(blocks)]
+    for seed in seeds:
+        seed_groups[stage((seed - 1) // SHEETS)].append(seed)
+    for vertex in range(len(graph)):
+        fort_groups[stage(vertex // SHEETS)].append(vertex + 1)
+
+    anchors = BOUNDARY['anchor_stages'](blocks)
+    outside = set(range(blocks)) - BOUNDARY['near_seed_stages'](blocks)
+    for stages in (anchors, outside):
+        clauses.append([seed for i in stages for seed in seed_groups[i]])
+
+    occupied = list(range(top + 1, top + blocks + 1))
+    starts = list(range(top + blocks + 1, top + 2 * blocks + 1))
+    for mark, group in zip(occupied, seed_groups):
+        clauses.append([-mark, *group])
+        clauses.extend([-seed, mark] for seed in group)
+    clauses.append(starts)
+    for i, mark in enumerate(starts):
+        clauses.append([-mark, occupied[i]])
+        for offset in range(1, 5):
+            clauses.append([-mark, -occupied[(i - offset) % blocks]])
+        for offset in range(1, minimum_span - 2):
+            triple = [(i + offset + delta) % blocks for delta in range(3)]
+            clauses.append([-mark, *(occupied[s] for s in triple)])
+            clauses.append([-mark, *fort_groups[triple[0]], *fort_groups[triple[1]]])
+
+    lower, size_30 = CHECK['catalogues_through_size_30'](blocks)
+    smaller = (*lower, *size_30, *BOUNDARY['transferred_catalogue'](blocks))
+    if len(smaller) != 30359:
+        raise AssertionError('Unexpected lower-order archive size')
+    print(f'Checking anchored outer arcs of span at least {minimum_span}', flush=True)
+    with ITotalizer(lits=seeds, ubound=SIZE, top_id=starts[-1]) as counter:
+        with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
+            for row in smaller:
+                for clause in CHECK['block_translations'](row, SHEETS):
+                    solver.add_clause(clause)
+            if solver.solve(assumptions=[-counter.rhs[SIZE]]):
+                selected = {v for v in solver.get_model() if v > 0}
+                loss = CHECK['normalized'](divmod(v - 1, SHEETS) for v in seeds if v in selected)
+                raise AssertionError(('Unexpected candidate after a long seed gap', loss))
+    print(json.dumps({'blocks': blocks, 'minimum_seed_span': minimum_span,
+                      'outer_losses': 0}), flush=True)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     modes = parser.add_mutually_exclusive_group()
@@ -143,8 +197,12 @@ if __name__ == '__main__':
                        help='exclude every further loss in the guarded near-boundary strip')
     modes.add_argument('--outer-through', type=int, choices=range(5, 24), metavar='SPAN',
                        help='exclude outer losses of lengths five through SPAN')
+    modes.add_argument('--far-outer', action='store_true',
+                       help='exclude all anchored outer seed arcs of span at least 23')
     args = parser.parse_args()
-    if args.outer_through:
+    if args.far_outer:
+        check_far_outer_windows()
+    elif args.outer_through:
         check_outer_windows(args.outer_through)
     elif args.exhaustive:
         check_exhaustive(read_catalogue())
