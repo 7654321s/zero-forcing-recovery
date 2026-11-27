@@ -86,16 +86,19 @@ def check_exhaustive(rows):
     print(json.dumps({'blocks': BLOCKS, 'size': SIZE, 'additional_near_losses': 0}), flush=True)
 
 
-def check_outer_windows(last_span):
-    representative = 37
+def check_outer_windows(last_span, *, representative=37, budget=SIZE, sheets=SHEETS,
+                        rows_for_blocks=None):
     anchors = BOUNDARY['anchor_stages'](representative)
     near = BOUNDARY['near_seed_stages'](representative)
     counts = {}
     for span in range(5, last_span + 1):
         blocks = max(BLOCKS, span + 4)
-        lower, size_30 = CHECK['catalogues_through_size_30'](blocks)
-        lower = [(row, set(support(row)))
-                 for row in (*lower, *size_30, *BOUNDARY['transferred_catalogue'](blocks))]
+        if rows_for_blocks is None:
+            lower, size_30 = CHECK['catalogues_through_size_30'](blocks)
+            rows = (*lower, *size_30, *BOUNDARY['transferred_catalogue'](blocks))
+        else:
+            rows = rows_for_blocks(blocks)
+        lower = [(row, set(support(row))) for row in rows]
         checked = 0
         for first in range(representative):
             window = [(first + offset) % representative for offset in range(-2, span + 1)]
@@ -123,7 +126,7 @@ def check_outer_windows(last_span):
                 return selected
 
             result = CHECK['enumerate_blockers'](
-                blocks, smaller, budget=SIZE, strip_sheets=SHEETS, require_minimal_fort=True,
+                blocks, smaller, budget=budget, strip_sheets=sheets, require_minimal_fort=True,
                 restrict=restrict, stream_blockers=True)
             if result:
                 raise AssertionError(('Unexpected outer losses', first, span, sorted(result)))
@@ -137,21 +140,21 @@ def check_outer_windows(last_span):
     print(json.dumps({'outer_window_counts': counts, 'total': sum(counts.values())}), flush=True)
 
 
-def check_far_outer_windows():
+def check_far_outer_windows(*, blocks=37, sheets=SHEETS, budget=SIZE, smaller=None):
     from pysat.card import ITotalizer
     from pysat.solvers import Solver
 
-    blocks, minimum_span = 37, 23
+    minimum_span = 23
     stage = BOUNDARY['stage']
-    graph, blue, *_ = CHECK['COVER']['signed_prism_cover'](blocks, SHEETS)
+    graph, blue, *_ = CHECK['COVER']['signed_prism_cover'](blocks, sheets)
     clauses, seeds, top = CHECK['STRIP']['strip_formula'](
-        graph, blue, SIZE, sheets=SHEETS, quotient_bounds=False, require_minimal=True)
+        graph, blue, budget, sheets=sheets, quotient_bounds=False, require_minimal=True)
     seed_groups = [[] for _ in range(blocks)]
     fort_groups = [[] for _ in range(blocks)]
     for seed in seeds:
-        seed_groups[stage((seed - 1) // SHEETS)].append(seed)
+        seed_groups[stage((seed - 1) // sheets)].append(seed)
     for vertex in range(len(graph)):
-        fort_groups[stage(vertex // SHEETS)].append(vertex + 1)
+        fort_groups[stage(vertex // sheets)].append(vertex + 1)
 
     anchors = BOUNDARY['anchor_stages'](blocks)
     outside = set(range(blocks)) - BOUNDARY['near_seed_stages'](blocks)
@@ -173,19 +176,20 @@ def check_far_outer_windows():
             clauses.append([-mark, *(occupied[s] for s in triple)])
             clauses.append([-mark, *fort_groups[triple[0]], *fort_groups[triple[1]]])
 
-    lower, size_30 = CHECK['catalogues_through_size_30'](blocks)
-    smaller = (*lower, *size_30, *BOUNDARY['transferred_catalogue'](blocks))
-    if len(smaller) != 30359:
-        raise AssertionError('Unexpected lower-order archive size')
+    if smaller is None:
+        lower, size_30 = CHECK['catalogues_through_size_30'](blocks)
+        smaller = (*lower, *size_30, *BOUNDARY['transferred_catalogue'](blocks))
+        if len(smaller) != 30359:
+            raise AssertionError('Unexpected lower-order archive size')
     print(f'Checking anchored outer arcs of span at least {minimum_span}', flush=True)
-    with ITotalizer(lits=seeds, ubound=SIZE, top_id=starts[-1]) as counter:
+    with ITotalizer(lits=seeds, ubound=budget, top_id=starts[-1]) as counter:
         with Solver(name='cadical195', bootstrap_with=clauses + counter.cnf.clauses) as solver:
             for row in smaller:
-                for clause in CHECK['block_translations'](row, SHEETS):
+                for clause in CHECK['block_translations'](row, sheets):
                     solver.add_clause(clause)
-            if solver.solve(assumptions=[-counter.rhs[SIZE]]):
+            if solver.solve(assumptions=[-counter.rhs[budget]]):
                 selected = {v for v in solver.get_model() if v > 0}
-                loss = CHECK['normalized'](divmod(v - 1, SHEETS) for v in seeds if v in selected)
+                loss = CHECK['normalized'](divmod(v - 1, sheets) for v in seeds if v in selected)
                 raise AssertionError(('Unexpected candidate after a long seed gap', loss))
     print(json.dumps({'blocks': blocks, 'minimum_seed_span': minimum_span,
                       'outer_losses': 0}), flush=True)
