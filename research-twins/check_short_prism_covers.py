@@ -209,6 +209,18 @@ def exclude_sheet_profiles(blocks, sheets, budget, width, profiles):
           flush=True)
 
 
+def check_degree_33_period_39():
+    blocks, sheets, budget, width = 36, 39, 33, 25
+    bounds = residual_bounds(sheets, budget, width)
+    surplus = width * budget - sheets * bounds[width]
+    profiles = set(sparse_sheet_profiles(sheets, budget, bounds, width, surplus))
+    groups = {cap: [row for row in profiles if max(row) == cap] for cap in (1, 2, 3)}
+    if surplus != 6 or len(profiles) != 967 or tuple(map(len, groups.values())) != (177, 789, 1):
+        raise AssertionError('Unexpected sheet counts at degree 33 and period 39')
+    for group in groups.values():
+        exclude_sheet_profiles(blocks, sheets, budget, width, group)
+
+
 def check_degree_31_period_37(blocks=36):
     sheets, budget, width = 37, 31, 24
     bounds = residual_bounds(sheets, budget, width)
@@ -398,6 +410,8 @@ if __name__ == '__main__':
                       metavar='BLOCKS', help='exclude all cost-31 wrapped profiles at 37 sheets')
     mode.add_argument('--degree-31-period-36', nargs='?', type=int, choices=range(6, 25), const=13,
                       metavar='BLOCKS', help='exclude all cost-31 wrapped profiles at 36 sheets')
+    mode.add_argument('--degree-33-period-39', action='store_true',
+                      help='exclude all cost-33 wrapped profiles at 39 sheets')
     mode.add_argument('--four-sheet-barrier', action='store_true',
                       help='check the round-five separation across four intact sheets')
     mode.add_argument('--stage-ancestry', action='store_true',
@@ -421,6 +435,8 @@ if __name__ == '__main__':
         check_degree_31_period_37(args.degree_31_period_37)
     elif args.degree_31_period_36:
         check_degree_31_period_36(args.degree_31_period_36)
+    elif args.degree_33_period_39:
+        check_degree_33_period_39()
     elif args.four_sheet_barrier:
         for blocks in range(13, 28):
             check_four_sheet_barrier(blocks)

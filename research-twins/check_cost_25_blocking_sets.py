@@ -246,17 +246,40 @@ def signed_union_weights(losses, budget):
 
     # A union already at budget - 1 can gain only one site. Index each large
     # event by the normalized core left when that site is removed.
+    # Keep fingerprints and references, then compare complete cores on lookup.
     one_site_extensions = {}
     for size in (budget - 2, budget - 1):
         if size < 2 or size not in by_size:
             continue
-        cores = defaultdict(set)
-        for event in unions[size]:
+        events = tuple(unions[size])
+        site_bits = max(event.bit_length() for event in events).bit_length()
+        cores = {}
+        for index, event in enumerate(events):
             for site in members(event):
-                core = event ^ (1 << site)
-                origin = sheet_origin(core)
-                cores[core >> origin].add(site - origin)
-        one_site_extensions[size] = cores
+                fingerprint = hash(normalize_bits(event ^ (1 << site)))
+                reference = (index << site_bits) | site
+                previous = cores.get(fingerprint)
+                if previous is None:
+                    cores[fingerprint] = reference
+                elif isinstance(previous, list):
+                    previous.append(reference)
+                else:
+                    cores[fingerprint] = [previous, reference]
+        one_site_extensions[size] = events, site_bits, cores
+
+    def extension_sites(size, normalized_core):
+        events, site_bits, cores = one_site_extensions[size]
+        references = cores.get(hash(normalized_core), ())
+        if isinstance(references, int):
+            references = (references,)
+        site_mask = (1 << site_bits) - 1
+        for reference in references:
+            event = events[reference >> site_bits]
+            site = reference & site_mask
+            core = event ^ (1 << site)
+            origin = sheet_origin(core)
+            if core >> origin == normalized_core:
+                yield site - origin
 
     for degree in range(min(unions), budget):
         for union in unions[degree]:
@@ -266,11 +289,10 @@ def signed_union_weights(losses, budget):
             padded = union << margin_bits
             for size, index in by_size.items():
                 if degree == budget - 1 and size in one_site_extensions:
-                    cores = one_site_extensions[size]
                     for omitted in combinations(bits, degree - size + 1):
                         core = union ^ sum(omitted)
                         origin = sheet_origin(core)
-                        for site in cores.get(core >> origin, ()):
+                        for site in extension_sites(size, core >> origin):
                             joined = padded | (1 << (margin_bits + origin + site))
                             if joined != padded:
                                 unions[budget].add(normalize_bits(joined))
@@ -307,7 +329,7 @@ def signed_union_weights(losses, budget):
             weights[union] = weight
             profiles[degree][weight] += 1
         for union in unions[degree]:
-            if weights[union]:
+            if degree < budget and weights[union]:
                 record(by_size[degree], union)
     largest_span = max((row.bit_length() - 1) // label_count + 1 for row in weights)
     return profiles, largest_span

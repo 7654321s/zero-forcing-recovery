@@ -858,16 +858,47 @@ $$
 
 ### A finite representative for the degree-33 boundary count
 
-For $k\geq38$, apply the 35-stage band repeatedly to contract a cyclic fort of cost at most 33 to 36 blocks, preserving the cost and the occupied sheets. The previously certified width-25 band at 36 blocks then rules out wrapping at $m\geq40$ because $21m>25\cdot33$. The final-white-fort transfer identifies finite and cyclic minimal losses and bounds the finite fort span by 38 sheets. A guarded search at 38 blocks and 40 sheets can therefore compute the degree-33 count.
+For $k\geq38$, apply the 35-stage band repeatedly to contract a cyclic fort of cost at most 33 to 36 blocks, preserving the cost and the occupied sheets. The previously certified width-25 band at 36 blocks rules out wrapping at $m\geq40$ because $21m>25\cdot33$. At period 39 the degree-32 result already excludes smaller wrapped costs. For cost 33, the total surplus above 21 in the width-25 windows is $25\cdot33-39\cdot21=6$. Since 25 and 39 are coprime, the sheet-count recurrence determines each count profile from the surplus and total cost. The certified widths 10 through 25 leave 967 profiles up to rotation, with peak sheet counts one, two, and three in 177, 789, and one profile, respectively. The wrapped verifier excludes every one. The final-white-fort transfer therefore applies for $m\geq39$ and bounds the finite fort span by 37 sheets. A guarded search at 38 blocks and 39 sheets can compute the degree-33 count.
 
 Any seed arc has length $s\leq34$, with at least four empty stages in its outer gap. The span of its local test is at most $s+3\leq37$, including the predecessor and the two neighbors used to test fort clauses. All exceptional offsets are realized at 38 blocks. A 37-stage window is the only such window that can acquire an ordinary placement at a larger length while having none at 38 blocks. Its seed arc would have length 34, which the ordinary classification excludes. Each of the 420 three-stage ordinary types acquires one stage placement per additional block. Thus there is a constant $\beta_{33}$ such that
 $$
 M_{33}(k,m)=m(420k+\beta_{33}),
-\qquad k\geq38,\ m\geq40.
+\qquad k\geq38,\ m\geq39.
 $$
 It suffices to compute the normalized count at 38 blocks and subtract $420\cdot38$.
 
 For an anchored outer seed arc of span at most four, the only starts and spans at 38 blocks are $(34,3)$, $(33,4)$, and $(34,4)$. Transfer their windows to 13 blocks and exclude every contained loss through size 32. The three guarded searches give **420, 0, and 0** types, respectively. The 420 types at start 34 are precisely the translated ordinary catalogue. It remains to count the nonordinary near-boundary types and check the longer outer arcs.
+
+### Short degree-33 near-boundary windows omitting an opening stage
+
+Among near-boundary arcs of span at most four, 20 candidate windows omit at least one of the opening stages $\{0,1,2\}$. The guarded searches at 13 blocks exclude all smaller losses and the ordinary types at start 2. The [catalogue](degree-33-short-near-catalogue.json.gz) has **9,537** nonordinary size-33 types, grouped by the first stage and span of their occupied seed arcs.
+
+| First stage | Span | Types |
+| ---: | ---: | ---: |
+| 11 | 2 | 634 |
+| 10 | 3 | 1,757 |
+| 11 | 3 | 6,722 |
+| 1 | 3 | 420 |
+| 10 | 4 | 4 |
+
+Each other candidate window has zero new types. The remaining short near-boundary windows contain all three opening stages.
+
+### A finite representative for the degree-33 overlap correction
+
+Every known minimal loss through size 32 occupies at most four consecutive seed stages and spans at most thirteen sheets. These are the complete lower-order catalogues in the degree-33 parameter range. Any pair of constituents of a union of size at most 33 shares a seed, and any triple shares at least $3\cdot24-2\cdot33=6$ seeds. Aligning the constituents on these shared sites works as at degree 32. The union spans at most seven stages and 25 sheets. Its internal gaps have length at most two stages or eleven sheets. The outer gaps distinguish the stage and sheet origins at $k\geq37$ and $m\geq38$.
+
+Each union weight depends on a stage window of at most ten stages, including the extra stages needed to test the constituent losses. Twelve blocks realize both the ordinary placement and all exceptional offsets of these windows. The translated lower-order input has 80,549 loss types at twelve blocks. Let $C_{12}$ be the signed degree-33 union sum of these types in that representative. Each additional ordinary stage contributes $-980$, so
+$$
+V_{33}(k,m)=m\bigl(-980k+C_{12}+11760\bigr),
+\qquad k\geq37,\ m\geq38.
+$$
+The twelve-block input uses the verified local placements of short types transferred from the complete long-chain catalogues.
+
+Together with the boundary count representative, this gives
+$$
+[p^{33}]\log R_{k,m}(p)=m\bigl(560k-\beta_{33}-C_{12}-11760\bigr),
+\qquad k\geq38,\ m\geq39.
+$$
 
 ### A packing of disjoint ordinary blocking losses
 
@@ -1142,6 +1173,10 @@ python -B research-twins/check_degree_33_ordinary.py --window 5
 python -B research-twins/check_degree_33_ordinary.py --bounds
 python -B research-twins/check_degree_33_ordinary.py --seed-arcs
 python -B research-twins/check_degree_33_boundary.py
+python -B research-twins/check_degree_33_boundary.py --overlap
+python -B research-twins/check_degree_33_boundary.py --near-short witnesses
+python -B research-twins/check_degree_33_boundary.py --near-short exhaustive
+python -B research-twins/check_short_prism_covers.py --degree-33-period-39
 python -B research-twins/check_prism_projected_support.py --cost-31-stage-pairs
 python -B research-twins/check_block_stabilization.py --subbands-from 13 --band-through 24 --band-blocks 33
 python -B research-twins/check_short_prism_covers.py --degree-31-period-37 33

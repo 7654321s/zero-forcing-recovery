@@ -65,7 +65,8 @@ def check_exhaustive(rows):
     lower, size_30 = CHECK['catalogues_through_size_30'](BLOCKS)
     size_31 = BOUNDARY['transferred_catalogue'](BLOCKS)
     smaller = [row for row in (*lower, *size_30, *size_31) if near.issuperset(support(row))]
-    _, ordinary, _ = CHECK['ordinary_size_32_catalogue']()
+    archive = runpy.run_path(str(HERE / 'check_degree_33_ordinary.py'))
+    ordinary = archive['read_catalogues']()[2]
     ordinary = {row for row in BOUNDARY['ordinary_placements'](ordinary, BLOCKS)
                 if near.issuperset(support(row))}
     known = set(rows)
