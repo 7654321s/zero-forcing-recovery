@@ -143,7 +143,7 @@ def check_long_stage_span():
     print(json.dumps({'blocks': blocks, 'maximum_stage_span': 4}), flush=True)
 
 
-def check_boundary_catalogue(*, partitions=False):
+def read_boundary_catalogue():
     with gzip.open(HERE / 'degree-31-boundary-catalogue.json.gz', 'rt', encoding='utf-8') as src:
         archive = json.load(src)
     if (archive['schema_version'], archive['size'], archive['first_sheet'],
@@ -160,19 +160,28 @@ def check_boundary_catalogue(*, partitions=False):
            all(stage(v) in near_seed_stages(long_blocks) for v, _ in row) or
            CHECK['boundary_stage_arc'](row, long_blocks)[:2] != (32, 3) for row in outside):
         raise AssertionError('Witness outside the complementary boundary partition')
+    return near, outside
 
-    _, ordinary_types, _ = CHECK['ordinary_size_31_catalogue']()
+
+def long_catalogue(near, outside, ordinary_types):
     ordinary = ordinary_placements(ordinary_types, long_blocks)
-    translated = {tuple((v + stage_start(32), sheet) for v, sheet in row)
-                  for row in ordinary_types}
-    if outside != translated:
-        raise AssertionError('The terminal window differs from the ordinary templates')
     shift = stage_start(long_blocks - 3) - stage_start(near_blocks - 3)
     lifted_near = {tuple((v + shift if stage(v) >= near_blocks - 3 else v, sheet)
                          for v, sheet in row) for row in near}
     candidates = ordinary | lifted_near | outside
     if len(ordinary) != 2910 or len(candidates) != len(ordinary) + len(near) + len(outside):
         raise AssertionError('The long representative has duplicate boundary placements')
+    return candidates, shift
+
+
+def check_boundary_catalogue(*, partitions=False):
+    near, outside = read_boundary_catalogue()
+    _, ordinary_types, _ = CHECK['ordinary_size_31_catalogue']()
+    translated = {tuple((v + stage_start(32), sheet) for v, sheet in row)
+                  for row in ordinary_types}
+    if outside != translated:
+        raise AssertionError('The terminal window differs from the ordinary templates')
+    candidates, shift = long_catalogue(near, outside, ordinary_types)
 
     smaller, size_30 = CHECK['catalogues_through_size_30'](long_blocks)
     print(f'{long_blocks} blocks: checking {len(candidates)} distinct size-31 witnesses', flush=True)
@@ -183,7 +192,29 @@ def check_boundary_catalogue(*, partitions=False):
     if partitions:
         check_partitions(near, outside, ordinary_types, shift)
     print(json.dumps({'blocks': long_blocks, 'size': size, 'witnesses': len(verified),
-                      'ordinary': len(ordinary), 'near': len(near), 'outside': len(outside)}),
+                      'ordinary': len(verified) - len(near) - len(outside),
+                      'near': len(near), 'outside': len(outside)}),
+          flush=True)
+
+
+def check_degree_32_overlap_representative():
+    blocks = 12
+    near, outside = read_boundary_catalogue()
+    ordinary = [tuple((v - stage_start(32), sheet) for v, sheet in row) for row in outside]
+    source, _ = long_catalogue(near, outside, ordinary)
+    size_31 = CHECK['relocate_boundary_patterns'](source, long_blocks, blocks)
+    if len(size_31) != 97 * blocks + 17372:
+        raise AssertionError('Unexpected size-31 count in the overlap representative')
+    lower, size_30 = CHECK['catalogues_through_size_30'](blocks)
+    losses = (*lower, *size_30, *size_31)
+    print(f'{blocks} blocks: counting order-32 unions of {len(losses)} smaller losses', flush=True)
+    weights, span = CHECK['signed_union_weights'](losses, 32)
+    summed = {degree: sum(w * n for w, n in profile.items())
+              for degree, profile in weights.items()}
+    if span > 25 or summed[31] != 89 * blocks + 4238:
+        raise AssertionError(('Unexpected overlaps in the degree-32 representative', span, summed))
+    print(json.dumps({'blocks': blocks, 'maximum_sheet_span': span, 'weights': weights[32],
+                      'overlap_per_sheet': summed[32], 'boundary_intercept': summed[32] + 205 * blocks}),
           flush=True)
 
 
@@ -194,8 +225,12 @@ if __name__ == '__main__':
                        help='also exhaust the boundary windows of span at most four')
     modes.add_argument('--long-stage-span', action='store_true',
                        help='exclude all anchored losses of stage span at least five')
+    modes.add_argument('--degree-32-overlap', action='store_true',
+                       help='count degree-32 overlaps in the transferred 12-block catalogue')
     args = parser.parse_args()
     if args.long_stage_span:
         check_long_stage_span()
+    elif args.degree_32_overlap:
+        check_degree_32_overlap_representative()
     else:
         check_boundary_catalogue(partitions=args.partitions)

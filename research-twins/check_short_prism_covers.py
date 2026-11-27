@@ -189,8 +189,8 @@ def check_wrapped_budget(blocks, sheets, budget, band_through, *, occupied_stage
     print(f'{blocks} blocks, {sheets} sheets: no wrapped fort of cost {budget}{scope}', flush=True)
 
 
-def check_degree_31_period_37():
-    blocks, sheets, budget, width = 36, 37, 31, 24
+def check_degree_31_period_37(blocks=36):
+    sheets, budget, width = 37, 31, 24
     bounds = residual_bounds(sheets, budget, width)
     surplus = width * budget - sheets * bounds[width]
     profiles = set(sparse_sheet_profiles(sheets, budget, bounds, width, surplus))
@@ -356,8 +356,8 @@ if __name__ == '__main__':
     mode.add_argument('--insertion-obstruction', type=int, nargs='+', choices=range(22, 29),
                       metavar='SHEETS',
                       help='exclude wrapping at cost 24 when insertion is blocked at 24 blocks')
-    mode.add_argument('--degree-31-period-37', action='store_true',
-                      help='exclude all cost-31 wrapped profiles at 36 blocks and 37 sheets')
+    mode.add_argument('--degree-31-period-37', nargs='?', type=int, choices=(33, 36), const=36,
+                      metavar='BLOCKS', help='exclude all cost-31 wrapped profiles at 37 sheets')
     mode.add_argument('--four-sheet-barrier', action='store_true',
                       help='check the round-five separation across four intact sheets')
     mode.add_argument('--stage-ancestry', action='store_true',
@@ -378,7 +378,7 @@ if __name__ == '__main__':
         for sheets in args.insertion_obstruction:
             check_insertion_obstruction(sheets)
     elif args.degree_31_period_37:
-        check_degree_31_period_37()
+        check_degree_31_period_37(args.degree_31_period_37)
     elif args.four_sheet_barrier:
         for blocks in range(13, 28):
             check_four_sheet_barrier(blocks)
